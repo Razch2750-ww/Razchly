@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Canva Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-app-bg: var(--bg-color);
+  --color-app-card: var(--card-bg);
+  --color-app-border: var(--border-color);
+  --color-app-hover: var(--hover-bg);
+  --color-app-text: var(--text-color);
+  --color-app-text-bright: var(--text-bright);
+  --color-app-accent1: var(--accent1-color);
+  --color-app-accent2: var(--accent2-color, var(--accent1-color));
+  --color-app-accent3: var(--accent3-color, var(--accent1-color));
+  --color-app-accent4: var(--accent4-color, var(--accent1-color));
+  --color-app-accent5: var(--accent5-color, var(--accent1-color));
+  --color-app-accent6: var(--accent6-color, var(--accent1-color));
+  --color-app-accent7: var(--accent7-color, var(--accent1-color));
+  --color-app-accent8: var(--accent8-color, var(--accent1-color));
+  --color-app-accent9: var(--accent9-color, var(--accent1-color));
+  --color-app-accent10: var(--accent10-color, var(--accent1-color));
+  --color-app-success: #98c379;
+  --color-app-danger: #e06c75;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    @apply font-sans;
+  }
+  
+  /* Allow selection on inputs and text areas specifically to ensure they work */
+  input, textarea, p, h1, h2, h3, h4, h5, h6, span {
+    user-select: auto;
+  }
+  
+  /* Ensure native date inputs are visible */
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.5);
+    cursor: pointer;
+  }
+}

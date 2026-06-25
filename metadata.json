@@ -1,0 +1,6 @@
+{
+  "name": "razchly",
+  "description": "Catat keuangan dan manajemen transaksi Grab.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
