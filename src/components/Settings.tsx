@@ -3,7 +3,7 @@ import { useStore } from '../store/useStore';
 import { themes } from '../themes';
 import { doc, updateDoc, collection, onSnapshot, query, where, getDocs, writeBatch, getDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Palette, Globe, Check, Car, User as UserIcon, ChevronDown, ChevronUp, Plus, Edit2, Trash2, Wallet, X, Type, Star, Eye, EyeOff, LayoutGrid, Sparkles } from 'lucide-react';
+import { Palette, Globe, Check, Car, User as UserIcon, ChevronDown, ChevronUp, Plus, Edit2, Trash2, Wallet, X, Type, Star, Eye, EyeOff, LayoutGrid, Sparkles, Calendar } from 'lucide-react';
 import { Account, Transaction, Category } from '../types';
 import { auth } from '../lib/firebase';
 import { updateProfile } from 'firebase/auth';
@@ -17,7 +17,7 @@ import { AccountModal } from './AccountModal';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 export default function Settings() {
-  const { user, themeId, setThemeId, language, setLanguage, grabCashAccount, grabDompetAccount, grabHematAccount, setGrabAccounts, setGlobalAddModalOpen, setGlobalGrabModalOpen, customFontName, setCustomFont } = useStore();
+  const { user, themeId, setThemeId, language, setLanguage, grabCashAccount, grabDompetAccount, grabHematAccount, setGrabAccounts, setGlobalAddModalOpen, setGlobalGrabModalOpen, customFontName, setCustomFont, workSchedule, setWorkSchedule, attendancePeriodStart, setAttendancePeriodStart, attendancePeriodEnd, setAttendancePeriodEnd } = useStore();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [displayName, setDisplayName] = useState(user?.displayName || '');
@@ -32,6 +32,7 @@ export default function Settings() {
     kategori: false,
     tabungan: false,
     grab: false,
+    jadwal: false,
     bahasa: false,
     tema: false,
     font: false
@@ -65,6 +66,7 @@ export default function Settings() {
         kategori: false,
         tabungan: false,
         grab: false,
+        jadwal: false,
         bahasa: false,
         tema: false,
         font: false,
@@ -304,6 +306,67 @@ export default function Settings() {
               toast.error("Gagal memperbarui pengaturan Grab");
           }
       }
+  };
+
+  const handleWorkScheduleChange = async (dayKey: string, field: 'isActive' | 'start' | 'end', value: any) => {
+    if (!workSchedule) return;
+    
+    const newSchedule = {
+      ...workSchedule,
+      days: {
+        ...workSchedule.days,
+        [dayKey]: {
+          ...workSchedule.days[dayKey],
+          [field]: value
+        }
+      }
+    };
+    
+    setWorkSchedule(newSchedule);
+    
+    if (user) {
+      try {
+        await updateDoc(doc(db, 'users', user.uid), { workSchedule: newSchedule });
+        toast.success("Jadwal kerja diperbarui");
+      } catch (e) {
+        console.error('Error updating work schedule', e);
+        toast.error("Gagal memperbarui jadwal");
+      }
+    }
+  };
+
+  const handleAttendancePeriodStartChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = parseInt(e.target.value);
+    if (isNaN(val)) val = 1;
+    if (val < 1) val = 1;
+    if (val > 31) val = 31;
+    setAttendancePeriodStart(val);
+    if (user) {
+      try {
+        await updateDoc(doc(db, 'users', user.uid), { attendancePeriodStart: val });
+        toast.success("Periode awal absensi diperbarui");
+      } catch (err) {
+        console.error('Error updating attendance period start', err);
+        toast.error("Gagal memperbarui periode awal absensi");
+      }
+    }
+  };
+
+  const handleAttendancePeriodEndChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = parseInt(e.target.value);
+    if (isNaN(val)) val = 1;
+    if (val < 1) val = 1;
+    if (val > 31) val = 31;
+    setAttendancePeriodEnd(val);
+    if (user) {
+      try {
+        await updateDoc(doc(db, 'users', user.uid), { attendancePeriodEnd: val });
+        toast.success("Periode akhir absensi diperbarui");
+      } catch (err) {
+        console.error('Error updating attendance period end', err);
+        toast.error("Gagal memperbarui periode akhir absensi");
+      }
+    }
   };
 
   const groupedThemes = themes.reduce((acc, theme) => {
@@ -597,6 +660,67 @@ export default function Settings() {
                     </div>
                 </div>
             </div>
+          </div>
+          )}
+        </section>
+
+        <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-warning/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
+          <button type="button" onClick={() => toggleSection('jadwal')} className={`relative z-10 w-full flex items-center justify-between ${sections.jadwal ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
+            <div className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-app-warning" />
+              <h2 className="text-sm font-bold uppercase tracking-widest text-app-text-bright">Jadwal Kerja</h2>
+            </div>
+            {sections.jadwal ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
+          </button>
+          
+          {sections.jadwal && workSchedule && (
+          <div className="flex flex-col gap-6 animate-in slide-in-from-top-2 duration-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">Tanggal Awal Periode Absensi</label>
+                <input type="number" min="1" max="31" value={attendancePeriodStart} onChange={handleAttendancePeriodStartChange} className="w-full bg-app-bg border border-app-border rounded-lg px-3 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright" />
+              </div>
+              <div>
+                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">Tanggal Akhir Periode Absensi</label>
+                <input type="number" min="1" max="31" value={attendancePeriodEnd} onChange={handleAttendancePeriodEndChange} className="w-full bg-app-bg border border-app-border rounded-lg px-3 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright" />
+              </div>
+            </div>
+            <p className="text-xs text-app-text/50">Contoh: Jika awal diisi 19 dan akhir diisi 18, maka satu periode adalah tanggal 19 bulan sebelumnya hingga 18 bulan ini.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            {['1', '2', '3', '4', '5', '6', '0'].map((day) => {
+               const dayNames = { '1': 'Senin', '2': 'Selasa', '3': 'Rabu', '4': 'Kamis', '5': 'Jumat', '6': 'Sabtu', '0': 'Minggu' };
+               const ds = workSchedule.days[day];
+               if (!ds) return null;
+               return (
+                  <div key={day} className="bg-app-bg p-3 rounded-xl border border-app-border flex flex-col gap-3">
+                     <div className="flex items-center justify-between">
+                        <span className="font-bold text-app-text-bright">{dayNames[day as keyof typeof dayNames]}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleWorkScheduleChange(day, 'isActive', !ds.isActive)}
+                          className={`w-10 h-5 rounded-full transition-colors relative shrink-0 ${ds.isActive ? 'bg-app-success' : 'bg-app-border'}`}
+                        >
+                          <div className={`w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform ${ds.isActive ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                        </button>
+                     </div>
+                     {ds.isActive && (
+                        <div className="flex gap-2">
+                           <div className="flex-1">
+                              <label className="text-[10px] uppercase font-bold tracking-wider mb-1 block text-app-text/70">Mulai</label>
+                              <input type="time" value={ds.start} onChange={e => handleWorkScheduleChange(day, 'start', e.target.value)} className="w-full bg-app-card border border-app-border rounded-lg px-2 py-2 text-sm focus:border-app-accent1 outline-none text-app-text-bright" />
+                           </div>
+                           <div className="flex-1">
+                              <label className="text-[10px] uppercase font-bold tracking-wider mb-1 block text-app-text/70">Selesai</label>
+                              <input type="time" value={ds.end} onChange={e => handleWorkScheduleChange(day, 'end', e.target.value)} className="w-full bg-app-card border border-app-border rounded-lg px-2 py-2 text-sm focus:border-app-accent1 outline-none text-app-text-bright" />
+                           </div>
+                        </div>
+                     )}
+                  </div>
+               );
+            })}
+          </div>
           </div>
           )}
         </section>

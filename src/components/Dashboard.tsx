@@ -208,7 +208,6 @@ export default function Dashboard() {
           <button
             onClick={() => {
               setGlobalGrabModalOpen(true);
-              navigate("/transactions");
             }}
             className="w-10 h-10 rounded-full bg-app-success hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm"
             title="Transaksi Grab"
@@ -218,7 +217,6 @@ export default function Dashboard() {
           <button
             onClick={() => {
               setGlobalAddModalOpen(true);
-              navigate("/transactions");
             }}
             className="w-10 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm"
             title="Tambah Transaksi"
@@ -285,16 +283,16 @@ export default function Dashboard() {
              <div>
                 <div className="flex items-center gap-1.5 mb-1.5">
                    <div className="w-2 h-2 rounded-full bg-app-success"></div>
-                   <span className="text-app-text/80 text-[13px]">Pemasukan</span>
+                   <span className="text-app-text/80 text-[13px]">Pemasukan (Hari Ini)</span>
                 </div>
-                <p className="text-app-success font-bold text-[15px]">+Rp {incomeThisMonth.toLocaleString("id-ID")}</p>
+                <p className="text-app-success font-bold text-[15px]">+Rp {incomeToday.toLocaleString("id-ID")}</p>
              </div>
              <div className="text-right">
                 <div className="flex items-center justify-end gap-1.5 mb-1.5">
                    <div className="w-2 h-2 rounded-full bg-app-danger"></div>
-                   <span className="text-app-text/80 text-[13px]">Pengeluaran</span>
+                   <span className="text-app-text/80 text-[13px]">Pengeluaran (Hari Ini)</span>
                 </div>
-                <p className="text-app-danger font-bold text-[15px]">-Rp {expenseThisMonth.toLocaleString("id-ID")}</p>
+                <p className="text-app-danger font-bold text-[15px]">-Rp {expenseToday.toLocaleString("id-ID")}</p>
              </div>
           </div>
         </div>
@@ -430,17 +428,17 @@ export default function Dashboard() {
 
         {/* MOBILE ACTION BUTTONS */}
         <div className="flex gap-4 mb-8">
-            <button onClick={() => navigate('/transactions')} className="flex-1 bg-app-card border border-app-border py-4 rounded-[1.2rem] flex items-center justify-center gap-3 active:scale-95 transition-transform hover:bg-app-hover">
-                <div className="w-8 h-8 rounded bg-app-accent1/10 flex items-center justify-center">
-                   <BarChart2 className="w-4 h-4 text-app-accent1" />
+            <button onClick={() => navigate('/transactions')} className="flex-1 bg-app-card border border-app-border py-4 px-2 rounded-[1.2rem] flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-app-hover">
+                <div className="w-10 h-10 rounded-full bg-app-accent1/10 flex items-center justify-center">
+                   <BarChart2 className="w-5 h-5 text-app-accent1" />
                 </div>
-                <span className="text-app-text-bright font-semibold text-[15px]">Laporan</span>
+                <span className="text-app-text-bright font-semibold text-[13px] text-center leading-tight">Laporan</span>
             </button>
-            <button onClick={() => navigate('/grab')} className="flex-1 bg-app-card border border-app-border py-4 rounded-[1.2rem] flex items-center justify-center gap-3 active:scale-95 transition-transform hover:bg-app-hover">
-                <div className="w-8 h-8 rounded bg-app-accent1/10 flex items-center justify-center">
-                   <TrendingUp className="w-4 h-4 text-app-accent1" />
+            <button onClick={() => navigate('/grab')} className="flex-1 bg-app-card border border-app-border py-4 px-2 rounded-[1.2rem] flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-app-hover">
+                <div className="w-10 h-10 rounded-full bg-app-accent1/10 flex items-center justify-center">
+                   <TrendingUp className="w-5 h-5 text-app-accent1" />
                 </div>
-                <span className="text-app-text-bright font-semibold text-[15px]">Analisis Usaha</span>
+                <span className="text-app-text-bright font-semibold text-[13px] text-center leading-tight">Analisis Usaha</span>
             </button>
         </div>
       </div>

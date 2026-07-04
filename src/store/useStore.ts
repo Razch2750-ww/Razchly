@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { User } from 'firebase/auth';
+import { WorkSchedule } from '../types';
 
 interface AppState {
   user: User | null;
@@ -18,6 +19,18 @@ interface AppState {
   dailyExpenseLimits: number[];
   isGlobalAddModalOpen: boolean;
   isGlobalGrabModalOpen: boolean;
+  workSchedule: WorkSchedule;
+  attendancePeriodStart: number;
+  attendancePeriodEnd: number;
+  salarySettings: {
+    gajiPokok: number;
+    uangHarian: number;
+    uangKerajinan: number;
+    uangMakan: number;
+    uangTunjangan: number;
+    uangLemburPerJam: number;
+    lemburHours: number;
+  };
   setUser: (user: User | null) => void;
   setAuthChecked: (checked: boolean) => void;
   setThemeId: (id: string) => void;
@@ -31,7 +44,23 @@ interface AppState {
   setDailyExpenseLimits: (targets: number[]) => void;
   setGlobalAddModalOpen: (open: boolean) => void;
   setGlobalGrabModalOpen: (open: boolean) => void;
+  setWorkSchedule: (schedule: WorkSchedule) => void;
+  setAttendancePeriodStart: (day: number) => void;
+  setAttendancePeriodEnd: (day: number) => void;
+  setSalarySettings: (settings: any) => void;
 }
+
+const DEFAULT_SCHEDULE: WorkSchedule = {
+  days: {
+    '1': { isActive: true, start: '08:00', end: '17:00' }, // Monday
+    '2': { isActive: true, start: '08:00', end: '17:00' }, // Tuesday
+    '3': { isActive: true, start: '08:00', end: '17:00' }, // Wednesday
+    '4': { isActive: true, start: '08:00', end: '17:00' }, // Thursday
+    '5': { isActive: true, start: '08:00', end: '17:00' }, // Friday
+    '6': { isActive: true, start: '08:00', end: '15:00' }, // Saturday
+    '0': { isActive: false, start: '08:00', end: '17:00' }  // Sunday
+  }
+};
 
 export const useStore = create<AppState>((set) => ({
   user: null,
@@ -50,6 +79,18 @@ export const useStore = create<AppState>((set) => ({
   dailyExpenseLimits: [],
   isGlobalAddModalOpen: false,
   isGlobalGrabModalOpen: false,
+  workSchedule: DEFAULT_SCHEDULE,
+  attendancePeriodStart: 19,
+  attendancePeriodEnd: 18,
+  salarySettings: {
+    gajiPokok: 0,
+    uangHarian: 0,
+    uangKerajinan: 0,
+    uangMakan: 0,
+    uangTunjangan: 0,
+    uangLemburPerJam: 0,
+    lemburHours: 0,
+  },
   setUser: (user) => set({ user }),
   setAuthChecked: (checked) => set({ authChecked: checked }),
   setThemeId: (id) => set({ themeId: id }),
@@ -71,5 +112,9 @@ export const useStore = create<AppState>((set) => ({
   setDailyExpenseLimit: (limit) => set({ dailyExpenseLimit: limit }),
   setDailyExpenseLimits: (targets) => set({ dailyExpenseLimits: targets }),
   setGlobalAddModalOpen: (open) => set({ isGlobalAddModalOpen: open }),
-  setGlobalGrabModalOpen: (open) => set({ isGlobalGrabModalOpen: open })
+  setGlobalGrabModalOpen: (open) => set({ isGlobalGrabModalOpen: open }),
+  setWorkSchedule: (schedule) => set({ workSchedule: schedule }),
+  setAttendancePeriodStart: (day) => set({ attendancePeriodStart: day }),
+  setAttendancePeriodEnd: (day) => set({ attendancePeriodEnd: day }),
+  setSalarySettings: (settings) => set({ salarySettings: settings })
 }));

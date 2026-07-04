@@ -16,6 +16,17 @@ export interface Category {
   createdAt: number;
 }
 
+export interface AttendanceRecord {
+  id: string;
+  date: number;
+  status: 'present' | 'absent' | 'leave' | 'sick';
+  notes?: string;
+  checkIn?: number;
+  checkOut?: number;
+  checkInLocation?: { lat: number; lng: number };
+  checkOutLocation?: { lat: number; lng: number };
+}
+
 export type TransactionType = 'income' | 'expense' | 'transfer';
 
 export interface Loan {
@@ -23,11 +34,12 @@ export interface Loan {
   name: string;
   amount: number;
   hasInterest: boolean;
+  hasTenor?: boolean;
   interestType?: 'percentage' | 'nominal';
   interestValue?: number;
-  tenorUnit: 'hari' | 'minggu' | 'bulan';
-  tenorDuration: number;
-  paymentMethod: 'harian' | 'mingguan' | 'bulanan';
+  tenorUnit?: 'hari' | 'minggu' | 'bulan';
+  tenorDuration?: number;
+  paymentMethod?: 'harian' | 'mingguan' | 'bulanan';
   paymentDay?: string; // e.g. "Senin", "Selasa"
   paymentDate?: number; // 1-31
   depositToAccount: boolean;
@@ -38,6 +50,23 @@ export interface Loan {
   status: 'active' | 'paid';
   paidAmount?: number;
   paidPaymentsCount?: number;
+}
+
+export interface WorkSchedule {
+  days: {
+    [key: string]: {
+      isActive: boolean;
+      start: string; // e.g. "08:00"
+      end: string;   // e.g. "17:00"
+    }
+  };
+  overrides?: {
+    [dateString: string]: {
+      isActive: boolean;
+      start: string;
+      end: string;
+    }
+  };
 }
 
 export interface Transaction {

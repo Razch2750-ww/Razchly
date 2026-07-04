@@ -78,65 +78,6 @@ export default function SavingsTarget() {
     .reduce((sum, t) => sum + t.amount, 0), [transactions]);
     
   const savingsThisMonth = incomeThisMonth - expenseThisMonth;
-  
-  useEffect(() => {
-    if (!transactions.length) return;
-    
-    // We only celebrate actual non-zero targets
-    const currentMonthStr = new Date().toISOString().slice(0, 7); 
-    const currentDayStr = new Date().toISOString().slice(0, 10);
-
-    let celebrated = false;
-
-    if (monthlySavingsTargets && monthlySavingsTargets.length > 0) {
-      monthlySavingsTargets.forEach((target, idx) => {
-        const key = `celebrated_savings_${currentMonthStr}_layer_${idx}`;
-        if (target > 0 && savingsThisMonth >= target && !localStorage.getItem(key)) {
-          localStorage.setItem(key, "true");
-          celebrated = true;
-          setTimeout(() => {
-            toast.success(`Selamat! Target Tabungan Layer ${idx + 1} tercapai! 🎉`, { duration: 5000 });
-          }, idx * 500); // Stagger toasts if multiple hit
-        }
-      });
-    }
-
-    if (dailyIncomeTargets && dailyIncomeTargets.length > 0) {
-      dailyIncomeTargets.forEach((target, idx) => {
-        const key = `celebrated_income_${currentDayStr}_layer_${idx}`;
-        if (target > 0 && incomeToday >= target && !localStorage.getItem(key)) {
-          localStorage.setItem(key, "true");
-          celebrated = true;
-          setTimeout(() => {
-            toast.success(`Luar Biasa! Penghasilan Harian Layer ${idx + 1} tercapai! 🚀`, { duration: 5000 });
-          }, idx * 500 + 200);
-        }
-      });
-    }
-    
-    // Warning for expenses over limit
-    if (dailyExpenseLimits && dailyExpenseLimits.length > 0) {
-        dailyExpenseLimits.forEach((target, idx) => {
-            const key = `warned_expense_${currentDayStr}_layer_${idx}`;
-            if (target > 0 && expenseToday > target && !localStorage.getItem(key)) {
-                localStorage.setItem(key, "true");
-                setTimeout(() => {
-                    toast.error(`Perhatian: Pengeluaran melebihi Batas Layer ${idx + 1}! 💸`, { duration: 5000 });
-                }, idx * 500 + 400);
-            }
-        });
-    }
-
-    if (celebrated) {
-      confetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 },
-        colors: ['#4ade80', '#3b82f6', '#facc15', '#f43f5e']
-      });
-    }
-
-  }, [savingsThisMonth, incomeToday, expenseToday, monthlySavingsTargets, dailyIncomeTargets, dailyExpenseLimits, transactions.length]);
 
   return (
     <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">

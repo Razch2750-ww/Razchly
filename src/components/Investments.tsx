@@ -9,9 +9,12 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  writeBatch,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useStore } from "../store/useStore";
+import { sendDeviceNotification } from "../utils/notification";
 import { Account, Transaction } from "../types";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -65,6 +68,7 @@ export default function Investments() {
   const navigate = useNavigate();
 
   const [isPortfolioModalOpen, setIsPortfolioModalOpen] = useState(false);
+  const [portoTxType, setPortoTxType] = useState<"beli" | "jual">("beli");
   const [portoCategory, setPortoCategory] = useState<
     "saham" | "crypto" | "emas"
   >("saham");
@@ -75,6 +79,11 @@ export default function Investments() {
     format(new Date(), "yyyy-MM-dd'T'HH:mm"),
   );
   const [portoEditId, setPortoEditId] = useState<string | null>(null);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [portoAccountId, setPortoAccountId] = useState("");
+  const [hasFee, setHasFee] = useState(false);
+  const [portoFee, setPortoFee] = useState("");
+  const [portoSelectedId, setPortoSelectedId] = useState("");
   const [quotes, setQuotes] = useState<
     Record<
       string,
@@ -182,21 +191,31 @@ export default function Investments() {
   };
 
   const openPortfolioModal = () => {
+    setPortoTxType("beli");
     setPortoCategory("saham");
     setPortoCode("");
     setPortoQty("");
     setPortoPrice("");
     setPortoDate(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
+    setPortoAccountId(accounts[0]?.id || "");
+    setHasFee(false);
+    setPortoFee("");
+    setPortoSelectedId("");
     setPortoEditId(null);
     setIsPortfolioModalOpen(true);
   };
 
   const handleEdit = (inv: any) => {
+    setPortoTxType("beli");
     setPortoCategory(inv.category);
     setPortoCode(inv.code);
     setPortoQty(inv.qty.toString());
     setPortoPrice(inv.price.toString());
     setPortoDate(format(inv.createdAt, "yyyy-MM-dd'T'HH:mm"));
+    setPortoAccountId(accounts[0]?.id || "");
+    setHasFee(false);
+    setPortoFee("");
+    setPortoSelectedId(inv.id);
     setPortoEditId(inv.id);
     setIsPortfolioModalOpen(true);
   };
@@ -216,13 +235,14 @@ export default function Investments() {
     e.preventDefault();
     if (!user) return;
     try {
-      const codeToSave = portoCategory === "emas" ? "EMAS" : portoCode;
-
-      const newQty = parseFloat(portoQty) || 0;
-      const newPrice = parseNumberInput(portoPrice) || 0;
       const parsedDate = portoDate ? new Date(portoDate).getTime() : Date.now();
 
       if (portoEditId) {
+        // Direct correction of an investment document
+        const codeToSave = portoCategory === "emas" ? "EMAS" : portoCode.toUpperCase();
+        const newQty = parseFloat(portoQty) || 0;
+        const newPrice = parseNumberInput(portoPrice) || 0;
+
         await updateDoc(
           doc(db, "users", user.uid, "investments", portoEditId),
           {
@@ -233,38 +253,175 @@ export default function Investments() {
             createdAt: parsedDate,
           },
         );
-      } else {
-        const existing = investments.find(
-          (inv) => inv.category === portoCategory && inv.code === codeToSave,
-        );
-        if (existing) {
-          const totalQty = existing.qty + newQty;
-          const avgPrice =
-            (existing.qty * existing.price + newQty * newPrice) / totalQty;
+        toast.success("Penyesuaian investasi berhasil disimpan");
+        setIsPortfolioModalOpen(false);
+        return;
+      }
 
-          await updateDoc(
-            doc(db, "users", user.uid, "investments", existing.id),
-            {
-              qty: totalQty,
-              price: avgPrice,
-              createdAt: parsedDate,
-            },
-          );
+      // "Buy & Sell" transaction-based flow
+      if (portoTxType === "beli") {
+        const codeToSave = portoCategory === "emas" ? "EMAS" : portoCode.toUpperCase();
+        const qty = parseFloat(portoQty) || 0;
+        const price = parseNumberInput(portoPrice) || 0;
+        const fee = hasFee ? parseNumberInput(portoFee) || 0 : 0;
+
+        if (qty <= 0 || price <= 0) {
+          toast.error("Jumlah dan harga harus lebih besar dari 0");
+          return;
+        }
+
+        if (!portoAccountId) {
+          toast.error("Pilih rekening pembayaran");
+          return;
+        }
+
+        const mult = portoCategory === "saham" ? 100 : 1;
+        const totalCost = qty * price * mult + fee;
+
+        const batch = writeBatch(db);
+
+        // Deduct from account balance
+        const accRef = doc(db, "users", user.uid, "accounts", portoAccountId);
+        const accSnap = await getDoc(accRef);
+        if (!accSnap.exists()) {
+          toast.error("Rekening tidak ditemukan");
+          return;
+        }
+        const currentBal = accSnap.data()?.balance || 0;
+        batch.update(accRef, { balance: currentBal - totalCost });
+
+        // Update / Add holding
+        const existing = investments.find(
+          (inv) => inv.category === portoCategory && inv.code === codeToSave
+        );
+
+        if (existing) {
+          const totalQty = existing.qty + qty;
+          const avgPrice = (existing.qty * existing.price + qty * price) / totalQty;
+          const invRef = doc(db, "users", user.uid, "investments", existing.id);
+          batch.update(invRef, {
+            qty: totalQty,
+            price: avgPrice,
+            createdAt: parsedDate,
+          });
         } else {
-          await addDoc(collection(db, "users", user.uid, "investments"), {
+          const invRef = doc(collection(db, "users", user.uid, "investments"));
+          batch.set(invRef, {
             category: portoCategory,
             code: codeToSave,
-            qty: newQty,
-            price: newPrice,
+            qty: qty,
+            price: price,
             createdAt: parsedDate,
           });
         }
+
+        // Add transaction log
+        const tsxRef = doc(collection(db, "users", user.uid, "transactions"));
+        batch.set(tsxRef, {
+          type: "expense",
+          amount: totalCost,
+          accountId: portoAccountId,
+          date: parsedDate,
+          note: `Beli ${portoCategory === "saham" ? "Saham" : portoCategory === "crypto" ? "Crypto" : "Emas"} - ${codeToSave} (${qty} ${portoCategory === "saham" ? "Lot" : portoCategory === "crypto" ? "Koin" : "Gram"})`,
+          categoryId: "investment-buy",
+          categoryName: "Beli Investasi",
+          categoryIcon: "TrendingUp",
+        });
+
+        await batch.commit();
+
+        sendDeviceNotification(
+          "Pembelian Investasi Baru 📈",
+          `Beli ${portoCategory === "saham" ? "Saham" : portoCategory === "crypto" ? "Crypto" : "Emas"} - ${codeToSave}\nNominal: Rp ${totalCost.toLocaleString("id-ID")}\nJumlah: ${qty} ${portoCategory === "saham" ? "Lot" : portoCategory === "crypto" ? "Koin" : "Gram"}`
+        );
+
+        toast.success("Pembelian investasi berhasil disimpan");
+      } else {
+        // Sell flow
+        if (!portoSelectedId) {
+          toast.error("Pilih instrumen investasi yang ingin dijual");
+          return;
+        }
+
+        const existing = investments.find((inv) => inv.id === portoSelectedId);
+        if (!existing) {
+          toast.error("Instrumen investasi tidak ditemukan");
+          return;
+        }
+
+        const qty = parseFloat(portoQty) || 0;
+        const price = parseNumberInput(portoPrice) || 0;
+        const fee = hasFee ? parseNumberInput(portoFee) || 0 : 0;
+
+        if (qty <= 0 || price <= 0) {
+          toast.error("Jumlah dan harga harus lebih besar dari 0");
+          return;
+        }
+
+        if (qty > existing.qty) {
+          toast.error(`Jumlah yang dijual (${qty}) melebihi kepemilikan Anda (${existing.qty})`);
+          return;
+        }
+
+        if (!portoAccountId) {
+          toast.error("Pilih rekening tujuan dana");
+          return;
+        }
+
+        const mult = existing.category === "saham" ? 100 : 1;
+        const totalEarnings = qty * price * mult - fee;
+
+        const batch = writeBatch(db);
+
+        // Add to account balance
+        const accRef = doc(db, "users", user.uid, "accounts", portoAccountId);
+        const accSnap = await getDoc(accRef);
+        if (!accSnap.exists()) {
+          toast.error("Rekening tidak ditemukan");
+          return;
+        }
+        const currentBal = accSnap.data()?.balance || 0;
+        batch.update(accRef, { balance: currentBal + totalEarnings });
+
+        // Update/Delete holding
+        const remainingQty = existing.qty - qty;
+        const invRef = doc(db, "users", user.uid, "investments", existing.id);
+        if (remainingQty <= 0) {
+          batch.delete(invRef);
+        } else {
+          batch.update(invRef, {
+            qty: remainingQty,
+            createdAt: parsedDate,
+          });
+        }
+
+        // Add transaction log
+        const tsxRef = doc(collection(db, "users", user.uid, "transactions"));
+        batch.set(tsxRef, {
+          type: "income",
+          amount: totalEarnings,
+          accountId: portoAccountId,
+          date: parsedDate,
+          note: `Jual ${existing.category === "saham" ? "Saham" : existing.category === "crypto" ? "Crypto" : "Emas"} - ${existing.code} (${qty} ${existing.category === "saham" ? "Lot" : existing.category === "crypto" ? "Koin" : "Gram"})`,
+          categoryId: "investment-sell",
+          categoryName: "Jual Investasi",
+          categoryIcon: "TrendingDown",
+        });
+
+        await batch.commit();
+
+        sendDeviceNotification(
+          "Penjualan Investasi Baru 📉",
+          `Jual ${existing.category === "saham" ? "Saham" : existing.category === "crypto" ? "Crypto" : "Emas"} - ${existing.code}\nNominal: Rp ${totalEarnings.toLocaleString("id-ID")}\nJumlah: ${qty} ${existing.category === "saham" ? "Lot" : existing.category === "crypto" ? "Koin" : "Gram"}`
+        );
+
+        toast.success("Penjualan investasi berhasil disimpan");
       }
-      toast.success("Investasi berhasil disimpan");
+
       setIsPortfolioModalOpen(false);
     } catch (err) {
       console.error("Error saving portfolio", err);
-      toast.error("Gagal menyimpan investasi");
+      toast.error("Gagal menyimpan transaksi investasi");
     }
   };
 
@@ -291,9 +448,22 @@ export default function Investments() {
       setRecentTransactions(tsx);
     });
 
+    const accUnsub = onSnapshot(
+      collection(db, "users", user.uid, "accounts"),
+      (snap) => {
+        const accs: Account[] = [];
+        snap.forEach((d) => accs.push({ id: d.id, ...d.data() } as Account));
+        setAccounts(accs);
+        if (accs.length > 0) {
+          setPortoAccountId((prev) => prev || accs[0].id);
+        }
+      }
+    );
+
     return () => {
       invUnsub();
       tsxUnsub();
+      accUnsub();
     };
   }, [user]);
 
@@ -834,64 +1004,36 @@ export default function Investments() {
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-end mt-1">
-                      <div className="flex flex-col gap-1">
-                        <div className="text-xs text-app-text/60">
-                          Harga Beli: Rp {inv.price.toLocaleString("id-ID")}{inv.category === "saham" && " /lembar"}
-                        </div>
-                        {inv.category === "saham" && (
-                          <div className="text-[10px] text-app-text/50">
-                            Harga/Lot: Rp {(inv.price * 100).toLocaleString("id-ID")}
-                          </div>
-                        )}
-                        <div className="text-xs text-app-text/60">
-                          Volume: {inv.qty}{" "}
-                          {inv.category === "emas"
-                            ? "g"
-                            : inv.category === "crypto"
-                              ? "koin"
-                              : "lot"}
-                        </div>
-                        <div className="text-[10px] text-app-text/40 mt-1">
-                          Tanggal Beli:{" "}
-                          {format(inv.createdAt, "dd MMM yyyy", {
-                            locale: localeId,
-                          })}
-                        </div>
-                      </div>
-                      <div className="text-right flex flex-col items-end gap-1">
-                        <div className="text-xs text-app-text/60">
-                          Harga Sekarang
-                        </div>
-                        <div className="font-bold text-app-text-bright flex items-baseline gap-1">
-                          Rp {livePrice.toLocaleString("id-ID")}
-                          {inv.category === "saham" && <span className="text-[10px] font-normal text-app-text/50">/lembar</span>}
-                        </div>
-                        {inv.category === "saham" && (
-                          <div className="text-[10px] text-app-text/50">
-                            Rp {(livePrice * 100).toLocaleString("id-ID")} /lot
-                          </div>
-                        )}
-                        {liveData?.price && (
-                          <div
-                            className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${pl >= 0 ? "bg-app-success/10 text-app-success" : "bg-red-500/10 text-red-500"}`}
-                          >
-                            {pl >= 0 ? "+" : ""}Rp{" "}
-                            {(inv.qty * pl * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")} (
-                            {pl >= 0 ? "+" : ""}
-                            {plPercent.toFixed(2)}%)
-                          </div>
-                        )}
-                      </div>
+                    <div className="flex flex-col gap-2 mt-4">
+                       <div className="flex justify-between items-center">
+                         <span className="text-xs text-app-text/60">Volume</span>
+                         <span className="text-xs font-medium text-app-text-bright">{inv.qty} {inv.category === "emas" ? "g" : inv.category === "crypto" ? "koin" : "lot"}</span>
+                       </div>
+                       <div className="flex justify-between items-center">
+                         <span className="text-xs text-app-text/60">Harga Beli</span>
+                         <span className="text-xs font-medium text-app-text-bright">Rp {inv.price.toLocaleString("id-ID")} {inv.category === "saham" && "/lembar"}</span>
+                       </div>
+                       <div className="flex justify-between items-center">
+                         <span className="text-xs text-app-text/60">Harga Sekarang</span>
+                         <span className="text-xs font-medium text-app-text-bright">Rp {livePrice.toLocaleString("id-ID")} {inv.category === "saham" && "/lembar"}</span>
+                       </div>
+                       {liveData?.price && (
+                         <div className="flex justify-between items-center">
+                           <span className="text-xs text-app-text/60">Return</span>
+                           <span className={`text-xs font-bold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                             {pl >= 0 ? "+" : ""}Rp {(inv.qty * pl * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")} ({pl >= 0 ? "+" : ""}{plPercent.toFixed(2)}%)
+                           </span>
+                         </div>
+                       )}
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-app-border/30 flex justify-between items-center">
+                    <div className="mt-4 pt-4 border-t border-app-border/30 flex justify-between items-center">
                       <div>
-                        <div className="text-[10px] text-app-text/60 font-bold uppercase tracking-wider mb-0.5">Modal Awal</div>
+                        <div className="text-[10px] text-app-text/60 font-bold uppercase tracking-wider mb-1">Modal Awal</div>
                         <div className="text-sm font-bold text-app-text-bright">Rp {(inv.price * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[10px] text-app-text/60 font-bold uppercase tracking-wider mb-0.5">Sekarang</div>
+                        <div className="text-[10px] text-app-text/60 font-bold uppercase tracking-wider mb-1">Nilai Sekarang</div>
                         <div className={`text-sm font-bold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>Rp {(livePrice * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
                       </div>
                     </div>
@@ -916,7 +1058,7 @@ export default function Investments() {
           <div className="bg-app-card text-app-text w-full max-w-md rounded-3xl shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
-                Tambah Portofolio
+                {portoEditId ? "Sesuaikan Portofolio" : portoTxType === "beli" ? "Beli Investasi" : "Jual Investasi"}
               </h2>
               <button
                 onClick={() => setIsPortfolioModalOpen(false)}
@@ -926,96 +1068,361 @@ export default function Investments() {
               </button>
             </div>
 
-            <form onSubmit={savePortfolio} className="p-6 space-y-5">
-              {/* Kategori */}
-              <div className="flex bg-app-bg p-1 rounded-xl border border-app-border gap-1">
-                {[
-                  { id: "saham", label: "Saham IDX" },
-                  { id: "crypto", label: "Crypto" },
-                  { id: "emas", label: "Emas" },
-                ].map((type) => (
+            <form onSubmit={savePortfolio} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+              {/* Beli / Jual Tabs (Only when not editing directly) */}
+              {!portoEditId && (
+                <div className="flex bg-app-bg p-1 rounded-xl border border-app-border gap-1 mb-2">
                   <button
-                    key={type.id}
                     type="button"
-                    onClick={() => setPortoCategory(type.id as any)}
-                    className={`flex-1 py-2 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all ${
-                      portoCategory === type.id
+                    onClick={() => {
+                      setPortoTxType("beli");
+                      setPortoCategory("saham");
+                      setPortoCode("");
+                      setPortoQty("");
+                      setPortoPrice("");
+                      setHasFee(false);
+                      setPortoFee("");
+                      setPortoSelectedId("");
+                    }}
+                    className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                      portoTxType === "beli"
                         ? "bg-app-accent1 text-app-bg shadow-sm"
                         : "text-app-text hover:bg-app-hover"
                     }`}
                   >
-                    {type.label}
+                    Beli
                   </button>
-                ))}
-              </div>
-
-              {portoCategory === "saham" && (
-                <>
-                  <div className="relative">
-                    <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
-                      Kode atau Nama Saham
-                    </label>
-                    <input
-                      type="text"
-                      value={portoCode}
-                      onChange={(e) => {
-                        setPortoCode(e.target.value);
-                        setShowDropdown(true);
-                      }}
-                      onFocus={() => setShowDropdown(true)}
-                      onBlur={() =>
-                        setTimeout(() => setShowDropdown(false), 200)
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPortoTxType("jual");
+                      const activeInvs = investments.filter(inv => inv.qty > 0);
+                      if (activeInvs.length > 0) {
+                        setPortoSelectedId(activeInvs[0].id);
+                        setPortoCategory(activeInvs[0].category);
+                        setPortoCode(activeInvs[0].code);
+                      } else {
+                        setPortoSelectedId("");
                       }
-                      className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
-                      placeholder="Contoh: BBCA"
-                      required
-                    />
-                    {showDropdown && portoCode.length >= 2 && (
-                      <div className="absolute z-10 w-full mt-2 bg-app-card border border-app-border rounded-xl shadow-lg max-h-60 overflow-auto">
-                        {isSearching ? (
-                          <div className="p-3 text-center text-xs text-app-text/60">
-                            Mencari...
-                          </div>
-                        ) : searchResults.filter(
-                            (s) => s.type === "stock" || s.exchange === "IDX",
-                          ).length > 0 ? (
-                          searchResults
-                            .filter(
-                              (s) => s.type === "stock" || s.exchange === "IDX",
-                            )
-                            .slice(0, 5)
-                            .map((res, i) => (
-                              <div
-                                key={i}
-                                onClick={() => selectSymbol(res)}
-                                className="p-3 hover:bg-app-hover cursor-pointer border-b border-app-border/50 last:border-0 flex flex-col"
-                              >
-                                <span className="font-bold text-app-text-bright text-sm">
-                                  {res.symbol}{" "}
-                                  <span className="text-[10px] text-app-text/50 uppercase ml-1 px-1.5 py-0.5 bg-app-bg rounded-md">
-                                    {res.exchange}
-                                  </span>
-                                </span>
-                                <span className="text-xs text-app-text/60">
-                                  {res.description}
-                                </span>
+                      setPortoQty("");
+                      setPortoPrice("");
+                      setHasFee(false);
+                      setPortoFee("");
+                    }}
+                    className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                      portoTxType === "jual"
+                        ? "bg-app-accent1 text-app-bg shadow-sm"
+                        : "text-app-text hover:bg-app-hover"
+                    }`}
+                  >
+                    Jual
+                  </button>
+                </div>
+              )}
+
+              {/* Beli Flow Inputs */}
+              {(portoTxType === "beli" || portoEditId) && (
+                <>
+                  {/* Kategori */}
+                  <div className="flex bg-app-bg p-1 rounded-xl border border-app-border gap-1">
+                    {[
+                      { id: "saham", label: "Saham IDX" },
+                      { id: "crypto", label: "Crypto" },
+                      { id: "emas", label: "Emas" },
+                    ].map((type) => (
+                      <button
+                        key={type.id}
+                        type="button"
+                        disabled={!!portoEditId}
+                        onClick={() => setPortoCategory(type.id as any)}
+                        className={`flex-1 py-2 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 ${
+                          portoCategory === type.id
+                            ? "bg-app-accent1 text-app-bg shadow-sm"
+                            : "text-app-text hover:bg-app-hover"
+                        }`}
+                      >
+                        {type.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {portoCategory === "saham" && (
+                    <>
+                      <div className="relative">
+                        <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                          Kode atau Nama Saham
+                        </label>
+                        <input
+                          type="text"
+                          value={portoCode}
+                          disabled={!!portoEditId}
+                          onChange={(e) => {
+                            setPortoCode(e.target.value);
+                            setShowDropdown(true);
+                          }}
+                          onFocus={() => setShowDropdown(true)}
+                          onBlur={() =>
+                            setTimeout(() => setShowDropdown(false), 200)
+                          }
+                          className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright disabled:opacity-60"
+                          placeholder="Contoh: BBCA"
+                          required
+                        />
+                        {showDropdown && portoCode.length >= 2 && !portoEditId && (
+                          <div className="absolute z-10 w-full mt-2 bg-app-card border border-app-border rounded-xl shadow-lg max-h-60 overflow-auto">
+                            {isSearching ? (
+                              <div className="p-3 text-center text-xs text-app-text/60">
+                                Mencari...
                               </div>
-                            ))
-                        ) : (
-                          <div className="p-3 text-center text-xs text-app-text/60">
-                            Tidak ditemukan
+                            ) : searchResults.filter(
+                                (s) => s.type === "stock" || s.exchange === "IDX",
+                              ).length > 0 ? (
+                              searchResults
+                                .filter(
+                                  (s) => s.type === "stock" || s.exchange === "IDX",
+                                )
+                                .slice(0, 5)
+                                .map((res, i) => (
+                                  <div
+                                    key={i}
+                                    onClick={() => selectSymbol(res)}
+                                    className="p-3 hover:bg-app-hover cursor-pointer border-b border-app-border/50 last:border-0 flex flex-col"
+                                  >
+                                    <span className="font-bold text-app-text-bright text-sm">
+                                      {res.symbol}{" "}
+                                      <span className="text-[10px] text-app-text/50 uppercase ml-1 px-1.5 py-0.5 bg-app-bg rounded-md">
+                                        {res.exchange}
+                                      </span>
+                                    </span>
+                                    <span className="text-xs text-app-text/60">
+                                      {res.description}
+                                    </span>
+                                  </div>
+                                ))
+                            ) : (
+                              <div className="p-3 text-center text-xs text-app-text/60">
+                                Tidak ditemukan
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
-                    )}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                            Jumlah Lot
+                          </label>
+                          <input
+                            type="number"
+                            value={portoQty}
+                            onChange={(e) => setPortoQty(e.target.value)}
+                            className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
+                            placeholder="0"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                            {portoEditId ? "Harga Beli Rata-Rata" : "Harga per Lembar (Rp)"}
+                          </label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={portoPrice}
+                            onChange={(e) => setPortoPrice(formatNumberInput(e.target.value))}
+                            className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
+                            placeholder="Rp 0"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {portoCategory === "crypto" && (
+                    <>
+                      <div className="relative">
+                        <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                          Kode Koin
+                        </label>
+                        <input
+                          type="text"
+                          value={portoCode}
+                          disabled={!!portoEditId}
+                          onChange={(e) => {
+                            setPortoCode(e.target.value);
+                            setShowDropdown(true);
+                          }}
+                          onFocus={() => setShowDropdown(true)}
+                          onBlur={() =>
+                            setTimeout(() => setShowDropdown(false), 200)
+                          }
+                          className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright disabled:opacity-60"
+                          placeholder="Contoh: BTC"
+                          required
+                        />
+                        {showDropdown && portoCode.length >= 2 && !portoEditId && (
+                          <div className="absolute z-10 w-full mt-2 bg-app-card border border-app-border rounded-xl shadow-lg max-h-60 overflow-auto">
+                            {isSearching ? (
+                              <div className="p-3 text-center text-xs text-app-text/60">
+                                Mencari...
+                              </div>
+                            ) : searchResults.filter(
+                                (s) =>
+                                  s.type === "crypto" ||
+                                  s.type === "bitcoin" ||
+                                  s?.exchange?.toUpperCase() === "BINANCE",
+                              ).length > 0 ? (
+                              searchResults
+                                .filter(
+                                  (s) =>
+                                    s.type === "crypto" ||
+                                    s.type === "bitcoin" ||
+                                    s?.exchange?.toUpperCase() === "BINANCE",
+                                )
+                                .slice(0, 5)
+                                .map((res, i) => (
+                                  <div
+                                    key={i}
+                                    onClick={() => selectSymbol(res)}
+                                    className="p-3 hover:bg-app-hover cursor-pointer border-b border-app-border/50 last:border-0 flex flex-col"
+                                  >
+                                    <span className="font-bold text-app-text-bright text-sm">
+                                      {res.symbol}{" "}
+                                      <span className="text-[10px] text-app-text/50 uppercase ml-1 px-1.5 py-0.5 bg-app-bg rounded-md">
+                                        {res.exchange}
+                                      </span>
+                                    </span>
+                                    <span className="text-xs text-app-text/60">
+                                      {res.description}
+                                    </span>
+                                  </div>
+                                ))
+                            ) : (
+                              <div className="p-3 text-center text-xs text-app-text/60">
+                                Tidak ditemukan
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                            Jumlah Koin
+                          </label>
+                          <input
+                            type="number"
+                            step="0.000001"
+                            value={portoQty}
+                            onChange={(e) => setPortoQty(e.target.value)}
+                            className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
+                            placeholder="0"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                            Harga Beli per Koin (Rp)
+                          </label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={portoPrice}
+                            onChange={(e) => setPortoPrice(formatNumberInput(e.target.value))}
+                            className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
+                            placeholder="Rp 0"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {portoCategory === "emas" && (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                            Berat (Gram)
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={portoQty}
+                            onChange={(e) => setPortoQty(e.target.value)}
+                            className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
+                            placeholder="0"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                            Harga per Gram (Rp)
+                          </label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={portoPrice}
+                            onChange={(e) => setPortoPrice(formatNumberInput(e.target.value))}
+                            className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
+                            placeholder="Rp 0"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+
+              {/* Jual Flow Inputs */}
+              {portoTxType === "jual" && !portoEditId && (
+                <>
+                  <div>
+                    <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                      Pilih Portofolio
+                    </label>
+                    <select
+                      value={portoSelectedId}
+                      onChange={(e) => {
+                        const id = e.target.value;
+                        setPortoSelectedId(id);
+                        const found = investments.find(inv => inv.id === id);
+                        if (found) {
+                          setPortoCategory(found.category);
+                          setPortoCode(found.code);
+                        }
+                      }}
+                      className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
+                      required
+                    >
+                      <option value="" disabled>-- Pilih Portofolio Anda --</option>
+                      {investments.filter(inv => inv.qty > 0).map(inv => (
+                        <option key={inv.id} value={inv.id}>
+                          {inv.code} ({inv.category === "saham" ? "Saham IDX" : inv.category === "crypto" ? "Crypto" : "Emas"}) - Dimiliki: {inv.qty} {inv.category === "saham" ? "Lot" : inv.category === "crypto" ? "Koin" : "Gram"}
+                        </option>
+                      ))}
+                    </select>
+                    {portoSelectedId && (() => {
+                      const found = investments.find(inv => inv.id === portoSelectedId);
+                      if (!found) return null;
+                      return (
+                        <div className="mt-2 text-xs text-app-text/60 bg-app-bg p-3 rounded-xl border border-app-border/40">
+                          Kepemilikan: <span className="font-bold text-app-text-bright">{found.qty} {found.category === "saham" ? "Lot" : found.category === "crypto" ? "Koin" : "Gram"}</span> dengan rata-rata beli <span className="font-bold text-app-text-bright">Rp {found.price.toLocaleString("id-ID")}</span>
+                        </div>
+                      );
+                    })()}
                   </div>
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
-                        Jumlah Lot
+                        Jumlah Dijual
                       </label>
                       <input
                         type="number"
+                        step={portoCategory === "saham" ? "1" : portoCategory === "crypto" ? "0.000001" : "0.01"}
                         value={portoQty}
                         onChange={(e) => setPortoQty(e.target.value)}
                         className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
@@ -1025,7 +1432,7 @@ export default function Investments() {
                     </div>
                     <div>
                       <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
-                        Harga per Lembar (Rp)
+                        Harga Jual per {portoCategory === "saham" ? "Lembar" : portoCategory === "crypto" ? "Koin" : "Gram"} (Rp)
                       </label>
                       <input
                         type="text"
@@ -1041,136 +1448,64 @@ export default function Investments() {
                 </>
               )}
 
-              {portoCategory === "crypto" && (
+              {/* Accounts & Fees (Only when creating a new transaction, not when editing directly) */}
+              {!portoEditId && (
                 <>
-                  <div className="relative">
+                  <div>
                     <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
-                      Kode Koin
+                      {portoTxType === "beli" ? "Bayar dari Rekening" : "Terima di Rekening"}
                     </label>
-                    <input
-                      type="text"
-                      value={portoCode}
-                      onChange={(e) => {
-                        setPortoCode(e.target.value);
-                        setShowDropdown(true);
-                      }}
-                      onFocus={() => setShowDropdown(true)}
-                      onBlur={() =>
-                        setTimeout(() => setShowDropdown(false), 200)
-                      }
-                      className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
-                      placeholder="Contoh: BTC"
+                    <select
+                      value={portoAccountId}
+                      onChange={(e) => setPortoAccountId(e.target.value)}
+                      className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright font-medium"
                       required
-                    />
-                    {showDropdown && portoCode.length >= 2 && (
-                      <div className="absolute z-10 w-full mt-2 bg-app-card border border-app-border rounded-xl shadow-lg max-h-60 overflow-auto">
-                        {isSearching ? (
-                          <div className="p-3 text-center text-xs text-app-text/60">
-                            Mencari...
-                          </div>
-                        ) : searchResults.filter(
-                            (s) =>
-                              s.type === "crypto" ||
-                              s.type === "bitcoin" ||
-                              s?.exchange?.toUpperCase() === "BINANCE",
-                          ).length > 0 ? (
-                          searchResults
-                            .filter(
-                              (s) =>
-                                s.type === "crypto" ||
-                                s.type === "bitcoin" ||
-                                s?.exchange?.toUpperCase() === "BINANCE",
-                            )
-                            .slice(0, 5)
-                            .map((res, i) => (
-                              <div
-                                key={i}
-                                onClick={() => selectSymbol(res)}
-                                className="p-3 hover:bg-app-hover cursor-pointer border-b border-app-border/50 last:border-0 flex flex-col"
-                              >
-                                <span className="font-bold text-app-text-bright text-sm">
-                                  {res.symbol}{" "}
-                                  <span className="text-[10px] text-app-text/50 uppercase ml-1 px-1.5 py-0.5 bg-app-bg rounded-md">
-                                    {res.exchange}
-                                  </span>
-                                </span>
-                                <span className="text-xs text-app-text/60">
-                                  {res.description}
-                                </span>
-                              </div>
-                            ))
-                        ) : (
-                          <div className="p-3 text-center text-xs text-app-text/60">
-                            Tidak ditemukan
-                          </div>
-                        )}
+                    >
+                      <option value="" disabled>-- Pilih Rekening --</option>
+                      {accounts.map(acc => (
+                        <option key={acc.id} value={acc.id}>
+                          {acc.name} (Saldo: Rp {acc.balance.toLocaleString("id-ID")})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-app-text/70">Ada Biaya Transaksi (Fee)?</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHasFee(!hasFee);
+                          setPortoFee("");
+                        }}
+                        className={`w-10 h-6 rounded-full transition-colors relative flex items-center p-1 ${
+                          hasFee ? "bg-app-accent1" : "bg-app-border"
+                        }`}
+                      >
+                        <div
+                          className={`w-4 h-4 bg-app-card rounded-full shadow-md transition-transform ${
+                            hasFee ? "translate-x-4" : "translate-x-0"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                    {hasFee && (
+                      <div>
+                        <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                          Nominal Fee (Rp)
+                        </label>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={portoFee}
+                          onChange={(e) => setPortoFee(formatNumberInput(e.target.value))}
+                          className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
+                          placeholder="Rp 0"
+                          required
+                        />
                       </div>
                     )}
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
-                        Jumlah Koin
-                      </label>
-                      <input
-                        type="number"
-                        step="0.000001"
-                        value={portoQty}
-                        onChange={(e) => setPortoQty(e.target.value)}
-                        className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
-                        placeholder="0"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
-                        Nominal Beli (Rp)
-                      </label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={portoPrice}
-                        onChange={(e) => setPortoPrice(formatNumberInput(e.target.value))}
-                        className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
-                        placeholder="Rp 0"
-                        required
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {portoCategory === "emas" && (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
-                        Berat (Gram)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={portoQty}
-                        onChange={(e) => setPortoQty(e.target.value)}
-                        className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
-                        placeholder="0"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
-                        Harga Beli Total (Rp)
-                      </label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={portoPrice}
-                        onChange={(e) => setPortoPrice(formatNumberInput(e.target.value))}
-                        className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
-                        placeholder="Rp 0"
-                        required
-                      />
-                    </div>
                   </div>
                 </>
               )}
@@ -1205,7 +1540,7 @@ export default function Investments() {
                   type="submit"
                   className="flex-1 py-4 rounded-2xl font-bold text-sm bg-app-accent1 text-app-bg hover:opacity-90 transition-opacity shadow-lg"
                 >
-                  Simpan Portofolio
+                  {portoEditId ? "Simpan Perubahan" : portoTxType === "beli" ? "Simpan Pembelian" : "Simpan Penjualan"}
                 </button>
               </div>
             </form>

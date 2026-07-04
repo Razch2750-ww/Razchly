@@ -1,6 +1,6 @@
 {
   "name": "razchly",
-  "description": "Catat keuangan dan manajemen transaksi Grab.",
+  "description": "Catat keuangan, manajemen transaksi Grab, serta sistem trading AI & Autotrade Multi-Broker MT5 (Bybit, Exness, XM, dll) Kuantitatif 6-Lapis.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

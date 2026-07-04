@@ -51,6 +51,19 @@
         "createdAt": { "type": "number" }
       },
       "required": ["name", "icon", "type", "createdAt"]
+    },
+    "Attendance": {
+      "title": "Attendance Record",
+      "description": "Daily attendance record.",
+      "type": "object",
+      "properties": {
+        "date": { "type": "number" },
+        "status": { "type": "string", "enum": ["present", "absent", "leave", "sick"] },
+        "notes": { "type": "string" },
+        "checkIn": { "type": "number" },
+        "checkOut": { "type": "number" }
+      },
+      "required": ["date", "status"]
     }
   },
   "firestore": {
@@ -69,6 +82,10 @@
     "/users/{userId}/transactions/{transactionId}": {
       "schema": { "$ref": "#/entities/Transaction" },
       "description": "User's transactions"
+    },
+    "/users/{userId}/attendance/{attendanceId}": {
+      "schema": { "$ref": "#/entities/Attendance" },
+      "description": "User's attendance records"
     }
   }
 }

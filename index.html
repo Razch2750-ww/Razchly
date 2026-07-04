@@ -2,6 +2,57 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // Fix for sandbox/iframe environments where window.fetch has only a getter
+      (function() {
+        try {
+          const originalFetch = window.fetch;
+          let customFetch = originalFetch;
+          
+          Object.defineProperty(window, 'fetch', {
+            get() {
+              return customFetch;
+            },
+            set(val) {
+              customFetch = val;
+            },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (e) {
+          console.warn("Could not redefine window.fetch directly, attempting proxy fallback...", e);
+          try {
+            let customFetch = window.fetch;
+            const originalGlobalThis = window.globalThis || window;
+            const handler = {
+              get(target, prop) {
+                if (prop === 'fetch') return customFetch;
+                const value = Reflect.get(target, prop);
+                if (typeof value === 'function') {
+                  return value.bind(target);
+                }
+                return value;
+              },
+              set(target, prop, value) {
+                if (prop === 'fetch') {
+                  customFetch = value;
+                  return true;
+                }
+                return Reflect.set(target, prop, value);
+              }
+            };
+            const proxy = new Proxy(originalGlobalThis, handler);
+            Object.defineProperty(window, 'globalThis', {
+              value: proxy,
+              configurable: true,
+              writable: true
+            });
+          } catch (err2) {
+            console.error("Failed to apply all fetch getter bypasses:", err2);
+          }
+        }
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Razchly</title>
     <!-- PWA meta tags -->

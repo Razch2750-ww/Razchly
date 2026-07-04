@@ -55,6 +55,7 @@ import {
 } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { sendDeviceNotification } from "../utils/notification";
 import { AccountIcon } from "./AccountIcon";
 import { CategoryIcon, getCategoryIconDetails } from "./CategoryIcon";
 import * as XLSX from "xlsx";
@@ -73,7 +74,7 @@ import {
 import { formatNumberInput, parseNumberInput } from "../utils/numberFormat";
 import { toast } from "react-hot-toast";
 
-export default function Transactions() {
+export default function Transactions({ modalOnly = false }: { modalOnly?: boolean }) {
   const detailRef = useRef<HTMLDivElement>(null);
   const {
     user,
@@ -107,6 +108,7 @@ export default function Transactions() {
 
   // Regular Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [type, setType] = useState<TransactionType>("expense");
   const [amount, setAmount] = useState("");
   const [accountId, setAccountId] = useState("");
@@ -155,7 +157,7 @@ export default function Transactions() {
   } = useStore();
 
   useEffect(() => {
-    if (isGlobalAddModalOpen) {
+    if (isGlobalAddModalOpen && modalOnly) {
       if (accounts.length > 0) {
         openAddModal();
         setGlobalAddModalOpen(false);
@@ -170,14 +172,14 @@ export default function Transactions() {
         return () => clearTimeout(timer);
       }
     }
-  }, [isGlobalAddModalOpen, accounts]);
+  }, [isGlobalAddModalOpen, accounts, modalOnly]);
 
   useEffect(() => {
-    if (isGlobalGrabModalOpen) {
+    if (isGlobalGrabModalOpen && modalOnly) {
       setIsGrabModalOpen(true);
       setGlobalGrabModalOpen(false);
     }
-  }, [isGlobalGrabModalOpen]);
+  }, [isGlobalGrabModalOpen, modalOnly]);
 
   useEffect(() => {
     if (!user) return;
@@ -246,6 +248,7 @@ export default function Transactions() {
     const numAmount = parseNumberInput(amount);
     if (isNaN(numAmount) || numAmount <= 0) return;
 
+    setIsSubmitting(true);
     try {
       const batch = writeBatch(db);
       const tsxRef = doc(collection(db, "users", user.uid, "transactions"));
@@ -322,11 +325,31 @@ export default function Transactions() {
 
       batch.set(tsxRef, tsxData);
       await batch.commit();
+      
+      // Fire device notification with details
+      let notifBody = "";
+      let notifTitle = "";
+      if (type === "income") {
+        notifTitle = "Pemasukan Baru 💰";
+        notifBody = `Pemasukan sebesar Rp ${numAmount.toLocaleString("id-ID")} berhasil dicatat.\nKeterangan: ${note || "-"}`;
+      } else if (type === "expense") {
+        notifTitle = "Pengeluaran Baru 💸";
+        notifBody = `Pengeluaran sebesar Rp ${numAmount.toLocaleString("id-ID")} berhasil dicatat.\nKeterangan: ${note || "-"}`;
+      } else if (type === "transfer") {
+        notifTitle = "Transfer Baru 🔄";
+        notifBody = `Transfer sebesar Rp ${numAmount.toLocaleString("id-ID")} dari ${getAccountName(fromAccountId)} ke ${getAccountName(toAccountId)} berhasil dicatat.\nKeterangan: ${note || "-"}`;
+      }
+      if (notifTitle) {
+        sendDeviceNotification(notifTitle, notifBody);
+      }
+
       toast.success("Transaksi berhasil disimpan");
       setIsModalOpen(false);
     } catch (err) {
       console.error("Error saving transaction", err);
       toast.error("Gagal menyimpan transaksi");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -393,6 +416,7 @@ export default function Transactions() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const batch = writeBatch(db);
       const timestamp = grabDate ? new Date(grabDate).getTime() : Date.now();
@@ -469,6 +493,13 @@ export default function Transactions() {
       }
 
       await batch.commit();
+
+      const nominalVal = parseNumberInput(grabNominal);
+      sendDeviceNotification(
+        "Transaksi Grab Baru 🚗",
+        `Order Grab (${grabType === "tunai" ? "Tunai" : "Non-Tunai"}) - ${grabLabel}\nNominal: Rp ${nominalVal.toLocaleString("id-ID")}\nKeterangan: Driver ${grabAppDriver || "0"}, Cust ${grabAppCust || "0"}`
+      );
+
       toast.success("Order Grab berhasil dicatat");
 
       // Reset form
@@ -480,6 +511,8 @@ export default function Transactions() {
       setIsGrabModalOpen(false);
     } catch (err) {
       console.error("Error saving grab transaction", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -766,9 +799,11 @@ export default function Transactions() {
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-0 md:p-8 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
-      {/* MOBILE LAYOUT */}
-      <div className="md:hidden flex flex-col w-full min-h-screen px-4 pt-4 pb-32">
+    <>
+      {!modalOnly && (
+        <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-0 md:p-8 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
+          {/* MOBILE LAYOUT */}
+          <div className="md:hidden flex flex-col w-full min-h-screen px-4 pt-4 pb-32">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => navigate(-1)}>
@@ -1453,10 +1488,12 @@ export default function Transactions() {
           </div>
         </div>
       </div>{" "}
+        </div>
+      )}
       {/* End of DESKTOP LAYOUT */}
       {/* Modal Add */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex flex-col justify-end md:items-center md:justify-center backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/60 z-[60] flex flex-col justify-end md:items-center md:justify-center backdrop-blur-sm">
           <div className="bg-app-card text-app-text w-full md:max-w-xl md:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-app-border animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
@@ -1493,7 +1530,7 @@ export default function Transactions() {
 
             <form
               onSubmit={saveTransaction}
-              className="p-6 space-y-6 overflow-y-auto bg-app-card"
+              className="p-6 pb-12 md:pb-6 space-y-6 overflow-y-auto bg-app-card"
             >
               {/* Type specific fields */}
               {(type === "income" || type === "expense") && (
@@ -1696,9 +1733,10 @@ export default function Transactions() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full bg-app-accent1 hover:opacity-90 text-app-bg font-bold py-4 rounded-xl transition-all shadow-lg text-sm"
+                  disabled={isSubmitting}
+                  className="w-full bg-app-accent1 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 text-app-bg font-bold py-4 rounded-xl transition-all shadow-lg text-sm flex items-center justify-center gap-2"
                 >
-                  Simpan Transaksi
+                  {isSubmitting ? "Menyimpan..." : "Simpan Transaksi"}
                 </button>
               </div>
             </form>
@@ -1707,7 +1745,7 @@ export default function Transactions() {
       )}
       {/* Modal Add Grab */}
       {isGrabModalOpen && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex flex-col justify-end md:items-center md:justify-center backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/60 z-[60] flex flex-col justify-end md:items-center md:justify-center backdrop-blur-sm">
           <div className="bg-app-card text-app-text w-full md:max-w-xl md:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-app-border animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright flex items-center gap-2">
@@ -1738,7 +1776,7 @@ export default function Transactions() {
 
             <form
               onSubmit={saveGrabTransaction}
-              className="p-6 space-y-6 overflow-y-auto bg-app-card"
+              className="p-6 pb-12 md:pb-6 space-y-6 overflow-y-auto bg-app-card"
             >
               {/* Pilihan Label Layanan */}
               <div>
@@ -1917,13 +1955,14 @@ export default function Transactions() {
                 <button
                   type="submit"
                   disabled={
-                    grabType === "tunai" &&
-                    parseNumberInput(grabCashReceived) <
-                      parseNumberInput(grabAppCust)
+                    isSubmitting ||
+                    (grabType === "tunai" &&
+                      parseNumberInput(grabCashReceived) <
+                        parseNumberInput(grabAppCust))
                   }
                   className="w-full bg-app-success disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 text-white font-bold py-4 rounded-xl transition-all shadow-lg text-sm flex items-center justify-center gap-2"
                 >
-                  Simpan Transaksi Grab
+                  {isSubmitting ? "Menyimpan..." : "Simpan Transaksi Grab"}
                 </button>
               </div>
             </form>
@@ -1932,7 +1971,7 @@ export default function Transactions() {
       )}
       {/* Confirm Delete Modal */}
       {tsxToDelete && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-app-card text-app-text w-full max-w-sm rounded-3xl shadow-2xl border border-app-border p-6 animate-in zoom-in-95 duration-200">
             <h3 className="text-lg font-bold text-app-text-bright mb-2">
               Hapus Transaksi?
@@ -1958,6 +1997,6 @@ export default function Transactions() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Home, Wallet, Settings, Menu, PlusCircle, ArrowLeftRight, LogOut, X, TrendingUp, Plus, Car, Target, Scan, HandCoins } from 'lucide-react';
+import { Home, Wallet, Settings, Menu, PlusCircle, ArrowLeftRight, LogOut, X, TrendingUp, Plus, Car, Target, Scan, HandCoins, CalendarCheck, Cpu } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { auth } from '../lib/firebase';
 import { signOut } from 'firebase/auth';
+import Transactions from './Transactions';
 
 const NAV_ITEMS = [
   { path: '/', label: 'Dasbor', icon: Home },
   { path: '/transactions', label: 'Transaksi', icon: ArrowLeftRight },
   { path: '/investments', label: 'Investasi', icon: TrendingUp },
+  { path: '/ai-trading', label: 'AI Trading', icon: Cpu },
   { path: '/loans', label: 'Pinjaman', icon: HandCoins },
+  { path: '/attendance', label: 'Absensi', icon: CalendarCheck },
   { path: '/grab', label: 'Grab', icon: Car },
   { path: '/savings', label: 'Target', icon: Target },
   { path: '/analyze', label: 'Analisis', icon: Scan },
@@ -18,6 +21,7 @@ const NAV_ITEMS = [
 
 export default function Layout() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isFabOpen, setIsFabOpen] = useState(false);
   const navigate = useNavigate();
   const { user, setGlobalAddModalOpen, setGlobalGrabModalOpen } = useStore();
 
@@ -64,27 +68,63 @@ export default function Layout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 relative bg-app-bg flex flex-col">
+      <main className="flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 relative bg-app-bg flex flex-col">
         <Outlet />
+        <Transactions modalOnly />
       </main>
 
       {/* Mobile Floating Action Buttons */}
-      <div className="md:hidden fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-4 z-50 flex flex-col gap-3">
+      {isFabOpen && (
+        <div 
+          className="md:hidden fixed inset-0 z-40"
+          onClick={() => setIsFabOpen(false)}
+        />
+      )}
+      <div className="md:hidden fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-50 flex flex-col items-end gap-3">
+        {isFabOpen && (
+          <>
+            <button 
+              onClick={() => {
+                setIsFabOpen(false);
+                navigate('/ai-trading');
+              }}
+              className="w-12 h-12 rounded-full bg-app-card border border-app-border text-app-accent1 shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity animate-in slide-in-from-bottom-5 fade-in duration-200"
+              title="AI Trading"
+            >
+              <Cpu className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => {
+                setIsFabOpen(false);
+                navigate('/attendance');
+              }}
+              className="w-12 h-12 rounded-full bg-app-card border border-app-border text-app-text-bright shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity animate-in slide-in-from-bottom-5 fade-in duration-200"
+            >
+              <CalendarCheck className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => {
+                setIsFabOpen(false);
+                setGlobalGrabModalOpen(true);
+              }}
+              className="w-12 h-12 rounded-full bg-app-success text-app-bg shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity animate-in slide-in-from-bottom-5 fade-in duration-200"
+            >
+              <Car className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => {
+                setIsFabOpen(false);
+                setGlobalAddModalOpen(true);
+              }}
+              className="w-12 h-12 rounded-full bg-app-accent1 text-app-bg shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity animate-in slide-in-from-bottom-5 fade-in duration-200"
+            >
+              <ArrowLeftRight className="w-5 h-5" />
+            </button>
+          </>
+        )}
         <button 
-          onClick={() => {
-            setGlobalGrabModalOpen(true);
-            navigate('/transactions');
-          }}
-          className="w-12 h-12 rounded-full bg-app-success text-app-bg shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity"
-        >
-          <Car className="w-6 h-6" />
-        </button>
-        <button 
-          onClick={() => {
-            setGlobalAddModalOpen(true);
-            navigate('/transactions');
-          }}
-          className="w-14 h-14 rounded-full bg-app-accent1 text-app-bg shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity"
+          onClick={() => setIsFabOpen(!isFabOpen)}
+          className={`w-14 h-14 rounded-full bg-app-accent1 text-app-bg shadow-lg flex items-center justify-center hover:opacity-90 transition-all duration-300 ${isFabOpen ? 'rotate-45' : ''}`}
         >
           <Plus className="w-8 h-8" />
         </button>

@@ -12,13 +12,16 @@ import Dashboard from './components/Dashboard';
 import Transactions from './components/Transactions';
 import Investments from './components/Investments';
 import Loans from './components/Loans';
+import Attendance from './components/Attendance';
 import Settings from './components/Settings';
 import GrabDetails from './components/GrabDetails';
 import SavingsTarget from './components/SavingsTarget';
 import ImageAnalysis from './components/ImageAnalysis';
+import GlobalGoalNotifier from './components/GlobalGoalNotifier';
+import AiTrading from './components/AiTrading';
 
 export default function App() {
-  const { user, authChecked, setUser, setAuthChecked, setThemeId, setLanguage, setGrabAccounts, setMonthlySavingsTargets, setDailyIncomeTargets, setDailyExpenseLimits } = useStore();
+  const { user, authChecked, setUser, setAuthChecked, setThemeId, setLanguage, setGrabAccounts, setMonthlySavingsTargets, setDailyIncomeTargets, setDailyExpenseLimits, setWorkSchedule, setAttendancePeriodStart, setAttendancePeriodEnd, setSalarySettings } = useStore();
 
   useEffect(() => {
     let unsubscribeSettings: (() => void) | undefined;
@@ -33,6 +36,10 @@ export default function App() {
             const data = userDoc.data();
             if (data.theme) setThemeId(data.theme);
             if (data.language) setLanguage(data.language);
+            if (data.workSchedule) setWorkSchedule(data.workSchedule);
+            if (data.attendancePeriodStart) setAttendancePeriodStart(data.attendancePeriodStart);
+            if (data.attendancePeriodEnd) setAttendancePeriodEnd(data.attendancePeriodEnd);
+            if (data.salarySettings) setSalarySettings(data.salarySettings);
             if (data.grabCashAccount) setGrabAccounts(data.grabCashAccount, data.grabDompetAccount || '', data.grabHematAccount || '');
             if (data.monthlySavingsTargets) {
                 setMonthlySavingsTargets(data.monthlySavingsTargets);
@@ -142,6 +149,11 @@ export default function App() {
                   } else if (d.dailyExpenseLimit !== undefined) {
                       setDailyExpenseLimits([d.dailyExpenseLimit]);
                   }
+                  
+                  if (d.workSchedule) setWorkSchedule(d.workSchedule);
+                  if (d.attendancePeriodStart) setAttendancePeriodStart(d.attendancePeriodStart);
+                  if (d.attendancePeriodEnd) setAttendancePeriodEnd(d.attendancePeriodEnd);
+                  if (d.salarySettings) setSalarySettings(d.salarySettings);
               }
           });
         } catch (error) {
@@ -156,7 +168,7 @@ export default function App() {
         unsubscribe();
         if (unsubscribeSettings) unsubscribeSettings();
     };
-  }, [setUser, setAuthChecked, setThemeId, setLanguage, setGrabAccounts, setMonthlySavingsTargets, setDailyIncomeTargets, setDailyExpenseLimits]);
+  }, [setUser, setAuthChecked, setThemeId, setLanguage, setGrabAccounts, setMonthlySavingsTargets, setDailyIncomeTargets, setDailyExpenseLimits, setSalarySettings]);
 
   if (!authChecked) {
     return <div className="flex h-screen w-full items-center justify-center bg-app-bg text-app-accent1">Memuat...</div>;
@@ -165,6 +177,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ThemeApplicator />
+      <GlobalGoalNotifier />
       <Toaster position="top-center" toastOptions={{
         style: {
           background: 'var(--color-app-card)',
@@ -180,7 +193,9 @@ export default function App() {
             <Route index element={<Dashboard />} />
             <Route path="transactions" element={<Transactions />} />
             <Route path="investments" element={<Investments />} />
+            <Route path="ai-trading" element={<AiTrading />} />
             <Route path="loans" element={<Loans />} />
+            <Route path="attendance" element={<Attendance />} />
             <Route path="grab" element={<GrabDetails />} />
             <Route path="savings" element={<SavingsTarget />} />
             <Route path="analyze" element={<ImageAnalysis />} />
