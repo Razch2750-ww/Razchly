@@ -198,6 +198,10 @@ export default function Dashboard() {
     });
   }, [accounts, accountSort]);
 
+  const getAccountIcon = (id: string) => {
+    return accounts.find((a) => a.id === id)?.icon || "wallet";
+  };
+
   useEffect(() => {
     if (!user) return;
     const accUnsub = onSnapshot(
@@ -234,8 +238,13 @@ export default function Dashboard() {
     .reduce((sum, t) => sum + t.amount, 0);
 
   const expenseToday = recentTransactions
-    .filter((t) => t.type === "expense" && isSameDay(t.date, new Date()))
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => {
+      if (isSameDay(t.date, new Date())) {
+        if (t.type === "expense") return sum + t.amount;
+        if (t.adminFee) return sum + t.adminFee;
+      }
+      return sum;
+    }, 0);
 
   // Savings this month
   const incomeThisMonth = recentTransactions
@@ -243,8 +252,13 @@ export default function Dashboard() {
     .reduce((sum, t) => sum + t.amount, 0);
     
   const expenseThisMonth = recentTransactions
-    .filter((t) => t.type === "expense" && isSameMonth(t.date, new Date()))
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => {
+      if (isSameMonth(t.date, new Date())) {
+        if (t.type === "expense") return sum + t.amount;
+        if (t.adminFee) return sum + t.adminFee;
+      }
+      return sum;
+    }, 0);
     
   const savingsThisMonth = incomeThisMonth - expenseThisMonth;
   const savingsTargets = useStore((state) => state.monthlySavingsTargets);
@@ -270,8 +284,11 @@ export default function Dashboard() {
           .filter((t) => t.type === "income")
           .reduce((sum, t) => sum + t.amount, 0);
         const expense = hourTrans
-          .filter((t) => t.type === "expense")
-          .reduce((sum, t) => sum + t.amount, 0);
+          .reduce((sum, t) => {
+            if (t.type === "expense") return sum + t.amount;
+            if (t.adminFee) return sum + t.adminFee;
+            return sum;
+          }, 0);
 
         data.push({
           name: `${i.toString().padStart(2, "0")}:00`,
@@ -291,8 +308,11 @@ export default function Dashboard() {
           .filter((t) => t.type === "income")
           .reduce((sum, t) => sum + t.amount, 0);
         const expense = dayTransactions
-          .filter((t) => t.type === "expense")
-          .reduce((sum, t) => sum + t.amount, 0);
+          .reduce((sum, t) => {
+            if (t.type === "expense") return sum + t.amount;
+            if (t.adminFee) return sum + t.adminFee;
+            return sum;
+          }, 0);
 
         data.push({
           name: format(date, "dd MMM", { locale: localeId }),
@@ -890,11 +910,17 @@ export default function Dashboard() {
            <div className="space-y-3">
               {todayMobileTransactions.map((t) => (
                  <div key={t.id} onClick={() => navigate('/transactions', { state: { tab: "Semua" } })} className="flex items-center justify-between p-4 rounded-2xl bg-app-card border border-app-border active:scale-[0.98] transition-transform relative overflow-hidden">
-                     <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-text/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
+                     <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-accent1/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
                      <div className="flex items-center gap-4 relative z-10">
-                       <div className={`w-12 h-12 rounded-[1.1rem] flex items-center justify-center shrink-0 ${t.type === "income" ? "bg-app-success/10 text-app-success" : t.type === "expense" ? "bg-app-danger/10 text-app-danger" : "bg-app-text/10 text-app-text"}`}>
+                       <div className={`w-12 h-12 rounded-[1.1rem] flex items-center justify-center shrink-0 ${t.type === "income" ? "bg-app-success/10 text-app-success" : t.type === "expense" ? "bg-app-danger/10 text-app-danger" : "bg-app-accent1/10 text-app-accent1"}`}>
                          {t.type === "income" && <TrendingUp className="w-5 h-5" />}
                          {t.type === "expense" && <TrendingDown className="w-5 h-5" />}
+                         {t.type === "transfer" && (
+                           <AccountIcon
+                             iconId={getAccountIcon(t.fromAccountId)}
+                             className="w-6 h-6 border-0 bg-transparent shadow-none"
+                           />
+                         )}
                        </div>
                        <div>
                          <div className="flex items-center gap-2 mb-0.5">
@@ -915,6 +941,11 @@ export default function Dashboard() {
                      </div>
                      <p className={`text-[15px] font-bold whitespace-nowrap relative z-10 ${t.type === "income" ? "text-app-success" : t.type === "expense" ? "text-app-danger" : "text-app-text"}`}>
                        {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""} Rp {t.amount.toLocaleString("id-ID")}
+                       {t.adminFee && (
+                         <span className="block text-[10px] text-app-danger font-semibold text-right mt-0.5">
+                           Fee: -Rp {t.adminFee.toLocaleString("id-ID")}
+                         </span>
+                       )}
                      </p>
                  </div>
               ))}
@@ -953,7 +984,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/transactions', { state: { tab: "Semua" } })}
                   className="flex items-center justify-between p-4 rounded-2xl bg-app-bg border border-app-border hover:border-app-accent1/50 transition cursor-pointer relative overflow-hidden"
                 >
-                  <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-text/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
+                  <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-accent1/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
                   <div className="flex items-center gap-4 relative z-10">
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 
@@ -962,12 +993,18 @@ export default function Dashboard() {
                           ? "bg-app-success/10 text-app-success"
                           : t.type === "expense"
                             ? "bg-app-danger/10 text-app-danger"
-                            : "bg-app-text/10 text-app-text"
+                            : "bg-app-accent1/10 text-app-accent1"
                       }`}
                   >
                     {t.type === "income" && <TrendingUp className="w-5 h-5" />}
                     {t.type === "expense" && (
                       <TrendingDown className="w-5 h-5" />
+                    )}
+                    {t.type === "transfer" && (
+                      <AccountIcon
+                        iconId={getAccountIcon(t.fromAccountId)}
+                        className="w-5 h-5 border-0 bg-transparent shadow-none"
+                      />
                     )}
                   </div>
                   <div>
@@ -992,19 +1029,26 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-                <p
-                  className={`text-sm font-bold whitespace-nowrap relative z-10
-                      ${
-                        t.type === "income"
-                          ? "text-app-success"
-                          : t.type === "expense"
-                            ? "text-app-danger"
-                            : "text-app-text-bright"
-                      }`}
-                >
-                  {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""}{" "}
-                  Rp {t.amount.toLocaleString("id-ID")}
-                </p>
+                <div className="flex flex-col items-end shrink-0">
+                  <p
+                    className={`text-sm font-bold whitespace-nowrap relative z-10
+                        ${
+                          t.type === "income"
+                            ? "text-app-success"
+                            : t.type === "expense"
+                              ? "text-app-danger"
+                              : "text-app-text-bright"
+                        }`}
+                  >
+                    {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""}{" "}
+                    Rp {t.amount.toLocaleString("id-ID")}
+                  </p>
+                  {t.adminFee && (
+                    <p className="text-[10px] text-app-danger font-semibold mt-0.5">
+                      Fee: -Rp {t.adminFee.toLocaleString("id-ID")}
+                    </p>
+                  )}
+                </div>
               </div>
             ))}
           </div>

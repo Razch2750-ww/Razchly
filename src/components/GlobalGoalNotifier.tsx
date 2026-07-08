@@ -73,16 +73,26 @@ export default function GlobalGoalNotifier() {
       .reduce((sum, t) => sum + t.amount, 0);
 
     const expenseThisMonth = transactions
-      .filter((t) => t.type === "expense" && isSameMonth(new Date(t.date), new Date()))
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum, t) => {
+        if (isSameMonth(new Date(t.date), new Date())) {
+          if (t.type === "expense") return sum + t.amount;
+          if (t.adminFee) return sum + t.adminFee;
+        }
+        return sum;
+      }, 0);
 
     const incomeToday = transactions
       .filter((t) => t.type === "income" && isSameDay(new Date(t.date), new Date()))
       .reduce((sum, t) => sum + t.amount, 0);
 
     const expenseToday = transactions
-      .filter((t) => t.type === "expense" && isSameDay(new Date(t.date), new Date()))
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum, t) => {
+        if (isSameDay(new Date(t.date), new Date())) {
+          if (t.type === "expense") return sum + t.amount;
+          if (t.adminFee) return sum + t.adminFee;
+        }
+        return sum;
+      }, 0);
 
     const savingsThisMonth = incomeThisMonth - expenseThisMonth;
 

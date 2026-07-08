@@ -23,7 +23,9 @@ export default function Layout() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, setGlobalAddModalOpen, setGlobalGrabModalOpen } = useStore();
+  const { user, hiddenTabs, setGlobalAddModalOpen, setGlobalGrabModalOpen } = useStore();
+
+  const visibleNavItems = NAV_ITEMS.filter((item) => !hiddenTabs.includes(item.path));
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -46,7 +48,7 @@ export default function Layout() {
             <Menu className={`w-4 h-4 ${isSidebarOpen ? 'mr-2' : ''}`} />
             {isSidebarOpen && "Toggle Sidebar"}
           </button>
-          {NAV_ITEMS.map((item) => (
+          {visibleNavItems.map((item) => (
             <NavLink 
               key={item.path} 
               to={item.path}
@@ -132,7 +134,7 @@ export default function Layout() {
 
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t border-app-border bg-app-card px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] flex justify-around items-center z-50">
-        {NAV_ITEMS.filter(item => ['/', '/transactions', '/investments', '/loans'].includes(item.path)).map((item) => (
+        {NAV_ITEMS.filter(item => ['/', '/transactions', '/investments', '/loans'].includes(item.path) && !hiddenTabs.includes(item.path)).map((item) => (
           <NavLink 
             key={item.path} 
             to={item.path}

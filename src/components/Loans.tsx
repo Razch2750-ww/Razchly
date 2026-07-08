@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, HandCoins, Calendar, Info, Trash2, CreditCard, ArrowRightLeft, Wallet, Calculator, Eye, CheckCircle, ChevronUp } from "lucide-react";
+import { Plus, HandCoins, Calendar, Info, Trash2, CreditCard, ArrowRightLeft, Wallet, Calculator, Eye, CheckCircle, ChevronUp, Pencil } from "lucide-react";
 import { collection, onSnapshot, doc, setDoc, deleteDoc, getDoc, writeBatch } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useStore } from "../store/useStore";
@@ -85,7 +85,7 @@ function generateSchedule(loan: Loan, details: any) {
   return schedule;
 }
 
-const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void> | void, accounts: Account[] }> = ({ loan, deleteLoan, accounts }) => {
+const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void> | void, onEdit: (loan: Loan) => void, accounts: Account[] }> = ({ loan, deleteLoan, onEdit, accounts }) => {
   const { user } = useStore();
   const details = calculateLoanDetails(loan);
   const paidAmount = loan.paidAmount || 0;
@@ -169,7 +169,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
     return (
       <div 
         onClick={() => setIsExpanded(true)}
-        className="bg-app-card rounded-2xl border border-app-border p-4 shadow-sm flex justify-between items-center opacity-70 group hover:opacity-100 transition-opacity cursor-pointer"
+        className="bg-app-card rounded-2xl border border-app-border p-4 shadow-sm flex justify-between items-center opacity-70 group hover:opacity-100 transition-opacity cursor-pointer animate-in fade-in duration-200"
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-app-success/10 flex items-center justify-center">
@@ -180,12 +180,22 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
             <p className="text-xs text-app-text/60">Rp{details.totalPrincipal.toLocaleString("id-ID")} • Lunas</p>
           </div>
         </div>
-        <button 
-          onClick={(e) => { e.stopPropagation(); deleteLoan(loan.id); }} 
-          className="p-2 text-app-danger hover:bg-app-danger/10 rounded-full transition-colors"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button 
+            onClick={(e) => { e.stopPropagation(); onEdit(loan); }} 
+            className="p-2 text-app-accent1 hover:bg-app-accent1/10 rounded-full transition-colors"
+            title="Edit Pinjaman"
+          >
+            <Pencil className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={(e) => { e.stopPropagation(); deleteLoan(loan.id); }} 
+            className="p-2 text-app-danger hover:bg-app-danger/10 rounded-full transition-colors"
+            title="Hapus Pinjaman"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     );
   }
@@ -198,7 +208,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
           <CreditCard className="w-5 h-5 text-app-accent1" />
           <h2 className="font-bold text-app-text-bright text-lg">{loan.name}</h2>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 relative z-20">
           {isPaidOff && (
             <button 
               onClick={() => setIsExpanded(false)} 
@@ -208,7 +218,18 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
               <ChevronUp className="w-4 h-4" />
             </button>
           )}
-          <button onClick={() => deleteLoan(loan.id)} className="p-1.5 text-app-danger hover:bg-app-danger/10 rounded-full transition-colors">
+          <button 
+            onClick={(e) => { e.stopPropagation(); onEdit(loan); }} 
+            className="p-1.5 text-app-accent1 hover:bg-app-accent1/10 rounded-full transition-colors"
+            title="Edit Pinjaman"
+          >
+            <Pencil className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={(e) => { e.stopPropagation(); deleteLoan(loan.id); }} 
+            className="p-1.5 text-app-danger hover:bg-app-danger/10 rounded-full transition-colors"
+            title="Hapus Pinjaman"
+          >
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
@@ -440,6 +461,7 @@ export default function Loans() {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingLoan, setEditingLoan] = useState<Loan | null>(null);
 
   // Form states
   const [name, setName] = useState("");
@@ -505,6 +527,7 @@ export default function Loans() {
   }, [user]);
 
   const openAddModal = () => {
+    setEditingLoan(null);
     setName("");
     setAmount("");
     setHasInterest(false);
@@ -518,11 +541,39 @@ export default function Loans() {
     setPaymentDate(1);
     setDepositToAccount(false);
     setAutoDebit(false);
+    setCalculationResult(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (loan: Loan) => {
+    setEditingLoan(loan);
+    setName(loan.name);
+    setAmount(formatNumberInput(String(loan.amount)));
+    setHasInterest(loan.hasInterest || false);
+    setInterestType(loan.interestType || "percentage");
+    setInterestValue(loan.interestValue ? (loan.interestType === "nominal" ? formatNumberInput(String(loan.interestValue)) : String(loan.interestValue)) : "");
+    
+    setHasTenor(loan.hasTenor !== false);
+    setTenorUnit(loan.tenorUnit || "hari");
+    setTenorDuration(loan.tenorDuration ? String(loan.tenorDuration) : "");
+    setPaymentMethod(loan.paymentMethod || "harian");
+    setPaymentDay(loan.paymentDay || "Senin");
+    setPaymentDate(loan.paymentDate || 1);
+    
+    setDepositToAccount(loan.depositToAccount || false);
+    setAccountId(loan.accountId || (accounts[0]?.id || ""));
+    
+    setAutoDebit(loan.autoDebit || false);
+    setAutoDebitAccountId(loan.autoDebitAccountId || (accounts[0]?.id || ""));
+
+    const details = calculateLoanDetails(loan);
+    setCalculationResult(details);
     setIsModalOpen(true);
   };
 
   const closeAddModal = () => {
     setIsModalOpen(false);
+    setEditingLoan(null);
   };
 
   const handleCalculate = () => {
@@ -606,7 +657,10 @@ export default function Loans() {
       }
     }
 
-    const newLoanRef = doc(collection(db, "users", user.uid, "loans"));
+    const isEdit = !!editingLoan;
+    const loanRef = isEdit 
+      ? doc(db, "users", user.uid, "loans", editingLoan.id)
+      : doc(collection(db, "users", user.uid, "loans"));
     
     const loanData: any = {
       name: name || "Pinjaman",
@@ -615,11 +669,16 @@ export default function Loans() {
       hasTenor,
       depositToAccount,
       autoDebit,
-      createdAt: Date.now(),
-      status: "active",
-      paidAmount: 0,
-      paidPaymentsCount: 0
+      status: editingLoan ? editingLoan.status : "active",
+      paidAmount: editingLoan ? (editingLoan.paidAmount || 0) : 0,
+      paidPaymentsCount: editingLoan ? (editingLoan.paidPaymentsCount || 0) : 0
     };
+
+    if (!isEdit) {
+      loanData.createdAt = Date.now();
+    } else {
+      loanData.createdAt = editingLoan.createdAt;
+    }
 
     if (hasTenor) {
       loanData.tenorUnit = tenorUnit;
@@ -627,6 +686,10 @@ export default function Loans() {
       loanData.paymentMethod = paymentMethod;
       if (paymentMethod === "mingguan") loanData.paymentDay = paymentDay;
       if (paymentMethod === "bulanan") loanData.paymentDate = paymentDate;
+    } else {
+      loanData.tenorUnit = "";
+      loanData.tenorDuration = 0;
+      loanData.paymentMethod = "";
     }
 
     if (hasInterest) {
@@ -637,6 +700,9 @@ export default function Loans() {
       }
       loanData.interestType = interestType;
       loanData.interestValue = intVal;
+    } else {
+      loanData.interestType = "";
+      loanData.interestValue = 0;
     }
 
     if (depositToAccount) {
@@ -645,6 +711,8 @@ export default function Loans() {
         return;
       }
       loanData.accountId = accountId;
+    } else {
+      loanData.accountId = "";
     }
     
     if (autoDebit) {
@@ -653,14 +721,24 @@ export default function Loans() {
         return;
       }
       loanData.autoDebitAccountId = autoDebitAccountId;
+    } else {
+      loanData.autoDebitAccountId = "";
     }
 
     try {
       const batch = writeBatch(db);
-      batch.set(newLoanRef, loanData);
+      
+      if (isEdit) {
+        batch.set(loanRef, loanData, { merge: true });
+      } else {
+        batch.set(loanRef, loanData);
+      }
 
       // If deposit to account, we must increase account balance AND add a transaction
-      if (depositToAccount && accountId) {
+      // But for edit, only do this if depositToAccount was newly enabled (meaning it wasn't enabled before)
+      const shouldDeposit = depositToAccount && accountId && (!isEdit || !editingLoan.depositToAccount);
+
+      if (shouldDeposit) {
         const accRef = doc(db, "users", user.uid, "accounts", accountId);
         const accDoc = await getDoc(accRef);
         if (accDoc.exists()) {
@@ -674,7 +752,7 @@ export default function Loans() {
           amount: numAmount,
           accountId: accountId,
           date: Date.now(),
-          note: "Pencairan Pinjaman",
+          note: `Pencairan Pinjaman: ${loanData.name}`,
           categoryId: "loan-income",
           categoryName: "Pinjaman",
           categoryIcon: "HandCoins"
@@ -684,15 +762,15 @@ export default function Loans() {
       await batch.commit();
 
       sendDeviceNotification(
-        "Pinjaman Baru Ditambahkan 📋",
-        `Pinjaman "${loanData.name}" sebesar Rp ${numAmount.toLocaleString("id-ID")} berhasil ditambahkan.`
+        isEdit ? "Pinjaman Berhasil Diubah 📝" : "Pinjaman Baru Ditambahkan 📋",
+        `Pinjaman "${loanData.name}" sebesar Rp ${numAmount.toLocaleString("id-ID")} berhasil ${isEdit ? "diubah" : "ditambahkan"}.`
       );
 
-      toast.success("Pinjaman berhasil disimpan");
+      toast.success(isEdit ? "Pinjaman berhasil diubah" : "Pinjaman berhasil disimpan");
       closeAddModal();
     } catch (err) {
       console.error("Failed to save loan", err);
-      toast.error("Gagal menyimpan pinjaman");
+      toast.error(isEdit ? "Gagal mengubah pinjaman" : "Gagal menyimpan pinjaman");
     }
   };
 
@@ -707,7 +785,7 @@ export default function Loans() {
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text animate-in fade-in zoom-in-95 duration-300">
+    <div className="flex-1 flex flex-col w-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 bg-app-bg text-app-text animate-in fade-in zoom-in-95 duration-300">
       <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6">
         <div className="flex justify-between items-center w-full md:w-auto">
           <div>
@@ -742,46 +820,49 @@ export default function Loans() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...loans]
-          .sort((a, b) => {
-            const aRemaining = calculateLoanDetails(a).totalPayment - (a.paidAmount || 0);
-            const bRemaining = calculateLoanDetails(b).totalPayment - (b.paidAmount || 0);
-            const aPaid = aRemaining <= 0;
-            const bPaid = bRemaining <= 0;
-            if (aPaid && !bPaid) return 1;
-            if (!aPaid && bPaid) return -1;
-            
-            const aNextPayment = getNextPaymentDate(a);
-            const bNextPayment = getNextPaymentDate(b);
-            
-            if (aNextPayment && bNextPayment) {
-              return aNextPayment.getTime() - bNextPayment.getTime();
-            } else if (aNextPayment) {
-              return -1;
-            } else if (bNextPayment) {
-              return 1;
-            }
-            
-            return b.createdAt - a.createdAt;
-          })
-          .map(loan => (
-            <LoanCard key={loan.id} loan={loan} deleteLoan={deleteLoan} accounts={accounts} />
-          ))}
-        {loans.length === 0 && (
-          <div className="col-span-full py-12 flex flex-col items-center justify-center text-app-text/50 border border-dashed border-app-border rounded-3xl">
-            <HandCoins className="w-12 h-12 mb-3 text-app-text/30" />
-            <p>Belum ada data pinjaman.</p>
-          </div>
-        )}
-      </div>
+      {loans.length === 0 ? (
+        <div className="py-12 flex flex-col items-center justify-center text-app-text/50 border border-dashed border-app-border rounded-3xl">
+          <HandCoins className="w-12 h-12 mb-3 text-app-text/30" />
+          <p>Belum ada data pinjaman.</p>
+        </div>
+      ) : (
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 w-full">
+          {[...loans]
+            .sort((a, b) => {
+              const aRemaining = calculateLoanDetails(a).totalPayment - (a.paidAmount || 0);
+              const bRemaining = calculateLoanDetails(b).totalPayment - (b.paidAmount || 0);
+              const aPaid = aRemaining <= 0;
+              const bPaid = bRemaining <= 0;
+              if (aPaid && !bPaid) return 1;
+              if (!aPaid && bPaid) return -1;
+              
+              const aNextPayment = getNextPaymentDate(a);
+              const bNextPayment = getNextPaymentDate(b);
+              
+              if (aNextPayment && bNextPayment) {
+                return aNextPayment.getTime() - bNextPayment.getTime();
+              } else if (aNextPayment) {
+                return -1;
+              } else if (bNextPayment) {
+                return 1;
+              }
+              
+              return b.createdAt - a.createdAt;
+            })
+            .map(loan => (
+              <div key={loan.id} className="inline-block w-full mb-6 break-inside-avoid">
+                <LoanCard loan={loan} deleteLoan={deleteLoan} onEdit={openEditModal} accounts={accounts} />
+              </div>
+            ))}
+        </div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto pt-20">
           <div className="bg-app-card text-app-text w-full max-w-md rounded-3xl shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
-                Tambah Pinjaman
+                {editingLoan ? "Edit Pinjaman" : "Tambah Pinjaman"}
               </h2>
               <button
                 onClick={closeAddModal}
@@ -1062,7 +1143,7 @@ export default function Loans() {
                   type="submit"
                   className="flex-1 py-3.5 rounded-xl font-bold text-sm bg-app-success text-app-bg hover:opacity-90 transition-opacity"
                 >
-                  Simpan Pinjaman
+                  {editingLoan ? "Simpan Perubahan" : "Simpan Pinjaman"}
                 </button>
               </div>
             </form>

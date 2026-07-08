@@ -18,6 +18,7 @@ interface AppState {
   dailyIncomeTargets: number[];
   dailyExpenseLimit: number;
   dailyExpenseLimits: number[];
+  hiddenTabs: string[];
   isGlobalAddModalOpen: boolean;
   isGlobalGrabModalOpen: boolean;
   workSchedule: WorkSchedule;
@@ -44,6 +45,7 @@ interface AppState {
   setDailyIncomeTargets: (targets: number[]) => void;
   setDailyExpenseLimit: (limit: number) => void;
   setDailyExpenseLimits: (targets: number[]) => void;
+  setHiddenTabs: (tabs: string[]) => void;
   setGlobalAddModalOpen: (open: boolean) => void;
   setGlobalGrabModalOpen: (open: boolean) => void;
   setWorkSchedule: (schedule: WorkSchedule) => void;
@@ -80,6 +82,7 @@ export const useStore = create<AppState>((set) => ({
   dailyIncomeTargets: [],
   dailyExpenseLimit: 0,
   dailyExpenseLimits: [],
+  hiddenTabs: [],
   isGlobalAddModalOpen: false,
   isGlobalGrabModalOpen: false,
   workSchedule: DEFAULT_SCHEDULE,
@@ -115,6 +118,7 @@ export const useStore = create<AppState>((set) => ({
   setDailyIncomeTargets: (targets) => set({ dailyIncomeTargets: targets }),
   setDailyExpenseLimit: (limit) => set({ dailyExpenseLimit: limit }),
   setDailyExpenseLimits: (targets) => set({ dailyExpenseLimits: targets }),
+  setHiddenTabs: (tabs) => set({ hiddenTabs: tabs }),
   setGlobalAddModalOpen: (open) => set({ isGlobalAddModalOpen: open }),
   setGlobalGrabModalOpen: (open) => set({ isGlobalGrabModalOpen: open }),
   setWorkSchedule: (schedule) => set({ workSchedule: schedule }),

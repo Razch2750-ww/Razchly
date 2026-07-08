@@ -11,6 +11,7 @@ import {
 import { db } from "../lib/firebase";
 import { useStore } from "../store/useStore";
 import { Account, Transaction, TransactionType, Category } from "../types";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Plus,
   ArrowDownRight,
@@ -41,6 +42,12 @@ import {
   MoreHorizontal,
   ShoppingCart,
   HelpCircle,
+  Loader2,
+  AlertTriangle,
+  CheckCircle2,
+  Target,
+  Coins,
+  Compass,
 } from "lucide-react";
 import {
   format,
@@ -150,6 +157,62 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
   const [mobileIncomeFilter, setMobileIncomeFilter] = useState<string>("Semua");
   const [mobileExpenseFilter, setMobileExpenseFilter] =
     useState<string>("Semua");
+
+  // AI Strategy Recommendation State
+  const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false);
+  const [strategyRecommendation, setStrategyRecommendation] = useState<{
+    summary: string;
+    diagnostic: string[];
+    savingsRecommendations: Array<{
+      title: string;
+      description: string;
+      priority: string;
+      potentialSavings: string;
+    }>;
+    allocationPlan: Array<{
+      category: string;
+      currentPct: number;
+      recommendedPct: number;
+      recommendedAmount: number;
+    }>;
+    incomeStrategies: string[];
+    isOffline?: boolean;
+  } | null>(null);
+  const [strategyLoading, setStrategyLoading] = useState(false);
+
+  const fetchFinancialStrategy = async () => {
+    setStrategyLoading(true);
+    setIsStrategyModalOpen(true);
+    try {
+      const response = await fetch("/api/gemini/financial-strategy", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          netProfit: stats.netProfit,
+          income: stats.income,
+          expense: stats.expense,
+          avgIncome: stats.avgIncome,
+          avgExpense: stats.avgExpense,
+          count: stats.count,
+          periodText: getPeriodText()
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal mengambil rekomendasi strategi.");
+      }
+
+      const data = await response.json();
+      setStrategyRecommendation(data);
+    } catch (error) {
+      console.error("Error fetching financial strategy:", error);
+      toast.error("Gagal mendapatkan rekomendasi strategi AI.");
+    } finally {
+      setStrategyLoading(false);
+    }
+  };
 
   const {
     isGlobalAddModalOpen,
@@ -285,10 +348,16 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         if (t.type === "income") {
           if (t.accountId) {
             balanceChanges.set(t.accountId, (balanceChanges.get(t.accountId) || 0) - t.amount);
+            if (t.adminFee) {
+              balanceChanges.set(t.accountId, (balanceChanges.get(t.accountId) || 0) + t.adminFee);
+            }
           }
         } else if (t.type === "expense") {
           if (t.accountId) {
             balanceChanges.set(t.accountId, (balanceChanges.get(t.accountId) || 0) + t.amount);
+            if (t.adminFee) {
+              balanceChanges.set(t.accountId, (balanceChanges.get(t.accountId) || 0) + t.adminFee);
+            }
           }
         } else if (t.type === "transfer") {
           if (t.fromAccountId && t.toAccountId) {
@@ -310,9 +379,25 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       if (type === "income") {
         if (!accountId) return;
         balanceChanges.set(accountId, (balanceChanges.get(accountId) || 0) + numAmount);
+        
+        let numAdmin = 0;
+        if (hasAdminFee) {
+          numAdmin = parseNumberInput(adminFee);
+          if (!isNaN(numAdmin) && numAdmin > 0) {
+            balanceChanges.set(accountId, (balanceChanges.get(accountId) || 0) - numAdmin);
+          }
+        }
       } else if (type === "expense") {
         if (!accountId) return;
         balanceChanges.set(accountId, (balanceChanges.get(accountId) || 0) - numAmount);
+
+        let numAdmin = 0;
+        if (hasAdminFee) {
+          numAdmin = parseNumberInput(adminFee);
+          if (!isNaN(numAdmin) && numAdmin > 0) {
+            balanceChanges.set(accountId, (balanceChanges.get(accountId) || 0) - numAdmin);
+          }
+        }
       } else if (type === "transfer") {
         if (!fromAccountId || !toAccountId || fromAccountId === toAccountId) return;
         balanceChanges.set(fromAccountId, (balanceChanges.get(fromAccountId) || 0) - numAmount);
@@ -371,8 +456,21 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         tsxData.accountId = accountId;
         tsxData.fromAccountId = "";
         tsxData.toAccountId = "";
-        tsxData.adminFee = 0;
-        tsxData.adminFeeChargeTo = "";
+        
+        let numAdmin = 0;
+        if (hasAdminFee) {
+          numAdmin = parseNumberInput(adminFee);
+          if (!isNaN(numAdmin) && numAdmin > 0) {
+            tsxData.adminFee = numAdmin;
+            tsxData.adminFeeChargeTo = "origin";
+          } else {
+            tsxData.adminFee = 0;
+            tsxData.adminFeeChargeTo = "";
+          }
+        } else {
+          tsxData.adminFee = 0;
+          tsxData.adminFeeChargeTo = "";
+        }
       } else if (type === "transfer") {
         tsxData.fromAccountId = fromAccountId;
         tsxData.toAccountId = toAccountId;
@@ -449,9 +547,15 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       };
 
       if (tsx.type === "income") {
-        if (tsx.accountId) await updateBal(tsx.accountId, -tsx.amount);
+        if (tsx.accountId) {
+          const change = -tsx.amount + (tsx.adminFee || 0);
+          await updateBal(tsx.accountId, change);
+        }
       } else if (tsx.type === "expense") {
-        if (tsx.accountId) await updateBal(tsx.accountId, tsx.amount);
+        if (tsx.accountId) {
+          const change = tsx.amount + (tsx.adminFee || 0);
+          await updateBal(tsx.accountId, change);
+        }
       } else if (tsx.type === "transfer") {
         if (tsx.fromAccountId && tsx.toAccountId) {
           let fromChange = tsx.amount;
@@ -640,6 +744,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
     filteredByPeriodTransactions.forEach((t) => {
       if (t.type === "income") income += t.amount;
       if (t.type === "expense") expense += t.amount;
+      if (t.adminFee) expense += t.adminFee;
     });
     const netProfit = income - expense;
     let daysInPeriod = 1;
@@ -737,6 +842,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       if (!dateMap.has(d)) dateMap.set(d, { date: d, income: 0, expense: 0 });
       if (t.type === "income") dateMap.get(d).income += t.amount;
       if (t.type === "expense") dateMap.get(d).expense += t.amount;
+      if (t.adminFee) dateMap.get(d).expense += t.adminFee;
     });
     let data = Array.from(dateMap.values());
     if (data.length === 0) {
@@ -754,6 +860,9 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         income += t.amount;
       } else if (t.type === "expense") {
         expense += t.amount;
+      }
+      if (t.adminFee) {
+        expense += t.adminFee;
       }
     });
 
@@ -1216,6 +1325,11 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                               : ""}{" "}
                           Rp {t.amount.toLocaleString("id-ID")}
                         </p>
+                        {t.adminFee && (
+                          <p className="text-[9px] text-app-danger font-semibold mt-0.5">
+                            Fee: -Rp {t.adminFee.toLocaleString("id-ID")}
+                          </p>
+                        )}
                         <div className="flex items-center gap-1">
                           <button
                             onClick={(e) => {
@@ -1448,7 +1562,10 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                     ? `Hati-hati! Pengeluaran Anda lebih besar Rp ${Math.abs(stats.netProfit).toLocaleString("id-ID")} dari pemasukan pada periode ini.`
                     : "Pemasukan dan pengeluaran Anda saat ini seimbang."}
             </p>
-            <button className="flex items-center gap-2 text-app-accent1 text-xs font-bold tracking-widest uppercase hover:opacity-80 transition-opacity relative z-10">
+            <button
+              onClick={fetchFinancialStrategy}
+              className="flex items-center gap-2 text-app-accent1 text-xs font-bold tracking-widest uppercase hover:opacity-80 transition-opacity relative z-10 cursor-pointer"
+            >
               Pelajari Strategi <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -1652,23 +1769,30 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                       </div>
                     </div>
                     <div className="flex items-center gap-4 relative z-10">
-                      <p
-                        className={`text-base font-bold whitespace-nowrap
-                        ${
-                          t.type === "income"
-                            ? "text-app-success"
+                      <div className="flex flex-col items-end">
+                        <p
+                          className={`text-base font-bold whitespace-nowrap
+                          ${
+                            t.type === "income"
+                              ? "text-app-success"
+                              : t.type === "expense"
+                                ? "text-app-danger"
+                                : "text-app-text-bright"
+                          }`}
+                        >
+                          {t.type === "income"
+                            ? "+"
                             : t.type === "expense"
-                              ? "text-app-danger"
-                              : "text-app-text-bright"
-                        }`}
-                      >
-                        {t.type === "income"
-                          ? "+"
-                          : t.type === "expense"
-                            ? "-"
-                            : ""}{" "}
-                        Rp {t.amount.toLocaleString("id-ID")}
-                      </p>
+                              ? "-"
+                              : ""}{" "}
+                          Rp {t.amount.toLocaleString("id-ID")}
+                        </p>
+                        {t.adminFee && (
+                          <p className="text-[10px] text-app-danger font-semibold mt-0.5">
+                            Fee: -Rp {t.adminFee.toLocaleString("id-ID")}
+                          </p>
+                        )}
+                      </div>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1825,7 +1949,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 />
               </div>
 
-              {type === "transfer" && (
+              {(type === "transfer" || type === "income" || type === "expense") && (
                 <div className="flex flex-col gap-4 bg-app-bg p-4 rounded-2xl border border-app-border">
                   <div className="flex items-center gap-3">
                     <input
@@ -1839,7 +1963,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                       htmlFor="admin"
                       className="text-sm font-medium cursor-pointer text-app-text-bright"
                     >
-                      Ada Biaya Admin?
+                      Ada Biaya / Admin Fee?
                     </label>
                   </div>
 
@@ -1847,7 +1971,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2 border-t border-app-border/50">
                       <div className="flex-1">
                         <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
-                          Biaya Admin (Rp)
+                          Biaya / Admin Fee (Rp)
                         </label>
                         <input
                           type="text"
@@ -1861,23 +1985,25 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                           required
                         />
                       </div>
-                      <div className="flex-1">
-                        <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
-                          Potong Saldo Dari
-                        </label>
-                        <select
-                          className="w-full bg-transparent text-[10px] text-app-accent1 font-bold uppercase py-3 border-b border-transparent hover:border-app-border outline-none appearance-none"
-                          value={adminFeeChargeTo}
-                          onChange={(e) =>
-                            setAdminFeeChargeTo(e.target.value as any)
-                          }
-                        >
-                          <option value="origin">Potong Rekening Asal</option>
-                          <option value="destination">
-                            Potong Rekening Tujuan
-                          </option>
-                        </select>
-                      </div>
+                      {type === "transfer" && (
+                        <div className="flex-1">
+                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                            Potong Saldo Dari
+                          </label>
+                          <select
+                            className="w-full bg-transparent text-[10px] text-app-accent1 font-bold uppercase py-3 border-b border-transparent hover:border-app-border outline-none appearance-none"
+                            value={adminFeeChargeTo}
+                            onChange={(e) =>
+                              setAdminFeeChargeTo(e.target.value as any)
+                            }
+                          >
+                            <option value="origin">Potong Rekening Asal</option>
+                            <option value="destination">
+                              Potong Rekening Tujuan
+                            </option>
+                          </select>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -2206,6 +2332,228 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           </div>
         </div>
       )}
+
+      {/* AI STRATEGY RECOMMENDATION MODAL */}
+      <AnimatePresence>
+        {isStrategyModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsStrategyModalOpen(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+
+            {/* Modal Body */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-app-card border border-app-border w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl relative z-10 flex flex-col max-h-[85vh]"
+            >
+              {/* Decorative gradient beam */}
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-app-accent1 via-app-accent2 to-app-success" />
+
+              {/* Header */}
+              <div className="p-6 border-b border-app-border flex items-center justify-between shrink-0 bg-app-bg/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-app-accent1/10 flex items-center justify-center text-app-accent1 shadow-inner relative">
+                    <Sparkles className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-app-text-bright flex items-center gap-2">
+                      Strategi Keuangan AI
+                      {strategyRecommendation?.isOffline && (
+                        <span className="text-[10px] font-bold bg-app-border px-2 py-0.5 rounded-full text-app-text/60">
+                          Mode Lokal
+                        </span>
+                      )}
+                    </h2>
+                    <p className="text-xs text-app-text/60">
+                      Rekomendasi taktis dan alokasi anggaran personal Anda
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsStrategyModalOpen(false)}
+                  className="w-10 h-10 rounded-full hover:bg-app-hover flex items-center justify-center text-app-text/50 hover:text-app-text-bright transition-all"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Content Area */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {strategyLoading ? (
+                  <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                    <div className="relative">
+                      <Loader2 className="w-12 h-12 text-app-accent1 animate-spin" />
+                      <Sparkles className="w-5 h-5 text-app-accent2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-ping" />
+                    </div>
+                    <div className="text-center space-y-1">
+                      <h3 className="font-semibold text-app-text-bright">
+                        Merumuskan Strategi AI...
+                      </h3>
+                      <p className="text-xs text-app-text/50 max-w-xs">
+                        Algoritma cerdas sedang menganalisis pengeluaran dan merancang skema alokasi ideal Anda
+                      </p>
+                    </div>
+                  </div>
+                ) : strategyRecommendation ? (
+                  <>
+                    {/* EXECUTIVE SUMMARY CARD */}
+                    <div className="p-5 rounded-2xl bg-gradient-to-br from-app-accent1/10 to-transparent border border-app-accent1/20 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-app-accent1/5 rounded-full blur-xl pointer-events-none" />
+                      <p className="text-sm text-app-text-bright font-medium leading-relaxed">
+                        {strategyRecommendation.summary}
+                      </p>
+                    </div>
+
+                    {/* DIAGNOSTIC FINDINGS */}
+                    <div className="space-y-3">
+                      <h3 className="text-sm font-bold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-app-danger" />
+                        Temuan Diagnostik
+                      </h3>
+                      <div className="grid grid-cols-1 gap-2.5">
+                        {strategyRecommendation.diagnostic.map((diag, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start gap-3 p-3.5 bg-app-bg border border-app-border/40 rounded-xl text-xs text-app-text/80 leading-relaxed"
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-app-danger shrink-0 mt-1.5" />
+                            <span>{diag}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* SAVINGS RECOMMENDATIONS */}
+                    <div className="space-y-3">
+                      <h3 className="text-sm font-bold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
+                        <Coins className="w-4 h-4 text-app-success" />
+                        Rekomendasi Penghematan Taktis
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {strategyRecommendation.savingsRecommendations.map((rec, index) => (
+                          <div
+                            key={index}
+                            className="p-4 bg-app-bg border border-app-border rounded-2xl flex flex-col justify-between hover:border-app-accent1/30 transition-all group"
+                          >
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <span
+                                  className={`text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full ${
+                                    rec.priority === "tinggi"
+                                      ? "bg-app-danger/15 text-app-danger"
+                                      : rec.priority === "sedang"
+                                        ? "bg-app-warning/15 text-app-warning"
+                                        : "bg-app-accent2/15 text-app-accent2"
+                                  }`}
+                                >
+                                  {rec.priority}
+                                </span>
+                                <span className="text-[10px] font-bold text-app-success bg-app-success/10 px-2 py-0.5 rounded-full">
+                                  {rec.potentialSavings}
+                                </span>
+                              </div>
+                              <h4 className="font-bold text-app-text-bright text-xs mb-1.5 group-hover:text-app-accent1 transition-colors">
+                                {rec.title}
+                              </h4>
+                              <p className="text-[11px] text-app-text/60 leading-relaxed">
+                                {rec.description}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* BUDGET ALLOCATION PLAN */}
+                    <div className="space-y-3">
+                      <h3 className="text-sm font-bold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
+                        <Target className="w-4 h-4 text-app-accent2" />
+                        Rencana Alokasi Anggaran Ideal (50/20/20/10)
+                      </h3>
+                      <div className="p-4 bg-app-bg border border-app-border rounded-2xl space-y-4">
+                        {strategyRecommendation.allocationPlan.map((plan, index) => (
+                          <div key={index} className="space-y-2">
+                            <div className="flex items-center justify-between text-xs font-semibold">
+                              <span className="text-app-text-bright max-w-[70%] truncate">
+                                {plan.category}
+                              </span>
+                              <span className="text-app-success">
+                                Rp {plan.recommendedAmount.toLocaleString("id-ID")}
+                              </span>
+                            </div>
+                            
+                            {/* Horizontal progress visualization */}
+                            <div className="h-2 w-full bg-app-border rounded-full overflow-hidden relative flex">
+                              <div
+                                style={{ width: `${plan.recommendedPct}%` }}
+                                className={`h-full rounded-full ${
+                                  index === 0
+                                    ? "bg-app-accent1"
+                                    : index === 1
+                                      ? "bg-app-accent2"
+                                      : index === 2
+                                        ? "bg-app-success"
+                                        : "bg-app-warning"
+                                }`}
+                              />
+                            </div>
+                            <div className="flex justify-between text-[10px] text-app-text/50">
+                              <span>Alokasi saat ini: ~{plan.currentPct}%</span>
+                              <span className="font-bold text-app-text/80">Rekomendasi: {plan.recommendedPct}%</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* INCOME STRATEGIES */}
+                    <div className="space-y-3">
+                      <h3 className="text-sm font-bold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
+                        <Compass className="w-4 h-4 text-app-accent1" />
+                        Strategi Peningkatan Pemasukan
+                      </h3>
+                      <div className="p-4 bg-app-bg border border-app-border rounded-2xl space-y-3">
+                        {strategyRecommendation.incomeStrategies.map((strat, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start gap-3 text-xs leading-relaxed text-app-text/80"
+                          >
+                            <div className="w-5 h-5 rounded-full bg-app-accent1/10 flex items-center justify-center shrink-0 text-app-accent1 text-[10px] font-bold mt-0.5">
+                              {index + 1}
+                            </div>
+                            <span>{strat}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-10 text-app-text/50">
+                    Gagal memuat rekomendasi strategi.
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 border-t border-app-border flex justify-end shrink-0 bg-app-bg/30">
+                <button
+                  onClick={() => setIsStrategyModalOpen(false)}
+                  className="px-6 py-2.5 rounded-xl bg-app-accent1 hover:opacity-90 text-app-bg font-bold text-xs transition-opacity cursor-pointer shadow-md"
+                >
+                  Selesai & Terapkan
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

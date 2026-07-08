@@ -71,16 +71,26 @@ export default function SavingsTarget() {
     .reduce((sum, t) => sum + t.amount, 0), [transactions]);
     
   const expenseThisMonth = useMemo(() => transactions
-    .filter((t) => t.type === "expense" && isSameMonth(new Date(t.date), new Date()))
-    .reduce((sum, t) => sum + t.amount, 0), [transactions]);
+    .reduce((sum, t) => {
+      if (isSameMonth(new Date(t.date), new Date())) {
+        if (t.type === "expense") return sum + t.amount;
+        if (t.adminFee) return sum + t.adminFee;
+      }
+      return sum;
+    }, 0), [transactions]);
     
   const incomeToday = useMemo(() => transactions
     .filter((t) => t.type === "income" && isSameDay(new Date(t.date), new Date()))
     .reduce((sum, t) => sum + t.amount, 0), [transactions]);
     
   const expenseToday = useMemo(() => transactions
-    .filter((t) => t.type === "expense" && isSameDay(new Date(t.date), new Date()))
-    .reduce((sum, t) => sum + t.amount, 0), [transactions]);
+    .reduce((sum, t) => {
+      if (isSameDay(new Date(t.date), new Date())) {
+        if (t.type === "expense") return sum + t.amount;
+        if (t.adminFee) return sum + t.adminFee;
+      }
+      return sum;
+    }, 0), [transactions]);
     
   const savingsThisMonth = incomeThisMonth - expenseThisMonth;
 
@@ -380,184 +390,189 @@ export default function SavingsTarget() {
           </div>
         </div>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Tabungan Bulanan Berlayer */}
-        {monthlySavingsTargets && monthlySavingsTargets.length > 0 ? (
-          monthlySavingsTargets.map((target, idx) => {
-            const savingsProgress = target > 0 ? Math.min(Math.max((savingsThisMonth / target) * 100, 0), 100) : 0;
-            return (
-                <div key={idx} className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/5 via-transparent to-transparent pointer-events-none" />
-                  <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
-                     <Star className="w-5 h-5 text-app-accent1" /> Tabungan Layer {idx + 1}
-                  </h2>
-                  
-                  <div className="relative z-10 w-full flex-1 flex flex-col justify-end">
-                       <div className="flex justify-between items-end mb-2">
-                         <div>
-                            <p className="text-[10px] text-app-text/70 font-semibold mb-1 uppercase tracking-widest">Tercapai</p>
-                            <p className="text-lg font-bold text-app-accent1">Rp {Math.max(savingsThisMonth, 0).toLocaleString('id-ID')}</p>
-                         </div>
-                         <div className="text-right">
-                            <p className="text-[10px] text-app-text/70 font-semibold mb-1 uppercase tracking-widest">Target L{idx + 1}</p>
-                            <p className="text-sm font-bold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
-                         </div>
-                       </div>
-        
-                       <div className="h-4 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-4 shadow-inner">
-                        <div 
-                          className="h-full bg-gradient-to-r from-app-accent1/80 to-app-accent1 transition-all duration-1000 ease-out relative"
-                          style={{ width: `${savingsProgress}%` }}
-                        >
-                          <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                        </div>
+        <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/5 via-transparent to-transparent pointer-events-none" />
+          <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
+             <Star className="w-5 h-5 text-app-accent1" /> Tabungan Layered
+          </h2>
+          
+          <div className="relative z-10 w-full flex-1 flex flex-col gap-6">
+            {monthlySavingsTargets && monthlySavingsTargets.length > 0 ? (
+              monthlySavingsTargets.map((target, idx) => {
+                const savingsProgress = target > 0 ? Math.min(Math.max((savingsThisMonth / target) * 100, 0), 100) : 0;
+                return (
+                  <div key={idx} className="border-b border-app-border/30 last:border-0 pb-4 last:pb-0">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs font-bold text-app-text-bright">Layer {idx + 1}</span>
+                      <span className="text-[10px] font-bold text-app-accent1">
+                        {savingsProgress.toFixed(0)}% Tercapai
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-end mb-2">
+                      <div>
+                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Tercapai</p>
+                        <p className="text-sm font-bold text-app-accent1">Rp {Math.max(savingsThisMonth, 0).toLocaleString('id-ID')}</p>
                       </div>
-        
-                      <div className="flex justify-between items-center bg-app-bg/50 p-3 rounded-2xl border border-app-border/50 backdrop-blur-sm">
-                        <span className="text-[10px] font-bold text-app-text-bright">
-                          {savingsProgress.toFixed(0)}% Tercapai
-                        </span>
-                        <span className="text-[10px] font-medium text-app-text/70">
-                          {savingsThisMonth >= target ? (
-                            <span className="text-app-success font-bold text-[10px]">Tercapai! 🎉</span>
-                          ) : (
-                            `Sisa Rp ${Math.max(target - savingsThisMonth, 0).toLocaleString('id-ID')}`
-                          )}
-                        </span>
+                      <div className="text-right">
+                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Target L{idx + 1}</p>
+                        <p className="text-xs font-bold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
                       </div>
                     </div>
-                </div>
-            );
-          })
-        ) : (
-          <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden text-center justify-center">
-            <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
-                 <Star className="w-5 h-5 text-app-accent1" /> Tabungan Bulan Ini
-              </h2>
-            <div className="relative z-10 py-6">
-              <p className="text-app-text/60 font-medium text-sm">Target belum diatur.</p>
-            </div>
+     
+                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2 shadow-inner">
+                      <div 
+                        className="h-full bg-gradient-to-r from-app-accent1/80 to-app-accent1 transition-all duration-1000 ease-out relative"
+                        style={{ width: `${savingsProgress}%` }}
+                      >
+                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                      </div>
+                    </div>
+     
+                    <div className="flex justify-between items-center text-[10px]">
+                      <span className="text-app-text/50">Status</span>
+                      <span className="font-medium text-app-text/70">
+                        {savingsThisMonth >= target ? (
+                          <span className="text-app-success font-bold">Tercapai! 🎉</span>
+                        ) : (
+                          `Sisa Rp ${Math.max(target - savingsThisMonth, 0).toLocaleString('id-ID')}`
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-6">
+                <p className="text-app-text/60 font-medium text-sm">Target belum diatur.</p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Penghasilan Harian Berlayer */}
-        {dailyIncomeTargets && dailyIncomeTargets.length > 0 ? (
-          dailyIncomeTargets.map((target, idx) => {
-            const incomeProgress = target > 0 ? Math.min((incomeToday / target) * 100, 100) : 0;
-            return (
-                <div key={idx} className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/5 via-transparent to-transparent pointer-events-none" />
-                  <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
-                     <ArrowUp className="w-5 h-5 text-app-success" /> Penghasilan Layer {idx + 1}
-                  </h2>
-                  
-                  <div className="relative z-10 w-full flex-1 flex flex-col justify-end">
-                       <div className="flex justify-between items-end mb-2">
-                         <div>
-                            <p className="text-[10px] text-app-text/70 font-semibold mb-1 uppercase tracking-widest">Tercapai</p>
-                            <p className="text-lg font-bold text-app-success">Rp {Math.max(incomeToday, 0).toLocaleString('id-ID')}</p>
-                         </div>
-                         <div className="text-right">
-                            <p className="text-[10px] text-app-text/70 font-semibold mb-1 uppercase tracking-widest">Target L{idx + 1}</p>
-                            <p className="text-sm font-bold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
-                         </div>
-                       </div>
-        
-                       <div className="h-4 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-4 shadow-inner">
-                        <div 
-                          className="h-full bg-gradient-to-r from-app-success/80 to-app-success transition-all duration-1000 ease-out relative"
-                          style={{ width: `${incomeProgress}%` }}
-                        >
-                          <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                        </div>
+        <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/5 via-transparent to-transparent pointer-events-none" />
+          <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
+             <ArrowUp className="w-5 h-5 text-app-success" /> Penghasilan Layered
+          </h2>
+          
+          <div className="relative z-10 w-full flex-1 flex flex-col gap-6">
+            {dailyIncomeTargets && dailyIncomeTargets.length > 0 ? (
+              dailyIncomeTargets.map((target, idx) => {
+                const incomeProgress = target > 0 ? Math.min((incomeToday / target) * 100, 100) : 0;
+                return (
+                  <div key={idx} className="border-b border-app-border/30 last:border-0 pb-4 last:pb-0">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs font-bold text-app-text-bright">Layer {idx + 1}</span>
+                      <span className="text-[10px] font-bold text-app-success">
+                        {incomeProgress.toFixed(0)}% Tercapai
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-end mb-2">
+                      <div>
+                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Tercapai</p>
+                        <p className="text-sm font-bold text-app-success">Rp {Math.max(incomeToday, 0).toLocaleString('id-ID')}</p>
                       </div>
-        
-                      <div className="flex justify-between items-center bg-app-bg/50 p-3 rounded-2xl border border-app-border/50 backdrop-blur-sm">
-                        <span className="text-[10px] font-bold text-app-text-bright">
-                          {incomeProgress.toFixed(0)}% Tercapai
-                        </span>
-                        <span className="text-[10px] font-medium text-app-text/70">
-                          {incomeToday >= target ? (
-                            <span className="text-app-success font-bold text-[10px]">Tercapai! 🎉</span>
-                          ) : (
-                            `Kurang Rp ${Math.max(target - incomeToday, 0).toLocaleString('id-ID')}`
-                          )}
-                        </span>
+                      <div className="text-right">
+                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Target L{idx + 1}</p>
+                        <p className="text-xs font-bold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
                       </div>
                     </div>
-                </div>
-            );
-          })
-        ) : (
-          <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden text-center justify-center">
-            <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
-                 <ArrowUp className="w-5 h-5 text-app-success" /> Penghasilan Harian
-              </h2>
-            <div className="relative z-10 py-6">
-              <p className="text-app-text/60 font-medium text-sm">Target belum diatur.</p>
-            </div>
+     
+                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2 shadow-inner">
+                      <div 
+                        className="h-full bg-gradient-to-r from-app-success/80 to-app-success transition-all duration-1000 ease-out relative"
+                        style={{ width: `${incomeProgress}%` }}
+                      >
+                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                      </div>
+                    </div>
+     
+                    <div className="flex justify-between items-center text-[10px]">
+                      <span className="text-app-text/50">Status</span>
+                      <span className="font-medium text-app-text/70">
+                        {incomeToday >= target ? (
+                          <span className="text-app-success font-bold">Tercapai! 🎉</span>
+                        ) : (
+                          `Kurang Rp ${Math.max(target - incomeToday, 0).toLocaleString('id-ID')}`
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-6">
+                <p className="text-app-text/60 font-medium text-sm">Target belum diatur.</p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Pengeluaran Harian Berlayer */}
-        {dailyExpenseLimits && dailyExpenseLimits.length > 0 ? (
-          dailyExpenseLimits.map((target, idx) => {
-            const expenseProgress = target > 0 ? Math.min((expenseToday / target) * 100, 100) : 0;
-            return (
-                <div key={idx} className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/5 via-transparent to-transparent pointer-events-none" />
-                  <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
-                     <ArrowDown className="w-5 h-5 text-app-danger" /> Pengeluaran Layer {idx + 1}
-                  </h2>
-                  
-                  <div className="relative z-10 w-full flex-1 flex flex-col justify-end">
-                       <div className="flex justify-between items-end mb-2">
-                         <div>
-                            <p className="text-[10px] text-app-text/70 font-semibold mb-1 uppercase tracking-widest">Terpakai</p>
-                            <p className="text-lg font-bold text-app-danger">Rp {Math.max(expenseToday, 0).toLocaleString('id-ID')}</p>
-                         </div>
-                         <div className="text-right">
-                            <p className="text-[10px] text-app-text/70 font-semibold mb-1 uppercase tracking-widest">Batas L{idx + 1}</p>
-                            <p className="text-sm font-bold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
-                         </div>
-                       </div>
-        
-                       <div className="h-4 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-4 shadow-inner">
-                        <div 
-                          className={`h-full transition-all duration-1000 ease-out relative ${expenseProgress >= 100 ? 'bg-app-danger' : 'bg-gradient-to-r from-app-warning to-app-warning/80'}`}
-                          style={{ width: `${expenseProgress}%` }}
-                        >
-                          <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                        </div>
+        <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/5 via-transparent to-transparent pointer-events-none" />
+          <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
+             <ArrowDown className="w-5 h-5 text-app-danger" /> Pengeluaran Layered
+          </h2>
+          
+          <div className="relative z-10 w-full flex-1 flex flex-col gap-6">
+            {dailyExpenseLimits && dailyExpenseLimits.length > 0 ? (
+              dailyExpenseLimits.map((target, idx) => {
+                const expenseProgress = target > 0 ? Math.min((expenseToday / target) * 100, 100) : 0;
+                return (
+                  <div key={idx} className="border-b border-app-border/30 last:border-0 pb-4 last:pb-0">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs font-bold text-app-text-bright">Layer {idx + 1}</span>
+                      <span className="text-[10px] font-bold text-app-danger">
+                        {expenseProgress.toFixed(0)}% Terpakai
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-end mb-2">
+                      <div>
+                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Terpakai</p>
+                        <p className="text-sm font-bold text-app-danger">Rp {Math.max(expenseToday, 0).toLocaleString('id-ID')}</p>
                       </div>
-        
-                      <div className="flex justify-between items-center bg-app-bg/50 p-3 rounded-2xl border border-app-border/50 backdrop-blur-sm">
-                        <span className="text-[10px] font-bold text-app-text-bright">
-                          {expenseProgress.toFixed(0)}% Terpakai
-                        </span>
-                        <span className="text-[10px] font-medium text-app-text/70">
-                          {expenseToday > target ? (
-                            <span className="text-app-danger font-bold text-[10px]">Overbudget! 🚫</span>
-                          ) : (
-                            `Sisa Rp ${Math.max(target - expenseToday, 0).toLocaleString('id-ID')}`
-                          )}
-                        </span>
+                      <div className="text-right">
+                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Batas L{idx + 1}</p>
+                        <p className="text-xs font-bold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
                       </div>
                     </div>
-                </div>
-            );
-          })
-        ) : (
-          <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden text-center justify-center">
-            <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
-                 <ArrowDown className="w-5 h-5 text-app-danger" /> Pengeluaran Harian
-              </h2>
-            <div className="relative z-10 py-6">
-              <p className="text-app-text/60 font-medium text-sm">Batas belum diatur.</p>
-            </div>
+     
+                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2 shadow-inner">
+                      <div 
+                        className={`h-full transition-all duration-1000 ease-out relative ${expenseProgress >= 100 ? 'bg-app-danger' : 'bg-gradient-to-r from-app-warning to-app-warning/80'}`}
+                        style={{ width: `${expenseProgress}%` }}
+                      >
+                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                      </div>
+                    </div>
+     
+                    <div className="flex justify-between items-center text-[10px]">
+                      <span className="text-app-text/50">Status</span>
+                      <span className="font-medium text-app-text/70">
+                        {expenseToday > target ? (
+                          <span className="text-app-danger font-bold">Overbudget! 🚫</span>
+                        ) : (
+                          `Sisa Rp ${Math.max(target - expenseToday, 0).toLocaleString('id-ID')}`
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-6">
+                <p className="text-app-text/60 font-medium text-sm">Batas belum diatur.</p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

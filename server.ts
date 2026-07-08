@@ -575,6 +575,243 @@ LAPIS 6 (Smart Basket Risk): Berdasarkan tingkat volatilitas saat ini, kami mere
     }
   });
 
+  function getFinancialStrategyFallback(
+    netProfit: number,
+    income: number,
+    expense: number,
+    avgIncome: number,
+    avgExpense: number,
+    count: number,
+    periodText: string
+  ) {
+    const isDeficit = netProfit < 0;
+    const absProfit = Math.abs(netProfit);
+    
+    const summary = isDeficit
+      ? `Analisis Keuangan untuk periode ${periodText} menunjukkan bahwa Anda mengalami defisit sebesar Rp ${absProfit.toLocaleString("id-ID")}. Pengeluaran Anda lebih besar dari pemasukan, sehingga diperlukan penyesuaian strategi penghematan segera.`
+      : `Analisis Keuangan untuk periode ${periodText} menunjukkan kondisi surplus yang sangat sehat sebesar Rp ${netProfit.toLocaleString("id-ID")}. Pemasukan Anda melebihi pengeluaran, memberikan kesempatan luar biasa untuk menabung dan berinvestasi lebih banyak.`;
+
+    const diagnostic = isDeficit
+      ? [
+          `Defisit anggaran sebesar Rp ${absProfit.toLocaleString("id-ID")} terdeteksi karena total pengeluaran mencapai Rp ${expense.toLocaleString("id-ID")} sementara pemasukan hanya Rp ${income.toLocaleString("id-ID")}.`,
+          `Rata-rata pengeluaran harian Anda adalah Rp ${Math.round(avgExpense).toLocaleString("id-ID")}, sedangkan rata-rata pemasukan harian Anda hanya Rp ${Math.round(avgIncome).toLocaleString("id-ID")}.`,
+          `Rasio pengeluaran terhadap pemasukan Anda mencapai ${((expense / (income || 1)) * 100).toFixed(0)}%. Angka ini melebihi batas aman 100%.`
+        ]
+      : [
+          `Surplus anggaran sebesar Rp ${netProfit.toLocaleString("id-ID")} terdeteksi dengan efisiensi pengeluaran yang sangat baik.`,
+          `Rata-rata pemasukan harian Anda (Rp ${Math.round(avgIncome).toLocaleString("id-ID")}) konsisten berada di atas rata-rata pengeluaran harian (Rp ${Math.round(avgExpense).toLocaleString("id-ID")}).`,
+          `Rasio pengeluaran terhadap pemasukan Anda sangat sehat pada level ${((expense / (income || 1)) * 100).toFixed(0)}%, menyisakan ruang ${((netProfit / (income || 1)) * 100).toFixed(0)}% untuk tabungan dan investasi.`
+        ];
+
+    const savingsRecommendations = isDeficit
+      ? [
+          {
+            title: "Evaluasi & Batasi Biaya Konsumsi Harian",
+            description: `Dengan rata-rata pengeluaran harian sebesar Rp ${Math.round(avgExpense).toLocaleString("id-ID")}, cobalah kurangi jajan non-esensial atau masak sendiri di rumah untuk menekan biaya makan harian.`,
+            priority: "tinggi",
+            potentialSavings: "Rp 350.000 / bulan"
+          },
+          {
+            title: "Audit Layanan Berlangganan & Keanggotaan",
+            description: "Periksa kembali mutasi rekening Anda untuk mendeteksi biaya langganan otomatis (streaming, aplikasi, dll.) yang tidak terlalu sering Anda gunakan, lalu batalkan segera.",
+            priority: "tinggi",
+            potentialSavings: "Rp 150.000 / bulan"
+          },
+          {
+            title: "Terapkan Aturan Jeda Belanja 24 Jam",
+            description: "Sebelum memutuskan membeli barang berharga sedang/tinggi yang bukan merupakan kebutuhan darurat, tunggu 24 jam untuk meredam hasrat belanja impulsif.",
+            priority: "sedang",
+            potentialSavings: "Rp 250.000 / bulan"
+          }
+        ]
+      : [
+          {
+            title: "Automasi Tabungan di Awal Bulan",
+            description: "Gunakan fitur pemindahan saldo otomatis (auto-debit) di awal bulan langsung setelah menerima pemasukan agar dana tabungan tidak terpakai untuk konsumsi.",
+            priority: "tinggi",
+            potentialSavings: `Rp ${(Math.round(netProfit * 0.5)).toLocaleString("id-ID")} / bulan`
+          },
+          {
+            title: "Gunakan Pembayaran Nontunai untuk Cashback",
+            description: "Gunakan saldo nontunai (e-wallet) yang terintegrasi dengan dompet Anda untuk membayar pengeluaran rutin guna menikmati diskon atau cashback promosi.",
+            priority: "rendah",
+            potentialSavings: "Rp 50.000 / bulan"
+          }
+        ];
+
+    const totalBase = income || expense || 1000000;
+    const allocationPlan = [
+      {
+        category: "Kebutuhan Esensial (Kost/Kontrakan, Makan, Tagihan)",
+        currentPct: isDeficit ? 75 : 50,
+        recommendedPct: 50,
+        recommendedAmount: Math.round(totalBase * 0.50)
+      },
+      {
+        category: "Gaya Hidup & Keinginan (Jajan, Hiburan, Belanja)",
+        currentPct: isDeficit ? 25 : 20,
+        recommendedPct: 20,
+        recommendedAmount: Math.round(totalBase * 0.20)
+      },
+      {
+        category: "Tabungan & Investasi (Reksa Dana, Saham, AI Trading)",
+        currentPct: 0,
+        recommendedPct: 20,
+        recommendedAmount: Math.round(totalBase * 0.20)
+      },
+      {
+        category: "Dana Darurat (Proteksi Tabungan Musibah)",
+        currentPct: 0,
+        recommendedPct: 10,
+        recommendedAmount: Math.round(totalBase * 0.10)
+      }
+    ];
+
+    const incomeStrategies = isDeficit
+      ? [
+          "Optimalkan Jam Sibuk Grab: Jika Anda mengemudi Grab, targetkan jam sibuk (rush hour) pagi (06:00-09:00) dan sore (16:00-19:00) untuk memaksimalkan multiplier tarif dan insentif.",
+          "Kembangkan Keterampilan Digital Freelance: Gunakan platform freelance untuk menjual keahlian menulis, desain, atau administrasi data sebagai pemasukan sampingan.",
+          "Mulai AI Trading Berisiko Rendah: Alokasikan sebagian kecil dana menganggur ke bot trading AI Razchly dengan strategi konservatif untuk menciptakan aliran passive income."
+        ]
+      : [
+          "Reinvestasikan Keuntungan (Compounding): Masukkan surplus dana ke produk investasi dengan bunga berbunga seperti reksa dana obligasi atau deposito syariah agar tumbuh lebih cepat.",
+          "Diversifikasi Portofolio Investasi: Bagi surplus keuangan Anda ke dalam beberapa instrumen: 10% emas, 40% reksa dana pasar uang, dan 50% AI trading / instrumen dinamis.",
+          "Eksplorasi Skala Bisnis Sampingan: Gunakan sebagian kecil dana surplus sebagai modal awal untuk bisnis dropship atau kemitraan kecil tanpa mengganggu pekerjaan utama."
+        ];
+
+    return {
+      summary,
+      diagnostic,
+      savingsRecommendations,
+      allocationPlan,
+      incomeStrategies
+    };
+  }
+
+  // API Route for AI Financial Strategy Recommendation
+  app.post("/api/gemini/financial-strategy", async (req, res) => {
+    const { netProfit, income, expense, avgIncome, avgExpense, count, periodText } = req.body;
+    try {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey || apiKey === "MY_GEMINI_API_KEY" || apiKey.trim() === "") {
+        console.log("Missing Gemini API Key. Triggering offline financial-strategy fallback.");
+        const fallbackResult = getFinancialStrategyFallback(
+          Number(netProfit || 0),
+          Number(income || 0),
+          Number(expense || 0),
+          Number(avgIncome || 0),
+          Number(avgExpense || 0),
+          Number(count || 0),
+          periodText || "Bulan Ini"
+        );
+        return res.json({
+          ...fallbackResult,
+          isOffline: true
+        });
+      }
+
+      console.log("Attempting Gemini-3.5-Flash for AI financial strategy");
+      const ai = new GoogleGenAI({
+        apiKey: apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
+        }
+      });
+
+      const prompt = `Lakukan analisis mendalam dan berikan saran/strategi pengelolaan keuangan yang sangat cerdas, taktis, dan aplikatif dalam Bahasa Indonesia berdasarkan data laporan keuangan pengguna sebagai berikut:
+      - Periode: ${periodText || "Bulan Ini"}
+      - Total Transaksi Tercatat: ${count || 0}
+      - Total Pemasukan: Rp ${(income || 0).toLocaleString("id-ID")}
+      - Total Pengeluaran: Rp ${(expense || 0).toLocaleString("id-ID")}
+      - Keuntungan/Kerugian Bersih (Net Profit): Rp ${(netProfit || 0).toLocaleString("id-ID")}
+      - Rata-rata Pemasukan / Hari: Rp ${(avgIncome || 0).toLocaleString("id-ID")}
+      - Rata-rata Pengeluaran / Hari: Rp ${(avgExpense || 0).toLocaleString("id-ID")}
+
+      Berikan rekomendasi finansial yang disesuaikan secara khusus dengan kondisi surplus atau defisit di atas. Jawaban harus sangat memotivasi, solutif, realistis, dan ramah pengguna dalam Bahasa Indonesia.`;
+
+      const responseSchema = {
+        type: Type.OBJECT,
+        properties: {
+          summary: { type: Type.STRING, description: "Ringkasan eksekutif singkat tentang status keuangan pengguna saat ini" },
+          diagnostic: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+            description: "Daftar temuan diagnostik spesifik tentang pola pengeluaran atau kelemahan keuangan"
+          },
+          savingsRecommendations: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                title: { type: Type.STRING, description: "Judul rekomendasi penghematan" },
+                description: { type: Type.STRING, description: "Penjelasan detail cara melakukan penghematan" },
+                priority: { type: Type.STRING, description: "Prioritas: tinggi, sedang, atau rendah" },
+                potentialSavings: { type: Type.STRING, description: "Potensi uang yang bisa dihemat (misal: 'Rp 200.000 / bulan')" }
+              },
+              required: ["title", "description", "priority", "potentialSavings"]
+            }
+          },
+          allocationPlan: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                category: { type: Type.STRING, description: "Kategori alokasi anggaran" },
+                currentPct: { type: Type.NUMBER, description: "Perkiraan persentase alokasi saat ini berdasarkan data" },
+                recommendedPct: { type: Type.NUMBER, description: "Persentase alokasi yang direkomendasikan" },
+                recommendedAmount: { type: Type.NUMBER, description: "Nominal alokasi yang direkomendasikan dalam Rupiah" }
+              },
+              required: ["category", "currentPct", "recommendedPct", "recommendedAmount"]
+            }
+          },
+          incomeStrategies: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+            description: "Daftar rekomendasi atau taktik konkret untuk meningkatkan pemasukan pengguna"
+          }
+        },
+        required: ["summary", "diagnostic", "savingsRecommendations", "allocationPlan", "incomeStrategies"]
+      };
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: responseSchema
+        }
+      });
+
+      const result = JSON.parse(response.text || "{}");
+      res.json({
+        ...result,
+        isOffline: false
+      });
+    } catch (err: any) {
+      console.error("Financial strategy API error:", err);
+      try {
+        const fallbackResult = getFinancialStrategyFallback(
+          Number(netProfit || 0),
+          Number(income || 0),
+          Number(expense || 0),
+          Number(avgIncome || 0),
+          Number(avgExpense || 0),
+          Number(count || 0),
+          periodText || "Bulan Ini"
+        );
+        res.json({
+          ...fallbackResult,
+          isOffline: true,
+          error: String(err)
+        });
+      } catch (fallbackErr) {
+        res.status(500).json({ error: String(err), message: err.message });
+      }
+    }
+  });
+
   // API Route for real Bybit order execution
   app.post("/api/trade/bybit-execute", async (req, res) => {
     try {

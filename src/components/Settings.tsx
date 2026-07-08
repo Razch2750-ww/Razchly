@@ -3,7 +3,7 @@ import { useStore } from '../store/useStore';
 import { themes } from '../themes';
 import { doc, updateDoc, collection, onSnapshot, query, where, getDocs, writeBatch, getDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Palette, Globe, Check, Car, User as UserIcon, ChevronDown, ChevronUp, Plus, Edit2, Trash2, Wallet, X, Type, Star, Eye, EyeOff, LayoutGrid, Sparkles, Calendar } from 'lucide-react';
+import { Palette, Globe, Check, Car, User as UserIcon, ChevronDown, ChevronUp, Plus, Edit2, Trash2, Wallet, X, Type, Star, Eye, EyeOff, LayoutGrid, Sparkles, Calendar, ArrowLeftRight, TrendingUp, Cpu, HandCoins, CalendarCheck, Target, Scan } from 'lucide-react';
 import { Account, Transaction, Category } from '../types';
 import { auth } from '../lib/firebase';
 import { updateProfile } from 'firebase/auth';
@@ -17,7 +17,7 @@ import { AccountModal } from './AccountModal';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 export default function Settings() {
-  const { user, themeId, setThemeId, language, setLanguage, grabCashAccount, grabDompetAccount, grabHematAccount, setGrabAccounts, setGlobalAddModalOpen, setGlobalGrabModalOpen, customFontName, setCustomFont, workSchedule, setWorkSchedule, attendancePeriodStart, setAttendancePeriodStart, attendancePeriodEnd, setAttendancePeriodEnd } = useStore();
+  const { user, themeId, setThemeId, language, setLanguage, grabCashAccount, grabDompetAccount, grabHematAccount, setGrabAccounts, setGlobalAddModalOpen, setGlobalGrabModalOpen, customFontName, setCustomFont, workSchedule, setWorkSchedule, attendancePeriodStart, setAttendancePeriodStart, attendancePeriodEnd, setAttendancePeriodEnd, hiddenTabs, setHiddenTabs } = useStore();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [displayName, setDisplayName] = useState(user?.displayName || '');
@@ -35,7 +35,8 @@ export default function Settings() {
     jadwal: false,
     bahasa: false,
     tema: false,
-    font: false
+    font: false,
+    navigasi: false
   });
 
   useEffect(() => {
@@ -70,6 +71,7 @@ export default function Settings() {
         bahasa: false,
         tema: false,
         font: false,
+        navigasi: false,
         [section]: !isCurrentlyOpen
       };
     });
@@ -254,6 +256,24 @@ export default function Settings() {
       } catch (err) {
          console.error('Error updating language', err);
          toast.error("Gagal memperbarui bahasa");
+      }
+    }
+  };
+
+  const handleToggleTab = async (path: string) => {
+    if (user) {
+      try {
+        const isCurrentlyHidden = hiddenTabs.includes(path);
+        const newHiddenTabs = isCurrentlyHidden
+          ? hiddenTabs.filter(p => p !== path)
+          : [...hiddenTabs, path];
+        
+        await updateDoc(doc(db, 'users', user.uid), { hiddenTabs: newHiddenTabs });
+        setHiddenTabs(newHiddenTabs);
+        toast.success(isCurrentlyHidden ? "Menu tab berhasil diaktifkan!" : "Menu tab berhasil dinonaktifkan/disembunyikan!");
+      } catch (err) {
+         console.error('Error updating hidden tabs', err);
+         toast.error("Gagal memperbarui visibilitas menu");
       }
     }
   };
@@ -795,6 +815,70 @@ export default function Settings() {
                 </div>
               </div>
             ))}
+          </div>
+          )}
+        </section>
+
+        <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
+          <button type="button" onClick={() => toggleSection('navigasi')} className={`relative z-10 w-full flex items-center justify-between ${sections.navigasi ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
+            <div className="flex items-center gap-2">
+              <LayoutGrid className="w-5 h-5 text-app-accent1" />
+              <h2 className="text-sm font-bold uppercase tracking-widest text-app-text-bright">Navigasi Menu (Tampilkan/Sembunyikan)</h2>
+            </div>
+            {sections.navigasi ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
+          </button>
+
+          {sections.navigasi && (
+          <div className="space-y-4 animate-in slide-in-from-top-2 duration-200">
+            <p className="text-sm text-app-text/70 mb-2">
+              Aktifkan atau nonaktifkan tab menu navigasi di bawah ini sesuai kebutuhan Anda. Menu yang dinonaktifkan tidak akan muncul di sidebar desktop maupun menu bawah mobile.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+              {[
+                { path: '/transactions', label: 'Transaksi', icon: ArrowLeftRight },
+                { path: '/investments', label: 'Investasi', icon: TrendingUp },
+                { path: '/ai-trading', label: 'AI Trading', icon: Cpu },
+                { path: '/loans', label: 'Pinjaman', icon: HandCoins },
+                { path: '/attendance', label: 'Absensi', icon: CalendarCheck },
+                { path: '/grab', label: 'Grab', icon: Car },
+                { path: '/savings', label: 'Target', icon: Target },
+                { path: '/analyze', label: 'Analisis', icon: Scan },
+              ].map((tab) => {
+                const isHidden = hiddenTabs.includes(tab.path);
+                return (
+                  <div key={tab.path} className="flex items-center justify-between p-4 rounded-2xl bg-app-bg/50 border border-app-border">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 rounded-xl bg-app-card border border-app-border">
+                        <tab.icon className="w-4 h-4 text-app-accent1" />
+                      </div>
+                      <span className="text-sm font-semibold text-app-text-bright">{tab.label}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleTab(tab.path)}
+                      className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
+                        isHidden
+                          ? 'border-app-danger/30 bg-app-danger/10 text-app-danger hover:bg-app-danger/20'
+                          : 'border-app-success/30 bg-app-success/10 text-app-success hover:bg-app-success/20'
+                      }`}
+                    >
+                      {isHidden ? (
+                        <>
+                          <EyeOff className="w-3.5 h-3.5" />
+                          SEMBUNYI
+                        </>
+                      ) : (
+                        <>
+                          <Eye className="w-3.5 h-3.5" />
+                          TAMPIL
+                        </>
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
           </div>
           )}
         </section>

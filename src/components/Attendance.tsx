@@ -110,6 +110,7 @@ export default function Attendance() {
   const [modalCheckIn, setModalCheckIn] = useState("");
   const [modalCheckOut, setModalCheckOut] = useState("");
   const [modalNotes, setModalNotes] = useState("");
+  const [selectedDateActionMenu, setSelectedDateActionMenu] = useState<{ date: Date; hasRecord: AttendanceRecord | undefined } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -157,10 +158,8 @@ export default function Attendance() {
     return r.date === today.getTime();
   });
 
-  const openAddModal = () => {
-    const today = new Date();
-    // Use local time formatted correctly
-    setModalDate(new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0]);
+  const openAddModalForDate = (date: Date) => {
+    setModalDate(new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split('T')[0]);
     setModalStatus('present');
     setModalCheckIn("");
     setModalCheckOut("");
@@ -169,12 +168,24 @@ export default function Attendance() {
     setIsModalOpen(true);
   };
 
+  const openAddModal = () => {
+    openAddModalForDate(new Date());
+  };
+
   const openEditModal = (record: AttendanceRecord) => {
     const d = new Date(record.date);
     setModalDate(new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0]);
     setModalStatus(record.status);
-    setModalCheckIn(record.checkIn ? new Date(record.checkIn).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : "");
-    setModalCheckOut(record.checkOut ? new Date(record.checkOut).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : "");
+    
+    const formatTime = (timeMs: number) => {
+      const date = new Date(timeMs);
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+    
+    setModalCheckIn(record.checkIn ? formatTime(record.checkIn) : "");
+    setModalCheckOut(record.checkOut ? formatTime(record.checkOut) : "");
     setModalNotes(record.notes || "");
     setEditingRecord(record);
     setIsModalOpen(true);
@@ -739,16 +750,21 @@ export default function Attendance() {
                         return (
                           <div 
                             key={i} 
-                            onClick={() => setSelectedDateForHours(d)}
-                            className={`p-1.5 min-h-[4rem] flex flex-row items-start justify-between rounded-lg relative cursor-pointer hover:bg-app-card transition-colors border ${isToday ? 'bg-app-accent1/10 border-app-accent1 text-app-accent1' : 'bg-app-bg border-app-border text-app-text-bright'}`}
+                            onClick={() => {
+                              setSelectedDateActionMenu({ date: d, hasRecord });
+                            }}
+                            className={`p-1.5 min-h-[4.2rem] flex flex-col justify-between rounded-lg relative cursor-pointer hover:bg-app-card transition-colors border ${isToday ? 'bg-app-accent1/10 border-app-accent1 text-app-accent1' : 'bg-app-bg border-app-border text-app-text-bright'}`}
                           >
-                             <span className="text-xl font-bold pl-0.5">{d.getDate()}</span>
-                             <div className="flex flex-col items-end text-right pr-0.5 mt-0.5">
+                             <div className="flex items-center justify-between w-full">
+                               <span className="text-xs font-bold pl-0.5">{d.getDate()}</span>
+                               {isToday && <span className="w-1.5 h-1.5 rounded-full bg-app-accent1 mr-0.5" />}
+                             </div>
+                             <div className="flex flex-col items-end text-right pr-0.5 mt-0.5 w-full overflow-hidden">
                                {hasRecord ? (
                                  hasRecord.status === 'present' ? (
-                                   <div className="text-xs text-app-success leading-tight flex flex-col font-bold gap-0.5">
-                                     <span>{hasRecord.checkIn ? new Date(hasRecord.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
-                                     <span>{hasRecord.checkOut ? new Date(hasRecord.checkOut).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
+                                   <div className="text-[10px] text-app-success leading-tight flex flex-col font-bold gap-0 w-full">
+                                     <span className="truncate block">{hasRecord.checkIn ? new Date(hasRecord.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
+                                     <span className="truncate block">{hasRecord.checkOut ? new Date(hasRecord.checkOut).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
                                      {(() => {
                                         if (hasRecord.checkIn && hasRecord.checkOut) {
                                             const [sH, sM] = currentSchedule.start.split(':').map(Number);
@@ -757,27 +773,28 @@ export default function Attendance() {
                                             const actualHours = (hasRecord.checkOut - hasRecord.checkIn) / 3600000;
                                             const diff = actualHours - schedHours;
                                             if (diff >= 0.5) {
-                                                return <span className="text-[10px] text-app-warning mt-1 bg-app-warning/10 px-1 py-0.5 rounded block">+{diff.toFixed(5).replace('.', ',')}j</span>;
+                                                const diffStr = parseFloat(diff.toFixed(2)).toString().replace('.', ',');
+                                                 return <span className="text-[9px] text-app-warning mt-0.5 bg-app-warning/10 px-1 py-0.2 rounded block truncate w-full text-center">+{diffStr}j</span>;
                                             }
                                         }
                                         return null;
                                      })()}
                                    </div>
                                  ) : (
-                                   <div className={`text-xs mt-1 leading-tight font-black ${hasRecord.status === 'leave' ? 'text-app-warning' : hasRecord.status === 'sick' ? 'text-app-accent1' : 'text-app-danger'}`}>
+                                   <div className={`text-[10px] mt-0.5 leading-tight font-black truncate w-full ${hasRecord.status === 'leave' ? 'text-app-warning' : hasRecord.status === 'sick' ? 'text-app-accent1' : 'text-app-danger'}`}>
                                      {hasRecord.status === 'leave' ? 'IZIN' : hasRecord.status === 'sick' ? 'SAKIT' : 'ALPHA'}
                                    </div>
                                  )
                                ) : currentSchedule.isActive ? (
-                                 <div className="text-xs text-app-text/40 leading-tight flex flex-col font-medium">
-                                   <span>{currentSchedule.start}</span>
-                                   <span>{currentSchedule.end}</span>
+                                 <div className="text-[10px] text-app-text/40 leading-tight flex flex-col font-medium w-full">
+                                   <span className="truncate block">{currentSchedule.start}</span>
+                                   <span className="truncate block">{currentSchedule.end}</span>
                                  </div>
                                ) : (
-                                 <div className="text-xs text-app-danger/50 leading-tight font-bold mt-1">Libur</div>
+                                 <div className="text-[10px] text-app-danger/50 leading-tight font-bold mt-0.5 truncate w-full">Libur</div>
                                )}
                              </div>
-                             {hasRecord && <div className={`w-1.5 h-1.5 rounded-full absolute bottom-1.5 left-1.5 ${hasRecord.status === 'present' ? 'bg-app-success' : hasRecord.status === 'absent' ? 'bg-app-danger' : hasRecord.status === 'leave' ? 'bg-app-warning' : 'bg-app-accent1'}`} />}
+                             {hasRecord && <div className={`w-1 h-1 rounded-full absolute bottom-1 left-1 ${hasRecord.status === 'present' ? 'bg-app-success' : hasRecord.status === 'absent' ? 'bg-app-danger' : hasRecord.status === 'leave' ? 'bg-app-warning' : 'bg-app-accent1'}`} />}
                           </div>
                         );
                       });
@@ -1050,8 +1067,60 @@ export default function Attendance() {
         </div>
       )}
 
+      {selectedDateActionMenu && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-app-bg w-full max-w-xs rounded-3xl border border-app-border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between p-4 border-b border-app-border bg-app-card/30">
+              <h2 className="font-bold text-app-text-bright text-sm">Pilih Tindakan</h2>
+              <button 
+                onClick={() => setSelectedDateActionMenu(null)} 
+                className="p-1.5 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4 space-y-3.5">
+              <div className="text-center pb-2 border-b border-app-border/30">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-app-text/40 block mb-0.5">Tanggal</span>
+                <span className="text-sm font-bold text-app-text-bright">
+                  {selectedDateActionMenu.date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
+              </div>
+              
+              <button
+                onClick={() => {
+                  const { date, hasRecord } = selectedDateActionMenu;
+                  setSelectedDateActionMenu(null);
+                  if (hasRecord) {
+                    openEditModal(hasRecord);
+                  } else {
+                    openAddModalForDate(date);
+                  }
+                }}
+                className="w-full py-3 px-4 bg-app-accent1 text-app-bg hover:opacity-90 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
+              >
+                <Calendar className="w-4 h-4" />
+                {selectedDateActionMenu.hasRecord ? 'Edit Absensi' : 'Tambah Absensi'}
+              </button>
+
+              <button
+                onClick={() => {
+                  const { date } = selectedDateActionMenu;
+                  setSelectedDateActionMenu(null);
+                  setSelectedDateForHours(date);
+                }}
+                className="w-full py-3 px-4 bg-app-card text-app-text-bright hover:bg-app-hover border border-app-border rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2"
+              >
+                <Clock className="w-4 h-4" />
+                Edit Jadwal Kerja
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-app-bg w-full max-w-md rounded-3xl border border-app-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
               <h2 className="font-bold text-app-text-bright">{editingRecord ? 'Edit Absensi' : 'Tambah Absensi Manual'}</h2>

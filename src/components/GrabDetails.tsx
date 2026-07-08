@@ -8,7 +8,7 @@ import {
 import { db } from "../lib/firebase";
 import { useStore } from "../store/useStore";
 import { Transaction } from "../types";
-import { format, isSameDay, subDays, startOfDay, endOfDay, isWithinInterval, startOfMonth, endOfMonth, isSameMonth } from "date-fns";
+import { format, isSameDay, subDays, addDays, startOfDay, endOfDay, isWithinInterval, startOfMonth, endOfMonth, isSameMonth, subMonths, addMonths } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { Link } from "react-router-dom";
 import {
@@ -19,7 +19,9 @@ import {
   Receipt,
   PiggyBank,
   Tags,
-  Plus
+  Plus,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import {
   LineChart,
@@ -47,8 +49,39 @@ export default function GrabDetails() {
   const { user, setGlobalAddModalOpen, setGlobalGrabModalOpen } = useStore();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filterType, setFilterType] = useState<"hari_ini" | "7_hari" | "bulanan" | "custom">("hari_ini");
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [customStartDate, setCustomStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [customEndDate, setCustomEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
+
+  const handlePrev = () => {
+    if (filterType === "hari_ini") setCurrentDate((prev) => subDays(prev, 1));
+    else if (filterType === "7_hari") setCurrentDate((prev) => subDays(prev, 7));
+    else if (filterType === "bulanan") setCurrentDate((prev) => subMonths(prev, 1));
+  };
+
+  const handleNext = () => {
+    if (filterType === "hari_ini") setCurrentDate((prev) => addDays(prev, 1));
+    else if (filterType === "7_hari") setCurrentDate((prev) => addDays(prev, 7));
+    else if (filterType === "bulanan") setCurrentDate((prev) => addMonths(prev, 1));
+  };
+
+  const getPeriodText = () => {
+    if (filterType === "hari_ini") {
+      if (isSameDay(currentDate, new Date())) return "Hari Ini - " + format(currentDate, "EEEE, d MMM yyyy", { locale: localeId });
+      return format(currentDate, "EEEE, d MMM yyyy", { locale: localeId });
+    }
+    if (filterType === "7_hari") {
+      const start = subDays(currentDate, 6);
+      const startFormatted = format(start, "d MMM", { locale: localeId });
+      const endFormatted = format(currentDate, "d MMM yyyy", { locale: localeId });
+      return `${startFormatted} - ${endFormatted}`;
+    }
+    if (filterType === "bulanan") {
+      if (isSameMonth(currentDate, new Date())) return "Bulan Ini - " + format(currentDate, "MMMM yyyy", { locale: localeId });
+      return format(currentDate, "MMMM yyyy", { locale: localeId });
+    }
+    return "Custom";
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -116,13 +149,14 @@ export default function GrabDetails() {
   const filteredOrders = useMemo(() => {
     return grabOrders.filter((o) => {
       const oDate = new Date(o.date);
-      const today = new Date();
       if (filterType === "hari_ini") {
-        return isSameDay(oDate, today);
+        return isSameDay(oDate, currentDate);
       } else if (filterType === "7_hari") {
-        return oDate.getTime() >= subDays(today, 7).getTime();
+        const start = startOfDay(subDays(currentDate, 6));
+        const end = endOfDay(currentDate);
+        return isWithinInterval(oDate, { start, end });
       } else if (filterType === "bulanan") {
-        return isSameMonth(oDate, today);
+        return isSameMonth(oDate, currentDate);
       } else if (filterType === "custom") {
         const start = startOfDay(new Date(customStartDate));
         const end = endOfDay(new Date(customEndDate));
@@ -130,7 +164,7 @@ export default function GrabDetails() {
       }
       return true;
     });
-  }, [grabOrders, filterType, customStartDate, customEndDate]);
+  }, [grabOrders, filterType, currentDate, customStartDate, customEndDate]);
 
   // Hemat deductions logic
   const hematOrdersFound = filteredOrders.filter((o) => o.label.toLowerCase().includes("hemat")).length;
@@ -146,9 +180,9 @@ export default function GrabDetails() {
     const dataMap: { [key: string]: number } = {};
     if (filterType === "hari_ini") {
       // display 24 hours
-      const today = new Date();
+      const refDate = currentDate;
       for (let i = 0; i <= 24; i++) {
-        const d = new Date(today);
+        const d = new Date(refDate);
         d.setHours(i, 0, 0, 0);
         dataMap[format(d, "HH:mm")] = 0;
       }
@@ -159,15 +193,15 @@ export default function GrabDetails() {
     } else {
       // grouping by days
       let numDays = 7;
-      if (filterType === "bulanan") numDays = parseInt(format(endOfMonth(new Date()), "dd")) - 1;
+      if (filterType === "bulanan") numDays = parseInt(format(endOfMonth(currentDate), "dd")) - 1;
       if (filterType === "custom") {
           const s = startOfDay(new Date(customStartDate));
           const e = endOfDay(new Date(customEndDate));
           numDays = Math.max(1, Math.ceil((e.getTime() - s.getTime()) / (1000 * 3600 * 24)));
       }
       
-      const endD = filterType === "bulanan" ? endOfMonth(new Date()) : filterType === "custom" ? new Date(customEndDate) : new Date();
-      const startD = filterType === "bulanan" ? startOfMonth(new Date()) : subDays(endD, numDays);
+      const endD = filterType === "bulanan" ? endOfMonth(currentDate) : filterType === "custom" ? new Date(customEndDate) : currentDate;
+      const startD = filterType === "bulanan" ? startOfMonth(currentDate) : subDays(endD, numDays);
       
       for (let i = 0; i <= numDays; i++) {
         dataMap[format(subDays(endD, numDays - i), "dd MMM")] = 0;
@@ -179,7 +213,7 @@ export default function GrabDetails() {
     }
     
     return Object.keys(dataMap).map((k) => ({ name: k, amount: dataMap[k] }));
-  }, [filteredOrders, filterType, customEndDate, customStartDate]);
+  }, [filteredOrders, filterType, currentDate, customEndDate, customStartDate]);
 
   const totalNominal = filteredOrders.reduce((sum, o) => sum + o.nominalBersih, 0);
   const totalOrders = filteredOrders.length;
@@ -233,28 +267,49 @@ export default function GrabDetails() {
       </header>
 
       {/* Filter */}
-      <div className="flex items-center gap-1 bg-app-card p-1 rounded-full border border-app-border mb-6 overflow-x-auto no-scrollbar w-full">
+      <div className="bg-app-card rounded-xl p-1 flex items-center justify-between mb-6 border border-app-border w-full shrink-0">
         {["hari_ini", "7_hari", "bulanan", "custom"].map((ft) => (
           <button
             key={ft}
-            onClick={() => setFilterType(ft as any)}
-            className={`px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${filterType === ft ? "bg-app-accent1 text-white shadow-sm" : "bg-transparent text-app-text/60 hover:text-app-text-bright"}`}
+            onClick={() => {
+              setFilterType(ft as any);
+              setCurrentDate(new Date());
+            }}
+            className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-colors ${filterType === ft ? "bg-app-accent1 text-app-bg shadow-md" : "bg-transparent text-app-text/60 hover:text-app-text-bright"}`}
           >
-            {ft === "hari_ini" ? "Hari Ini" : ft === "7_hari" ? "7 Hari" : ft === "bulanan" ? "Bulanan" : "Kustom"}
+            {ft === "hari_ini" ? "Harian" : ft === "7_hari" ? "Mingguan" : ft === "bulanan" ? "Bulanan" : "Custom"}
           </button>
         ))}
       </div>
 
-      {filterType === "custom" && (
-        <div className="flex items-center gap-4 mb-8 bg-app-card p-4 rounded-2xl border border-app-border animate-in zoom-in-95 duration-200">
-          <div className="flex-1">
-            <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">Mulai</label>
-            <input type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright" />
-          </div>
-          <div className="flex-1">
-            <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">Sampai</label>
-            <input type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright" />
-          </div>
+      {/* Date Navigator / Custom Range */}
+      {filterType === "custom" ? (
+        <div className="flex items-center gap-2 mb-6 px-2 shrink-0 animate-in zoom-in-95 duration-200">
+          <input 
+            type="date" 
+            value={customStartDate}
+            onChange={(e) => setCustomStartDate(e.target.value)}
+            className="flex-1 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-3 py-2 outline-none focus:border-app-accent1"
+          />
+          <span className="text-app-text/50">-</span>
+          <input 
+            type="date" 
+            value={customEndDate}
+            onChange={(e) => setCustomEndDate(e.target.value)}
+            className="flex-1 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-3 py-2 outline-none focus:border-app-accent1"
+          />
+        </div>
+      ) : (
+        <div className="flex items-center justify-between mb-6 px-2 shrink-0">
+          <button onClick={handlePrev} className="p-1 hover:bg-app-hover rounded-full transition-colors cursor-pointer">
+            <ChevronLeft className="w-5 h-5 text-app-accent1" />
+          </button>
+          <span className="font-bold text-sm text-app-text-bright">
+            {getPeriodText()}
+          </span>
+          <button onClick={handleNext} className="p-1 hover:bg-app-hover rounded-full transition-colors cursor-pointer">
+            <ChevronRight className="w-5 h-5 text-app-accent1" />
+          </button>
         </div>
       )}
 
