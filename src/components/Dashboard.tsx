@@ -48,6 +48,15 @@ import { format, subDays, isSameDay, isSameMonth } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { AccountModal } from "./AccountModal";
 
+export interface Investment {
+  id: string;
+  category: "saham" | "crypto" | "emas";
+  code: string;
+  qty: number;
+  price: number;
+  createdAt: number;
+}
+
 export default function Dashboard() {
   const user = useStore((state) => state.user);
   const { themeId, setThemeId, setGlobalAddModalOpen, setGlobalGrabModalOpen } =
@@ -63,6 +72,118 @@ export default function Dashboard() {
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const navigate = useNavigate();
+
+  const [investments, setInvestments] = useState<Investment[]>([]);
+  const [quotes, setQuotes] = useState<
+    Record<
+      string,
+      {
+        price: number;
+        change: number;
+        description?: string;
+        logoid?: string;
+        currency?: string;
+        error?: string;
+      }
+    >
+  >(() => {
+    try {
+      const cached = localStorage.getItem("investments_quotes_cache");
+      return cached ? JSON.parse(cached) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const getLivePrice = (inv: Investment) => {
+    const symbolCode = inv.category === "emas" ? "EMAS" : inv.code;
+    const liveData = quotes[symbolCode];
+    let livePrice = liveData?.price || inv.price;
+
+    // Convert to IDR if currency is USD or USDT
+    if (liveData?.currency === "USD" || liveData?.currency === "USDT") {
+      const usdidr = quotes["USDIDR"]?.price || 16250;
+      livePrice *= usdidr;
+    }
+    return livePrice;
+  };
+
+  const totalInvestmentValue = useMemo(() => {
+    return investments.reduce((sum, inv) => {
+      const mult = inv.category === "saham" ? 100 : 1;
+      return sum + inv.qty * mult * getLivePrice(inv);
+    }, 0);
+  }, [investments, quotes]);
+
+  const totalInvestmentCapital = useMemo(() => {
+    return investments.reduce((sum, inv) => {
+      const mult = inv.category === "saham" ? 100 : 1;
+      return sum + inv.qty * mult * inv.price;
+    }, 0);
+  }, [investments]);
+
+  const totalInvestmentReturn = totalInvestmentValue - totalInvestmentCapital;
+  const totalInvestmentReturnPercent = totalInvestmentCapital > 0 
+    ? (totalInvestmentReturn / totalInvestmentCapital) * 100 
+    : 0;
+
+  useEffect(() => {
+    if (!user) return;
+    const qInv = query(collection(db, "users", user.uid, "investments"));
+    const invUnsub = onSnapshot(qInv, (snap) => {
+      const invs: Investment[] = [];
+      snap.forEach((d) => invs.push({ id: d.id, ...d.data() } as Investment));
+      setInvestments(invs);
+    });
+    return () => invUnsub();
+  }, [user]);
+
+  useEffect(() => {
+    if (investments.length === 0) return;
+    const fetchQuotes = async () => {
+      const symbols = new Set(
+        investments.map((i) => (i.category === "emas" ? "EMAS" : i.code)),
+      );
+      symbols.add("USDIDR");
+
+      if (symbols.size === 1 && !symbols.has("USDIDR")) return;
+
+      try {
+        const res = await fetch(
+          "/api/quotes?symbols=" + Array.from(symbols).join(","),
+        );
+        if (res.ok) {
+          const contentType = res.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await res.json();
+            setQuotes((prev) => {
+              const merged = { ...prev };
+              Object.keys(data).forEach((key) => {
+                if (!merged[key]) merged[key] = data[key];
+                else {
+                  merged[key] = {
+                    ...merged[key],
+                    ...data[key],
+                    logoid: data[key].logoid || merged[key].logoid,
+                    description: data[key].description || merged[key].description,
+                  };
+                }
+              });
+              localStorage.setItem("investments_quotes_cache", JSON.stringify(merged));
+              return merged;
+            });
+          } else {
+            console.warn("Expected JSON from /api/quotes, but received:", contentType);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch dashboard investment quotes:", e);
+      }
+    };
+    fetchQuotes();
+    const interval = setInterval(fetchQuotes, 15 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [investments]);
 
   const sortedAccounts = useMemo(() => {
     return [...accounts].sort((a, b) => {
@@ -298,8 +419,52 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* MOBILE INVESTASI SAYA WIDGET */}
+      <div className="md:hidden mb-6">
+        <div className="bg-app-card border border-app-border rounded-[1.5rem] p-6 relative overflow-hidden text-app-text shadow-lg cursor-pointer" onClick={() => navigate("/investments")}>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-app-accent1/5 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+          <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-app-accent1/5 rounded-full blur-[40px] pointer-events-none"></div>
+          
+          <div className="flex justify-between items-start relative z-10 mb-6 mt-1">
+             <div>
+                <p className="text-app-text/70 text-xs font-bold tracking-[0.15em] mb-2 uppercase">Investasi Saya</p>
+                <div className="flex items-center gap-2 mb-1">
+                   <h2 className="text-3xl font-bold text-app-text-bright">Rp {totalInvestmentValue.toLocaleString("id-ID")}</h2>
+                </div>
+                <p className="text-app-text/60 text-xs font-medium">Nilai saat ini</p>
+             </div>
+             {totalInvestmentReturn >= 0 ? (
+               <TrendingUp className="w-5 h-5 text-app-success" />
+             ) : (
+               <TrendingDown className="w-5 h-5 text-app-danger" />
+             )}
+          </div>
+
+          <div className="h-px w-full bg-app-border mt-4 mb-4 relative z-10"></div>
+
+          <div className="flex justify-between items-center relative z-10">
+             <div>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                   <div className="w-2 h-2 rounded-full bg-app-text/40"></div>
+                   <span className="text-app-text/80 text-[13px]">Modal Awal</span>
+                </div>
+                <p className="text-app-text-bright font-bold text-[15px]">Rp {totalInvestmentCapital.toLocaleString("id-ID")}</p>
+             </div>
+             <div className="text-right">
+                <div className="flex items-center justify-end gap-1.5 mb-1.5">
+                   <div className={`w-2 h-2 rounded-full ${totalInvestmentReturn >= 0 ? "bg-app-success" : "bg-app-danger"}`}></div>
+                   <span className="text-app-text/80 text-[13px]">Imbal Hasil</span>
+                </div>
+                <p className={`font-bold text-[15px] ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                   {totalInvestmentReturn >= 0 ? "+" : ""}Rp {totalInvestmentReturn.toLocaleString("id-ID")} ({totalInvestmentReturn >= 0 ? "+" : ""}{totalInvestmentReturnPercent.toFixed(2)}%)
+                </p>
+             </div>
+          </div>
+        </div>
+      </div>
+
       {/* DESKTOP TOP WIDGETS */}
-      <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         {/* TOTAL SALDO */}
         <div
           onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
@@ -377,6 +542,31 @@ export default function Dashboard() {
             </div>
           </div>
           <ChevronRight className="w-5 h-5 text-app-text/40 relative z-10" />
+        </div>
+
+        {/* INVESTASI SAYA */}
+        <div
+          onClick={() => navigate("/investments")}
+          className="bg-app-card rounded-2xl p-6 border border-app-border flex items-center justify-between shadow-sm cursor-pointer hover:bg-app-hover transition-colors overflow-hidden relative"
+        >
+          <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${totalInvestmentReturn >= 0 ? "from-app-success/15" : "from-app-danger/5"} via-transparent to-transparent pointer-events-none opacity-80 block`} />
+          <div className="flex items-center gap-4 relative z-10 min-w-0 flex-1">
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${totalInvestmentReturn >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
+              <TrendingUp className={`w-6 h-6 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1 truncate">
+                Investasi Saya
+              </p>
+              <p className="text-xl font-bold text-app-text-bright truncate">
+                Rp {totalInvestmentValue.toLocaleString("id-ID")}
+              </p>
+              <div className={`flex items-center gap-1 mt-1 text-xs font-medium truncate ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                {totalInvestmentReturn >= 0 ? "+" : ""}Rp {totalInvestmentReturn.toLocaleString("id-ID")} ({totalInvestmentReturn >= 0 ? "+" : ""}{totalInvestmentReturnPercent.toFixed(2)}%)
+              </div>
+            </div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-app-text/40 relative z-10 shrink-0 ml-1" />
         </div>
       </div>
 

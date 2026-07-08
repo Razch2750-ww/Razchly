@@ -9,7 +9,7 @@ import { sendDeviceNotification, requestNotificationPermission } from '../utils/
 import { Transaction } from '../types';
 
 export default function GlobalGoalNotifier() {
-  const { user, monthlySavingsTargets, dailyIncomeTargets, dailyExpenseLimits } = useStore();
+  const { user, monthlySavingsTargets, monthlyExpenseBudget, dailyIncomeTargets, dailyExpenseLimits } = useStore();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   // Request browser notification permission once loaded
@@ -171,6 +171,43 @@ export default function GlobalGoalNotifier() {
       });
     }
 
+    // 4. Predictive Monthly Budget Check
+    if (monthlyExpenseBudget && monthlyExpenseBudget > 0) {
+      const currentDay = new Date().getDate();
+      const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+      
+      if (currentDay >= 1) {
+        const dailySpendingRate = expenseThisMonth / currentDay;
+        const projectedMonthlyExpense = dailySpendingRate * daysInMonth;
+        
+        if (projectedMonthlyExpense > monthlyExpenseBudget) {
+          const key = `warned_predictive_budget_${currentMonthStr}_${currentDayStr}`;
+          if (!localStorage.getItem(key)) {
+            localStorage.setItem(key, "true");
+            
+            const daysUntilRunOut = Math.max(0, Math.floor(monthlyExpenseBudget / dailySpendingRate) - currentDay);
+            const runOutDay = Math.floor(monthlyExpenseBudget / dailySpendingRate);
+            
+            const title = "Peringatan Anggaran PWA! ⚠️";
+            const message = `Rata-rata belanja Rp ${Math.round(dailySpendingRate).toLocaleString('id-ID')}/hari diproyeksikan menghabiskan Rp ${Math.round(projectedMonthlyExpense).toLocaleString('id-ID')} bulan ini, melebihi anggaran Rp ${monthlyExpenseBudget.toLocaleString('id-ID')}. Sisa dana diproyeksikan habis dalam ${daysUntilRunOut} hari (pada tanggal ${runOutDay}).`;
+            
+            setTimeout(() => {
+              toast.error(message, { duration: 10000 });
+              sendDeviceNotification(title, message);
+              
+              // Notify other tabs
+              localStorage.setItem('goal_warn_event', JSON.stringify({
+                type: 'predictive_budget_alert',
+                title,
+                message,
+                timestamp: Date.now()
+              }));
+            }, 1000);
+          }
+        }
+      }
+    }
+
     if (celebrated) {
       confetti({
         particleCount: 150,
@@ -180,7 +217,7 @@ export default function GlobalGoalNotifier() {
       });
     }
 
-  }, [monthlySavingsTargets, dailyIncomeTargets, dailyExpenseLimits, transactions]);
+  }, [monthlySavingsTargets, monthlyExpenseBudget, dailyIncomeTargets, dailyExpenseLimits, transactions]);
 
   return null;
 }

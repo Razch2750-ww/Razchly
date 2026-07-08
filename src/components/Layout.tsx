@@ -7,7 +7,7 @@ import { signOut } from 'firebase/auth';
 import Transactions from './Transactions';
 
 const NAV_ITEMS = [
-  { path: '/', label: 'Dasbor', icon: Home },
+  { path: '/', label: 'Beranda', icon: Home },
   { path: '/transactions', label: 'Transaksi', icon: ArrowLeftRight },
   { path: '/investments', label: 'Investasi', icon: TrendingUp },
   { path: '/ai-trading', label: 'AI Trading', icon: Cpu },

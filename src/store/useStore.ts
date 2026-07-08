@@ -13,6 +13,7 @@ interface AppState {
   grabDompetAccount: string;
   grabHematAccount: string;
   monthlySavingsTargets: number[];
+  monthlyExpenseBudget: number;
   dailyIncomeTarget: number;
   dailyIncomeTargets: number[];
   dailyExpenseLimit: number;
@@ -38,6 +39,7 @@ interface AppState {
   setCustomFont: (base64: string | null, name: string | null) => void;
   setGrabAccounts: (cash: string, dompet: string, hemat: string) => void;
   setMonthlySavingsTargets: (targets: number[]) => void;
+  setMonthlyExpenseBudget: (budget: number) => void;
   setDailyIncomeTarget: (target: number) => void;
   setDailyIncomeTargets: (targets: number[]) => void;
   setDailyExpenseLimit: (limit: number) => void;
@@ -73,6 +75,7 @@ export const useStore = create<AppState>((set) => ({
   grabDompetAccount: '',
   grabHematAccount: '',
   monthlySavingsTargets: [],
+  monthlyExpenseBudget: 0,
   dailyIncomeTarget: 0,
   dailyIncomeTargets: [],
   dailyExpenseLimit: 0,
@@ -107,6 +110,7 @@ export const useStore = create<AppState>((set) => ({
   },
   setGrabAccounts: (cash, dompet, hemat) => set({ grabCashAccount: cash, grabDompetAccount: dompet, grabHematAccount: hemat }),
   setMonthlySavingsTargets: (targets) => set({ monthlySavingsTargets: targets }),
+  setMonthlyExpenseBudget: (budget) => set({ monthlyExpenseBudget: budget }),
   setDailyIncomeTarget: (target) => set({ dailyIncomeTarget: target }),
   setDailyIncomeTargets: (targets) => set({ dailyIncomeTargets: targets }),
   setDailyExpenseLimit: (limit) => set({ dailyExpenseLimit: limit }),

@@ -4,7 +4,7 @@ import { doc, updateDoc, collection, onSnapshot, query, orderBy } from 'firebase
 import { db } from '../lib/firebase';
 import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import { Star, TrendingUp, Target, ArrowUp, ArrowDown, Plus, Car } from 'lucide-react';
+import { Star, TrendingUp, Target, ArrowUp, ArrowDown, Plus, Car, AlertTriangle, Sparkles, TrendingDown } from 'lucide-react';
 
 import { formatNumberInput, parseNumberInput } from '../utils/numberFormat';
 import { Transaction } from '../types';
@@ -12,11 +12,12 @@ import { isSameMonth, isSameDay } from 'date-fns';
 import confetti from 'canvas-confetti';
 
 export default function SavingsTarget() {
-  const { user, monthlySavingsTargets, setMonthlySavingsTargets, dailyIncomeTargets, setDailyIncomeTargets, dailyExpenseLimits, setDailyExpenseLimits, setGlobalAddModalOpen, setGlobalGrabModalOpen } = useStore();
+  const { user, monthlySavingsTargets, setMonthlySavingsTargets, monthlyExpenseBudget, setMonthlyExpenseBudget, dailyIncomeTargets, setDailyIncomeTargets, dailyExpenseLimits, setDailyExpenseLimits, setGlobalAddModalOpen, setGlobalGrabModalOpen } = useStore();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [targetInputs, setTargetInputs] = useState<string[]>(monthlySavingsTargets && monthlySavingsTargets.length > 0 ? monthlySavingsTargets.map(t => formatNumberInput(t.toString())) : ['']);
   const [incomeTargetInputs, setIncomeTargetInputs] = useState<string[]>(dailyIncomeTargets && dailyIncomeTargets.length > 0 ? dailyIncomeTargets.map(t => formatNumberInput(t.toString())) : ['']);
   const [expenseLimitInputs, setExpenseLimitInputs] = useState<string[]>(dailyExpenseLimits && dailyExpenseLimits.length > 0 ? dailyExpenseLimits.map(t => formatNumberInput(t.toString())) : ['']);
+  const [monthlyBudgetInput, setMonthlyBudgetInput] = useState<string>(monthlyExpenseBudget ? formatNumberInput(monthlyExpenseBudget.toString()) : '');
 
 
   useEffect(() => {
@@ -34,7 +35,8 @@ export default function SavingsTarget() {
     setTargetInputs(monthlySavingsTargets && monthlySavingsTargets.length > 0 ? monthlySavingsTargets.map(t => formatNumberInput(t.toString())) : ['']);
     setIncomeTargetInputs(dailyIncomeTargets && dailyIncomeTargets.length > 0 ? dailyIncomeTargets.map(t => formatNumberInput(t.toString())) : ['']);
     setExpenseLimitInputs(dailyExpenseLimits && dailyExpenseLimits.length > 0 ? dailyExpenseLimits.map(t => formatNumberInput(t.toString())) : ['']);
-  }, [monthlySavingsTargets, dailyIncomeTargets, dailyExpenseLimits]);
+    setMonthlyBudgetInput(monthlyExpenseBudget ? formatNumberInput(monthlyExpenseBudget.toString()) : '');
+  }, [monthlySavingsTargets, dailyIncomeTargets, dailyExpenseLimits, monthlyExpenseBudget]);
 
   const handleTabunganChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,16 +45,19 @@ export default function SavingsTarget() {
             const parsedTargets = targetInputs.map(t => parseNumberInput(t)).filter(t => t > 0);
             const parsedIncomeTargets = incomeTargetInputs.map(t => parseNumberInput(t)).filter(t => t > 0);
             const parsedExpenseLimits = expenseLimitInputs.map(t => parseNumberInput(t)).filter(t => t > 0);
+            const parsedMonthlyBudget = parseNumberInput(monthlyBudgetInput);
             
             // Cleanup single target field format from legacy if saving array
             await updateDoc(doc(db, 'users', user.uid), { 
                 monthlySavingsTargets: parsedTargets.length > 0 ? parsedTargets : [],
                 dailyIncomeTargets: parsedIncomeTargets.length > 0 ? parsedIncomeTargets : [],
-                dailyExpenseLimits: parsedExpenseLimits.length > 0 ? parsedExpenseLimits : []
+                dailyExpenseLimits: parsedExpenseLimits.length > 0 ? parsedExpenseLimits : [],
+                monthlyExpenseBudget: parsedMonthlyBudget > 0 ? parsedMonthlyBudget : 0
             });
             setMonthlySavingsTargets(parsedTargets);
             setDailyIncomeTargets(parsedIncomeTargets);
             setDailyExpenseLimits(parsedExpenseLimits);
+            setMonthlyExpenseBudget(parsedMonthlyBudget > 0 ? parsedMonthlyBudget : 0);
             toast.success("Target berhasil diperbarui!");
         } catch (e) {
             console.error("Error updating tabungan target", e);
@@ -78,6 +83,44 @@ export default function SavingsTarget() {
     .reduce((sum, t) => sum + t.amount, 0), [transactions]);
     
   const savingsThisMonth = incomeThisMonth - expenseThisMonth;
+
+  const currentDay = useMemo(() => {
+    return new Date().getDate();
+  }, []);
+
+  const daysInMonth = useMemo(() => {
+    return new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+  }, []);
+
+  const dailySpendingRate = useMemo(() => {
+    return currentDay >= 1 ? expenseThisMonth / currentDay : 0;
+  }, [expenseThisMonth, currentDay]);
+
+  const projectedMonthlyExpense = useMemo(() => {
+    return dailySpendingRate * daysInMonth;
+  }, [dailySpendingRate, daysInMonth]);
+
+  const isOverBudget = useMemo(() => {
+    return monthlyExpenseBudget > 0 && projectedMonthlyExpense > monthlyExpenseBudget;
+  }, [projectedMonthlyExpense, monthlyExpenseBudget]);
+
+  const daysUntilRunOut = useMemo(() => {
+    if (dailySpendingRate <= 0) return daysInMonth;
+    const runOutDay = Math.floor(monthlyExpenseBudget / dailySpendingRate);
+    return Math.max(0, runOutDay - currentDay);
+  }, [dailySpendingRate, monthlyExpenseBudget, currentDay, daysInMonth]);
+
+  const runOutDayCalculated = useMemo(() => {
+    if (dailySpendingRate <= 0) return daysInMonth;
+    return Math.floor(monthlyExpenseBudget / dailySpendingRate);
+  }, [dailySpendingRate, monthlyExpenseBudget, daysInMonth]);
+
+  const runOutDateStr = useMemo(() => {
+    if (dailySpendingRate <= 0) return "";
+    const runOutDay = Math.floor(monthlyExpenseBudget / dailySpendingRate);
+    if (runOutDay <= 0 || runOutDay > 100) return "";
+    return `tanggal ${runOutDay}`;
+  }, [dailySpendingRate, monthlyExpenseBudget]);
 
   return (
     <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
@@ -183,7 +226,8 @@ export default function SavingsTarget() {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Tabungan Bulanan (Berlapis) */}
               <div className="w-full">
                 <div className="flex items-center justify-between mb-2">
                     <label className="text-[10px] uppercase font-bold tracking-wider text-app-text/70 flex items-center gap-1"><Star className="w-3 h-3 text-app-accent1"/> Tabungan Bulanan (Berlapis)</label>
@@ -215,6 +259,32 @@ export default function SavingsTarget() {
                     ))}
                 </div>
               </div>
+
+              {/* Anggaran Pengeluaran Bulanan */}
+              <div className="w-full flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                      <label className="text-[10px] uppercase font-bold tracking-wider text-app-text/70 flex items-center gap-1">
+                        <TrendingDown className="w-3 h-3 text-app-danger"/> Anggaran Pengeluaran Bulanan (PWA Prediktif)
+                      </label>
+                  </div>
+                  <div className="border border-app-border rounded-xl p-4 bg-app-bg/50">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-app-danger/20 text-app-danger px-3 py-3 rounded-lg font-bold text-sm">TOTAL</div>
+                      <input
+                        type="text"
+                        value={monthlyBudgetInput}
+                        onChange={(e) => setMonthlyBudgetInput(e.target.value)}
+                        className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 focus:border-app-danger outline-none text-app-text-bright text-lg font-medium"
+                        placeholder="Rp 0"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-app-text/60 mt-3 leading-relaxed">
+                    Tentukan anggaran belanja bulanan Anda. Sistem PWA akan memproyeksikan pengeluaran harian dan mengirimkan notifikasi perangkat jika run-rate harian terdeteksi berisiko melebihi batas sebelum bulan berakhir.
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="flex justify-end mt-2">
@@ -228,14 +298,86 @@ export default function SavingsTarget() {
           </p>
         </div>
 
-        <div className="lg:col-span-1 bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <TrendingUp className="w-24 h-24 text-app-success" />
+        <div className="lg:col-span-1 flex flex-col gap-6">
+          {/* Laba Bersih Card */}
+          <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden flex-1 min-h-[140px]">
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <TrendingUp className="w-16 h-16 text-app-success" />
+            </div>
+            <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-2 relative z-10">Laba Bersih Bulan Ini</p>
+            <h3 className="text-3xl font-bold text-app-text-bright relative z-10">Rp {Math.max(savingsThisMonth, 0).toLocaleString("id-ID")}</h3>
+            <p className="text-xs text-app-text/50 mt-2 relative z-10">Masuk akal untuk ditabung</p>
           </div>
-          <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-2 relative z-10">Laba Bersih Bulan Ini</p>
-          <h3 className="text-3xl font-bold text-app-text-bright relative z-10">Rp {Math.max(savingsThisMonth, 0).toLocaleString("id-ID")}</h3>
-          <p className="text-xs text-app-text/50 mt-2 relative z-10">Masuk akal untuk ditabung</p>
+
+          {/* Predictive analysis card */}
+          <div className={`rounded-3xl p-6 border shadow-sm flex flex-col relative overflow-hidden flex-1 ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-transparent via-transparent pointer-events-none opacity-80 block" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-3">
+                {monthlyExpenseBudget > 0 ? (
+                  isOverBudget ? (
+                    <AlertTriangle className="w-5 h-5 text-app-danger shrink-0 animate-pulse" />
+                  ) : (
+                    <Sparkles className="w-5 h-5 text-app-success shrink-0" />
+                  )
+                ) : (
+                  <TrendingDown className="w-5 h-5 text-app-text/40 shrink-0" />
+                )}
+                <h4 className="text-app-text-bright font-bold text-sm">
+                  {monthlyExpenseBudget > 0 ? (
+                    isOverBudget ? "Prediksi: Peringatan Anggaran! ⚠️" : "Prediksi: Anggaran Aman! ✨"
+                  ) : (
+                    "Prediksi Pengeluaran PWA"
+                  )}
+                </h4>
+              </div>
+
+              {monthlyExpenseBudget > 0 ? (
+                <>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <p className="text-app-text/50">Anggaran</p>
+                        <p className="font-bold text-app-text-bright">Rp {monthlyExpenseBudget.toLocaleString('id-ID')}</p>
+                      </div>
+                      <div>
+                        <p className="text-app-text/50">Proyeksi Bulan Ini</p>
+                        <p className={`font-bold ${isOverBudget ? 'text-app-danger' : 'text-app-success'}`}>
+                          Rp {Math.round(projectedMonthlyExpense).toLocaleString('id-ID')}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="h-1.5 w-full bg-app-bg rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full ${isOverBudget ? 'bg-app-danger animate-pulse' : 'bg-app-success'}`}
+                        style={{ width: `${Math.min(100, (projectedMonthlyExpense / monthlyExpenseBudget) * 100)}%` }}
+                      />
+                    </div>
+
+                    <p className="text-[11px] text-app-text/80 leading-relaxed">
+                      {isOverBudget ? (
+                        <>
+                          Pengeluaran harian Anda rata-rata <span className="font-bold text-app-danger">Rp {Math.round(dailySpendingRate).toLocaleString('id-ID')}</span>. Anda diproyeksikan melebihi anggaran sebesar <span className="font-bold text-app-danger">Rp {Math.round(projectedMonthlyExpense - monthlyExpenseBudget).toLocaleString('id-ID')}</span> dan kehabisan anggaran dalam <span className="font-bold text-app-danger">{daysUntilRunOut} hari</span> ({runOutDateStr || 'akhir bulan'}).
+                        </>
+                      ) : (
+                        <>
+                          Pengeluaran harian rata-rata Anda <span className="font-bold text-app-success">Rp {Math.round(dailySpendingRate).toLocaleString('id-ID')}</span> sangat baik! Jika dipertahankan, Anda diproyeksikan memiliki sisa anggaran <span className="font-bold text-app-success">Rp {Math.round(monthlyExpenseBudget - projectedMonthlyExpense).toLocaleString('id-ID')}</span> di akhir bulan.
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div className="py-2 text-center">
+                  <p className="text-[11px] text-app-text/60 leading-relaxed">
+                    Atur Anggaran Pengeluaran Bulanan di formulir sebelah untuk mengaktifkan Analisis Prediktif PWA pintar!
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -21,7 +21,7 @@ import GlobalGoalNotifier from './components/GlobalGoalNotifier';
 import AiTrading from './components/AiTrading';
 
 export default function App() {
-  const { user, authChecked, setUser, setAuthChecked, setThemeId, setLanguage, setGrabAccounts, setMonthlySavingsTargets, setDailyIncomeTargets, setDailyExpenseLimits, setWorkSchedule, setAttendancePeriodStart, setAttendancePeriodEnd, setSalarySettings } = useStore();
+  const { user, authChecked, setUser, setAuthChecked, setThemeId, setLanguage, setGrabAccounts, setMonthlySavingsTargets, setMonthlyExpenseBudget, setDailyIncomeTargets, setDailyExpenseLimits, setWorkSchedule, setAttendancePeriodStart, setAttendancePeriodEnd, setSalarySettings } = useStore();
 
   useEffect(() => {
     let unsubscribeSettings: (() => void) | undefined;
@@ -47,6 +47,11 @@ export default function App() {
                 setMonthlySavingsTargets([data.monthlySavingsTarget]);
             } else {
                 setMonthlySavingsTargets([]);
+            }
+            if (data.monthlyExpenseBudget !== undefined) {
+                setMonthlyExpenseBudget(data.monthlyExpenseBudget);
+            } else {
+                setMonthlyExpenseBudget(0);
             }
             if (data.dailyIncomeTargets) {
                 setDailyIncomeTargets(data.dailyIncomeTargets);
@@ -138,6 +143,12 @@ export default function App() {
                       setMonthlySavingsTargets([d.monthlySavingsTarget]);
                   }
                   
+                  if (d.monthlyExpenseBudget !== undefined) {
+                      setMonthlyExpenseBudget(d.monthlyExpenseBudget);
+                  } else {
+                      setMonthlyExpenseBudget(0);
+                  }
+                  
                   if (d.dailyIncomeTargets !== undefined) {
                       setDailyIncomeTargets(d.dailyIncomeTargets);
                   } else if (d.dailyIncomeTarget !== undefined) {
@@ -168,7 +179,7 @@ export default function App() {
         unsubscribe();
         if (unsubscribeSettings) unsubscribeSettings();
     };
-  }, [setUser, setAuthChecked, setThemeId, setLanguage, setGrabAccounts, setMonthlySavingsTargets, setDailyIncomeTargets, setDailyExpenseLimits, setSalarySettings]);
+  }, [setUser, setAuthChecked, setThemeId, setLanguage, setGrabAccounts, setMonthlySavingsTargets, setMonthlyExpenseBudget, setDailyIncomeTargets, setDailyExpenseLimits, setSalarySettings]);
 
   if (!authChecked) {
     return <div className="flex h-screen w-full items-center justify-center bg-app-bg text-app-accent1">Memuat...</div>;

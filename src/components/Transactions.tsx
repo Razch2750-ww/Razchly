@@ -30,6 +30,7 @@ import {
   ChevronDown,
   Car,
   Trash2,
+  Edit2,
   ArrowLeft,
   Share2,
   Laptop,
@@ -108,6 +109,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
   // Regular Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [type, setType] = useState<TransactionType>("expense");
   const [amount, setAmount] = useState("");
@@ -225,6 +227,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
   const [categoryId, setCategoryId] = useState("");
 
   const openAddModal = () => {
+    setEditingTransaction(null);
     setType("expense");
     setAmount("");
     setAccountId(accounts[0]?.id || "");
@@ -236,6 +239,27 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
     setAdminFee("");
     setAdminFeeChargeTo("origin");
     setTsxDate(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingTransaction(null);
+  };
+
+  const openEditModal = (t: Transaction) => {
+    setEditingTransaction(t);
+    setType(t.type);
+    setAmount(t.amount.toString());
+    setAccountId(t.accountId || "");
+    setFromAccountId(t.fromAccountId || "");
+    setToAccountId(t.toAccountId || "");
+    setNote(t.note || "");
+    setCategoryId(t.categoryId || "");
+    setHasAdminFee(!!t.adminFee);
+    setAdminFee(t.adminFee ? t.adminFee.toString() : "");
+    setAdminFeeChargeTo(t.adminFeeChargeTo || "origin");
+    setTsxDate(format(new Date(t.date), "yyyy-MM-dd'T'HH:mm"));
     setIsModalOpen(true);
   };
 
@@ -251,7 +275,77 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
     setIsSubmitting(true);
     try {
       const batch = writeBatch(db);
-      const tsxRef = doc(collection(db, "users", user.uid, "transactions"));
+
+      // Track balance changes for each account
+      const balanceChanges = new Map<string, number>();
+
+      // 1. Revert old transaction if editing
+      if (editingTransaction) {
+        const t = editingTransaction;
+        if (t.type === "income") {
+          if (t.accountId) {
+            balanceChanges.set(t.accountId, (balanceChanges.get(t.accountId) || 0) - t.amount);
+          }
+        } else if (t.type === "expense") {
+          if (t.accountId) {
+            balanceChanges.set(t.accountId, (balanceChanges.get(t.accountId) || 0) + t.amount);
+          }
+        } else if (t.type === "transfer") {
+          if (t.fromAccountId && t.toAccountId) {
+            balanceChanges.set(t.fromAccountId, (balanceChanges.get(t.fromAccountId) || 0) + t.amount);
+            balanceChanges.set(t.toAccountId, (balanceChanges.get(t.toAccountId) || 0) - t.amount);
+            
+            if (t.adminFee) {
+              if (t.adminFeeChargeTo === "origin") {
+                balanceChanges.set(t.fromAccountId, (balanceChanges.get(t.fromAccountId) || 0) + t.adminFee);
+              } else {
+                balanceChanges.set(t.toAccountId, (balanceChanges.get(t.toAccountId) || 0) + t.adminFee);
+              }
+            }
+          }
+        }
+      }
+
+      // 2. Apply new transaction balance changes
+      if (type === "income") {
+        if (!accountId) return;
+        balanceChanges.set(accountId, (balanceChanges.get(accountId) || 0) + numAmount);
+      } else if (type === "expense") {
+        if (!accountId) return;
+        balanceChanges.set(accountId, (balanceChanges.get(accountId) || 0) - numAmount);
+      } else if (type === "transfer") {
+        if (!fromAccountId || !toAccountId || fromAccountId === toAccountId) return;
+        balanceChanges.set(fromAccountId, (balanceChanges.get(fromAccountId) || 0) - numAmount);
+        balanceChanges.set(toAccountId, (balanceChanges.get(toAccountId) || 0) + numAmount);
+
+        let numAdmin = 0;
+        if (hasAdminFee) {
+          numAdmin = parseNumberInput(adminFee);
+          if (!isNaN(numAdmin) && numAdmin > 0) {
+            if (adminFeeChargeTo === "origin") {
+              balanceChanges.set(fromAccountId, (balanceChanges.get(fromAccountId) || 0) - numAdmin);
+            } else {
+              balanceChanges.set(toAccountId, (balanceChanges.get(toAccountId) || 0) - numAdmin);
+            }
+          }
+        }
+      }
+
+      // 3. Write account balance updates to batch
+      for (const [accId, change] of balanceChanges.entries()) {
+        if (change === 0) continue;
+        const accRef = doc(db, "users", user.uid, "accounts", accId);
+        const accDoc = await getDoc(accRef);
+        if (accDoc.exists()) {
+          const currentBal = accDoc.data().balance || 0;
+          batch.update(accRef, { balance: currentBal + change });
+        }
+      }
+
+      // 4. Construct transaction data
+      const tsxRef = editingTransaction
+        ? doc(db, "users", user.uid, "transactions", editingTransaction.id)
+        : doc(collection(db, "users", user.uid, "transactions"));
 
       const tsxData: any = {
         type,
@@ -267,26 +361,22 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           tsxData.categoryName = cat.name;
           tsxData.categoryIcon = cat.icon;
         }
+      } else {
+        tsxData.categoryId = "";
+        tsxData.categoryName = "";
+        tsxData.categoryIcon = "";
       }
 
       if (type === "income" || type === "expense") {
-        if (!accountId) return;
         tsxData.accountId = accountId;
-
-        // Update Account Balance
-        const accRef = doc(db, "users", user.uid, "accounts", accountId);
-        const accDoc = await getDoc(accRef);
-        if (accDoc.exists()) {
-          const currentBal = accDoc.data().balance || 0;
-          const newBal =
-            type === "income" ? currentBal + numAmount : currentBal - numAmount;
-          batch.update(accRef, { balance: newBal });
-        }
+        tsxData.fromAccountId = "";
+        tsxData.toAccountId = "";
+        tsxData.adminFee = 0;
+        tsxData.adminFeeChargeTo = "";
       } else if (type === "transfer") {
-        if (!fromAccountId || !toAccountId || fromAccountId === toAccountId)
-          return;
         tsxData.fromAccountId = fromAccountId;
         tsxData.toAccountId = toAccountId;
+        tsxData.accountId = "";
 
         let numAdmin = 0;
         if (hasAdminFee) {
@@ -295,56 +385,40 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             tsxData.adminFee = numAdmin;
             tsxData.adminFeeChargeTo = adminFeeChargeTo;
           }
-        }
-
-        const fromRef = doc(db, "users", user.uid, "accounts", fromAccountId);
-        const toRef = doc(db, "users", user.uid, "accounts", toAccountId);
-
-        const fromDoc = await getDoc(fromRef);
-        const toDoc = await getDoc(toRef);
-
-        if (fromDoc.exists() && toDoc.exists()) {
-          let fromBal = fromDoc.data().balance || 0;
-          let toBal = toDoc.data().balance || 0;
-
-          fromBal -= numAmount;
-          toBal += numAmount;
-
-          if (numAdmin > 0) {
-            if (adminFeeChargeTo === "origin") {
-              fromBal -= numAdmin;
-            } else {
-              toBal -= numAdmin;
-            }
-          }
-
-          batch.update(fromRef, { balance: fromBal });
-          batch.update(toRef, { balance: toBal });
+        } else {
+          tsxData.adminFee = 0;
+          tsxData.adminFeeChargeTo = "";
         }
       }
 
-      batch.set(tsxRef, tsxData);
+      if (editingTransaction) {
+        batch.update(tsxRef, tsxData);
+      } else {
+        batch.set(tsxRef, tsxData);
+      }
+
       await batch.commit();
       
       // Fire device notification with details
       let notifBody = "";
       let notifTitle = "";
+      const actionStr = editingTransaction ? "diperbarui" : "berhasil dicatat";
       if (type === "income") {
-        notifTitle = "Pemasukan Baru 💰";
-        notifBody = `Pemasukan sebesar Rp ${numAmount.toLocaleString("id-ID")} berhasil dicatat.\nKeterangan: ${note || "-"}`;
+        notifTitle = editingTransaction ? "Pemasukan Diperbarui 💰" : "Pemasukan Baru 💰";
+        notifBody = `Pemasukan sebesar Rp ${numAmount.toLocaleString("id-ID")} ${actionStr}.\nKeterangan: ${note || "-"}`;
       } else if (type === "expense") {
-        notifTitle = "Pengeluaran Baru 💸";
-        notifBody = `Pengeluaran sebesar Rp ${numAmount.toLocaleString("id-ID")} berhasil dicatat.\nKeterangan: ${note || "-"}`;
+        notifTitle = editingTransaction ? "Pengeluaran Diperbarui 💸" : "Pengeluaran Baru 💸";
+        notifBody = `Pengeluaran sebesar Rp ${numAmount.toLocaleString("id-ID")} ${actionStr}.\nKeterangan: ${note || "-"}`;
       } else if (type === "transfer") {
-        notifTitle = "Transfer Baru 🔄";
-        notifBody = `Transfer sebesar Rp ${numAmount.toLocaleString("id-ID")} dari ${getAccountName(fromAccountId)} ke ${getAccountName(toAccountId)} berhasil dicatat.\nKeterangan: ${note || "-"}`;
+        notifTitle = editingTransaction ? "Transfer Diperbarui 🔄" : "Transfer Baru 🔄";
+        notifBody = `Transfer sebesar Rp ${numAmount.toLocaleString("id-ID")} dari ${getAccountName(fromAccountId)} ke ${getAccountName(toAccountId)} ${actionStr}.\nKeterangan: ${note || "-"}`;
       }
       if (notifTitle) {
         sendDeviceNotification(notifTitle, notifBody);
       }
 
-      toast.success("Transaksi berhasil disimpan");
-      setIsModalOpen(false);
+      toast.success(editingTransaction ? "Transaksi berhasil diperbarui" : "Transaksi berhasil disimpan");
+      closeModal();
     } catch (err) {
       console.error("Error saving transaction", err);
       toast.error("Gagal menyimpan transaksi");
@@ -1047,6 +1121,131 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </span>
           </div>
         </div>
+
+        {/* History Transaksi Section */}
+        <div className="mt-6">
+          <h3 className="text-[13px] font-bold text-app-text-bright mb-3">
+            Daftar Transaksi
+          </h3>
+          <div className="bg-app-card border border-app-border rounded-2xl p-4 shadow-lg space-y-3 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+            {mobileFilteredTransactions.length === 0 ? (
+              <div className="py-6 text-center text-app-text/50 text-xs rounded-xl border border-dashed border-app-border relative z-10">
+                Belum ada transaksi di periode ini.
+              </div>
+            ) : (
+              <div className="space-y-2 relative z-10">
+                {mobileFilteredTransactions.map((t) => (
+                  <div
+                    key={t.id}
+                    className="flex items-center justify-between p-3.5 bg-app-bg hover:bg-app-hover rounded-xl transition-colors border border-app-border/40 hover:border-app-border relative overflow-hidden"
+                  >
+                    <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-accent1/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
+                    <div className="flex items-center gap-3 relative z-10 min-w-0 flex-1">
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border
+                        ${
+                          t.type === "income"
+                            ? "bg-app-success/10 text-app-success border-app-success/20"
+                            : t.type === "expense"
+                              ? "bg-app-danger/10 text-app-danger border-app-danger/20"
+                              : "bg-app-accent1/10 text-app-accent1 border-app-accent1/20"
+                        }`}
+                      >
+                        <AccountIcon
+                          iconId={getAccountIcon(
+                            t.type === "transfer"
+                              ? t.fromAccountId
+                              : t.accountId,
+                          )}
+                          className="w-5 h-5"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <p className="text-xs text-app-text-bright font-bold truncate">
+                            {t.note ||
+                              (t.type === "income"
+                                ? "Pemasukan"
+                                : t.type === "expense"
+                                  ? "Pengeluaran"
+                                  : "Transfer")}
+                          </p>
+                          {t.type === "transfer" && (
+                            <span className="px-1.5 py-0.5 bg-app-accent1/10 text-app-accent1 text-[8px] font-black rounded-full border border-app-accent1/20 uppercase tracking-wide">
+                              Transfer
+                            </span>
+                          )}
+                          {t.categoryId && (
+                            <span className="px-1.5 py-0.5 bg-app-card border border-app-border text-app-text text-[8px] font-bold rounded-full flex items-center gap-1">
+                              <CategoryIcon
+                                iconId={t.categoryIcon || "dollar-sign"}
+                                className="w-2.5 h-2.5 text-app-text/70"
+                              />
+                              <span>{t.categoryName}</span>
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] opacity-60 mt-0.5 truncate">
+                          {t.type === "transfer"
+                            ? `${getAccountName(t.fromAccountId)} ➔ ${getAccountName(t.toAccountId)}`
+                            : getAccountName(t.accountId)}{" "}
+                          •{" "}
+                          {format(t.date, "dd MMM, HH:mm", {
+                            locale: localeId,
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 relative z-10 shrink-0 pl-2">
+                      <div className="flex flex-col items-end gap-1">
+                        <p
+                          className={`text-xs font-bold whitespace-nowrap
+                          ${
+                            t.type === "income"
+                              ? "text-app-success"
+                              : t.type === "expense"
+                                ? "text-app-danger"
+                                : "text-app-text-bright"
+                          }`}
+                        >
+                          {t.type === "income"
+                            ? "+"
+                            : t.type === "expense"
+                              ? "-"
+                              : ""}{" "}
+                          Rp {t.amount.toLocaleString("id-ID")}
+                        </p>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditModal(t);
+                            }}
+                            className="p-1 text-app-accent1 hover:bg-app-accent1/10 rounded-full transition-all"
+                            title="Edit Transaksi"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setTsxToDelete(t);
+                            }}
+                            className="p-1 text-app-danger hover:bg-app-danger/10 rounded-full transition-all"
+                            title="Hapus Transaksi"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
       {/* DESKTOP LAYOUT */}
       <div className="hidden md:flex flex-col w-full h-full gap-6">
@@ -1473,6 +1672,16 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
+                          openEditModal(t);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-2 text-app-accent1 hover:bg-app-accent1/10 rounded-full transition-all md:opacity-0 max-md:opacity-100"
+                        title="Edit Transaksi"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setTsxToDelete(t);
                         }}
                         className="opacity-0 group-hover:opacity-100 p-2 text-app-danger hover:bg-app-danger/10 rounded-full transition-all md:opacity-0 max-md:opacity-100"
@@ -1497,10 +1706,10 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           <div className="bg-app-card text-app-text w-full md:max-w-xl md:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-app-border animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
-                Catat Transaksi
+                {editingTransaction ? "Edit Transaksi" : "Catat Transaksi"}
               </h2>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={closeModal}
                 className="p-2 hover:bg-app-hover rounded-full transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -1736,7 +1945,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   disabled={isSubmitting}
                   className="w-full bg-app-accent1 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 text-app-bg font-bold py-4 rounded-xl transition-all shadow-lg text-sm flex items-center justify-center gap-2"
                 >
-                  {isSubmitting ? "Menyimpan..." : "Simpan Transaksi"}
+                  {isSubmitting ? "Menyimpan..." : editingTransaction ? "Perbarui Transaksi" : "Simpan Transaksi"}
                 </button>
               </div>
             </form>

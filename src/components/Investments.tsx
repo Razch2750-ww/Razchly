@@ -131,12 +131,17 @@ export default function Investments() {
       try {
         const res = await fetch(`/api/quotes?symbols=COMPOSITE,USDIDR`);
         if (res.ok) {
-          const data = await res.json();
-          setMarketData((prev: any) => ({
-            ...prev,
-            COMPOSITE: data.COMPOSITE || prev.COMPOSITE,
-            USDIDR: data.USDIDR || prev.USDIDR
-          }));
+          const contentType = res.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await res.json();
+            setMarketData((prev: any) => ({
+              ...prev,
+              COMPOSITE: data.COMPOSITE || prev.COMPOSITE,
+              USDIDR: data.USDIDR || prev.USDIDR
+            }));
+          } else {
+            console.warn("Expected JSON from /api/quotes, but received:", contentType);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch market data:", err);
@@ -158,8 +163,13 @@ export default function Investments() {
       try {
         const res = await fetch(`/api/search?q=${portoCode}`);
         if (!res.ok) throw new Error("Status " + res.status);
-        const data = await res.json();
-        setSearchResults(data);
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const data = await res.json();
+          setSearchResults(data);
+        } else {
+          throw new Error("API returned non-JSON response: " + contentType);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -483,6 +493,10 @@ export default function Investments() {
         );
         if (!res.ok) {
           throw new Error("API returned status " + res.status);
+        }
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("API returned non-JSON response: " + contentType);
         }
         const data = await res.json();
         setQuotes((prev) => {

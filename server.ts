@@ -144,6 +144,7 @@ async function startServer() {
 
                const m = new session.Market(parsedSymbol);
                let resultData: any = {};
+               let resolveTimeout: any = null;
 
                m.onData((data: any) => {
                    if(data.symbol === parsedSymbol && data.status === 'ok') {
@@ -156,14 +157,35 @@ async function startServer() {
                    if (data['currency_logoid']) resultData.currency_logoid = data['currency_logoid'];
 
                    if(data.lp || data.price || (data.ask && data.bid)) {
-                      const resData = {
-                          price: data.lp || data.price || (data.ask + data.bid)/2,
-                          change: data.ch || 0,
-                          description: resultData.description,
-                          logoid: resultData.base_currency_logoid || resultData.logoid,
-                          currency: resultData.currency_code
-                      };
-                      resolve({ symbol, ...resData, realSymbol: parsedSymbol, data: resultData });
+                      resultData.price = data.lp || data.price || (data.ask + data.bid)/2;
+                      resultData.change = data.ch || resultData.change || 0;
+                   }
+
+                   if (resultData.price !== undefined) {
+                      const hasMeta = !!(resultData.description && (resultData.base_currency_logoid || resultData.logoid));
+                      
+                      if (hasMeta) {
+                         if (resolveTimeout) clearTimeout(resolveTimeout);
+                         const resData = {
+                             price: resultData.price,
+                             change: resultData.change || 0,
+                             description: resultData.description,
+                             logoid: resultData.base_currency_logoid || resultData.logoid,
+                             currency: resultData.currency_code
+                         };
+                         resolve({ symbol, ...resData, realSymbol: parsedSymbol, data: resultData });
+                      } else if (!resolveTimeout) {
+                         resolveTimeout = setTimeout(() => {
+                             const resData = {
+                                 price: resultData.price,
+                                 change: resultData.change || 0,
+                                 description: resultData.description,
+                                 logoid: resultData.base_currency_logoid || resultData.logoid,
+                                 currency: resultData.currency_code
+                             };
+                             resolve({ symbol, ...resData, realSymbol: parsedSymbol, data: resultData });
+                         }, 850);
+                      }
                    }
                });
 

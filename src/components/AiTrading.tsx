@@ -71,9 +71,16 @@ export default function AiTrading() {
     const fetchRate = async () => {
       try {
         const response = await fetch("/api/quotes?symbols=USDIDR");
-        const data = await response.json();
-        if (data && data.USDIDR && data.USDIDR.price) {
-          setUsdToIdrRate(data.USDIDR.price);
+        if (response.ok) {
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            if (data && data.USDIDR && data.USDIDR.price) {
+              setUsdToIdrRate(data.USDIDR.price);
+            }
+          } else {
+            console.warn("Expected JSON from /api/quotes, but received:", contentType);
+          }
         }
       } catch (e) {
         console.error("Gagal mengambil kurs USDIDR:", e);
@@ -666,8 +673,15 @@ void OnTradeTransaction(const MqlTradeTransaction& trans,
     setLoadingSearch(true);
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
-      const data = await response.json();
-      setSearchResults(data);
+      if (response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const data = await response.json();
+          setSearchResults(data);
+        } else {
+          console.warn("Expected JSON from /api/search, but received:", contentType);
+        }
+      }
     } catch (e) {
       console.error("Search error:", e);
     } finally {
@@ -680,9 +694,16 @@ void OnTradeTransaction(const MqlTradeTransaction& trans,
     setLoadingQuote(true);
     try {
       const response = await fetch(`/api/quotes?symbols=${sym}`);
-      const data = await response.json();
-      if (data[sym]) {
-        setQuote(data[sym]);
+      if (response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const data = await response.json();
+          if (data[sym]) {
+            setQuote(data[sym]);
+          }
+        } else {
+          console.warn("Expected JSON from /api/quotes, but received:", contentType);
+        }
       }
     } catch (e) {
       console.error("Quote fetch error:", e);
