@@ -1,6 +1,92 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
+/* Premium Animation Keyframes */
+@keyframes textReveal {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes wordReveal {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes floatingLabel {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-25px) scale(0.85);
+    opacity: 1;
+  }
+}
+
+@keyframes softGlow {
+  0%, 100% {
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1), 0 0 10px rgba(0, 0, 0, 0.05);
+    border-color: currentColor;
+  }
+  50% {
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05), 0 0 20px rgba(59, 130, 246, 0.3);
+    border-color: rgb(59, 130, 246);
+  }
+}
+
+@keyframes parallaxBackground {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(30px);
+  }
+}
+
+@keyframes microWaggle {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  25% {
+    transform: rotate(-2deg) translateY(-2px);
+  }
+  75% {
+    transform: rotate(2deg) translateY(2px);
+  }
+}
+
+@keyframes subtleFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 @theme {
   --font-sans: "Canva Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
@@ -67,5 +153,205 @@
     transform: scale(0.98);
     filter: brightness(0.94);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  }
+}
+
+@layer components {
+  /* 1. TEXT REVEAL ANIMATIONS */
+  .text-reveal {
+   animation: textReveal 0.6s ease-out;
+   overflow: hidden;
+  }
+
+  .word-reveal {
+   display: inline-block;
+   animation: wordReveal 0.6s ease-out;
+   overflow: hidden;
+  }
+
+  .text-reveal-stagger > * {
+   animation: wordReveal 0.6s ease-out;
+   overflow: hidden;
+  }
+
+  .text-reveal-stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .text-reveal-stagger > *:nth-child(2) { animation-delay: 100ms; }
+  .text-reveal-stagger > *:nth-child(3) { animation-delay: 200ms; }
+  .text-reveal-stagger > *:nth-child(4) { animation-delay: 300ms; }
+  .text-reveal-stagger > *:nth-child(5) { animation-delay: 400ms; }
+  .text-reveal-stagger > *:nth-child(n+6) { animation-delay: 500ms; }
+
+  /* 2. SKELETON LOADER - SHIMMER EFFECT */
+  .skeleton {
+   background: linear-gradient(
+     90deg,
+     rgba(200, 200, 200, 0.2) 0%,
+     rgba(200, 200, 200, 0.3) 20%,
+     rgba(200, 200, 200, 0.2) 40%,
+     rgba(200, 200, 200, 0.2) 100%
+   );
+   background-size: 1000px 100%;
+   animation: shimmer 2s infinite;
+   border-radius: 8px;
+  }
+
+  .skeleton-text {
+   @apply skeleton h-4 w-full mb-3;
+  }
+
+  .skeleton-title {
+   @apply skeleton h-6 w-3/4 mb-4;
+  }
+
+  .skeleton-avatar {
+   @apply skeleton h-12 w-12 rounded-full;
+  }
+
+  .skeleton-card {
+   @apply skeleton h-40 w-full rounded-lg;
+  }
+
+  .skeleton-button {
+   @apply skeleton h-10 w-24 rounded-md;
+  }
+
+  .skeleton-line {
+   @apply skeleton h-3 w-full mb-2;
+  }
+
+  .skeleton-line:last-child {
+   @apply mb-0;
+  }
+
+  .loading-container {
+   @apply space-y-4;
+  }
+
+  /* 3. FLOATING FORM LABELS & SOFT GLOW */
+  .form-group {
+   @apply relative;
+  }
+
+  .floating-input {
+   @apply w-full px-4 py-3 bg-transparent border-2 border-current rounded-lg transition-all duration-150;
+  }
+
+  .floating-label {
+   @apply absolute left-4 top-4 text-sm transition-all duration-150 pointer-events-none;
+   transform: translateY(0) scale(1);
+   transform-origin: left top;
+   opacity: 0.6;
+  }
+
+  .floating-input:focus ~ .floating-label,
+  .floating-input:not(:placeholder-shown) ~ .floating-label {
+   animation: floatingLabel 0.15s ease-out forwards;
+  }
+
+  .floating-input:focus {
+   animation: softGlow 0.3s ease-in-out;
+  }
+
+  .input-glow {
+   @apply transition-all duration-200;
+  }
+
+  .input-glow:focus {
+   animation: softGlow 0.3s ease-in-out infinite;
+  }
+
+  /* 4. PARALLAX BACKGROUND */
+  .parallax-container {
+   position: relative;
+   overflow: hidden;
+  }
+
+  .parallax-bg {
+   will-change: transform;
+   transition: transform 0.3s ease-out;
+  }
+
+  .parallax-content {
+   position: relative;
+   z-index: 10;
+  }
+
+  /* Parallax on scroll - applied via JS */
+  .parallax-offset {
+   transform: translateY(var(--parallax-offset, 0));
+  }
+
+  /* 5. MICRO-LOOPING & SUBTLE ANIMATIONS */
+  .micro-waggle {
+   animation: microWaggle 3s ease-in-out infinite;
+   will-change: transform;
+  }
+
+  .subtle-float {
+   animation: subtleFloat 4s ease-in-out infinite;
+   will-change: transform;
+  }
+
+  .empty-state-icon {
+   @apply micro-waggle text-4xl opacity-75;
+  }
+
+  .empty-state-container {
+   @apply flex flex-col items-center justify-center py-12 text-center;
+  }
+
+  .error-icon {
+   @apply micro-waggle text-5xl opacity-70;
+  }
+
+  /* PREMIUM UTILITIES */
+  .backdrop-blur-premium {
+   @apply backdrop-blur-xl bg-white/10 dark:bg-black/10;
+  }
+
+  .card-premium {
+   @apply rounded-xl border-2 backdrop-blur-sm transition-all duration-300;
+  }
+
+  .btn-premium {
+   @apply px-6 py-3 rounded-lg font-medium transition-all duration-200 transform;
+  }
+
+  .btn-premium:hover:not(:disabled) {
+   @apply scale-105;
+  }
+
+  .btn-premium:active:not(:disabled) {
+   @apply scale-95;
+  }
+
+  .text-gradient {
+   background: linear-gradient(135deg, var(--accent1-color), var(--accent2-color, var(--accent1-color)));
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+   background-clip: text;
+  }
+
+  /* Smooth transitions */
+  .transition-premium {
+   @apply transition-all duration-300 ease-out;
+  }
+
+  /* Focus states for accessibility */
+  .focus-ring {
+   @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .focus-ring-primary {
+   @apply focus-ring focus:ring-blue-500;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+   *, *::before, *::after {
+     animation-duration: 0.01ms !important;
+     animation-iteration-count: 1 !important;
+     transition-duration: 0.01ms !important;
+   }
   }
 }
