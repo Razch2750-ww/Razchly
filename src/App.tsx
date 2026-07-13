@@ -19,6 +19,7 @@ import SavingsTarget from './components/SavingsTarget';
 import ImageAnalysis from './components/ImageAnalysis';
 import GlobalGoalNotifier from './components/GlobalGoalNotifier';
 import AiTrading from './components/AiTrading';
+import { initializePremiumAnimations } from './utils/parallaxHelper';
 
 export default function App() {
   const { user, authChecked, setUser, setAuthChecked, setThemeId, setLanguage, setGrabAccounts, setMonthlySavingsTargets, setMonthlyExpenseBudget, setDailyIncomeTargets, setDailyExpenseLimits, setHiddenTabs, setWorkSchedule, setAttendancePeriodStart, setAttendancePeriodEnd, setSalarySettings } = useStore();
@@ -191,6 +192,11 @@ export default function App() {
         if (unsubscribeSettings) unsubscribeSettings();
     };
   }, [setUser, setAuthChecked, setThemeId, setLanguage, setGrabAccounts, setMonthlySavingsTargets, setMonthlyExpenseBudget, setDailyIncomeTargets, setDailyExpenseLimits, setHiddenTabs, setSalarySettings]);
+
+  // Initialize premium animations on mount
+  useEffect(() => {
+    initializePremiumAnimations();
+  }, []);
 
   if (!authChecked) {
     return <div className="flex h-screen w-full items-center justify-center bg-app-bg text-app-accent1">Memuat...</div>;
