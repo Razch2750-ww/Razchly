@@ -48,4 +48,24 @@
     filter: invert(0.5);
     cursor: pointer;
   }
+
+  /* Premium Button Micro-Interactions */
+  button:not(:disabled), .btn-interactive {
+    transition: transform 180ms ease-in-out, 
+                background-color 180ms ease-in-out, 
+                box-shadow 180ms ease-in-out, 
+                filter 150ms ease-in-out;
+  }
+  
+  button:not(:disabled):hover, .btn-interactive:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    filter: brightness(1.06) contrast(0.97);
+  }
+  
+  button:not(:disabled):active, .btn-interactive:active {
+    transform: scale(0.98);
+    filter: brightness(0.94);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  }
 }

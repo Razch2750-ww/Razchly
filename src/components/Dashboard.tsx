@@ -47,6 +47,7 @@ import {
 import { format, subDays, isSameDay, isSameMonth } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { AccountModal } from "./AccountModal";
+import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem } from "./MotionWrappers";
 
 export interface Investment {
   id: string;
@@ -402,8 +403,11 @@ export default function Dashboard() {
       </header>
 
       {/* MOBILE TOTAL SALDO WIDGET */}
-      <div className="md:hidden mb-6">
-        <div className="bg-app-card border border-app-border rounded-[1.5rem] p-6 relative overflow-hidden text-app-text shadow-lg cursor-pointer" onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}>
+      <ScrollReveal className="md:hidden mb-6">
+        <HoverCard 
+          onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
+          className="bg-app-card border border-app-border rounded-[1.5rem] p-6 relative overflow-hidden text-app-text shadow-lg cursor-pointer"
+        >
           <div className="absolute top-0 right-0 w-64 h-64 bg-app-accent1/5 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
           <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-app-accent1/5 rounded-full blur-[40px] pointer-events-none"></div>
           
@@ -436,12 +440,15 @@ export default function Dashboard() {
                 <p className="text-app-danger font-bold text-[15px]">-Rp {expenseToday.toLocaleString("id-ID")}</p>
              </div>
           </div>
-        </div>
-      </div>
+        </HoverCard>
+      </ScrollReveal>
 
       {/* MOBILE INVESTASI SAYA WIDGET */}
-      <div className="md:hidden mb-6">
-        <div className="bg-app-card border border-app-border rounded-[1.5rem] p-6 relative overflow-hidden text-app-text shadow-lg cursor-pointer" onClick={() => navigate("/investments")}>
+      <ScrollReveal className="md:hidden mb-6" delay={0.08}>
+        <HoverCard 
+          onClick={() => navigate("/investments")}
+          className="bg-app-card border border-app-border rounded-[1.5rem] p-6 relative overflow-hidden text-app-text shadow-lg cursor-pointer"
+        >
           <div className="absolute top-0 right-0 w-64 h-64 bg-app-accent1/5 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
           <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-app-accent1/5 rounded-full blur-[40px] pointer-events-none"></div>
           
@@ -454,9 +461,9 @@ export default function Dashboard() {
                 <p className="text-app-text/60 text-xs font-medium">Nilai saat ini</p>
              </div>
              {totalInvestmentReturn >= 0 ? (
-               <TrendingUp className="w-5 h-5 text-app-success" />
+                <TrendingUp className="w-5 h-5 text-app-success" />
              ) : (
-               <TrendingDown className="w-5 h-5 text-app-danger" />
+                <TrendingDown className="w-5 h-5 text-app-danger" />
              )}
           </div>
 
@@ -480,115 +487,123 @@ export default function Dashboard() {
                 </p>
              </div>
           </div>
-        </div>
-      </div>
+        </HoverCard>
+      </ScrollReveal>
 
       {/* DESKTOP TOP WIDGETS */}
-      <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <StaggerContainer className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         {/* TOTAL SALDO */}
-        <div
-          onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
-          className="bg-app-card rounded-2xl p-6 border border-app-border flex items-center justify-between shadow-sm cursor-pointer hover:bg-app-hover transition-colors overflow-hidden relative"
-        >
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="w-12 h-12 rounded-xl bg-app-accent1/10 flex items-center justify-center">
-              <Wallet className="w-6 h-6 text-app-accent1" />
-            </div>
-            <div>
-              <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1">
-                Total Saldo
-              </p>
-              <p className="text-xl font-bold text-app-text-bright">
-                Rp {totalBalance.toLocaleString("id-ID")}
-              </p>
-              <div className="flex items-center gap-1 mt-1 text-app-accent1 text-xs font-medium">
-                <TrendingUp className="w-3 h-3" /> Saldo Aman
+        <StaggerItem>
+          <HoverCard
+            onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
+            className="bg-app-card rounded-2xl p-6 border border-app-border flex items-center justify-between shadow-sm cursor-pointer overflow-hidden relative h-full w-full"
+          >
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="w-12 h-12 rounded-xl bg-app-accent1/10 flex items-center justify-center shrink-0">
+                <Wallet className="w-6 h-6 text-app-accent1" />
+              </div>
+              <div>
+                <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1">
+                  Total Saldo
+                </p>
+                <p className="text-xl font-bold text-app-text-bright">
+                  Rp {totalBalance.toLocaleString("id-ID")}
+                </p>
+                <div className="flex items-center gap-1 mt-1 text-app-accent1 text-xs font-medium">
+                  <TrendingUp className="w-3 h-3" /> Saldo Aman
+                </div>
               </div>
             </div>
-          </div>
-          <ChevronRight className="w-5 h-5 text-app-text/40 relative z-10" />
-        </div>
+            <ChevronRight className="w-5 h-5 text-app-text/40 relative z-10 shrink-0" />
+          </HoverCard>
+        </StaggerItem>
 
         {/* PEMASUKAN */}
-        <div
-          onClick={() =>
-            navigate("/transactions", { state: { tab: "Pemasukan" } })
-          }
-          className="bg-app-card rounded-2xl p-6 border border-app-border flex items-center justify-between shadow-sm cursor-pointer hover:bg-app-hover transition-colors overflow-hidden relative"
-        >
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="w-12 h-12 rounded-xl bg-app-success/10 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-app-success" />
-            </div>
-            <div>
-              <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1">
-                Pemasukan (Hari Ini)
-              </p>
-              <p className="text-xl font-bold text-app-text-bright">
-                Rp {incomeToday.toLocaleString("id-ID")}
-              </p>
-              <div className="flex items-center gap-1 mt-1 text-app-success text-xs font-medium">
-                <TrendingUp className="w-3 h-3" /> 0% dari kemarin
+        <StaggerItem>
+          <HoverCard
+            onClick={() =>
+              navigate("/transactions", { state: { tab: "Pemasukan" } })
+            }
+            className="bg-app-card rounded-2xl p-6 border border-app-border flex items-center justify-between shadow-sm cursor-pointer overflow-hidden relative h-full w-full"
+          >
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="w-12 h-12 rounded-xl bg-app-success/10 flex items-center justify-center shrink-0">
+                <TrendingUp className="w-6 h-6 text-app-success" />
+              </div>
+              <div>
+                <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1">
+                  Pemasukan (Hari Ini)
+                </p>
+                <p className="text-xl font-bold text-app-text-bright">
+                  Rp {incomeToday.toLocaleString("id-ID")}
+                </p>
+                <div className="flex items-center gap-1 mt-1 text-app-success text-xs font-medium">
+                  <TrendingUp className="w-3 h-3" /> 0% dari kemarin
+                </div>
               </div>
             </div>
-          </div>
-          <ChevronRight className="w-5 h-5 text-app-text/40 relative z-10" />
-        </div>
+            <ChevronRight className="w-5 h-5 text-app-text/40 relative z-10 shrink-0" />
+          </HoverCard>
+        </StaggerItem>
 
         {/* PENGELUARAN */}
-        <div
-          onClick={() =>
-            navigate("/transactions", { state: { tab: "Pengeluaran" } })
-          }
-          className="bg-app-card rounded-2xl p-6 border border-app-border flex items-center justify-between shadow-sm cursor-pointer hover:bg-app-hover transition-colors overflow-hidden relative"
-        >
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/5 via-transparent to-transparent pointer-events-none opacity-80 block" />
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="w-12 h-12 rounded-xl bg-app-danger/10 flex items-center justify-center">
-              <TrendingDown className="w-6 h-6 text-app-danger" />
-            </div>
-            <div>
-              <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1">
-                Pengeluaran (Hari Ini)
-              </p>
-              <p className="text-xl font-bold text-app-text-bright">
-                Rp {expenseToday.toLocaleString("id-ID")}
-              </p>
-              <div className="flex items-center gap-1 mt-1 text-app-danger text-xs font-medium">
-                <TrendingDown className="w-3 h-3" /> 0% dari kemarin
+        <StaggerItem>
+          <HoverCard
+            onClick={() =>
+              navigate("/transactions", { state: { tab: "Pengeluaran" } })
+            }
+            className="bg-app-card rounded-2xl p-6 border border-app-border flex items-center justify-between shadow-sm cursor-pointer overflow-hidden relative h-full w-full"
+          >
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/5 via-transparent to-transparent pointer-events-none opacity-80 block" />
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="w-12 h-12 rounded-xl bg-app-danger/10 flex items-center justify-center shrink-0">
+                <TrendingDown className="w-6 h-6 text-app-danger" />
+              </div>
+              <div>
+                <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1">
+                  Pengeluaran (Hari Ini)
+                </p>
+                <p className="text-xl font-bold text-app-text-bright">
+                  Rp {expenseToday.toLocaleString("id-ID")}
+                </p>
+                <div className="flex items-center gap-1 mt-1 text-app-danger text-xs font-medium">
+                  <TrendingDown className="w-3 h-3" /> 0% dari kemarin
+                </div>
               </div>
             </div>
-          </div>
-          <ChevronRight className="w-5 h-5 text-app-text/40 relative z-10" />
-        </div>
+            <ChevronRight className="w-5 h-5 text-app-text/40 relative z-10 shrink-0" />
+          </HoverCard>
+        </StaggerItem>
 
         {/* INVESTASI SAYA */}
-        <div
-          onClick={() => navigate("/investments")}
-          className="bg-app-card rounded-2xl p-6 border border-app-border flex items-center justify-between shadow-sm cursor-pointer hover:bg-app-hover transition-colors overflow-hidden relative"
-        >
-          <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${totalInvestmentReturn >= 0 ? "from-app-success/15" : "from-app-danger/5"} via-transparent to-transparent pointer-events-none opacity-80 block`} />
-          <div className="flex items-center gap-4 relative z-10 min-w-0 flex-1">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${totalInvestmentReturn >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
-              <TrendingUp className={`w-6 h-6 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`} />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1 truncate">
-                Investasi Saya
-              </p>
-              <p className="text-xl font-bold text-app-text-bright truncate">
-                Rp {totalInvestmentValue.toLocaleString("id-ID")}
-              </p>
-              <div className={`flex items-center gap-1 mt-1 text-xs font-medium truncate ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                {totalInvestmentReturn >= 0 ? "+" : ""}Rp {totalInvestmentReturn.toLocaleString("id-ID")} ({totalInvestmentReturn >= 0 ? "+" : ""}{totalInvestmentReturnPercent.toFixed(2)}%)
+        <StaggerItem>
+          <HoverCard
+            onClick={() => navigate("/investments")}
+            className="bg-app-card rounded-2xl p-6 border border-app-border flex items-center justify-between shadow-sm cursor-pointer overflow-hidden relative h-full w-full"
+          >
+            <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${totalInvestmentReturn >= 0 ? "from-app-success/15" : "from-app-danger/5"} via-transparent to-transparent pointer-events-none opacity-80 block`} />
+            <div className="flex items-center gap-4 relative z-10 min-w-0 flex-1">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${totalInvestmentReturn >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
+                <TrendingUp className={`w-6 h-6 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1 truncate">
+                  Investasi Saya
+                </p>
+                <p className="text-xl font-bold text-app-text-bright truncate">
+                  Rp {totalInvestmentValue.toLocaleString("id-ID")}
+                </p>
+                <div className={`flex items-center gap-1 mt-1 text-xs font-medium truncate ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                  {totalInvestmentReturn >= 0 ? "+" : ""}Rp {totalInvestmentReturn.toLocaleString("id-ID")} ({totalInvestmentReturn >= 0 ? "+" : ""}{totalInvestmentReturnPercent.toFixed(2)}%)
+                </div>
               </div>
             </div>
-          </div>
-          <ChevronRight className="w-5 h-5 text-app-text/40 relative z-10 shrink-0 ml-1" />
-        </div>
-      </div>
+            <ChevronRight className="w-5 h-5 text-app-text/40 relative z-10 shrink-0 ml-1" />
+          </HoverCard>
+        </StaggerItem>
+      </StaggerContainer>
 
       {/* MOBILE MIDDLE SECTION */}
       <div className="md:hidden pb-4">
