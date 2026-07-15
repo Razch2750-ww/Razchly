@@ -40,18 +40,26 @@ export default function Layout() {
     <div className="flex h-screen w-full bg-app-bg text-app-text overflow-hidden relative font-sans">
       
       {/* Desktop Sidebar */}
-      <aside className={`hidden md:flex flex-col transition-all duration-300 border-r border-app-border bg-app-bg ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
-        <div className={`py-6 border-b border-app-border/50 mb-4 flex items-center justify-center ${isSidebarOpen ? 'px-6 !justify-start' : 'px-0'}`}>
-          <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
-            <img src="/icon.svg" alt="Razchly Logo" className="w-[80%] h-[80%] object-contain" />
+      <aside className={`hidden md:flex flex-col transition-all duration-300 border-r border-app-border/60 bg-app-bg ${isSidebarOpen ? 'w-64' : 'w-[72px]'}`}>
+        {/* Logo */}
+        <div className={`h-16 flex items-center shrink-0 border-b border-app-border/40 ${isSidebarOpen ? 'px-5 gap-3' : 'justify-center px-0'}`}>
+          <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-app-accent1/10">
+            <img src="/icon.svg" alt="Razchly Logo" className="w-[70%] h-[70%] object-contain" />
           </div>
-          {isSidebarOpen && <span className="font-bold text-app-text-bright text-xl tracking-tight ml-3">Razchly</span>}
+          {isSidebarOpen && (
+            <span className="font-extrabold text-app-text-bright text-lg tracking-tight leading-none">
+              Razchly
+            </span>
+          )}
         </div>
         
-        <nav className="flex-1 px-4 flex flex-col gap-2 relative">
-          <button onClick={() => setSidebarOpen(!isSidebarOpen)} className={`flex items-center w-full py-2 my-2 text-xs border border-app-border rounded-lg hover:bg-app-hover transition-all opacity-70 ${!isSidebarOpen ? 'justify-center px-0' : 'px-4'}`}>
-            <Menu className={`w-4 h-4 ${isSidebarOpen ? 'mr-2' : ''}`} />
-            {isSidebarOpen && "Toggle Sidebar"}
+        <nav className="flex-1 px-3 py-4 flex flex-col gap-1 relative">
+          <button
+            onClick={() => setSidebarOpen(!isSidebarOpen)}
+            className={`flex items-center w-full py-2.5 mb-3 text-[11px] font-semibold tracking-wide text-app-text/50 hover:text-app-text rounded-lg hover:bg-app-hover/60 transition-all ${!isSidebarOpen ? 'justify-center px-0' : 'px-3 gap-2'}`}
+          >
+            <Menu className="w-4 h-4 shrink-0" />
+            {isSidebarOpen && "Collapse"}
           </button>
           {visibleNavItems.map((item) => (
             <NavLink 
@@ -59,45 +67,59 @@ export default function Layout() {
               to={item.path}
               onMouseEnter={() => setHoveredPath(item.path)}
               onMouseLeave={() => setHoveredPath(null)}
-              className={({ isActive }) => `relative flex items-center gap-4 py-3 rounded-xl transition-all ${isActive ? 'text-app-text-bright' : 'hover:text-app-text-bright cursor-pointer'} ${!isSidebarOpen ? 'justify-center px-0' : 'px-4'}`}
-              title={item.label}
+              className={({ isActive }) =>
+                `relative flex items-center gap-3 py-2.5 rounded-xl transition-all duration-200
+                ${isActive
+                  ? 'text-app-text-bright'
+                  : 'text-app-text/60 hover:text-app-text-bright cursor-pointer'
+                }
+                ${!isSidebarOpen ? 'justify-center px-0' : 'px-3'}`
+              }
+              title={!isSidebarOpen ? item.label : undefined}
             >
-              {/* Dynamic Sliding Capsule Background for Active Item */}
+              {/* Active pill background */}
               {item.path === window.location.pathname && (
                 <motion.div 
                   layoutId="sidebar-active-bg"
-                  className="absolute inset-0 bg-app-card border border-app-border rounded-xl shadow-sm -z-10"
-                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                  className="absolute inset-0 bg-app-accent1/12 border border-app-accent1/20 rounded-xl -z-10"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
-              {/* Dynamic Hover Sliding Background */}
+              {/* Hover background */}
               {item.path !== window.location.pathname && hoveredPath === item.path && (
                 <motion.div 
                   layoutId="sidebar-hover-bg"
-                  className="absolute inset-0 bg-app-hover rounded-xl -z-10"
-                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                  className="absolute inset-0 bg-app-hover/80 rounded-xl -z-10"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
               
-              {/* Elegant dynamic vertical accent line on the left */}
-              {item.path === window.location.pathname && (
-                <motion.div 
-                  layoutId="sidebar-accent-line"
-                  className="absolute left-0 top-3 bottom-3 w-1 bg-app-accent1 rounded-r-md"
-                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                />
+              {/* Icon with active accent ring instead of side stripe */}
+              <span className={`relative flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-all duration-200 ${
+                item.path === window.location.pathname
+                  ? 'bg-app-accent1/15 text-app-accent1'
+                  : 'text-current'
+              }`}>
+                <item.icon className="w-4.5 h-4.5" />
+              </span>
+              {isSidebarOpen && (
+                <span className="truncate text-sm font-medium relative z-10">{item.label}</span>
               )}
-
-              <item.icon className="w-5 h-5 shrink-0 relative z-10" />
-              {isSidebarOpen && <span className="truncate font-medium relative z-10">{item.label}</span>}
             </NavLink>
           ))}
         </nav>
 
-        <div className="p-4 mt-auto">
-          <button onClick={handleLogout} className={`flex items-center w-full py-3 rounded-xl hover:bg-app-hover transition-colors text-app-danger ${!isSidebarOpen ? 'justify-center px-0' : 'px-4'}`}>
-             <LogOut className="w-5 h-5 shrink-0" />
-             {isSidebarOpen && <span className="ml-4">Keluar</span>}
+        <div className="p-3 border-t border-app-border/40 mt-auto">
+          <button
+            onClick={handleLogout}
+            className={`flex items-center w-full py-2.5 rounded-xl hover:bg-app-danger/10 transition-colors text-app-text/50 hover:text-app-danger ${
+              !isSidebarOpen ? 'justify-center px-0' : 'px-3 gap-3'
+            }`}
+          >
+            <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
+              <LogOut className="w-4 h-4" />
+            </span>
+            {isSidebarOpen && <span className="text-sm font-medium">Keluar</span>}
           </button>
         </div>
       </aside>

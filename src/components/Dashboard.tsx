@@ -373,54 +373,45 @@ export default function Dashboard() {
   return (
     <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
       {/* DESKTOP HEADER */}
-      <header className="hidden md:flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6">
+      <header className="hidden md:flex items-start justify-between mb-8 gap-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1">
-            <TextReveal key={user?.displayName || "USER"} text={`Selamat datang kembali, ${user?.displayName || "USER"} 👋`} />
+          <h1 className="text-3xl font-bold text-app-text-bright mb-1.5 tracking-tight">
+            <TextReveal key={user?.displayName || "USER"} text={`Selamat datang, ${user?.displayName || "USER"}`} />
           </h1>
-          <p className="text-app-text-bright text-sm">
-            {format(new Date(), "EEEE, d MMMM yyyy", { locale: localeId })} • Berikut ringkasan keuangan hari ini.
+          <p className="text-app-text/60 text-sm">
+            {format(new Date(), "EEEE, d MMMM yyyy", { locale: localeId })} — Ringkasan keuangan hari ini
           </p>
         </div>
 
-        <div className="flex items-center gap-4 hidden md:flex">
+        <div className="flex items-center gap-3">
           <button
-            onClick={() => {
-              setGlobalGrabModalOpen(true);
-            }}
-            className="w-10 h-10 rounded-full bg-app-success hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm"
+            onClick={() => setGlobalGrabModalOpen(true)}
+            className="w-9 h-9 rounded-xl bg-app-success/10 hover:bg-app-success/20 flex items-center justify-center text-app-success transition-colors"
             title="Transaksi Grab"
           >
-            <Car className="w-5 h-5" />
+            <Car className="w-4 h-4" />
           </button>
           <button
-            onClick={() => {
-              setGlobalAddModalOpen(true);
-            }}
-            className="w-10 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm"
+            onClick={() => setGlobalAddModalOpen(true)}
+            className="flex items-center gap-2 h-9 px-4 rounded-xl bg-app-accent1 hover:opacity-90 text-white text-sm font-semibold transition-opacity shadow-sm"
             title="Tambah Transaksi"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4" />
+            Tambah
           </button>
           <Link
             to="/settings"
             state={{ expandSection: 'profile' }}
-            className="px-4 h-10 rounded-full bg-app-card flex items-center justify-center text-sm font-semibold text-app-text-bright border border-app-border gap-2 hover:bg-app-hover cursor-pointer transition-colors"
+            className="flex items-center gap-2.5 h-9 px-3 rounded-xl bg-app-card border border-app-border text-sm font-medium text-app-text-bright hover:bg-app-hover transition-colors cursor-pointer"
           >
-            <span className="opacity-70">
-              {user?.displayName?.toUpperCase() || "USER"}
-            </span>
-            <div className="w-6 h-6 rounded-full bg-app-accent1 text-xs font-bold flex items-center justify-center text-app-bg overflow-hidden">
+            <div className="w-6 h-6 rounded-full bg-app-accent1 text-[11px] font-bold flex items-center justify-center text-white overflow-hidden">
               {user?.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt="avatar"
-                  className="w-full h-full object-cover"
-                />
+                <img src={user.photoURL} alt="avatar" className="w-full h-full object-cover" />
               ) : (
                 getInitials(user?.displayName || "USER")
               )}
             </div>
+            <span className="text-app-text/70">{user?.displayName?.split(' ')[0] || "User"}</span>
           </Link>
         </div>
       </header>
@@ -556,158 +547,123 @@ export default function Dashboard() {
         </ScrollReveal>
       </div>
 
-      {/* DESKTOP TOP WIDGETS */}
-      <StaggerContainer className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-6">
-        {/* TOTAL SALDO */}
-        <StaggerItem>
+      {/* DESKTOP TOP WIDGETS — bento asymmetric layout */}
+      <div className="hidden md:grid grid-cols-3 gap-4 mb-6">
+        {/* HERO: TOTAL SALDO — takes 2 cols, taller */}
+        <ScrollReveal className="col-span-2">
           <HoverCard
             onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
-            className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full w-full"
+            className="bg-app-card rounded-2xl p-8 border border-app-border shadow-sm cursor-pointer overflow-hidden relative min-h-[160px] flex flex-col justify-between w-full"
           >
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
-            <div className="flex items-center justify-between gap-3 h-full w-full relative z-10">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-app-accent1/10 flex items-center justify-center shrink-0">
-                  <Wallet className="w-5 h-5 text-app-accent1" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-app-text/70 text-[11px] font-medium uppercase tracking-wider mb-0.5 truncate">
-                    Total Saldo
-                  </p>
-                  <p className="text-lg font-bold text-app-text-bright truncate">
-                    Rp {totalBalance.toLocaleString("id-ID")}
-                  </p>
-                  <div className="flex items-center gap-1 mt-0.5 text-app-accent1 text-[11px] font-medium truncate">
-                    <TrendingUp className="w-3 h-3 shrink-0" /> Saldo Aman
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/8 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-app-accent1/6 blur-3xl pointer-events-none" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-app-accent1/15 flex items-center justify-center">
+                    <Wallet className="w-4.5 h-4.5 text-app-accent1" />
                   </div>
+                  <span className="text-app-text/70 text-sm font-medium">Total Saldo</span>
                 </div>
+                <Eye className="w-4 h-4 text-app-text/30" />
               </div>
-              <ChevronRight className="w-4 h-4 text-app-text/40 shrink-0" />
+              <p className="text-4xl font-bold text-app-text-bright tracking-tight leading-none">
+                Rp {totalBalance.toLocaleString("id-ID")}
+              </p>
+              <p className="text-app-text/50 text-xs mt-3 font-medium">
+                {accounts.length} dompet aktif · {format(new Date(), "MMMM yyyy", { locale: localeId })}
+              </p>
             </div>
           </HoverCard>
-        </StaggerItem>
+        </ScrollReveal>
 
-        {/* PEMASUKAN */}
-        <StaggerItem>
-          <HoverCard
-            onClick={() =>
-              navigate("/transactions", { state: { tab: "Pemasukan" } })
-            }
-            className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full w-full"
-          >
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
-            <div className="flex items-center justify-between gap-3 h-full w-full relative z-10">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-app-success/10 flex items-center justify-center shrink-0">
-                  <TrendingUp className="w-5 h-5 text-app-success" />
+        {/* RIGHT SIDE: 2×2 compact grid */}
+        <div className="grid grid-rows-2 gap-4">
+          {/* Row 1: Pemasukan + Pengeluaran side by side */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Pemasukan */}
+            <ScrollReveal delay={0.05}>
+              <HoverCard
+                onClick={() => navigate("/transactions", { state: { tab: "Pemasukan" } })}
+                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
+              >
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/8 via-transparent to-transparent pointer-events-none" />
+                <div className="relative z-10 flex items-center gap-2 mb-1">
+                  <TrendingUp className="w-3.5 h-3.5 text-app-success" />
+                  <span className="text-app-text/60 text-[11px] font-medium">Masuk</span>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-app-text/70 text-[11px] font-medium uppercase tracking-wider mb-0.5 truncate">
-                    Pemasukan (Hari Ini)
-                  </p>
-                  <p className="text-lg font-bold text-app-text-bright truncate">
-                    Rp {incomeToday.toLocaleString("id-ID")}
-                  </p>
-                  <div className="flex items-center gap-1 mt-0.5 text-app-success text-[11px] font-medium truncate">
-                    <TrendingUp className="w-3 h-3 shrink-0" /> 0% dari kemarin
-                  </div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-app-text/40 shrink-0" />
-            </div>
-          </HoverCard>
-        </StaggerItem>
+                <p className="text-app-text-bright font-bold text-lg relative z-10 leading-none">
+                  Rp {incomeToday.toLocaleString("id-ID")}
+                </p>
+                <p className="text-app-text/40 text-[10px] relative z-10">Hari ini</p>
+              </HoverCard>
+            </ScrollReveal>
 
-        {/* PENGELUARAN */}
-        <StaggerItem>
-          <HoverCard
-            onClick={() =>
-              navigate("/transactions", { state: { tab: "Pengeluaran" } })
-            }
-            className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full w-full"
-          >
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/5 via-transparent to-transparent pointer-events-none opacity-80 block" />
-            <div className="flex items-center justify-between gap-3 h-full w-full relative z-10">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-app-danger/10 flex items-center justify-center shrink-0">
-                  <TrendingDown className="w-5 h-5 text-app-danger" />
+            {/* Pengeluaran */}
+            <ScrollReveal delay={0.08}>
+              <HoverCard
+                onClick={() => navigate("/transactions", { state: { tab: "Pengeluaran" } })}
+                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
+              >
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/6 via-transparent to-transparent pointer-events-none" />
+                <div className="relative z-10 flex items-center gap-2 mb-1">
+                  <TrendingDown className="w-3.5 h-3.5 text-app-danger" />
+                  <span className="text-app-text/60 text-[11px] font-medium">Keluar</span>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-app-text/70 text-[11px] font-medium uppercase tracking-wider mb-0.5 truncate">
-                    Pengeluaran (Hari Ini)
-                  </p>
-                  <p className="text-lg font-bold text-app-text-bright truncate">
-                    Rp {expenseToday.toLocaleString("id-ID")}
-                  </p>
-                  <div className="flex items-center gap-1 mt-0.5 text-app-danger text-[11px] font-medium truncate">
-                    <TrendingDown className="w-3 h-3 shrink-0" /> 0% dari kemarin
-                  </div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-app-text/40 shrink-0" />
-            </div>
-          </HoverCard>
-        </StaggerItem>
+                <p className="text-app-text-bright font-bold text-lg relative z-10 leading-none">
+                  Rp {expenseToday.toLocaleString("id-ID")}
+                </p>
+                <p className="text-app-text/40 text-[10px] relative z-10">Hari ini</p>
+              </HoverCard>
+            </ScrollReveal>
+          </div>
 
-        {/* INVESTASI SAYA */}
-        <StaggerItem>
-          <HoverCard
-            onClick={() => navigate("/investments")}
-            className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full w-full"
-          >
-            <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${totalInvestmentReturn >= 0 ? "from-app-success/15" : "from-app-danger/5"} via-transparent to-transparent pointer-events-none opacity-80 block`} />
-            <div className="flex items-center justify-between gap-3 h-full w-full relative z-10">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${totalInvestmentReturn >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
-                  <TrendingUp className={`w-5 h-5 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`} />
+          {/* Row 2: Investasi + Pinjaman side by side */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Investasi */}
+            <ScrollReveal delay={0.1}>
+              <HoverCard
+                onClick={() => navigate("/investments")}
+                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
+              >
+                <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${totalInvestmentReturn >= 0 ? "from-app-success/8" : "from-app-danger/6"} via-transparent to-transparent pointer-events-none`} />
+                <div className="relative z-10 flex items-center gap-2 mb-1">
+                  <TrendingUp className={`w-3.5 h-3.5 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`} />
+                  <span className="text-app-text/60 text-[11px] font-medium">Investasi</span>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-app-text/70 text-[11px] font-medium uppercase tracking-wider mb-0.5 truncate">
-                    Investasi Saya
-                  </p>
-                  <p className="text-lg font-bold text-app-text-bright truncate">
-                    Rp {totalInvestmentValue.toLocaleString("id-ID")}
-                  </p>
-                  <div className={`flex items-center gap-1 mt-0.5 text-[11px] font-medium truncate ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                    {totalInvestmentReturn >= 0 ? "+" : ""}Rp {totalInvestmentReturn.toLocaleString("id-ID")} ({totalInvestmentReturn >= 0 ? "+" : ""}{totalInvestmentReturnPercent.toFixed(2)}%)
-                  </div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-app-text/40 shrink-0" />
-            </div>
-          </HoverCard>
-        </StaggerItem>
+                <p className="text-app-text-bright font-bold text-lg relative z-10 leading-none">
+                  Rp {totalInvestmentValue.toLocaleString("id-ID")}
+                </p>
+                <p className={`text-[10px] font-semibold relative z-10 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                  {totalInvestmentReturn >= 0 ? "+" : ""}{totalInvestmentReturnPercent.toFixed(2)}%
+                </p>
+              </HoverCard>
+            </ScrollReveal>
 
-        {/* PINJAMAN & PIUTANG */}
-        <StaggerItem>
-          <HoverCard
-            onClick={() => navigate("/loans")}
-            className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full w-full"
-          >
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
-            <div className="flex items-center justify-between gap-3 h-full w-full relative z-10">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-app-accent1/10 flex items-center justify-center shrink-0">
-                  <HandCoins className="w-5 h-5 text-app-accent1" />
+            {/* Pinjaman */}
+            <ScrollReveal delay={0.12}>
+              <HoverCard
+                onClick={() => navigate("/loans")}
+                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
+              >
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/8 via-transparent to-transparent pointer-events-none" />
+                <div className="relative z-10 flex items-center gap-2 mb-1">
+                  <HandCoins className="w-3.5 h-3.5 text-app-accent1" />
+                  <span className="text-app-text/60 text-[11px] font-medium">Pinjaman</span>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-app-text/70 text-[11px] font-medium uppercase tracking-wider mb-0.5 truncate">
-                    Hutang & Piutang
-                  </p>
-                  <p className="text-lg font-bold text-app-text-bright truncate">
-                    Rp {(loanStats.totalPiutang - loanStats.totalHutang).toLocaleString("id-ID")}
-                  </p>
-                  <div className="text-[10px] text-app-text/60 mt-0.5 flex gap-1.5 truncate font-semibold">
-                    <span className="text-app-success">P: Rp{loanStats.totalPiutang.toLocaleString("id-ID")}</span>
-                    <span className="text-app-danger">H: Rp{loanStats.totalHutang.toLocaleString("id-ID")}</span>
-                  </div>
+                <p className="text-app-text-bright font-bold text-lg relative z-10 leading-none">
+                  Rp {(loanStats.totalPiutang - loanStats.totalHutang).toLocaleString("id-ID")}
+                </p>
+                <div className="text-[10px] font-semibold relative z-10 flex gap-2">
+                  <span className="text-app-success">+{loanStats.totalPiutang.toLocaleString("id-ID")}</span>
+                  <span className="text-app-danger">-{loanStats.totalHutang.toLocaleString("id-ID")}</span>
                 </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-app-text/40 shrink-0" />
-            </div>
-          </HoverCard>
-        </StaggerItem>
-      </StaggerContainer>
+              </HoverCard>
+            </ScrollReveal>
+          </div>
+        </div>
+      </div>
+
 
       {/* MOBILE MIDDLE SECTION */}
       <div className="md:hidden pb-4">
