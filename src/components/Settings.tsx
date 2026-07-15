@@ -13,6 +13,8 @@ import { CategoryModal } from './CategoryModal';
 import { toast } from 'react-hot-toast';
 
 import { AccountModal } from './AccountModal';
+import { motion } from "motion/react";
+import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
 
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
@@ -403,7 +405,9 @@ export default function Settings() {
       {/* HEADER */}
       <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1 tracking-tight">Pengaturan</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1 tracking-tight">
+            <TextReveal text="Pengaturan" />
+          </h1>
           <p className="text-sm text-app-text/70">Sesuaikan profil, rekening, dan preferensi aplikasi Anda.</p>
         </div>
         
@@ -427,7 +431,7 @@ export default function Settings() {
         </div>
       </header>
 
-      <div className="flex-1 space-y-6 pb-10">
+      <ScrollReveal className="flex-1 space-y-6 pb-10">
         
         <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
@@ -946,7 +950,7 @@ export default function Settings() {
           </div>
           )}
         </section>
-      </div>
+      </ScrollReveal>
 
       {/* Modal Rekening */}
       <AccountModal 

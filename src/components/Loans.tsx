@@ -6,8 +6,9 @@ import { useStore } from "../store/useStore";
 import { sendDeviceNotification } from "../utils/notification";
 import { Account, Loan } from "../types";
 import { parseNumberInput, formatNumberInput } from "../utils/numberFormat";
-
 import { toast } from "react-hot-toast";
+import { motion } from "motion/react";
+import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
 
 function calculateLoanDetails(loan: Loan) {
   const duration = loan.tenorDuration;
@@ -104,6 +105,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
   const isPaidOff = remaining <= 0;
 
   const schedule = generateSchedule(loan, details);
+  const isLend = loan.type === 'lend';
 
   const handlePay = async (amount: number, isPayoff = false) => {
     if (!user) return;
@@ -112,11 +114,11 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       return;
     }
     if (!selectedAccountId) {
-      toast.error("Pilih rekening pembayaran");
+      toast.error(isLend ? "Pilih rekening penerimaan" : "Pilih rekening pembayaran");
       return;
     }
     const acc = accounts.find(a => a.id === selectedAccountId);
-    if (!acc || acc.balance < amount) {
+    if (!isLend && (!acc || acc.balance < amount)) {
       toast.error("Saldo tidak mencukupi");
       return;
     }
@@ -125,17 +127,21 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       const batch = writeBatch(db);
       
       const accRef = doc(db, "users", user.uid, "accounts", selectedAccountId);
-      batch.update(accRef, { balance: acc.balance - amount });
+      if (isLend) {
+        batch.update(accRef, { balance: (acc?.balance || 0) + amount });
+      } else {
+        batch.update(accRef, { balance: (acc?.balance || 0) - amount });
+      }
 
       const tsxRef = doc(collection(db, "users", user.uid, "transactions"));
       batch.set(tsxRef, {
-        type: "expense",
+        type: isLend ? "income" : "expense",
         amount: amount,
         accountId: selectedAccountId,
         date: Date.now(),
-        note: `Pembayaran Pinjaman: ${loan.name}`,
-        categoryId: "loan-payment",
-        categoryName: "Bayar Pinjaman",
+        note: isLend ? `Penerimaan Piutang: ${loan.name}` : `Pembayaran Pinjaman: ${loan.name}`,
+        categoryId: isLend ? "loan-repayment-income" : "loan-payment",
+        categoryName: isLend ? "Terima Piutang" : "Bayar Pinjaman",
         categoryIcon: "HandCoins"
       });
 
@@ -144,7 +150,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       const isFullyPaid = newPaidAmount >= details.totalPayment || isPayoff;
       
       batch.update(loanRef, {
-        paidAmount: newPaidAmount,
+        paidAmount: isFullyPaid ? details.totalPayment : newPaidAmount,
         paidPaymentsCount: paidCount + 1,
         status: isFullyPaid ? "paid" : "active"
       });
@@ -152,16 +158,18 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       await batch.commit();
 
       sendDeviceNotification(
-        "Pembayaran Pinjaman Berhasil 💸",
-        `Pembayaran untuk pinjaman "${loan.name}" sebesar Rp ${amount.toLocaleString("id-ID")} berhasil dicatat.`
+        isLend ? "Penerimaan Piutang Berhasil 💸" : "Pembayaran Pinjaman Berhasil 💸",
+        isLend
+          ? `Penerimaan cicilan untuk "${loan.name}" sebesar Rp ${amount.toLocaleString("id-ID")} berhasil dicatat.`
+          : `Pembayaran untuk pinjaman "${loan.name}" sebesar Rp ${amount.toLocaleString("id-ID")} berhasil dicatat.`
       );
 
-      toast.success("Pembayaran berhasil");
+      toast.success(isLend ? "Penerimaan berhasil dicatat" : "Pembayaran berhasil");
       setIsManualPayment(false);
       setManualAmount("");
     } catch (err) {
       console.error(err);
-      toast.error("Gagal melakukan pembayaran");
+      toast.error(isLend ? "Gagal mencatat penerimaan" : "Gagal melakukan pembayaran");
     }
   };
   
@@ -176,7 +184,9 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
             <CheckCircle className="w-5 h-5 text-app-success" />
           </div>
           <div>
-            <h2 className="font-bold text-app-text-bright text-base">{loan.name}</h2>
+            <h2 className="font-bold text-app-text-bright text-base">
+              {loan.name} <span className="text-xs font-normal opacity-50">({isLend ? 'Piutang' : 'Pinjaman'})</span>
+            </h2>
             <p className="text-xs text-app-text/60">Rp{details.totalPrincipal.toLocaleString("id-ID")} • Lunas</p>
           </div>
         </div>
@@ -184,14 +194,14 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
           <button 
             onClick={(e) => { e.stopPropagation(); onEdit(loan); }} 
             className="p-2 text-app-accent1 hover:bg-app-accent1/10 rounded-full transition-colors"
-            title="Edit Pinjaman"
+            title="Edit"
           >
             <Pencil className="w-4 h-4" />
           </button>
           <button 
             onClick={(e) => { e.stopPropagation(); deleteLoan(loan.id); }} 
             className="p-2 text-app-danger hover:bg-app-danger/10 rounded-full transition-colors"
-            title="Hapus Pinjaman"
+            title="Hapus"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -200,19 +210,36 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
     );
   }
 
+  const labelPrefix = isLend ? "Piutang" : "Pinjaman";
+  const totalPrincipalLabel = isLend ? "Total Dipinjamkan" : "Total Pinjaman";
+  const totalPaymentLabel = isLend ? "Total Diterima" : "Total Bayar";
+  const installmentLabel = isLend ? "Cicilan Piutang" : "Cicilan";
+  const paidAmountLabel = isLend ? "Sudah Diterima" : "Sudah Dibayar";
+  const remainingLabel = isLend ? "Sisa Piutang" : "Sisa Hutang";
+  const selectAccountLabel = isLend ? "Pilih Rekening Penerimaan" : "Pilih Rekening Pembayaran";
+  const payBtnLabel = isLend ? "Terima Sekarang" : "Bayar Sekarang";
+  const payManualLabel = isLend ? "Terima Manual" : "Bayar Manual";
+  const payManualAmountLabel = isLend ? "Nominal Penerimaan Manual" : "Nominal Pembayaran Manual";
+
   return (
-    <div className="bg-app-card rounded-2xl border border-app-border p-5 shadow-sm flex flex-col relative overflow-hidden group hover:border-app-accent1/30 transition-colors">
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
+    <div className={`bg-app-card rounded-2xl border ${isLend ? 'border-app-success/20 hover:border-app-success/40' : 'border-app-accent1/20 hover:border-app-accent1/40'} p-5 shadow-sm flex flex-col relative overflow-hidden group transition-colors`}>
+      <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${isLend ? 'from-app-success/15' : 'from-app-accent1/15'} via-transparent to-transparent pointer-events-none opacity-80 block`} />
       <div className="flex justify-between items-center mb-4 relative z-10">
         <div className="flex items-center gap-3">
-          <CreditCard className="w-5 h-5 text-app-accent1" />
-          <h2 className="font-bold text-app-text-bright text-lg">{loan.name}</h2>
+          {isLend ? (
+            <HandCoins className="w-5 h-5 text-app-success" />
+          ) : (
+            <CreditCard className="w-5 h-5 text-app-accent1" />
+          )}
+          <h2 className="font-bold text-app-text-bright text-lg">
+            {loan.name} <span className="text-xs font-normal opacity-50">({isLend ? 'Piutang' : 'Pinjaman'})</span>
+          </h2>
         </div>
         <div className="flex items-center gap-1 relative z-20">
           {isPaidOff && (
             <button 
               onClick={() => setIsExpanded(false)} 
-              className="p-1.5 text-app-text/70 hover:bg-app-accent1/10 rounded-full transition-colors"
+              className={`p-1.5 text-app-text/70 ${isLend ? 'hover:bg-app-success/10' : 'hover:bg-app-accent1/10'} rounded-full transition-colors`}
               title="Tutup detail"
             >
               <ChevronUp className="w-4 h-4" />
@@ -220,15 +247,15 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
           )}
           <button 
             onClick={(e) => { e.stopPropagation(); onEdit(loan); }} 
-            className="p-1.5 text-app-accent1 hover:bg-app-accent1/10 rounded-full transition-colors"
-            title="Edit Pinjaman"
+            className={`p-1.5 ${isLend ? 'text-app-success hover:bg-app-success/10' : 'text-app-accent1 hover:bg-app-accent1/10'} rounded-full transition-colors`}
+            title="Edit"
           >
             <Pencil className="w-4 h-4" />
           </button>
           <button 
             onClick={(e) => { e.stopPropagation(); deleteLoan(loan.id); }} 
             className="p-1.5 text-app-danger hover:bg-app-danger/10 rounded-full transition-colors"
-            title="Hapus Pinjaman"
+            title="Hapus"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -238,7 +265,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       <div className="bg-app-bg/50 rounded-xl p-4 space-y-3 border border-app-border/50">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-xs text-app-text/70 mb-1">Total Pinjaman</p>
+            <p className="text-xs text-app-text/70 mb-1">{totalPrincipalLabel}</p>
             <p className="font-semibold text-app-text-bright">Rp{details.totalPrincipal.toLocaleString("id-ID")}</p>
           </div>
           <div>
@@ -249,12 +276,12 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
         
         <div className="grid grid-cols-2 gap-4 pt-3 border-t border-app-border/50">
           <div>
-            <p className="text-xs text-app-text/70 mb-1">Total Bayar</p>
+            <p className="text-xs text-app-text/70 mb-1">{totalPaymentLabel}</p>
             <p className="font-semibold text-app-success">Rp{details.totalPayment.toLocaleString("id-ID")}</p>
           </div>
           {loan.hasTenor !== false && (
             <div>
-              <p className="text-xs text-app-text/70 mb-1">Cicilan</p>
+              <p className="text-xs text-app-text/70 mb-1">{installmentLabel}</p>
               <p className="font-semibold text-app-warning">
                 Rp{Math.round(details.installment).toLocaleString("id-ID")}/{loan.paymentMethod === 'harian' ? 'hari' : loan.paymentMethod === 'mingguan' ? 'minggu' : 'bulan'}
               </p>
@@ -264,11 +291,11 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
 
         <div className="grid grid-cols-2 gap-4 pt-3 border-t border-app-border/50">
           <div>
-            <p className="text-xs text-app-text/70 mb-1">Sudah Dibayar</p>
+            <p className="text-xs text-app-text/70 mb-1">{paidAmountLabel}</p>
             <p className="font-semibold text-app-success">Rp{paidAmount.toLocaleString("id-ID")}</p>
           </div>
           <div>
-            <p className="text-xs text-app-text/70 mb-1">Sisa Hutang</p>
+            <p className="text-xs text-app-text/70 mb-1">{remainingLabel}</p>
             <p className="font-semibold text-app-danger">Rp{remaining.toLocaleString("id-ID")}</p>
           </div>
         </div>
@@ -295,23 +322,28 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       </div>
       <div className="w-full bg-app-bg rounded-full h-1.5 mb-5 overflow-hidden border border-app-border/50">
         <div 
-          className="bg-app-accent1 h-1.5 rounded-full transition-all duration-500" 
+          className={`${isLend ? 'bg-app-success' : 'bg-app-accent1'} h-1.5 rounded-full transition-all duration-500`} 
           style={{ width: `${Math.min(100, Math.max(0, progress))}%` }} 
         />
       </div>
 
-      {loan.hasTenor !== false && nextPaymentDate && (
+      {((loan.hasTenor !== false && nextPaymentDate) || (loan.hasTenor === false && loan.dueDate)) && (
         <div className="bg-app-bg/50 rounded-xl p-3 border border-app-border/50 flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-app-text/70" />
             <span className="text-sm text-app-text-bright">
-              {nextPaymentDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+              {loan.hasTenor === false ? "Jatuh Tempo: " : ""}
+              {loan.hasTenor === false 
+                ? new Date(loan.dueDate!).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+                : nextPaymentDate!.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+              }
             </span>
           </div>
           {(() => {
             const todayDate = new Date();
             todayDate.setHours(0, 0, 0, 0);
-            const nextDateNoTime = new Date(nextPaymentDate);
+            const targetDate = loan.hasTenor === false ? new Date(loan.dueDate!) : nextPaymentDate!;
+            const nextDateNoTime = new Date(targetDate);
             nextDateNoTime.setHours(0, 0, 0, 0);
             const diffTime = nextDateNoTime.getTime() - todayDate.getTime();
             const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
@@ -330,7 +362,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
               );
             } else {
               return (
-                <span className="text-xs font-medium bg-app-accent1/20 text-app-accent1 px-2 py-1 rounded-md">
+                <span className={`text-xs font-medium ${isLend ? 'bg-app-success/20 text-app-success' : 'bg-app-accent1/20 text-app-accent1'} px-2 py-1 rounded-md`}>
                   {diffDays} hari lagi
                 </span>
               );
@@ -340,8 +372,8 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       )}
 
       <div className="mb-4">
-        <label className="block text-xs text-app-text/70 mb-1">Pilih Rekening Pembayaran</label>
-        <div className="flex items-center gap-2 bg-app-bg border border-app-border rounded-xl px-3 py-2">
+        <label className="block text-xs text-app-text/70 mb-1">{selectAccountLabel}</label>
+        <div className={`flex items-center gap-2 bg-app-bg border ${isLend ? 'border-app-success/20 focus-within:border-app-success/50' : 'border-app-accent1/20 focus-within:border-app-accent1/50'} rounded-xl px-3 py-2`}>
           <Wallet className="w-4 h-4 text-app-text/50" />
           <select 
             value={selectedAccountId}
@@ -359,31 +391,31 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
 
       {isManualPayment && (
         <div className="mb-4 bg-app-bg p-3 rounded-xl border border-app-border">
-          <label className="block text-xs text-app-text/70 mb-1">Nominal Pembayaran Manual</label>
+          <label className="block text-xs text-app-text/70 mb-1">{payManualAmountLabel}</label>
           <div className="flex gap-2">
             <input 
               type="number"
               value={manualAmount}
               onChange={(e) => setManualAmount(e.target.value)}
               placeholder="Contoh: 100000"
-              className="flex-1 bg-transparent border border-app-border rounded-lg px-3 py-2 text-sm text-app-text-bright outline-none focus:border-app-accent1"
+              className={`flex-1 bg-transparent border border-app-border rounded-lg px-3 py-2 text-sm text-app-text-bright outline-none ${isLend ? 'focus:border-app-success' : 'focus:border-app-accent1'}`}
             />
             <button 
               onClick={() => handlePay(Number(manualAmount))}
               disabled={!manualAmount || Number(manualAmount) <= 0}
-              className="bg-app-accent1 text-app-bg px-4 py-2 rounded-lg text-sm font-bold disabled:opacity-50"
+              className={`${isLend ? 'bg-app-success' : 'bg-app-accent1'} text-app-bg px-4 py-2 rounded-lg text-sm font-bold disabled:opacity-50`}
             >
-              Bayar
+              {isLend ? "Terima" : "Bayar"}
             </button>
           </div>
-          <p className="text-[10px] text-app-text/50 mt-1">Sisa yang harus dibayar: Rp{remaining.toLocaleString('id-ID')}</p>
+          <p className="text-[10px] text-app-text/50 mt-1">Sisa yang harus {isLend ? "diterima" : "dibayar"}: Rp{remaining.toLocaleString('id-ID')}</p>
         </div>
       )}
 
       {isPaidOff ? (
         <div className="bg-app-success/10 text-app-success p-3 rounded-xl border border-app-success/20 flex items-center justify-center gap-2 font-bold text-sm">
           <CheckCircle className="w-5 h-5" />
-          Pinjaman Lunas
+          {labelPrefix} Lunas
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-2">
@@ -392,14 +424,14 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
               onClick={() => handlePay(Math.round(details.installment))}
               className="flex items-center justify-center gap-2 py-2.5 bg-app-success text-app-bg rounded-xl font-medium text-sm hover:opacity-90 transition-opacity"
             >
-              <Wallet className="w-4 h-4" /> Bayar Sekarang
+              <Wallet className="w-4 h-4" /> {payBtnLabel}
             </button>
           )}
           <button 
             onClick={() => setIsManualPayment(!isManualPayment)}
             className={`flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-sm transition-colors border ${isManualPayment ? 'bg-app-hover border-app-border text-app-text-bright' : 'bg-app-bg border-app-border text-app-text-bright hover:bg-app-hover'}`}
           >
-            <Calculator className="w-4 h-4" /> Bayar Manual
+            <Calculator className="w-4 h-4" /> {payManualLabel}
           </button>
           {loan.hasTenor !== false && (
             <button 
@@ -413,7 +445,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
             onClick={() => handlePay(remaining, true)}
             className="flex items-center justify-center gap-2 py-2.5 bg-app-bg border border-app-danger/50 text-app-danger rounded-xl font-medium text-sm hover:bg-app-danger/10 transition-colors"
           >
-            <CheckCircle className="w-4 h-4" /> Lunasi
+            <CheckCircle className="w-4 h-4" /> {isLend ? "Selesaikan" : "Lunasi"}
           </button>
         </div>
       )}
@@ -464,6 +496,7 @@ export default function Loans() {
   const [editingLoan, setEditingLoan] = useState<Loan | null>(null);
 
   // Form states
+  const [type, setType] = useState<"borrow" | "lend">("borrow");
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [hasInterest, setHasInterest] = useState(false);
@@ -479,10 +512,14 @@ export default function Loans() {
   const [paymentDate, setPaymentDate] = useState(1);
 
   const [depositToAccount, setDepositToAccount] = useState(false);
+  const [deductFromAccount, setDeductFromAccount] = useState(false);
   const [accountId, setAccountId] = useState("");
 
   const [autoDebit, setAutoDebit] = useState(false);
   const [autoDebitAccountId, setAutoDebitAccountId] = useState("");
+
+  const [dueDateEnabled, setDueDateEnabled] = useState(false);
+  const [dueDateVal, setDueDateVal] = useState("");
 
   const [calculationResult, setCalculationResult] = useState<{
     totalPrincipal: number;
@@ -528,6 +565,7 @@ export default function Loans() {
 
   const openAddModal = () => {
     setEditingLoan(null);
+    setType("borrow");
     setName("");
     setAmount("");
     setHasInterest(false);
@@ -540,13 +578,17 @@ export default function Loans() {
     setPaymentDay("Senin");
     setPaymentDate(1);
     setDepositToAccount(false);
+    setDeductFromAccount(false);
     setAutoDebit(false);
+    setDueDateEnabled(false);
+    setDueDateVal("");
     setCalculationResult(null);
     setIsModalOpen(true);
   };
 
   const openEditModal = (loan: Loan) => {
     setEditingLoan(loan);
+    setType(loan.type || "borrow");
     setName(loan.name);
     setAmount(formatNumberInput(String(loan.amount)));
     setHasInterest(loan.hasInterest || false);
@@ -561,10 +603,14 @@ export default function Loans() {
     setPaymentDate(loan.paymentDate || 1);
     
     setDepositToAccount(loan.depositToAccount || false);
+    setDeductFromAccount(loan.deductFromAccount || false);
     setAccountId(loan.accountId || (accounts[0]?.id || ""));
     
     setAutoDebit(loan.autoDebit || false);
     setAutoDebitAccountId(loan.autoDebitAccountId || (accounts[0]?.id || ""));
+    
+    setDueDateEnabled(!!loan.dueDate);
+    setDueDateVal(loan.dueDate ? new Date(loan.dueDate).toISOString().split('T')[0] : "");
 
     const details = calculateLoanDetails(loan);
     setCalculationResult(details);
@@ -579,7 +625,7 @@ export default function Loans() {
   const handleCalculate = () => {
     const numAmount = parseNumberInput(amount);
     if (!numAmount || numAmount <= 0) {
-      toast.error("Jumlah pinjaman tidak valid");
+      toast.error(type === 'lend' ? "Jumlah piutang tidak valid" : "Jumlah pinjaman tidak valid");
       return;
     }
 
@@ -638,13 +684,13 @@ export default function Loans() {
     if (!user) return;
 
     if (!name.trim()) {
-      toast.error("Nama pinjaman harus diisi");
+      toast.error(type === 'lend' ? "Nama piutang harus diisi" : "Nama pinjaman harus diisi");
       return;
     }
 
     const numAmount = parseNumberInput(amount);
     if (!numAmount || numAmount <= 0) {
-      toast.error("Jumlah pinjaman tidak valid");
+      toast.error(type === 'lend' ? "Jumlah piutang tidak valid" : "Jumlah pinjaman tidak valid");
       return;
     }
 
@@ -663,15 +709,17 @@ export default function Loans() {
       : doc(collection(db, "users", user.uid, "loans"));
     
     const loanData: any = {
-      name: name || "Pinjaman",
+      name: name || (type === 'lend' ? "Pemberian Pinjaman" : "Pinjaman"),
       amount: numAmount,
       hasInterest,
       hasTenor,
-      depositToAccount,
-      autoDebit,
+      depositToAccount: type === 'borrow' ? depositToAccount : false,
+      deductFromAccount: type === 'lend' ? deductFromAccount : false,
+      autoDebit: type === 'borrow' ? autoDebit : false,
       status: editingLoan ? editingLoan.status : "active",
       paidAmount: editingLoan ? (editingLoan.paidAmount || 0) : 0,
-      paidPaymentsCount: editingLoan ? (editingLoan.paidPaymentsCount || 0) : 0
+      paidPaymentsCount: editingLoan ? (editingLoan.paidPaymentsCount || 0) : 0,
+      type: type,
     };
 
     if (!isEdit) {
@@ -686,10 +734,16 @@ export default function Loans() {
       loanData.paymentMethod = paymentMethod;
       if (paymentMethod === "mingguan") loanData.paymentDay = paymentDay;
       if (paymentMethod === "bulanan") loanData.paymentDate = paymentDate;
+      loanData.dueDate = 0;
     } else {
       loanData.tenorUnit = "";
       loanData.tenorDuration = 0;
       loanData.paymentMethod = "";
+      if (dueDateVal) {
+        loanData.dueDate = new Date(dueDateVal).getTime();
+      } else {
+        loanData.dueDate = 0;
+      }
     }
 
     if (hasInterest) {
@@ -705,9 +759,15 @@ export default function Loans() {
       loanData.interestValue = 0;
     }
 
-    if (depositToAccount) {
+    if (type === 'borrow' && depositToAccount) {
       if (!accountId) {
         toast.error("Pilih rekening tujuan");
+        return;
+      }
+      loanData.accountId = accountId;
+    } else if (type === 'lend' && deductFromAccount) {
+      if (!accountId) {
+        toast.error("Pilih rekening sumber");
         return;
       }
       loanData.accountId = accountId;
@@ -715,7 +775,7 @@ export default function Loans() {
       loanData.accountId = "";
     }
     
-    if (autoDebit) {
+    if (type === 'borrow' && autoDebit) {
       if (!autoDebitAccountId) {
         toast.error("Pilih rekening potongan");
         return;
@@ -734,9 +794,9 @@ export default function Loans() {
         batch.set(loanRef, loanData);
       }
 
-      // If deposit to account, we must increase account balance AND add a transaction
+      // If deposit to account (for borrow), we must increase account balance AND add a transaction
       // But for edit, only do this if depositToAccount was newly enabled (meaning it wasn't enabled before)
-      const shouldDeposit = depositToAccount && accountId && (!isEdit || !editingLoan.depositToAccount);
+      const shouldDeposit = type === 'borrow' && depositToAccount && accountId && (!isEdit || !editingLoan.depositToAccount);
 
       if (shouldDeposit) {
         const accRef = doc(db, "users", user.uid, "accounts", accountId);
@@ -759,18 +819,52 @@ export default function Loans() {
         });
       }
 
+      // If deduct from account (for lending), we must decrease account balance AND add a transaction
+      // But for edit, only do this if deductFromAccount was newly enabled (meaning it wasn't enabled before)
+      const shouldDeduct = type === 'lend' && deductFromAccount && accountId && (!isEdit || !editingLoan.deductFromAccount);
+
+      if (shouldDeduct) {
+        const accRef = doc(db, "users", user.uid, "accounts", accountId);
+        const accDoc = await getDoc(accRef);
+        if (accDoc.exists()) {
+          const currentBal = accDoc.data().balance || 0;
+          if (currentBal < numAmount) {
+            toast.error("Saldo rekening tidak mencukupi");
+            return;
+          }
+          batch.update(accRef, { balance: currentBal - numAmount });
+        }
+
+        const tsxRef = doc(collection(db, "users", user.uid, "transactions"));
+        batch.set(tsxRef, {
+          type: "expense",
+          amount: numAmount,
+          accountId: accountId,
+          date: Date.now(),
+          note: `Pemberian Pinjaman: ${loanData.name}`,
+          categoryId: "loan-expense",
+          categoryName: "Pemberian Pinjaman",
+          categoryIcon: "HandCoins"
+        });
+      }
+
       await batch.commit();
 
-      sendDeviceNotification(
-        isEdit ? "Pinjaman Berhasil Diubah 📝" : "Pinjaman Baru Ditambahkan 📋",
-        `Pinjaman "${loanData.name}" sebesar Rp ${numAmount.toLocaleString("id-ID")} berhasil ${isEdit ? "diubah" : "ditambahkan"}.`
-      );
+      const successTitle = type === 'lend'
+        ? (isEdit ? "Piutang Berhasil Diubah 📝" : "Piutang Baru Ditambahkan 📋")
+        : (isEdit ? "Pinjaman Berhasil Diubah 📝" : "Pinjaman Baru Ditambahkan 📋");
 
-      toast.success(isEdit ? "Pinjaman berhasil diubah" : "Pinjaman berhasil disimpan");
+      const successMsg = type === 'lend'
+        ? `Piutang "${loanData.name}" sebesar Rp ${numAmount.toLocaleString("id-ID")} berhasil ${isEdit ? "diubah" : "ditambahkan"}.`
+        : `Pinjaman "${loanData.name}" sebesar Rp ${numAmount.toLocaleString("id-ID")} berhasil ${isEdit ? "diubah" : "ditambahkan"}.`;
+
+      sendDeviceNotification(successTitle, successMsg);
+
+      toast.success(type === 'lend' ? "Data piutang berhasil disimpan" : "Data pinjaman berhasil disimpan");
       closeAddModal();
     } catch (err) {
       console.error("Failed to save loan", err);
-      toast.error(isEdit ? "Gagal mengubah pinjaman" : "Gagal menyimpan pinjaman");
+      toast.error(isEdit ? "Gagal mengubah data" : "Gagal menyimpan data");
     }
   };
 
@@ -790,7 +884,7 @@ export default function Loans() {
         <div className="flex justify-between items-center w-full md:w-auto">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1">
-              Pinjaman Anda
+              <TextReveal text="Pinjaman Anda" />
             </h1>
             <p className="text-app-text/70 text-sm">
               Kelola data pinjaman Anda beserta bunga dan pengaturan auto debit.
@@ -822,11 +916,11 @@ export default function Loans() {
 
       {loans.length === 0 ? (
         <div className="py-12 flex flex-col items-center justify-center text-app-text/50 border border-dashed border-app-border rounded-3xl">
-          <HandCoins className="w-12 h-12 mb-3 text-app-text/30" />
+          <HandCoins className="w-12 h-12 mb-3 text-app-text/30 animate-waggle" />
           <p>Belum ada data pinjaman.</p>
         </div>
       ) : (
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 w-full">
+        <StaggerContainer className="columns-1 md:columns-2 lg:columns-3 gap-6 w-full">
           {[...loans]
             .sort((a, b) => {
               const aRemaining = calculateLoanDetails(a).totalPayment - (a.paidAmount || 0);
@@ -850,11 +944,11 @@ export default function Loans() {
               return b.createdAt - a.createdAt;
             })
             .map(loan => (
-              <div key={loan.id} className="inline-block w-full mb-6 break-inside-avoid">
+              <StaggerItem key={loan.id} className="inline-block w-full mb-6 break-inside-avoid">
                 <LoanCard loan={loan} deleteLoan={deleteLoan} onEdit={openEditModal} accounts={accounts} />
-              </div>
+              </StaggerItem>
             ))}
-        </div>
+        </StaggerContainer>
       )}
 
       {isModalOpen && (
@@ -862,7 +956,7 @@ export default function Loans() {
           <div className="bg-app-card text-app-text w-full max-w-md rounded-3xl shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
-                {editingLoan ? "Edit Pinjaman" : "Tambah Pinjaman"}
+                {editingLoan ? (type === 'lend' ? "Edit Piutang" : "Edit Pinjaman") : (type === 'lend' ? "Tambah Piutang" : "Tambah Pinjaman")}
               </h2>
               <button
                 onClick={closeAddModal}
@@ -873,24 +967,54 @@ export default function Loans() {
             </div>
             
             <form onSubmit={saveLoan} className="p-6 space-y-5 max-h-[70vh] overflow-y-auto no-scrollbar">
-              {/* Nama Pinjaman */}
+              {/* Tipe Selector */}
+              {!editingLoan && (
+                <div className="flex bg-app-bg p-1 rounded-xl border border-app-border gap-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setType("borrow");
+                      setName("");
+                      setDepositToAccount(false);
+                      setDeductFromAccount(false);
+                    }}
+                    className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all ${type === "borrow" ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text hover:text-app-text-bright"}`}
+                  >
+                    Saya Pinjam (Hutang)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setType("lend");
+                      setName("");
+                      setDepositToAccount(false);
+                      setDeductFromAccount(false);
+                    }}
+                    className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all ${type === "lend" ? "bg-app-success text-app-bg shadow-sm" : "text-app-text hover:text-app-text-bright"}`}
+                  >
+                    Saya Pinjamkan (Piutang)
+                  </button>
+                </div>
+              )}
+
+              {/* Nama Pinjaman/Piutang */}
               <div>
                 <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">
-                  Nama Pinjaman
+                  {type === 'lend' ? "Nama Piutang" : "Nama Pinjaman"}
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Contoh: KPR / Motor"
+                  placeholder={type === 'lend' ? "Contoh: Pinjaman ke Budi" : "Contoh: KPR / Motor"}
                   className="w-full bg-app-bg border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                 />
               </div>
 
-              {/* Jumlah Pinjaman */}
+              {/* Jumlah Pinjaman/Piutang */}
               <div>
                 <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">
-                  Jumlah Pinjaman (Rp)
+                  {type === 'lend' ? "Jumlah yang Dipinjamkan (Rp)" : "Jumlah Pinjaman (Rp)"}
                 </label>
                 <input
                   type="text"
@@ -952,7 +1076,13 @@ export default function Loans() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setHasTenor(!hasTenor)}
+                    onClick={() => {
+                      const nextHasTenor = !hasTenor;
+                      setHasTenor(nextHasTenor);
+                      if (nextHasTenor) {
+                        setDueDateEnabled(false);
+                      }
+                    }}
                     className={`w-12 h-6 rounded-full transition-colors relative shrink-0 ${hasTenor ? 'bg-app-accent1' : 'bg-app-border'}`}
                   >
                     <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${hasTenor ? 'translate-x-6' : 'translate-x-0.5'}`} />
@@ -965,7 +1095,7 @@ export default function Loans() {
                   {/* Tenor */}
                   <div className="mb-5">
                     <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">
-                      Tenor Pinjaman
+                      Tenor {type === 'lend' ? "Piutang" : "Pinjaman"}
                     </label>
                     <div className="flex gap-2 mb-3">
                       {["hari", "minggu", "bulan"].map((t) => (
@@ -992,7 +1122,7 @@ export default function Loans() {
                   {/* Metode Pembayaran */}
                   <div className="mb-5">
                     <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">
-                      Metode Bayar
+                      Metode {type === 'lend' ? "Terima" : "Bayar"}
                     </label>
                     <div className="flex gap-2 mb-3">
                       {["harian", "mingguan", "bulanan"].map((t) => (
@@ -1036,73 +1166,130 @@ export default function Loans() {
                 </>
               )}
 
-              {/* Saldo Masuk */}
-              <div className="bg-app-bg p-4 rounded-xl border border-app-border">
-                <div className="flex items-center justify-between mb-3">
+              {/* Optional Payment Date (Jatuh tempo pelunasan) - when no tenor/installments */}
+              {!hasTenor && (
+                <div className="bg-app-bg p-4 rounded-xl border border-app-border space-y-2">
                   <div>
-                    <label className="text-sm font-bold text-app-text-bright block">Saldo Masuk?</label>
-                    <span className="text-xs text-app-text/60">Tambahkan ke saldo rekening</span>
+                    <label className="text-sm font-bold text-app-text-bright block">Tanggal Pembayaran (Jatuh Tempo)</label>
+                    <span className="text-xs text-app-text/60">Bisa diisi atau dikosongkan jika tidak ada jatuh tempo</span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setDepositToAccount(!depositToAccount)}
-                    className={`w-12 h-6 rounded-full transition-colors relative shrink-0 ${depositToAccount ? 'bg-app-accent1' : 'bg-app-border'}`}
-                  >
-                    <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${depositToAccount ? 'translate-x-6' : 'translate-x-0.5'}`} />
-                  </button>
+                  
+                  <input 
+                    type="date"
+                    value={dueDateVal}
+                    onChange={(e) => setDueDateVal(e.target.value)}
+                    className="w-full bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1 mt-1"
+                  />
                 </div>
-                
-                {depositToAccount && (
-                  <select
-                    value={accountId}
-                    onChange={(e) => setAccountId(e.target.value)}
-                    className="w-full mt-2 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
-                  >
-                    <option value="" disabled className="bg-[#1C1C1E] text-white">Pilih Rekening Tujuan</option>
-                    {accounts.map(acc => (
-                      <option key={acc.id} value={acc.id} className="bg-[#1C1C1E] text-white">{acc.name} (Rp {acc.balance.toLocaleString('id-ID')})</option>
-                    ))}
-                  </select>
-                )}
-              </div>
+              )}
 
-              {/* Auto Debit */}
-              <div className="bg-app-bg p-4 rounded-xl border border-app-border">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <label className="text-sm font-bold text-app-text-bright block">Auto Debit?</label>
-                    <span className="text-xs text-app-text/60">Potong saldo otomatis saat jatuh tempo</span>
+              {/* Saldo Masuk (Only for Borrow) */}
+              {type === 'borrow' && (
+                <div className="bg-app-bg p-4 rounded-xl border border-app-border">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <label className="text-sm font-bold text-app-text-bright block">Saldo Masuk?</label>
+                      <span className="text-xs text-app-text/60">Tambahkan langsung ke saldo rekening</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setDepositToAccount(!depositToAccount)}
+                      className={`w-12 h-6 rounded-full transition-colors relative shrink-0 ${depositToAccount ? 'bg-app-accent1' : 'bg-app-border'}`}
+                    >
+                      <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${depositToAccount ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setAutoDebit(!autoDebit)}
-                    className={`w-12 h-6 rounded-full transition-colors relative shrink-0 ${autoDebit ? 'bg-app-accent1' : 'bg-app-border'}`}
-                  >
-                    <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${autoDebit ? 'translate-x-6' : 'translate-x-0.5'}`} />
-                  </button>
+                  
+                  {depositToAccount && (
+                    <select
+                      value={accountId}
+                      onChange={(e) => setAccountId(e.target.value)}
+                      className="w-full mt-2 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
+                    >
+                      <option value="" disabled className="bg-[#1C1C1E] text-white">Pilih Rekening Tujuan</option>
+                      {accounts.map(acc => (
+                        <option key={acc.id} value={acc.id} className="bg-[#1C1C1E] text-white">{acc.name} (Rp {acc.balance.toLocaleString('id-ID')})</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
-                
-                {autoDebit && (
-                  <select
-                    value={autoDebitAccountId}
-                    onChange={(e) => setAutoDebitAccountId(e.target.value)}
-                    className="w-full mt-2 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
-                  >
-                    <option value="" disabled className="bg-[#1C1C1E] text-white">Pilih Rekening Potongan</option>
-                    {accounts.map(acc => (
-                      <option key={acc.id} value={acc.id} className="bg-[#1C1C1E] text-white">{acc.name}</option>
-                    ))}
-                  </select>
-                )}
-              </div>
+              )}
+
+              {/* Potong dari Rekening (Only for Lend / Meminjamkan) */}
+              {type === 'lend' && (
+                <div className="bg-app-bg p-4 rounded-xl border border-app-border">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <label className="text-sm font-bold text-app-text-bright block">Potong dari Rekening?</label>
+                      <span className="text-xs text-app-text/60">Kurangi saldo dari rekening sumber dana</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setDeductFromAccount(!deductFromAccount)}
+                      className={`w-12 h-6 rounded-full transition-colors relative shrink-0 ${deductFromAccount ? 'bg-app-success' : 'bg-app-border'}`}
+                    >
+                      <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${deductFromAccount ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                    </button>
+                  </div>
+                  
+                  {deductFromAccount && (
+                    <select
+                      value={accountId}
+                      onChange={(e) => setAccountId(e.target.value)}
+                      className="w-full mt-2 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
+                    >
+                      <option value="" disabled className="bg-[#1C1C1E] text-white">Pilih Rekening Sumber</option>
+                      {accounts.map(acc => (
+                        <option key={acc.id} value={acc.id} className="bg-[#1C1C1E] text-white">{acc.name} (Rp {acc.balance.toLocaleString('id-ID')})</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )}
+
+              {/* Auto Debit (Only for Borrow) */}
+              {type === 'borrow' && (
+                <div className="bg-app-bg p-4 rounded-xl border border-app-border">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <label className="text-sm font-bold text-app-text-bright block">Auto Debit?</label>
+                      <span className="text-xs text-app-text/60">Potong saldo otomatis saat jatuh tempo</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAutoDebit(!autoDebit)}
+                      className={`w-12 h-6 rounded-full transition-colors relative shrink-0 ${autoDebit ? 'bg-app-accent1' : 'bg-app-border'}`}
+                    >
+                      <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${autoDebit ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                    </button>
+                  </div>
+                  
+                  {autoDebit && (
+                    <select
+                      value={autoDebitAccountId}
+                      onChange={(e) => setAutoDebitAccountId(e.target.value)}
+                      className="w-full mt-2 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
+                    >
+                      <option value="" disabled className="bg-[#1C1C1E] text-white">Pilih Rekening Potongan</option>
+                      {accounts.map(acc => (
+                        <option key={acc.id} value={acc.id} className="bg-[#1C1C1E] text-white">{acc.name}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )}
 
               {/* Hasil Perhitungan */}
               {calculationResult && (
                 <div className="bg-app-card p-4 rounded-xl border border-app-border space-y-4">
-                  <h3 className="font-bold text-app-text-bright">Hasil Perhitungan</h3>
+                  <h3 className="font-bold text-app-text-bright">
+                    {type === 'lend' ? "Hasil Penerimaan" : "Hasil Perhitungan"}
+                  </h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-app-text/70 mb-1">Total Pinjaman</p>
+                      <p className="text-xs text-app-text/70 mb-1">
+                        {type === 'lend' ? "Total Dipinjamkan" : "Total Pinjaman"}
+                      </p>
                       <p className="font-bold text-app-text-bright">Rp {calculationResult.totalPrincipal.toLocaleString("id-ID")}</p>
                     </div>
                     <div>
@@ -1110,11 +1297,15 @@ export default function Loans() {
                       <p className="font-bold text-app-text-bright">Rp {calculationResult.totalInterest.toLocaleString("id-ID")}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-app-text/70 mb-1">Total Bayar</p>
+                      <p className="text-xs text-app-text/70 mb-1">
+                        {type === 'lend' ? "Total Penerimaan" : "Total Bayar"}
+                      </p>
                       <p className="font-bold text-app-success">Rp {calculationResult.totalPayment.toLocaleString("id-ID")}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-app-text/70 mb-1">Cicilan</p>
+                      <p className="text-xs text-app-text/70 mb-1">
+                        {type === 'lend' ? "Penerimaan Cicilan" : "Cicilan"}
+                      </p>
                       <p className="font-bold text-app-warning">Rp {calculationResult.installment.toLocaleString("id-ID", { maximumFractionDigits: 0 })} / {paymentMethod === "harian" ? "hari" : paymentMethod === "mingguan" ? "minggu" : "bulan"}</p>
                     </div>
                   </div>
@@ -1137,13 +1328,13 @@ export default function Loans() {
                   onClick={handleCalculate}
                   className="flex-1 py-3.5 rounded-xl font-bold text-sm bg-app-accent1 text-app-bg hover:opacity-90 transition-opacity"
                 >
-                  Hitung Cicilan
+                  {type === 'lend' ? "Hitung Penerimaan" : "Hitung Cicilan"}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 py-3.5 rounded-xl font-bold text-sm bg-app-success text-app-bg hover:opacity-90 transition-opacity"
                 >
-                  {editingLoan ? "Simpan Perubahan" : "Simpan Pinjaman"}
+                  {editingLoan ? "Simpan Perubahan" : (type === 'lend' ? "Simpan Piutang" : "Simpan Pinjaman")}
                 </button>
               </div>
             </form>

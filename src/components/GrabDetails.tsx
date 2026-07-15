@@ -32,6 +32,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { TextReveal } from "./MotionWrappers";
 
 interface ParsedGrabOrder {
   id: string;
@@ -239,7 +240,7 @@ export default function GrabDetails() {
       <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6 shrink-0">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1 tracking-tight">
-            Analisis Grab
+            <TextReveal text="Analisis Grab" />
           </h1>
           <p className="text-app-text/70 text-sm">
             Pantau dan analisis pendapatan dan statistik dari aktivitas Grab Anda.

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
+import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'motion/react';
 
 // Spring config for nice, premium elasticity (spring physics)
 const cardSpringConfig = { damping: 15, stiffness: 120, mass: 0.8 };
@@ -113,7 +113,7 @@ export const staggerContainerVariants = {
   },
 };
 
-export const staggerItemVariants = {
+export const staggerItemVariants: any = {
   hidden: { opacity: 0, y: 15 },
   show: {
     opacity: 1,
@@ -150,374 +150,241 @@ interface StaggerItemProps {
   children: React.ReactNode;
   className?: string;
   id?: string;
+  onClick?: (e: any) => void;
+  [key: string]: any;
 }
 
-export function StaggerItem({ children, className = '', id }: StaggerItemProps) {
+export function StaggerItem({ children, className = '', id, ...props }: StaggerItemProps) {
   return (
     <motion.div
       id={id}
       className={className}
       variants={staggerItemVariants}
+      {...props}
     >
       {children}
     </motion.div>
   );
 }
 
-/* ======================== NEW PREMIUM COMPONENTS ======================== */
-
 interface TextRevealProps {
   text: string;
   className?: string;
-  duration?: number;
-  staggerDelay?: number;
   id?: string;
 }
 
 /**
- * TextReveal - Dynamic Typography with per-word reveal animation
- * Text appears to slide up from bottom with smooth clip-path reveal
- * Duration: 600ms by default, ease-out for smooth cinematic effect
+ * TextReveal splits text into words and animates each up vertically
+ * from an overflow-hidden mask for a highly premium, cinematic layout load.
  */
-export function TextReveal({ 
-  text, 
-  className = '', 
-  duration = 0.6, 
-  staggerDelay = 0.08,
-  id 
-}: TextRevealProps) {
+export function TextReveal({ text, className = '', id }: TextRevealProps) {
   const words = text.split(' ');
-
   return (
-    <div id={id} className={`flex flex-wrap gap-2 ${className}`}>
-      {words.map((word, idx) => (
-        <motion.span
-          key={idx}
-          className="word-reveal inline-block"
-          initial={{ opacity: 0, y: 20, clipPath: 'inset(0 0 100% 0)' }}
-          animate={{ opacity: 1, y: 0, clipPath: 'inset(0 0 0 0)' }}
-          transition={{
-            duration,
-            ease: 'easeOut',
-            delay: idx * staggerDelay,
-          }}
-        >
-          {word}
-        </motion.span>
+    <span id={id} className={`${className} inline-flex flex-wrap gap-x-[0.22em] overflow-hidden`}>
+      {words.map((word, i) => (
+        <span key={i} className="inline-block overflow-hidden py-[0.1em] -my-[0.1em]">
+          <motion.span
+            className="inline-block"
+            initial={{ y: '115%' }}
+            animate={{ y: 0 }}
+            transition={{
+              duration: 0.6,
+              ease: [0.16, 1, 0.3, 1], // fluid ease-out quartic
+              delay: i * 0.035,
+            }}
+          >
+            {word}
+          </motion.span>
+        </span>
       ))}
-    </div>
+    </span>
   );
 }
 
-interface SkeletonLoaderProps {
-  count?: number;
-  type?: 'text' | 'card' | 'avatar' | 'button' | 'line' | 'custom';
+interface ShimmerLoaderProps {
   className?: string;
+  width?: string;
+  height?: string;
   id?: string;
 }
 
 /**
- * SkeletonLoader - Smooth shimmer effect (not blinking)
- * Uses diagonal gradient animation with 2s duration
- * Perfect for loading states in data-heavy areas
+ * ShimmerLoader provides a premium diagonal-sweep light animation
+ * as a placeholder when loading or processing remote services.
  */
-export function SkeletonLoader({
-  count = 3,
-  type = 'text',
-  className = '',
-  id,
-}: SkeletonLoaderProps) {
-  const skeletonClasses = {
-    text: 'skeleton-text',
-    card: 'skeleton-card',
-    avatar: 'skeleton-avatar',
-    button: 'skeleton-button',
-    line: 'skeleton-line',
-    custom: 'skeleton',
-  };
-
-  const classes = skeletonClasses[type];
-
+export function ShimmerLoader({ className = '', width = '100%', height = '1rem', id }: ShimmerLoaderProps) {
   return (
-    <div id={id} className={`loading-container ${className}`}>
-      {Array.from({ length: count }).map((_, idx) => (
-        <div key={idx} className={classes} />
-      ))}
-    </div>
+    <div
+      id={id}
+      className={`shimmer-element rounded-lg ${className}`}
+      style={{ width, height }}
+    />
   );
 }
 
-interface FloatingFormGroupProps {
-  id?: string;
+interface FloatingFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  type?: string;
-  placeholder?: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  onFocus?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  onBlur?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  error?: string;
-  disabled?: boolean;
-  multiline?: boolean;
-  rows?: number;
   className?: string;
+  containerClassName?: string;
 }
 
 /**
- * FloatingFormGroup - Interactive floating labels with soft glow
- * Label animates up and shrinks when field is focused or has value
- * Soft glow border effect on focus (150ms transition)
+ * FloatingField renders a text-field with a highly responsive floating label
+ * and a premium focus soft-glow border ring.
  */
-export function FloatingFormGroup({
-  id,
-  label,
-  type = 'text',
-  placeholder = '',
-  value = '',
-  onChange,
-  onFocus,
-  onBlur,
-  error,
-  disabled = false,
-  multiline = false,
-  rows = 3,
-  className = '',
-}: FloatingFormGroupProps) {
-  const [isFocused, setIsFocused] = React.useState(false);
-  const hasValue = value && value.toString().length > 0;
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setIsFocused(true);
-    onFocus?.(e);
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setIsFocused(false);
-    onBlur?.(e);
-  };
+export function FloatingField({ label, className = '', containerClassName = '', value, onChange, ...props }: FloatingFieldProps) {
+  const [focused, setFocused] = React.useState(false);
+  const hasValue = value !== undefined && value !== '';
 
   return (
-    <div className={`form-group ${className}`}>
-      {multiline ? (
-        <textarea
-          id={id}
-          className={`floating-input ${error ? 'border-red-500' : ''} ${isFocused ? 'input-glow' : ''}`}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          disabled={disabled}
-          rows={rows}
-        />
-      ) : (
-        <input
-          id={id}
-          type={type}
-          className={`floating-input ${error ? 'border-red-500' : ''} ${isFocused ? 'input-glow' : ''}`}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          disabled={disabled}
-        />
-      )}
-      <label className={`floating-label ${(isFocused || hasValue) ? 'translate-y-[-25px] scale-85 opacity-100' : ''}`}>
+    <div className={`floating-control-container relative ${containerClassName}`}>
+      <input
+        {...props}
+        value={value}
+        onChange={onChange}
+        onFocus={(e) => {
+          setFocused(true);
+          props.onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          props.onBlur?.(e);
+        }}
+        className={`w-full bg-app-card/65 border border-app-border rounded-xl px-4 pt-6 pb-2 text-app-text-bright text-sm transition-all focus:border-app-accent1 focus:ring-2 focus:ring-app-accent1/20 focus:outline-none placeholder-transparent ${className}`}
+        placeholder={label}
+      />
+      <label
+        className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-xs text-app-text/60 transition-all duration-200 origin-left select-none
+          ${(focused || hasValue) ? 'scale-85 -translate-y-[120%] text-app-accent1' : ''}
+        `}
+      >
         {label}
       </label>
-      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
+  );
+}
+
+interface ParallaxBgProps {
+  children: React.ReactNode;
+  className?: string;
+  speed?: number; // Slower velocity fraction (0.1 to 0.4)
+}
+
+/**
+ * ParallaxBg adds standard translate-y parallax shift relative to page scrolling.
+ */
+export function ParallaxBg({ children, className = '', speed = 0.15 }: ParallaxBgProps) {
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 800], [0, -800 * speed]);
+
+  return (
+    <motion.div style={{ y }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
+
+interface WaggleIconProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+/**
+ * WaggleIcon wraps icons in empty or warning states to add a gentle
+ * and attractive periodic rotation/waggle loop.
+ */
+export function WaggleIcon({ children, className = '' }: WaggleIconProps) {
+  return (
+    <div className={`animate-waggle inline-block ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+export function Skeleton({ className = '' }: { className?: string }) {
+  return (
+    <div className={`relative overflow-hidden bg-app-card/40 rounded-xl border border-app-border/40 ${className}`}>
+      <div className="absolute inset-0 shimmer-bg" />
+    </div>
+  );
+}
+
+interface MicroLoopProps {
+  children: React.ReactNode;
+  className?: string;
+  type?: 'waggle' | 'pulse' | 'float';
+}
+
+export function MicroLoop({ children, className = '', type = 'waggle' }: MicroLoopProps) {
+  const variants: any = {
+    waggle: {
+      rotate: [0, -3, 3, -3, 3, 0],
+      transition: {
+        duration: 1.5,
+        ease: 'easeInOut',
+        repeat: Infinity,
+        repeatDelay: 3
+      }
+    },
+    pulse: {
+      scale: [1, 1.03, 0.97, 1.02, 1],
+      transition: {
+        duration: 2,
+        ease: 'easeInOut',
+        repeat: Infinity,
+        repeatDelay: 3
+      }
+    },
+    float: {
+      y: [0, -6, 0],
+      transition: {
+        duration: 2.5,
+        ease: 'easeInOut',
+        repeat: Infinity,
+      }
+    }
+  };
+
+  return (
+    <motion.div
+      className={`inline-block ${className}`}
+      animate={type}
+      variants={variants}
+    >
+      {children}
+    </motion.div>
   );
 }
 
 interface ParallaxBackgroundProps {
-  children: React.ReactNode;
-  backgroundImage?: string;
-  offset?: number;
-  speed?: number;
-  className?: string;
-  id?: string;
+  containerRef: React.RefObject<HTMLElement>;
 }
 
-/**
- * ParallaxBackground - Depth of field effect
- * Background moves 30% slower than foreground (1 - speed)
- * Creates 3D layered effect that removes flat appearance
- */
-export function ParallaxBackground({
-  children,
-  backgroundImage,
-  offset = 0,
-  speed = 0.3,
-  className = '',
-  id,
-}: ParallaxBackgroundProps) {
-  const [scrollY, setScrollY] = React.useState(0);
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const parallaxY = scrollY * speed;
+export function ParallaxBackground({ containerRef }: ParallaxBackgroundProps) {
+  const { scrollY } = useScroll({ container: containerRef });
+  
+  // Multi-layered speed depths (moving 30% to 50% slower than main scrolling content)
+  const y1 = useTransform(scrollY, [0, 1000], [0, 300]);
+  const y2 = useTransform(scrollY, [0, 1000], [0, -200]);
+  const y3 = useTransform(scrollY, [0, 1000], [0, 150]);
 
   return (
-    <div
-      id={id}
-      className={`parallax-container relative overflow-hidden ${className}`}
-      style={{
-        backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      {backgroundImage && (
-        <div
-          className="parallax-bg absolute inset-0 -z-10"
-          style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            transform: `translateY(${parallaxY}px)`,
-          }}
-        />
-      )}
-      <div className="parallax-content relative z-10">
-        {children}
-      </div>
+    <div className="absolute inset-0 pointer-events-none overflow-hidden -z-20">
+      {/* Glow blob 1 - Depth layer 1 */}
+      <motion.div
+        style={{ y: y1 }}
+        className="absolute top-24 left-[10%] w-[25vw] h-[25vw] rounded-full bg-gradient-to-tr from-app-accent1/10 to-transparent blur-[80px] opacity-35"
+      />
+      {/* Glow blob 2 - Depth layer 2 */}
+      <motion.div
+        style={{ y: y2 }}
+        className="absolute top-[50vh] right-[15%] w-[30vw] h-[30vw] rounded-full bg-gradient-to-br from-app-accent2/8 to-transparent blur-[100px] opacity-25"
+      />
+      {/* Fine particle ring / Accent Blob 3 - Depth layer 3 */}
+      <motion.div
+        style={{ y: y3 }}
+        className="absolute top-[100vh] left-[25%] w-[15vw] h-[15vw] rounded-full border border-app-accent1/10 bg-app-accent1/3 blur-[40px] opacity-20"
+      />
     </div>
-  );
-}
-
-interface EmptyStateProps {
-  icon?: React.ReactNode;
-  title: string;
-  description?: string;
-  action?: React.ReactNode;
-  animated?: boolean;
-  className?: string;
-  id?: string;
-}
-
-/**
- * EmptyState - Expressive empty state with micro-looping animation
- * Icon performs gentle waggle animation (tilts slightly, bobs up/down)
- * Perfect for cart, no results, or placeholder screens
- */
-export function EmptyState({
-  icon,
-  title,
-  description,
-  action,
-  animated = true,
-  className = '',
-  id,
-}: EmptyStateProps) {
-  return (
-    <div id={id} className={`empty-state-container ${className}`}>
-      {icon && (
-        <div className={animated ? 'empty-state-icon' : 'text-4xl opacity-75 mb-4'}>
-          {icon}
-        </div>
-      )}
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      {description && <p className="text-sm opacity-60 mb-4 max-w-xs">{description}</p>}
-      {action && <div className="mt-4">{action}</div>}
-    </div>
-  );
-}
-
-interface ErrorStateProps {
-  icon?: React.ReactNode;
-  title: string;
-  message?: string;
-  action?: React.ReactNode;
-  animated?: boolean;
-  className?: string;
-  id?: string;
-}
-
-/**
- * ErrorState - Error display with micro-animation
- * Icon performs subtle waggle for visual interest without distraction
- */
-export function ErrorState({
-  icon,
-  title,
-  message,
-  action,
-  animated = true,
-  className = '',
-  id,
-}: ErrorStateProps) {
-  return (
-    <div id={id} className={`empty-state-container ${className}`}>
-      {icon && (
-        <div className={animated ? 'error-icon mb-4' : 'text-5xl opacity-70 mb-4'}>
-          {icon}
-        </div>
-      )}
-      <h3 className="text-lg font-semibold mb-2 text-red-500">{title}</h3>
-      {message && <p className="text-sm opacity-60 mb-4 max-w-xs">{message}</p>}
-      {action && <div className="mt-4">{action}</div>}
-    </div>
-  );
-}
-
-interface PremiumButtonProps {
-  children: React.ReactNode;
-  onClick?: () => void;
-  variant?: 'primary' | 'secondary' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
-  disabled?: boolean;
-  className?: string;
-  id?: string;
-  type?: 'button' | 'submit' | 'reset';
-}
-
-/**
- * PremiumButton - Button with premium micro-interactions
- * Smooth hover scale, soft shadow, and focus ring
- */
-export function PremiumButton({
-  children,
-  onClick,
-  variant = 'primary',
-  size = 'md',
-  disabled = false,
-  className = '',
-  id,
-  type = 'button',
-}: PremiumButtonProps) {
-  const variantClasses = {
-    primary: 'bg-blue-500 hover:bg-blue-600 text-white',
-    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white',
-    danger: 'bg-red-500 hover:bg-red-600 text-white',
-  };
-
-  const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2.5 text-base',
-    lg: 'px-6 py-3.5 text-lg',
-  };
-
-  return (
-    <motion.button
-      id={id}
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`btn-premium ${variantClasses[variant]} ${sizeClasses[size]} focus-ring-primary ${className}`}
-      whileHover={!disabled ? { scale: 1.05 } : {}}
-      whileTap={!disabled ? { scale: 0.95 } : {}}
-      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-    >
-      {children}
-    </motion.button>
   );
 }

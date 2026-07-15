@@ -42,6 +42,7 @@ import {
   RiskParams 
 } from "../utils/indicators";
 import TradingViewChart from "./TradingViewChart";
+import { TextReveal } from "./MotionWrappers";
 
 export default function AiTrading() {
   // Tabs: signals, autotrade, risk, backtest, mql5
@@ -1197,8 +1198,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-app-border pb-5 mb-6" id="ai-trading-header">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-app-text-bright flex items-center gap-2">
-            <Cpu className="w-7 h-7 text-app-accent1" />
-            OpenAlice Neural Trading Suite
+            <Cpu className="w-7 h-7 text-app-accent1 shrink-0" />
+            <TextReveal text="OpenAlice Neural Trading Suite" />
           </h1>
           <p className="text-sm text-app-text/70 mt-1">
             Sistem trading kuantitatif multi-layer ultra presisi. Mengintegrasikan model kecerdasan buatan, grid-hedging otomatis, dan perlindungan ekuitas modal.

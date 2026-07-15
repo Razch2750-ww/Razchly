@@ -75,19 +75,18 @@ export function CategoryModal({ isOpen, onClose, category, type }: CategoryModal
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="text-sm font-semibold text-app-text-bright mb-2 block">
-              Nama Kategori
-            </label>
+          <div className="floating-label-group">
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-app-bg text-app-text-bright rounded-xl border border-app-border px-4 py-3 focus:outline-none focus:border-app-accent1 outline-none transition-colors"
+              className="floating-label-input"
               placeholder="Contoh: Makanan"
+              id="cat-name"
               required
               autoFocus
             />
+            <label htmlFor="cat-name" className="floating-label-text">Nama Kategori</label>
           </div>
 
           <div>

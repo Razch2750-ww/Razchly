@@ -98,28 +98,30 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
               ))}
             </div>
           </div>
-          <div>
-            <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">Nama Rekening</label>
+          <div className="floating-label-group">
             <input 
               type="text" 
               value={name} 
               onChange={e => setName(e.target.value)}
-              className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
+              className="floating-label-input"
               placeholder="Contoh: BCA, Dompet, GoPay"
+              id="acc-name"
               required
             />
+            <label htmlFor="acc-name" className="floating-label-text">Nama Rekening</label>
           </div>
-          <div>
-            <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">Saldo (Rp)</label>
+          <div className="floating-label-group">
             <input 
               type="text" 
               inputMode="numeric"
               value={balance} 
               onChange={e => setBalance(formatNumberInput(e.target.value))}
-              className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-2xl font-bold font-mono text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
+              className="floating-label-input font-mono text-xl font-bold"
               placeholder="0"
+              id="acc-balance"
               required
             />
+            <label htmlFor="acc-balance" className="floating-label-text">Saldo Awal (Rp)</label>
           </div>
           <div className="pt-4 flex gap-3">
             <button 

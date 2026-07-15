@@ -6,6 +6,8 @@ import { db } from '../lib/firebase';
 import { collection, onSnapshot, writeBatch, doc } from 'firebase/firestore';
 import { Account, Category, Transaction, TransactionType } from '../types';
 import { CategoryIcon } from './CategoryIcon';
+import { motion } from "motion/react";
+import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
 
 interface ExtractedTransaction {
   date: string;
@@ -218,7 +220,10 @@ export default function ImageAnalysis() {
 
   return (
     <div className="flex-1 flex flex-col w-full h-full max-w-4xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
-        <h1 className="text-2xl font-bold text-app-text-bright mb-6">Analisis Mutasi Rekening / Struk (AI)</h1>
+      <ScrollReveal className="w-full flex flex-col">
+        <h1 className="text-2xl font-bold text-app-text-bright mb-6">
+          <TextReveal text="Analisis Mutasi Rekening / Struk (AI)" />
+        </h1>
         
         <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-xl">
             <div className="flex flex-col md:flex-row gap-6">
@@ -418,6 +423,7 @@ export default function ImageAnalysis() {
                 </div>
             )}
         </div>
+      </ScrollReveal>
     </div>
   );
 }

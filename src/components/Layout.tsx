@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Home, Wallet, Settings, Menu, PlusCircle, ArrowLeftRight, LogOut, X, TrendingUp, Plus, Car, Target, Scan, HandCoins, CalendarCheck, Cpu } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -6,6 +6,7 @@ import { useStore } from '../store/useStore';
 import { auth } from '../lib/firebase';
 import { signOut } from 'firebase/auth';
 import Transactions from './Transactions';
+import { ParallaxBackground } from './MotionWrappers';
 
 const NAV_ITEMS = [
   { path: '/', label: 'Beranda', icon: Home },
@@ -27,6 +28,7 @@ export default function Layout() {
   const [hoveredMobilePath, setHoveredMobilePath] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, hiddenTabs, setGlobalAddModalOpen, setGlobalGrabModalOpen } = useStore();
+  const mainRef = useRef<HTMLElement>(null);
 
   const visibleNavItems = NAV_ITEMS.filter((item) => !hiddenTabs.includes(item.path));
 
@@ -101,7 +103,8 @@ export default function Layout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 relative bg-app-bg flex flex-col">
+      <main ref={mainRef} className="flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 relative bg-app-bg flex flex-col">
+        <ParallaxBackground containerRef={mainRef} />
         <Outlet />
         <Transactions modalOnly />
       </main>
