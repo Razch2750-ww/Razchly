@@ -10,6 +10,7 @@ import { formatNumberInput, parseNumberInput } from '../utils/numberFormat';
 import { Transaction } from '../types';
 import { isSameMonth, isSameDay } from 'date-fns';
 import confetti from 'canvas-confetti';
+import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
 
 export default function SavingsTarget() {
   const { user, monthlySavingsTargets, setMonthlySavingsTargets, monthlyExpenseBudget, setMonthlyExpenseBudget, dailyIncomeTargets, setDailyIncomeTargets, dailyExpenseLimits, setDailyExpenseLimits, setGlobalAddModalOpen, setGlobalGrabModalOpen } = useStore();
@@ -138,7 +139,7 @@ export default function SavingsTarget() {
       <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6 shrink-0">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1 tracking-tight">
-            Target Tabungan
+            <TextReveal text="Target Tabungan" />
           </h1>
           <p className="text-app-text/70 text-sm">Kelola dan pantau target keuangan berlapis Anda.</p>
         </div>
@@ -164,7 +165,8 @@ export default function SavingsTarget() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2 bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
+        <ScrollReveal className="lg:col-span-2">
+          <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden h-full">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <h2 className="text-app-text-bright font-bold mb-6 flex items-center gap-2 relative z-10">
             <Target className="w-5 h-5 text-app-accent1" /> Atur Target Finansial
@@ -307,10 +309,12 @@ export default function SavingsTarget() {
             Target ini digunakan untuk mengukur kinerja laporan keuangan Anda.
           </p>
         </div>
+        </ScrollReveal>
 
-        <div className="lg:col-span-1 flex flex-col gap-6">
+        <StaggerContainer className="lg:col-span-1 flex flex-col gap-6">
           {/* Laba Bersih Card */}
-          <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden flex-1 min-h-[140px]">
+          <StaggerItem className="flex-1">
+            <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden h-full min-h-[140px]">
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
             <div className="absolute top-0 right-0 p-4 opacity-10">
               <TrendingUp className="w-16 h-16 text-app-success" />
@@ -318,10 +322,12 @@ export default function SavingsTarget() {
             <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-2 relative z-10">Laba Bersih Bulan Ini</p>
             <h3 className="text-3xl font-bold text-app-text-bright relative z-10">Rp {Math.max(savingsThisMonth, 0).toLocaleString("id-ID")}</h3>
             <p className="text-xs text-app-text/50 mt-2 relative z-10">Masuk akal untuk ditabung</p>
-          </div>
+            </div>
+          </StaggerItem>
 
           {/* Predictive analysis card */}
-          <div className={`rounded-3xl p-6 border shadow-sm flex flex-col relative overflow-hidden flex-1 ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
+          <StaggerItem className="flex-1">
+            <div className={`rounded-3xl p-6 border shadow-sm flex flex-col relative overflow-hidden h-full ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-transparent via-transparent pointer-events-none opacity-80 block" />
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-3">
@@ -387,8 +393,9 @@ export default function SavingsTarget() {
                 </div>
               )}
             </div>
-          </div>
-        </div>
+            </div>
+          </StaggerItem>
+        </StaggerContainer>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Tabungan Bulanan Berlayer */}

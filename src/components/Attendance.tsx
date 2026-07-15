@@ -6,6 +6,8 @@ import { sendDeviceNotification } from "../utils/notification";
 import { AttendanceRecord } from "../types";
 import { Calendar, Clock, CheckCircle, XCircle, FileText, Activity, Plus, Edit2, Trash2, X, MapPin } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { motion } from "motion/react";
+import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
 
 const CurrencyInput = ({ value, onChange }: { value: number, onChange: (val: number) => void }) => {
   const displayValue = value ? `Rp${value.toLocaleString('id-ID')}` : '';
@@ -76,7 +78,7 @@ export default function Attendance() {
   const [notes, setNotes] = useState("");
   const [localSalarySettings, setLocalSalarySettings] = useState(salarySettings);
   const pendingUpdatesRef = useRef<Record<string, number>>({});
-  const updateTimeoutRef = useRef<NodeJS.Timeout>();
+  const updateTimeoutRef = useRef<any>(null);
 
   useEffect(() => {
     setLocalSalarySettings({ ...salarySettings, ...pendingUpdatesRef.current });
@@ -244,7 +246,7 @@ export default function Attendance() {
         ? `Kehadiran (Check-In: ${modalCheckIn || '-'}, Check-Out: ${modalCheckOut || '-'})`
         : modalStatus === 'absent' ? 'Alpa / Tidak Hadir'
         : modalStatus === 'leave' ? 'Izin / Cuti'
-        : modalStatus === 'holiday' ? 'Hari Libur'
+        : modalStatus === 'sick' ? 'Sakit'
         : modalStatus;
 
       sendDeviceNotification(
@@ -375,7 +377,7 @@ export default function Attendance() {
       <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1 tracking-tight">
-            Absensi
+            <TextReveal text="Absensi" />
           </h1>
           <p className="text-app-text/70 text-sm">
             Catat dan pantau kehadiran Anda
@@ -548,9 +550,10 @@ export default function Attendance() {
              </div>
            </div>
 
-           <div className="space-y-3">
+           <StaggerContainer className="space-y-3">
              {records.length > 0 ? records.map(record => (
-               <div key={record.id} className="bg-app-card rounded-xl border border-app-border p-4 flex items-center justify-between">
+               <StaggerItem key={record.id}>
+                 <div className="bg-app-card rounded-xl border border-app-border p-4 flex items-center justify-between">
                  <div className="flex items-center gap-4">
                    <div className="w-12 h-12 rounded-lg bg-app-bg border border-app-border flex flex-col items-center justify-center shrink-0">
                      <span className="text-xs text-app-text/70">{new Date(record.date).toLocaleDateString('id-ID', { weekday: 'short' })}</span>
@@ -599,12 +602,13 @@ export default function Attendance() {
                  </div>
                  </div>
                </div>
+               </StaggerItem>
              )) : (
                <div className="bg-app-card rounded-xl border border-app-border p-8 text-center text-app-text/50">
                  Belum ada data absensi bulan ini.
                </div>
              )}
-           </div>
+           </StaggerContainer>
         </div>
 
 

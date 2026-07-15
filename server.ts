@@ -8,12 +8,67 @@ import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config();
+import { adminAuth } from "./src/lib/firebase-admin.ts";
+
+// Simple structured logger
+const logger = {
+  info: (msg: string, meta?: any) => {
+    console.log(JSON.stringify({ timestamp: new Date().toISOString(), level: "INFO", message: msg, ...meta }));
+  },
+  warn: (msg: string, meta?: any) => {
+    console.warn(JSON.stringify({ timestamp: new Date().toISOString(), level: "WARN", message: msg, ...meta }));
+  },
+  error: (msg: string, error?: any) => {
+    console.error(JSON.stringify({ timestamp: new Date().toISOString(), level: "ERROR", message: msg, error: error?.message || error }));
+  }
+};
+
+// In-memory Rate Limiting Middleware
+const rateLimits = new Map<string, number[]>();
+function rateLimiter(limit: number, windowMs: number) {
+  return (req: any, res: any, next: any) => {
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const now = Date.now();
+    const timestamps = rateLimits.get(ip) || [];
+    
+    // Filter out expired timestamps
+    const activeTimestamps = timestamps.filter(t => now - t < windowMs);
+    
+    if (activeTimestamps.length >= limit) {
+      logger.warn("Rate limit exceeded", { ip, path: req.path });
+      return res.status(429).json({ error: "Batas limit permintaan terlampaui. Silakan coba lagi nanti." });
+    }
+    
+    activeTimestamps.push(now);
+    rateLimits.set(ip, activeTimestamps);
+    next();
+  };
+}
+
+// Authentication Middleware via Firebase Admin Token Verification
+async function requireAuth(req: any, res: any, next: any) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    logger.warn("Missing or invalid authorization header", { path: req.path });
+    return res.status(401).json({ error: "Unauthorized. Token otentikasi diperlukan." });
+  }
+
+  const token = authHeader.split("Bearer ")[1];
+  try {
+    const decodedToken = await adminAuth.verifyIdToken(token);
+    req.user = decodedToken;
+    next();
+  } catch (err: any) {
+    logger.error("Authentication validation failed", err);
+    return res.status(401).json({ error: "Unauthorized. Token tidak valid." });
+  }
+}
 
 process.on('uncaughtException', (err) => {
-  console.error("Uncaught Exception:", err);
+  logger.error("Uncaught Exception:", err);
 });
 process.on('unhandledRejection', (reason, promise) => {
-  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  logger.error("Unhandled Rejection at", reason);
 });
 
 async function startServer() {
@@ -413,7 +468,7 @@ LAPIS 6 (Smart Basket Risk): Berdasarkan tingkat volatilitas saat ini, kami mere
   }
 
   // API Route for image analysis
-  app.post("/api/gemini/analyze", async (req, res) => {
+  app.post("/api/gemini/analyze", requireAuth, rateLimiter(15, 60 * 1000), async (req, res) => {
     const { images, imageParams, prompt, categories } = req.body;
     try {
       const apiKey = process.env.GEMINI_API_KEY;
@@ -484,7 +539,7 @@ LAPIS 6 (Smart Basket Risk): Berdasarkan tingkat volatilitas saat ini, kami mere
   });
 
   // API Route for AI stock/crypto trading analysis
-  app.post("/api/gemini/trading-analysis", async (req, res) => {
+  app.post("/api/gemini/trading-analysis", requireAuth, rateLimiter(15, 60 * 1000), async (req, res) => {
     const { symbol, currentPrice, candles, engine = "ALICE" } = req.body;
     try {
       if (engine === "ALICE") {
@@ -689,7 +744,7 @@ LAPIS 6 (Smart Basket Risk): Berdasarkan tingkat volatilitas saat ini, kami mere
   }
 
   // API Route for AI Financial Strategy Recommendation
-  app.post("/api/gemini/financial-strategy", async (req, res) => {
+  app.post("/api/gemini/financial-strategy", requireAuth, rateLimiter(15, 60 * 1000), async (req, res) => {
     const { netProfit, income, expense, avgIncome, avgExpense, count, periodText } = req.body;
     try {
       const apiKey = process.env.GEMINI_API_KEY;
@@ -813,7 +868,7 @@ LAPIS 6 (Smart Basket Risk): Berdasarkan tingkat volatilitas saat ini, kami mere
   });
 
   // API Route for real Bybit order execution
-  app.post("/api/trade/bybit-execute", async (req, res) => {
+  app.post("/api/trade/bybit-execute", requireAuth, rateLimiter(10, 60 * 1000), async (req, res) => {
     try {
       const { apiKey, apiSecret, symbol, side, qty, isTestnet } = req.body;
       if (!apiKey || !apiSecret || !symbol || !side || !qty) {
@@ -869,7 +924,7 @@ LAPIS 6 (Smart Basket Risk): Berdasarkan tingkat volatilitas saat ini, kami mere
   });
 
   // API Route to forward trading signals to custom MT5 Webhook Bridges
-  app.post("/api/trade/webhook-send", async (req, res) => {
+  app.post("/api/trade/webhook-send", requireAuth, rateLimiter(30, 60 * 1000), async (req, res) => {
     try {
       const { webhookUrl, payload } = req.body;
       if (!webhookUrl) {

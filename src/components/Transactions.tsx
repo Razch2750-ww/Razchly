@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useStore } from "../store/useStore";
+import { authFetch } from "../utils/api";
 import { Account, Transaction, TransactionType, Category } from "../types";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -81,6 +82,7 @@ import {
 
 import { formatNumberInput, parseNumberInput } from "../utils/numberFormat";
 import { toast } from "react-hot-toast";
+import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal, MicroLoop } from "./MotionWrappers";
 
 export default function Transactions({ modalOnly = false }: { modalOnly?: boolean }) {
   const detailRef = useRef<HTMLDivElement>(null);
@@ -184,11 +186,8 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
     setStrategyLoading(true);
     setIsStrategyModalOpen(true);
     try {
-      const response = await fetch("/api/gemini/financial-strategy", {
+      const response = await authFetch("/api/gemini/financial-strategy", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           netProfit: stats.netProfit,
           income: stats.income,
@@ -992,7 +991,9 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           <button onClick={() => navigate(-1)}>
             <ArrowLeft className="w-6 h-6 text-app-text" />
           </button>
-          <h1 className="text-xl font-bold text-app-text-bright">Laporan Keuangan</h1>
+          <h1 className="text-xl font-bold text-app-text-bright">
+            <TextReveal text="Laporan Keuangan" />
+          </h1>
           <button>
             <Share2 className="w-5 h-5 text-app-text/80" />
           </button>
@@ -1239,16 +1240,17 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           <div className="bg-app-card border border-app-border rounded-2xl p-4 shadow-lg space-y-3 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
             {mobileFilteredTransactions.length === 0 ? (
-              <div className="py-6 text-center text-app-text/50 text-xs rounded-xl border border-dashed border-app-border relative z-10">
+              <div className="py-8 flex flex-col items-center justify-center text-center text-app-text/50 text-xs rounded-xl border border-dashed border-app-border relative z-10 bg-app-card/30">
+                <FileText className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
                 Belum ada transaksi di periode ini.
               </div>
             ) : (
-              <div className="space-y-2 relative z-10">
+              <StaggerContainer className="space-y-2 relative z-10">
                 {mobileFilteredTransactions.map((t) => (
-                  <div
-                    key={t.id}
-                    className="flex items-center justify-between p-3.5 bg-app-bg hover:bg-app-hover rounded-xl transition-colors border border-app-border/40 hover:border-app-border relative overflow-hidden"
-                  >
+                  <StaggerItem key={t.id}>
+                    <div
+                      className="flex items-center justify-between p-3.5 bg-app-bg hover:bg-app-hover rounded-xl transition-colors border border-app-border/40 hover:border-app-border relative overflow-hidden"
+                    >
                     <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-accent1/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
                     <div className="flex items-center gap-3 relative z-10 min-w-0 flex-1">
                       <div
@@ -1355,8 +1357,9 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                       </div>
                     </div>
                   </div>
+                </StaggerItem>
                 ))}
-              </div>
+              </StaggerContainer>
             )}
           </div>
         </div>
@@ -1367,7 +1370,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         <header className="flex flex-col md:flex-row md:items-center justify-between shrink-0">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1 tracking-tight">
-              Laporan Keuangan
+              <TextReveal text="Laporan Keuangan" />
             </h1>
             <p className="text-app-text/70 text-sm">
               Unduh dan analisis laporan keuangan bulanan Anda.
@@ -1412,7 +1415,8 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         </header>
 
         {/* FILTER & EXPORT BAR */}
-        <div className="bg-app-card border border-app-border rounded-2xl p-4 md:p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm shrink-0 relative overflow-hidden">
+        <ScrollReveal>
+          <div className="bg-app-card border border-app-border rounded-2xl p-4 md:p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm shrink-0 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
           <div className="relative z-10">
             <h2 className="text-app-text-bright font-bold text-lg">
@@ -1486,8 +1490,10 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </button>
           </div>
         </div>
+        </ScrollReveal>
 
         {/* STATS & AI INSIGHT GRID */}
+        <ScrollReveal>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 shrink-0">
           {/* TOTAL KEUNTUNGAN BERSIH */}
           <div className="lg:col-span-2 bg-app-card rounded-3xl p-6 md:p-8 border border-app-border shadow-sm flex flex-col justify-between relative overflow-hidden">
@@ -1570,8 +1576,10 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </button>
           </div>
         </div>
+        </ScrollReveal>
 
         {/* SUMBER & ALOKASI */}
+        <ScrollReveal>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 shrink-0">
           <div>
             <div className="flex items-center justify-between mb-4">
@@ -1666,6 +1674,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </div>
           </div>
         </div>
+        </ScrollReveal>
 
         {/* DETAIL TRANSAKSI */}
         <div
@@ -1676,41 +1685,48 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             <h3 className="text-xl font-bold text-app-text-bright">
               Detail Transaksi
             </h3>
-            <div className="flex items-center gap-2 bg-app-card p-1 rounded-full border border-app-border">
-              <button
-                onClick={() => setTab("Semua")}
-                className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${tab === "Semua" ? "bg-app-accent1 text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
-              >
-                Semua
-              </button>
-              <button
-                onClick={() => setTab("Pemasukan")}
-                className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${tab === "Pemasukan" ? "bg-app-success text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
-              >
-                Pemasukan
-              </button>
-              <button
-                onClick={() => setTab("Pengeluaran")}
-                className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${tab === "Pengeluaran" ? "bg-app-danger text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
-              >
-                Pengeluaran
-              </button>
+            <div className="flex items-center gap-1 bg-app-card p-1 rounded-full border border-app-border relative">
+              {["Semua", "Pemasukan", "Pengeluaran"].map((t) => {
+                const isActive = tab === t;
+                const activeColorClass = t === "Semua" ? "bg-app-accent1" : t === "Pemasukan" ? "bg-app-success" : "bg-app-danger";
+                return (
+                  <button
+                    key={t}
+                    onClick={() => setTab(t as any)}
+                    className="px-5 py-2 rounded-full text-xs font-bold transition-colors relative"
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTabTxDesktop"
+                        className={`absolute inset-0 rounded-full ${activeColorClass}`}
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    <span className={`relative z-10 ${isActive ? "text-white" : "text-app-text/60 hover:text-app-text-bright"}`}>
+                      {t}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           <div className="bg-app-card border border-app-border rounded-3xl p-6 shadow-sm mb-6 flex-1 overflow-hidden relative flex flex-col">
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
             {filteredTransactions.length === 0 ? (
-              <div className="p-8 text-center text-app-text/50 rounded-2xl border border-dashed border-app-border mt-4 relative z-10">
-                Belum ada transaksi di tab ini.
+              <div className="p-8 text-center text-app-text/50 rounded-2xl border border-dashed border-app-border mt-4 relative z-10 flex flex-col items-center justify-center gap-3">
+                <MicroLoop type="waggle">
+                  <Wallet className="w-10 h-10 text-app-accent1/60" />
+                </MicroLoop>
+                <span>Belum ada transaksi di tab ini.</span>
               </div>
             ) : (
-              <div className="space-y-2 mt-4 flex-1 overflow-y-auto no-scrollbar relative z-10 pr-2 -mr-2 pb-2">
+              <StaggerContainer className="space-y-2 mt-4 flex-1 overflow-y-auto no-scrollbar relative z-10 pr-2 -mr-2 pb-2">
                 {filteredTransactions.map((t) => (
-                  <div
-                    key={t.id}
-                    className="flex items-center justify-between p-4 bg-app-bg hover:bg-app-hover rounded-2xl transition-colors border border-app-border/50 hover:border-app-border cursor-pointer group relative overflow-hidden"
-                  >
+                  <StaggerItem key={t.id}>
+                    <div
+                      className="flex items-center justify-between p-4 bg-app-bg hover:bg-app-hover rounded-2xl transition-colors border border-app-border/50 hover:border-app-border cursor-pointer group relative overflow-hidden"
+                    >
                     <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-accent1/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
                     <div className="flex items-center gap-4 relative z-10">
                       <div
@@ -1815,8 +1831,9 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                       </button>
                     </div>
                   </div>
+                </StaggerItem>
                 ))}
-              </div>
+              </StaggerContainer>
             )}
           </div>
         </div>

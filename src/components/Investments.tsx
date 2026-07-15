@@ -33,6 +33,8 @@ import {
   Filter,
   ArrowDownUp,
   RefreshCw,
+  List,
+  PieChart as PieChartIcon,
 } from "lucide-react";
 import {
   LineChart,
@@ -42,11 +44,16 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 import { format, subDays, isSameDay } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { formatNumberInput, parseNumberInput } from "../utils/numberFormat";
 import { toast } from "react-hot-toast";
+import { motion } from "motion/react";
+import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
 
 export interface Investment {
   id: string;
@@ -55,6 +62,485 @@ export interface Investment {
   qty: number;
   price: number;
   createdAt: number;
+}
+
+function AssetLogo({ logoid, code, description }: { logoid?: string; code: string; description?: string }) {
+  const [customError, setCustomError] = useState(false);
+  const [tvError, setTvError] = useState(false);
+
+  useEffect(() => {
+    setCustomError(false);
+    setTvError(false);
+  }, [logoid, code, description]);
+
+  // Try to find an original custom logo first
+  const cleanCode = code.toUpperCase().trim();
+  const cleanDesc = (description || "").toLowerCase();
+
+  let customLogoUrl = "";
+
+  // Well-known exact mappings
+  const mappings: Record<string, string> = {
+    RANS: "https://upload.wikimedia.org/wikipedia/id/7/7b/Logo_RANS_Entertainment.png",
+    BACH: "https://logo.clearbit.com/bach.co.id",
+    PRDL: "https://logo.clearbit.com/prodia.co.id",
+    PRDA: "https://logo.clearbit.com/prodia.co.id",
+    JECX: "https://logo.clearbit.com/jec.co.id",
+    BBCA: "https://logo.clearbit.com/bca.co.id",
+    BBRI: "https://logo.clearbit.com/bri.co.id",
+    BBNI: "https://logo.clearbit.com/bni.co.id",
+    BMRI: "https://logo.clearbit.com/bankmandiri.co.id",
+    TLKM: "https://logo.clearbit.com/telkom.co.id",
+    ASII: "https://logo.clearbit.com/astra.co.id",
+    UNVR: "https://logo.clearbit.com/unilever.co.id",
+    GOTO: "https://logo.clearbit.com/gotocompany.com",
+    BUKA: "https://logo.clearbit.com/bukalapak.com",
+  };
+
+  if (mappings[cleanCode]) {
+    customLogoUrl = mappings[cleanCode];
+  } else if (cleanDesc.includes("rans entertainment")) {
+    customLogoUrl = "https://upload.wikimedia.org/wikipedia/id/7/7b/Logo_RANS_Entertainment.png";
+  } else if (cleanDesc.includes("prodia")) {
+    customLogoUrl = "https://logo.clearbit.com/prodia.co.id";
+  } else if (cleanDesc.includes("bach multi global")) {
+    customLogoUrl = "https://logo.clearbit.com/bach.co.id";
+  } else if (cleanDesc.includes("astra international")) {
+    customLogoUrl = "https://logo.clearbit.com/astra.co.id";
+  } else if (cleanDesc.includes("telkom")) {
+    customLogoUrl = "https://logo.clearbit.com/telkom.co.id";
+  } else if (cleanDesc.includes("central asia")) {
+    customLogoUrl = "https://logo.clearbit.com/bca.co.id";
+  } else if (cleanDesc.includes("rakyat indonesia")) {
+    customLogoUrl = "https://logo.clearbit.com/bri.co.id";
+  } else if (cleanDesc.includes("negara indonesia")) {
+    customLogoUrl = "https://logo.clearbit.com/bni.co.id";
+  } else if (cleanDesc.includes("mandiri")) {
+    customLogoUrl = "https://logo.clearbit.com/bankmandiri.co.id";
+  } else if (cleanDesc) {
+    // Attempt clearbit from first descriptive word
+    const words = cleanDesc
+      .replace(/^pt\s+/, "")
+      .replace(/\s+tbk$/, "")
+      .trim()
+      .split(/\s+/);
+    if (words.length > 0 && words[0].length > 2) {
+      const cleanWord = words[0].replace(/[^a-z0-9]/g, "");
+      if (cleanWord) {
+        customLogoUrl = `https://logo.clearbit.com/${cleanWord}.co.id`;
+      }
+    }
+  }
+
+  if (customLogoUrl && !customError) {
+    return (
+      <img
+        src={customLogoUrl}
+        alt={code}
+        className="w-full h-full object-cover bg-white"
+        referrerPolicy="no-referrer"
+        onError={() => setCustomError(true)}
+      />
+    );
+  }
+
+  // Fallback to TradingView logo
+  if (logoid && !tvError) {
+    return (
+      <img
+        src={`https://s3-symbol-logo.tradingview.com/${logoid}.svg`}
+        alt={code}
+        className="w-full h-full object-cover bg-white"
+        referrerPolicy="no-referrer"
+        onError={() => setTvError(true)}
+      />
+    );
+  }
+
+  // Fallback to text initials badge
+  return (
+    <div className="w-full h-full flex items-center justify-center bg-app-accent1/15 text-app-accent1 font-bold text-xs tracking-wider uppercase">
+      {code.slice(0, 2)}
+    </div>
+  );
+}
+
+function getFraction(price: number): number {
+  if (price < 200) return 1;
+  if (price < 500) return 2;
+  if (price < 2000) return 5;
+  if (price < 5000) return 10;
+  return 25;
+}
+
+function getAraPercentage(price: number): number {
+  if (price <= 200) return 0.35;
+  if (price <= 5000) return 0.25;
+  return 0.20;
+}
+
+const ARB_PERCENTAGE = 0.15;
+
+interface SimulationStep {
+  day: number;
+  prevPrice: number;
+  pct: number;
+  frac: number;
+  change: number;
+  price: number;
+  totalValue: number;
+}
+
+function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
+  const [stockName, setStockName] = useState("");
+  const [priceInput, setPriceInput] = useState("272");
+  const [lotInput, setLotInput] = useState("10");
+  const [days, setDays] = useState(10);
+  const [direction, setDirection] = useState<"ara" | "arb">("ara");
+
+  const parsedPrice = parseNumberInput(priceInput) || 0;
+  const parsedLots = parseNumberInput(lotInput) || 0;
+
+  const simulationSteps = useMemo(() => {
+    if (parsedPrice <= 0) return [];
+    
+    const steps: SimulationStep[] = [];
+    let currentPrice = parsedPrice;
+    const maxDays = Math.min(Math.max(1, days), 100);
+    
+    for (let i = 1; i <= maxDays; i++) {
+      const prev = currentPrice;
+      const frac = getFraction(prev);
+      
+      let pct = 0;
+      let theoryChange = 0;
+      let change = 0;
+      let nextPrice = 0;
+      
+      if (direction === "ara") {
+        pct = getAraPercentage(prev);
+        theoryChange = prev * pct;
+        change = Math.floor(theoryChange / frac) * frac;
+        nextPrice = prev + change;
+      } else {
+        pct = ARB_PERCENTAGE;
+        theoryChange = prev * pct;
+        change = Math.floor(theoryChange / frac) * frac;
+        nextPrice = Math.max(50, prev - change);
+      }
+      
+      steps.push({
+        day: i,
+        prevPrice: prev,
+        pct: pct * 100,
+        frac,
+        change,
+        price: nextPrice,
+        totalValue: nextPrice * parsedLots * 100,
+      });
+      
+      currentPrice = nextPrice;
+    }
+    return steps;
+  }, [parsedPrice, parsedLots, days, direction]);
+
+  const handleQuickSelect = (code: string, price: number, qty?: number) => {
+    setStockName(code);
+    setPriceInput(price.toLocaleString("id-ID"));
+    if (qty !== undefined) {
+      setLotInput(qty.toString());
+    }
+  };
+
+  return (
+    <div className="bg-app-card rounded-3xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+      
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 relative z-10">
+        <div>
+          <h2 className="text-app-text-bright font-bold flex items-center gap-2 text-lg">
+            Simulasi ARA & ARB Saham (BEI)
+          </h2>
+          <p className="text-xs text-app-text/60 mt-1">
+            Hitung potensi auto rejection berdasarkan regulasi fraksi harga dan batasan BEI terbaru.
+          </p>
+        </div>
+        
+        {/* Toggle ARA / ARB */}
+        <div className="flex bg-app-bg p-1 rounded-xl border border-app-border">
+          <button
+            type="button"
+            onClick={() => setDirection("ara")}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1.5 ${
+              direction === "ara"
+                ? "bg-app-success text-white shadow-sm font-bold"
+                : "text-app-text/60 hover:text-app-text-bright font-semibold"
+            }`}
+          >
+            <TrendingUp className="w-3.5 h-3.5" /> ARA
+          </button>
+          <button
+            type="button"
+            onClick={() => setDirection("arb")}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1.5 ${
+              direction === "arb"
+                ? "bg-app-danger text-white shadow-sm font-bold"
+                : "text-app-text/60 hover:text-app-text-bright font-semibold"
+            }`}
+          >
+            <TrendingDown className="w-3.5 h-3.5" /> ARB
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-6 relative z-10">
+        {/* INPUTS CONTAINER (Full Width, beautifully aligned) */}
+        <div className="bg-app-bg/40 p-5 rounded-2xl border border-app-border/60 space-y-5">
+          {/* Section 1: Quick Select */}
+          <div>
+            <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+              Pilih Contoh / Portofolio
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => handleQuickSelect("Contoh 1", 272, 10)}
+                className="px-2.5 py-1.5 rounded-lg bg-app-bg border border-app-border text-xs text-app-text hover:text-app-text-bright hover:border-app-accent1 transition-all"
+              >
+                Rp 272 (Contoh 1)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickSelect("Contoh 2", 1255, 10)}
+                className="px-2.5 py-1.5 rounded-lg bg-app-bg border border-app-border text-xs text-app-text hover:text-app-text-bright hover:border-app-accent1 transition-all"
+              >
+                Rp 1.255 (Contoh 2)
+              </button>
+              
+              {ownedStocks.map((stock) => (
+                <button
+                  key={stock.id}
+                  type="button"
+                  onClick={() => handleQuickSelect(stock.code, stock.price, stock.qty)}
+                  className="px-2.5 py-1.5 rounded-lg bg-app-bg border border-app-border text-xs text-app-text hover:text-app-text-bright hover:border-app-accent1 transition-all flex items-center gap-1.5"
+                >
+                  <span className="font-bold text-app-accent1">{stock.code}</span>
+                  <span className="text-app-text/60">Rp {stock.price.toLocaleString("id-ID")}</span>
+                  {stock.qty && <span className="px-1 py-0.5 rounded bg-app-bg text-[9px] text-app-accent2">{stock.qty} Lot</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Section 2: Main inputs in a clean responsive grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div>
+              <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                Nama / Kode Saham
+              </label>
+              <input
+                type="text"
+                value={stockName}
+                onChange={(e) => setStockName(e.target.value.toUpperCase())}
+                placeholder="Contoh: TLKM"
+                className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-2.5 text-sm focus:border-app-accent1 outline-none text-app-text-bright font-medium"
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                Harga Sebelumnya (Rp)
+              </label>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={priceInput}
+                onChange={(e) => setPriceInput(formatNumberInput(e.target.value))}
+                placeholder="Harga acuan..."
+                className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-2.5 text-sm focus:border-app-accent1 outline-none text-app-text-bright font-bold"
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                Jumlah Lot
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={lotInput}
+                onChange={(e) => setLotInput(formatNumberInput(e.target.value))}
+                placeholder="Jumlah lot..."
+                className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-2.5 text-sm focus:border-app-accent1 outline-none text-app-text-bright font-bold"
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70 flex justify-between">
+                <span>Berapa Kali ARA/ARB ({days}x)</span>
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="range"
+                  min="1"
+                  max="15"
+                  value={days > 15 ? 15 : days}
+                  onChange={(e) => setDays(parseInt(e.target.value) || 1)}
+                  className="flex-1 accent-app-accent1 cursor-pointer bg-app-border h-1 rounded"
+                />
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={days}
+                  onChange={(e) => setDays(Math.min(100, Math.max(1, parseInt(e.target.value) || 1)))}
+                  className="w-16 text-center bg-app-bg border border-app-border rounded-lg py-1.5 text-xs text-app-text-bright font-bold focus:border-app-accent1 outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Summary details */}
+          {parsedPrice > 0 && parsedLots > 0 && (
+            <div className="bg-app-bg/50 p-4 rounded-xl border border-app-border/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+              <div>
+                <span className="text-app-text/50">Total Uang Awal:</span>
+                <span className="font-bold text-app-text-bright ml-2 text-sm">
+                  Rp {(parsedPrice * parsedLots * 100).toLocaleString("id-ID")}
+                </span>
+              </div>
+              <div className="text-app-text/50">
+                Konversi Shares: <span className="font-bold text-app-text-bright">{parsedLots} lot</span> ({ (parsedLots * 100).toLocaleString("id-ID") } lembar saham)
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* PROJECTION RESULTS & ATURAN BEI (Stack below) */}
+        <div className="space-y-6">
+          <div className="bg-app-bg/50 rounded-2xl border border-app-border p-5">
+            <h3 className="text-xs font-bold text-app-text-bright uppercase tracking-wider mb-4 flex items-center justify-between">
+              <span>Hasil Proyeksi Hari-ke-Hari {stockName ? `Saham ${stockName}` : ""}</span>
+              <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold ${direction === "ara" ? "bg-app-success/10 text-app-success border border-app-success/20" : "bg-app-danger/10 text-app-danger border border-app-danger/20"}`}>
+                {direction.toUpperCase()} MODE
+              </span>
+            </h3>
+            
+            {simulationSteps.length === 0 ? (
+              <p className="text-xs text-app-text/50 text-center py-8">
+                Masukkan harga acuan yang valid untuk melihat simulasi.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs min-w-[650px]">
+                  <thead>
+                    <tr className="border-b border-app-border text-app-text/50">
+                      <th className="pb-3 font-bold">HARI</th>
+                      <th className="pb-3 font-bold text-right">HARGA ACUAN</th>
+                      <th className="pb-3 font-bold text-right">HARGA TARGET</th>
+                      {parsedLots > 0 && (
+                        <>
+                          <th className="pb-3 font-bold text-right">LOT</th>
+                          <th className="pb-3 font-bold text-right">TOTAL UANG TARGET</th>
+                          <th className="pb-3 font-bold text-right">KUMULATIF +/-</th>
+                        </>
+                      )}
+                      <th className="pb-3 font-bold text-right">FRAKSI</th>
+                      <th className="pb-3 font-bold text-right">B.PERSEN</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-app-border/30">
+                    {simulationSteps.map((step) => {
+                      const initialTotal = parsedPrice * parsedLots * 100;
+                      const diffTotal = step.totalValue - initialTotal;
+                      const pctTotal = initialTotal > 0 ? (diffTotal / initialTotal) * 100 : 0;
+                      return (
+                        <tr key={step.day} className="hover:bg-app-hover/35 transition-colors">
+                          <td className="py-3 font-bold text-app-text-bright">Hari {step.day}</td>
+                          <td className="py-3 text-right font-medium text-app-text/80">Rp {step.prevPrice.toLocaleString("id-ID")}</td>
+                          <td className={`py-3 text-right font-bold text-sm ${direction === "ara" ? "text-app-success" : "text-app-danger"}`}>
+                            Rp {step.price.toLocaleString("id-ID")}
+                          </td>
+                          {parsedLots > 0 && (
+                            <>
+                              <td className="py-3 text-right text-app-text/70">{parsedLots} lot</td>
+                              <td className="py-3 text-right font-bold text-app-text-bright">
+                                Rp {step.totalValue.toLocaleString("id-ID")}
+                              </td>
+                              <td className={`py-3 text-right font-semibold text-xs ${diffTotal >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                                {diffTotal >= 0 ? "+" : ""}Rp {diffTotal.toLocaleString("id-ID")}
+                                <span className="block text-[10px] font-normal opacity-80">
+                                  ({diffTotal >= 0 ? "+" : ""}{pctTotal.toFixed(2)}%)
+                                </span>
+                              </td>
+                            </>
+                          )}
+                          <td className="py-3 text-right text-app-text/50">Rp {step.frac}</td>
+                          <td className="py-3 text-right text-app-text/60">{direction === "ara" ? "+" : "-"}{step.pct}%</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Rules Explanation */}
+          <div className="bg-app-card rounded-2xl border border-app-border/40 p-4 text-[11px] text-app-text/60 space-y-3">
+            <h4 className="font-bold text-app-text-bright">
+              Aturan ARA & ARB Bursa Efek Indonesia (BEI):
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <p className="font-bold text-app-success">Batas Kenaikan (ARA):</p>
+                <ul className="list-disc pl-4 space-y-0.5">
+                  <li>Harga Rp50 – Rp200: <span className="font-semibold text-app-text-bright">+35%</span></li>
+                  <li>Harga &gt;Rp200 – Rp5.000: <span className="font-semibold text-app-text-bright">+25%</span></li>
+                  <li>Harga &gt;Rp5.000: <span className="font-semibold text-app-text-bright">+20%</span></li>
+                </ul>
+              </div>
+              <div className="space-y-1.5">
+                <p className="font-bold text-app-danger">Batas Penurunan (ARB):</p>
+                <p className="leading-normal">
+                  Seragam <span className="font-semibold text-app-text-bright">-15%</span> untuk seluruh rentang harga saham.
+                </p>
+                <p className="leading-normal">
+                  Pembulatan ke bawah (<span className="font-semibold text-app-text-bright">floor</span>) diterapkan pada kelipatan fraksi harga terdekat agar tidak melampaui persentase maksimal.
+                </p>
+              </div>
+            </div>
+            
+            <div className="pt-2 border-t border-app-border/30">
+              <span className="font-bold text-app-text-bright">Tabel Fraksi Harga:</span>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-1.5">
+                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border/20 text-center">
+                  <p className="text-app-text/40 text-[9px] uppercase font-bold">Selalu &lt; 200</p>
+                  <p className="font-bold text-app-text-bright">Rp 1</p>
+                </div>
+                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border/20 text-center">
+                  <p className="text-app-text/40 text-[9px] uppercase font-bold">200 - &lt; 500</p>
+                  <p className="font-bold text-app-text-bright">Rp 2</p>
+                </div>
+                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border/20 text-center">
+                  <p className="text-app-text/40 text-[9px] uppercase font-bold">500 - &lt; 2.000</p>
+                  <p className="font-bold text-app-text-bright">Rp 5</p>
+                </div>
+                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border/20 text-center">
+                  <p className="text-app-text/40 text-[9px] uppercase font-bold">2.000 - &lt; 5.000</p>
+                  <p className="font-bold text-app-text-bright">Rp 10</p>
+                </div>
+                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border/20 text-center col-span-2 sm:col-span-1">
+                  <p className="text-app-text/40 text-[9px] uppercase font-bold">&ge; 5.000</p>
+                  <p className="font-bold text-app-text-bright">Rp 25</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function Investments() {
@@ -68,6 +554,7 @@ export default function Investments() {
   const navigate = useNavigate();
 
   const [isPortfolioModalOpen, setIsPortfolioModalOpen] = useState(false);
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
   const [portoTxType, setPortoTxType] = useState<"beli" | "jual">("beli");
   const [portoCategory, setPortoCategory] = useState<
     "saham" | "crypto" | "emas"
@@ -111,6 +598,8 @@ export default function Investments() {
 
   const [filterCategory, setFilterCategory] = useState<"semua" | "saham" | "crypto" | "emas">("semua");
   const [sortBy, setSortBy] = useState<"terbaru" | "terlama" | "terbesar" | "terkecil">("terbaru");
+  const [portfolioViewMode, setPortfolioViewMode] = useState<"daftar" | "alokasi">("daftar");
+  const [allocationViewBy, setAllocationViewBy] = useState<"aset" | "kategori">("aset");
 
   const [marketData, setMarketData] = useState<any>({
     COMPOSITE: { price: 7245.12, change: 0.45 },
@@ -632,6 +1121,10 @@ export default function Investments() {
     return result;
   }, [investments, filterCategory, sortBy, quotes]);
 
+  const ownedStocks = useMemo(() => {
+    return investments.filter((inv) => inv.category === "saham");
+  }, [investments]);
+
   return (
     <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
       {/* HEADER */}
@@ -639,7 +1132,7 @@ export default function Investments() {
         <div className="flex justify-between items-center w-full md:w-auto">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1">
-              Investasi Anda
+              <TextReveal text="Investasi Anda" />
             </h1>
             <p className="text-app-text/70 text-sm">
               Berikut ringkasan performa investasi Anda.
@@ -647,6 +1140,13 @@ export default function Investments() {
           </div>
 
           <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={() => setIsSimulatorOpen(true)}
+              className="px-3 h-10 rounded-full bg-app-card border border-app-border hover:bg-app-hover flex items-center justify-center text-app-text-bright transition-colors shadow-sm font-bold"
+              title="Simulasi ARA/ARB"
+            >
+              <TrendingUp className="w-4 h-4 text-app-accent1" />
+            </button>
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
@@ -667,6 +1167,14 @@ export default function Investments() {
         </div>
 
         <div className="flex items-center gap-4 hidden md:flex">
+          <button
+            onClick={() => setIsSimulatorOpen(true)}
+            className="px-4 h-10 rounded-full bg-app-card border border-app-border hover:bg-app-hover flex items-center justify-center text-app-text-bright transition-colors shadow-sm font-bold text-sm gap-2"
+            title="Simulasi ARA/ARB"
+          >
+            <TrendingUp className="w-4 h-4 text-app-accent1" />
+            Simulasi ARA/ARB
+          </button>
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
@@ -705,91 +1213,90 @@ export default function Investments() {
           </Link>
         </div>
       </header>
-
-      {/* TOP WIDGETS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      {/* WIDGETS (STACK ON MOBILE, GRID ON DESKTOP) */}
+      <div className="flex flex-col gap-4 mb-6 md:grid md:grid-cols-3 md:gap-6 md:mb-8">
         {/* TOTAL INVESTASI */}
-        <div className="bg-app-card rounded-2xl p-6 border border-app-border border-transparent flex items-center justify-between shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex items-center justify-between shadow-sm relative overflow-hidden cursor-pointer">
           <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${incomeToday >= 0 ? "from-app-success/15" : "from-app-danger/5"} via-transparent to-transparent pointer-events-none opacity-80 block`} />
-          <div className="flex items-center gap-4 relative z-10">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${incomeToday >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
+          <div className="flex items-center gap-4 relative z-10 w-full">
+            <div className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center ${incomeToday >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
               <BarChart3 className={`w-6 h-6 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`} />
             </div>
-            <div>
+            <div className="flex-1 min-w-0">
               <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1">
                 Total Investasi
               </p>
-              <p className="text-xl font-bold text-app-text-bright">
+              <p className="text-xl font-bold text-app-text-bright break-words leading-tight">
                 Rp {totalBalance.toLocaleString("id-ID")}
               </p>
               <div className={`flex items-center gap-1 mt-1 text-xs font-medium ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
                 {incomeToday >= 0 ? (
                   <>
-                    <TrendingUp className="w-3 h-3" /> Berjalan baik
+                    <TrendingUp className="w-3 h-3 shrink-0" /> <span className="truncate">Berjalan baik</span>
                   </>
                 ) : (
                   <>
-                    <TrendingDown className="w-3 h-3" /> Sedang menurun
+                    <TrendingDown className="w-3 h-3 shrink-0" /> <span className="truncate">Sedang menurun</span>
                   </>
                 )}
               </div>
             </div>
           </div>
-          <ChevronRight className="w-5 h-5 text-app-text/40 relative z-10" />
+          <ChevronRight className="w-5 h-5 shrink-0 text-app-text/40 relative z-10 ml-2" />
         </div>
 
         {/* RETURN */}
-        <div className="bg-app-card rounded-2xl border border-app-border flex shadow-sm overflow-hidden relative">
+        <div className="bg-app-card rounded-2xl border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
-          <div className="flex-1 p-4 border-r border-app-border flex flex-col justify-center relative z-10">
+          <div className="flex-1 p-4 border-r border-app-border flex flex-col justify-center relative z-10 min-w-0">
              <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider mb-1">Modal Awal</p>
-             <p className="text-lg font-bold text-app-text-bright truncate">Rp {expenseToday.toLocaleString("id-ID")}</p>
+             <p className="text-lg font-bold text-app-text-bright break-words leading-tight">Rp {expenseToday.toLocaleString("id-ID")}</p>
           </div>
-          <div className="flex-1 p-4 flex flex-col justify-center relative z-10">
+          <div className="flex-1 p-4 flex flex-col justify-center relative z-10 min-w-0">
              <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider mb-1">Sekarang</p>
-             <p className={`text-lg font-bold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} truncate`}>
+             <p className={`text-lg font-bold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} break-words leading-tight`}>
                Rp {totalBalance.toLocaleString("id-ID")}
              </p>
-             <div className={`text-[10px] font-medium mt-1 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                {incomeToday >= 0 ? "+" : ""}Rp {incomeToday.toLocaleString("id-ID")} ({incomeToday >= 0 ? "+" : ""}{expenseToday > 0 ? ((incomeToday / expenseToday) * 100).toFixed(2) : 0}%)
+             <div className={`text-[10px] font-medium mt-1 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} leading-tight`}>
+                {incomeToday >= 0 ? "+" : ""}Rp {incomeToday.toLocaleString("id-ID")} <br className="md:hidden" />({incomeToday >= 0 ? "+" : ""}{expenseToday > 0 ? ((incomeToday / expenseToday) * 100).toFixed(2) : 0}%)
              </div>
           </div>
         </div>
 
         {/* PASAR: IHSG & KURS RUPIAH */}
-        <div className="bg-app-card rounded-2xl border border-app-border flex shadow-sm overflow-hidden relative">
+        <div className="bg-app-card rounded-2xl border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
-          <div className="flex-1 p-4 border-r border-app-border hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10">
+          <div className="flex-1 p-4 border-r border-app-border hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0">
              <div className="flex justify-between items-start mb-1">
                <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">IHSG</p>
                {marketData.COMPOSITE?.change >= 0 ? (
-                 <TrendingUp className="w-4 h-4 text-app-success" />
+                 <TrendingUp className="w-4 h-4 shrink-0 text-app-success" />
                ) : (
-                 <TrendingDown className="w-4 h-4 text-app-danger" />
+                 <TrendingDown className="w-4 h-4 shrink-0 text-app-danger" />
                )}
              </div>
-             <p className="text-lg font-bold text-app-text-bright">
+             <p className="text-lg font-bold text-app-text-bright break-words leading-tight">
                {marketData.COMPOSITE?.price?.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "7.245,12"}
              </p>
              <div className={`flex items-center gap-1 mt-1 text-[10px] font-medium ${marketData.COMPOSITE?.change >= 0 ? "text-app-success" : "text-app-danger"}`}>
                {marketData.COMPOSITE?.change >= 0 ? "+" : ""}{marketData.COMPOSITE?.change?.toFixed(2) || "0.00"}%
              </div>
           </div>
-          <a 
-            href="https://www.google.com/search?q=1+dolar" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex-1 p-4 hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center block relative z-10"
+          <a
+             href="https://www.google.com/search?q=1+dolar"
+             target="_blank"
+             rel="noopener noreferrer"
+            className="flex-1 p-4 hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0"
           >
              <div className="flex justify-between items-start mb-1">
                <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">USD/IDR</p>
                {marketData.USDIDR?.change >= 0 ? (
-                 <TrendingUp className="w-4 h-4 text-app-danger" />
+                 <TrendingUp className="w-4 h-4 shrink-0 text-app-danger" />
                ) : (
-                 <TrendingDown className="w-4 h-4 text-app-success" />
+                 <TrendingDown className="w-4 h-4 shrink-0 text-app-success" />
                )}
              </div>
-             <p className="text-lg font-bold text-app-text-bright">
+             <p className="text-lg font-bold text-app-text-bright break-words leading-tight">
                {marketData.USDIDR?.price?.toLocaleString("id-ID") || "16.250"}
              </p>
              <div className={`flex items-center gap-1 mt-1 text-[10px] font-medium ${marketData.USDIDR?.change >= 0 ? "text-app-danger" : "text-app-success"}`}>
@@ -832,6 +1339,25 @@ export default function Investments() {
                 data={chartData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
+                <defs>
+                  <linearGradient id={`colorValue-${chartPeriod}`} x1="0" y1="0" x2="1" y2="0">
+                    {chartData.length <= 1 ? (
+                      <stop offset="100%" stopColor="var(--color-app-success)" />
+                    ) : (
+                      chartData.flatMap((d, i) => {
+                        if (i === 0) return [<stop key="stop-start" offset="0%" stopColor="var(--color-app-success)" />];
+                        const prevOffset = `${((i - 1) / (chartData.length - 1)) * 100}%`;
+                        const currentOffset = `${(i / (chartData.length - 1)) * 100}%`;
+                        const isDown = (d?.value ?? 0) < (chartData[i - 1]?.value ?? 0);
+                        const color = isDown ? "var(--color-app-danger)" : "var(--color-app-success)";
+                        return [
+                          <stop key={`stop-${i}-prev`} offset={prevOffset} stopColor={color} />,
+                          <stop key={`stop-${i}-curr`} offset={currentOffset} stopColor={color} />
+                        ];
+                      })
+                    )}
+                  </linearGradient>
+                </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
                   vertical={false}
@@ -873,20 +1399,48 @@ export default function Investments() {
                   type="monotone"
                   name="Nilai Sekarang"
                   dataKey="value"
-                  stroke="var(--color-app-success)"
+                  stroke={`url(#colorValue-${chartPeriod})`}
                   strokeWidth={2}
-                  dot={{
-                    r: 3,
-                    fill: "var(--color-app-success)",
-                    strokeWidth: 0,
+                  dot={(props: any) => {
+                    const { cx, cy, index, payload } = props;
+                    if (!payload) return null;
+                    const prevPayload = index > 0 ? chartData[index - 1] : payload;
+                    const isDown = payload.value < (prevPayload?.value ?? payload.value);
+                    const color = isDown ? "var(--color-app-danger)" : "var(--color-app-success)";
+                    return (
+                      <circle
+                        cx={cx}
+                        cy={cy}
+                        r={3}
+                        fill={color}
+                        stroke="none"
+                        key={`dot-${index}`}
+                      />
+                    );
                   }}
-                  activeDot={{ r: 5 }}
+                  activeDot={(props: any) => {
+                    const { cx, cy, index, payload } = props;
+                    if (!payload) return null;
+                    const prevPayload = index > 0 ? chartData[index - 1] : payload;
+                    const isDown = payload.value < (prevPayload?.value ?? payload.value);
+                    const color = isDown ? "var(--color-app-danger)" : "var(--color-app-success)";
+                    return (
+                      <circle
+                        cx={cx}
+                        cy={cy}
+                        r={5}
+                        fill={color}
+                        stroke="none"
+                        key={`active-dot-${index}`}
+                      />
+                    );
+                  }}
                 />
                 <Line
                   type="monotone"
                   name="Modal Awal"
                   dataKey="modal"
-                  stroke="var(--color-app-border)"
+                  stroke="#ffffff"
                   strokeWidth={2}
                   dot={false}
                   activeDot={{ r: 3 }}
@@ -904,6 +1458,31 @@ export default function Investments() {
               Portofolio Investasi
             </h2>
             <div className="flex items-center gap-2">
+              <div className="flex bg-app-bg p-1 rounded-xl border border-app-border">
+                <button
+                  onClick={() => setPortfolioViewMode("daftar")}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    portfolioViewMode === "daftar"
+                      ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+                      : "text-app-text/60 hover:text-app-text-bright border border-transparent"
+                  }`}
+                  title="Tampilan Daftar"
+                >
+                  <List className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setPortfolioViewMode("alokasi")}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    portfolioViewMode === "alokasi"
+                      ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+                      : "text-app-text/60 hover:text-app-text-bright border border-transparent"
+                  }`}
+                  title="Tampilan Alokasi"
+                >
+                  <PieChartIcon className="w-4 h-4" />
+                </button>
+              </div>
+
               <div className="flex bg-app-bg p-1 rounded-xl border border-app-border">
                 {[
                   { id: "semua", label: "Semua" },
@@ -949,113 +1528,267 @@ export default function Investments() {
               </div>
             </div>
           </div>
-          <div className="space-y-4 flex-1 overflow-y-auto pr-2">
-            {filteredAndSortedInvestments.length === 0 ? (
-              <div className="text-app-text/50 text-sm text-center py-4">
-                Belum ada instrumen investasi
+          {portfolioViewMode === "alokasi" ? (
+            <div className="flex-1 overflow-y-auto pr-2 flex flex-col">
+              <div className="flex bg-app-card border border-app-border rounded-lg p-1 mb-2 shrink-0 mx-1">
+                <button
+                  onClick={() => setAllocationViewBy("aset")}
+                  className={`flex-1 py-1.5 text-[11px] font-bold rounded-md transition-colors ${
+                    allocationViewBy === "aset"
+                      ? "bg-app-bg text-app-text-bright shadow-sm"
+                      : "text-app-text/50 hover:text-app-text"
+                  }`}
+                >
+                  Semua Aset
+                </button>
+                <button
+                  onClick={() => setAllocationViewBy("kategori")}
+                  className={`flex-1 py-1.5 text-[11px] font-bold rounded-md transition-colors ${
+                    allocationViewBy === "kategori"
+                      ? "bg-app-bg text-app-text-bright shadow-sm"
+                      : "text-app-text/50 hover:text-app-text"
+                  }`}
+                >
+                  Kategori
+                </button>
               </div>
-            ) : (
-              filteredAndSortedInvestments.map((inv) => {
-                const symbolCode = inv.category === "emas" ? "EMAS" : inv.code;
-                const liveData = quotes[symbolCode];
-                const livePrice = getLivePrice(inv);
-                const pl = livePrice - inv.price;
-                const plPercent = (pl / inv.price) * 100;
+              {(() => {
+                let allocationData: any[] = [];
+                if (allocationViewBy === "aset") {
+                  allocationData = filteredAndSortedInvestments
+                    .map((inv) => {
+                      const symbolCode = inv.category === "emas" ? "EMAS" : inv.code;
+                      const livePrice = getLivePrice(inv);
+                      const value = (inv.category === "saham" ? 100 : 1) * inv.qty * livePrice;
+                      return {
+                        id: inv.id,
+                        name: inv.code,
+                        category: inv.category,
+                        value: value,
+                        qty: inv.qty,
+                        logoid: quotes[symbolCode]?.logoid,
+                        description: quotes[symbolCode]?.description,
+                      };
+                    })
+                    .sort((a, b) => b.value - a.value);
+                } else {
+                  const aggregated = filteredAndSortedInvestments.reduce((acc, inv) => {
+                    const livePrice = getLivePrice(inv);
+                    const value = (inv.category === "saham" ? 100 : 1) * inv.qty * livePrice;
+                    if (!acc[inv.category]) {
+                      acc[inv.category] = {
+                        id: inv.category,
+                        name: inv.category.charAt(0).toUpperCase() + inv.category.slice(1),
+                        category: inv.category,
+                        value: 0,
+                        qty: 0,
+                        logoid: "",
+                        description: `Alokasi Kategori ${inv.category}`,
+                      };
+                    }
+                    acc[inv.category].value += value;
+                    acc[inv.category].qty += inv.qty;
+                    return acc;
+                  }, {} as Record<string, any>);
+                  allocationData = Object.values(aggregated).sort((a, b) => b.value - a.value);
+                }
 
-                const borderColors: Record<string, string> = {
-                  saham: "border-blue-500/30 bg-blue-500/5",
-                  emas: "border-yellow-500/30 bg-yellow-500/5",
-                  crypto: "border-purple-500/30 bg-purple-500/5",
-                };
-                const colorClass =
-                  borderColors[inv.category] || "border-app-border bg-app-bg";
+                const totalAllocValue = allocationData.reduce((sum, item) => sum + item.value, 0);
+                const COLORS = [
+                  "#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#EF4444", 
+                  "#14B8A6", "#6366f1", "#EC4899", "#f97316"
+                ];
+
+                if (totalAllocValue === 0) {
+                  return (
+                    <div className="flex flex-col items-center justify-center text-app-text/50 text-sm py-8 bg-app-card/30 border border-dashed border-app-border rounded-2xl h-full mt-4 mx-1">
+                      <TrendingUp className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
+                      Belum ada instrumen investasi
+                    </div>
+                  );
+                }
 
                 return (
-                  <div
-                    key={inv.id}
-                    className={`flex flex-col p-4 rounded-2xl border ${colorClass} gap-3 relative overflow-hidden`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        {/* LOGO */}
-                        <div className="w-10 h-10 rounded-full bg-app-card border border-app-border flex items-center justify-center shrink-0 overflow-hidden">
-                          {liveData?.logoid ? (
-                            <img
-                              src={`https://s3-symbol-logo.tradingview.com/${liveData.logoid}.svg`}
-                              alt="logo"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-xs font-bold uppercase text-app-text/50">
-                              {inv.code.slice(0, 2)}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex flex-col">
-                          <h3 className="font-bold text-app-text-bright leading-tight">
-                            {inv.code}
-                          </h3>
-                          <span className="text-[10px] text-app-text/50 line-clamp-1">
-                            {liveData?.description ||
-                              inv.category.toUpperCase()}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleEdit(inv)}
-                          className="p-1.5 bg-app-card border border-app-border rounded-lg text-app-text/60 hover:text-blue-400 focus:outline-none transition-colors"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(inv.id)}
-                          className="p-1.5 bg-app-card border border-app-border rounded-lg text-app-text/60 hover:text-red-400 focus:outline-none transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                  <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    <div className="flex justify-center items-center h-[240px] relative mt-4">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={allocationData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={80}
+                            outerRadius={105}
+                            stroke="none"
+                            paddingAngle={3}
+                            dataKey="value"
+                            isAnimationActive={true}
+                          >
+                            {allocationData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "var(--color-app-card)",
+                              border: "1px solid var(--color-app-border)",
+                              borderRadius: "16px",
+                              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                              padding: "12px",
+                            }}
+                            itemStyle={{
+                              fontSize: 14,
+                              fontWeight: "bold",
+                              color: "var(--color-app-text-bright)",
+                            }}
+                            formatter={(value: number) => [`Rp ${value.toLocaleString("id-ID")}`, "Nilai"]}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="absolute flex flex-col items-center justify-center pointer-events-none">
+                        <span className="text-xl font-bold text-app-text-bright">Rp {totalAllocValue.toLocaleString("id-ID")}</span>
+                        <span className="text-xs text-app-text/60 mt-1">{allocationData.length} {allocationViewBy === "aset" ? "Aset" : "Kategori"}</span>
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-2 mt-4">
-                       <div className="flex justify-between items-center">
-                         <span className="text-xs text-app-text/60">Volume</span>
-                         <span className="text-xs font-medium text-app-text-bright">{inv.qty} {inv.category === "emas" ? "g" : inv.category === "crypto" ? "koin" : "lot"}</span>
-                       </div>
-                       <div className="flex justify-between items-center">
-                         <span className="text-xs text-app-text/60">Harga Beli</span>
-                         <span className="text-xs font-medium text-app-text-bright">Rp {inv.price.toLocaleString("id-ID")} {inv.category === "saham" && "/lembar"}</span>
-                       </div>
-                       <div className="flex justify-between items-center">
-                         <span className="text-xs text-app-text/60">Harga Sekarang</span>
-                         <span className="text-xs font-medium text-app-text-bright">Rp {livePrice.toLocaleString("id-ID")} {inv.category === "saham" && "/lembar"}</span>
-                       </div>
-                       {liveData?.price && (
-                         <div className="flex justify-between items-center">
-                           <span className="text-xs text-app-text/60">Return</span>
-                           <span className={`text-xs font-bold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                             {pl >= 0 ? "+" : ""}Rp {(inv.qty * pl * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")} ({pl >= 0 ? "+" : ""}{plPercent.toFixed(2)}%)
-                           </span>
-                         </div>
-                       )}
-                    </div>
+                    <div className="space-y-5 px-1 pb-4">
+                      {allocationData.map((item, index) => {
+                        const percentage = totalAllocValue > 0 ? ((item.value / totalAllocValue) * 100) : 0;
+                        const color = COLORS[index % COLORS.length];
 
-                    <div className="mt-4 pt-4 border-t border-app-border/30 flex justify-between items-center">
-                      <div>
-                        <div className="text-[10px] text-app-text/60 font-bold uppercase tracking-wider mb-1">Modal Awal</div>
-                        <div className="text-sm font-bold text-app-text-bright">Rp {(inv.price * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-[10px] text-app-text/60 font-bold uppercase tracking-wider mb-1">Nilai Sekarang</div>
-                        <div className={`text-sm font-bold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>Rp {(livePrice * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
-                      </div>
+                        return (
+                          <div key={item.id} className="flex flex-col gap-3 group">
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-app-card border border-app-border flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                                  <AssetLogo logoid={item.logoid} code={item.name} description={item.description} />
+                                </div>
+                                <div className="flex flex-col">
+                                  <div className="flex items-baseline gap-2">
+                                    <span className="font-bold text-sm text-app-text-bright">{item.name}</span>
+                                    <span className="text-xs text-app-text/60 font-medium">Rp {item.value.toLocaleString("id-ID")}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <span className="font-bold text-[15px] text-app-text-bright">{percentage.toFixed(2)}%</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-app-border/30 rounded-full overflow-hidden relative">
+                              <div 
+                                className="h-full rounded-full transition-all duration-1000 ease-out" 
+                                style={{ width: `${percentage}%`, backgroundColor: color }}
+                              >
+                                <div className="absolute inset-0 bg-white/20 w-full h-full mix-blend-overlay"></div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 );
-              })
-            )}
-          </div>
+              })()}
+            </div>
+          ) : (
+            <StaggerContainer className="space-y-4 flex-1 overflow-y-auto pr-2">
+              {filteredAndSortedInvestments.length === 0 ? (
+                <div className="flex flex-col items-center justify-center text-app-text/50 text-sm py-8 bg-app-card/30 border border-dashed border-app-border rounded-2xl">
+                  <TrendingUp className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
+                  Belum ada instrumen investasi
+                </div>
+              ) : (
+                filteredAndSortedInvestments.map((inv) => {
+                  const symbolCode = inv.category === "emas" ? "EMAS" : inv.code;
+                  const liveData = quotes[symbolCode];
+                  const livePrice = getLivePrice(inv);
+                  const pl = livePrice - inv.price;
+                  const plPercent = (pl / inv.price) * 100;
+
+                  const borderColors: Record<string, string> = {
+                    saham: "border-blue-500/30 bg-blue-500/5",
+                    emas: "border-yellow-500/30 bg-yellow-500/5",
+                    crypto: "border-purple-500/30 bg-purple-500/5",
+                  };
+                  const colorClass =
+                    borderColors[inv.category] || "border-app-border bg-app-bg";
+
+                  return (
+                    <StaggerItem key={inv.id}>
+                      <div
+                        className={`flex flex-col p-4 rounded-2xl border ${colorClass} gap-3 relative overflow-hidden`}
+                      >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          {/* LOGO */}
+                          <div className="w-10 h-10 rounded-full bg-app-card border border-app-border flex items-center justify-center shrink-0 overflow-hidden">
+                            <AssetLogo logoid={liveData?.logoid} code={inv.code} description={liveData?.description} />
+                          </div>
+                          <div className="flex flex-col">
+                            <h3 className="font-bold text-app-text-bright leading-tight">
+                              {inv.code}
+                            </h3>
+                            <span className="text-[10px] text-app-text/50 line-clamp-1">
+                              {liveData?.description ||
+                                inv.category.toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleEdit(inv)}
+                            className="p-1.5 bg-app-card border border-app-border rounded-lg text-app-text/60 hover:text-blue-400 focus:outline-none transition-colors"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(inv.id)}
+                            className="p-1.5 bg-app-card border border-app-border rounded-lg text-app-text/60 hover:text-red-400 focus:outline-none transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2 mt-4">
+                         <div className="flex justify-between items-center">
+                           <span className="text-xs text-app-text/60">Volume</span>
+                           <span className="text-xs font-medium text-app-text-bright">{inv.qty} {inv.category === "emas" ? "g" : inv.category === "crypto" ? "koin" : "lot"}</span>
+                         </div>
+                         <div className="flex justify-between items-center">
+                           <span className="text-xs text-app-text/60">Harga Beli</span>
+                           <span className="text-xs font-medium text-app-text-bright">Rp {inv.price.toLocaleString("id-ID")} {inv.category === "saham" && "/lembar"}</span>
+                         </div>
+                         <div className="flex justify-between items-center">
+                           <span className="text-xs text-app-text/60">Harga Sekarang</span>
+                           <span className="text-xs font-medium text-app-text-bright">Rp {livePrice.toLocaleString("id-ID")} {inv.category === "saham" && "/lembar"}</span>
+                         </div>
+                         {liveData?.price && (
+                           <div className="flex justify-between items-center">
+                             <span className="text-xs text-app-text/60">Return</span>
+                             <span className={`text-xs font-bold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                               {pl >= 0 ? "+" : ""}Rp {(inv.qty * pl * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")} ({pl >= 0 ? "+" : ""}{plPercent.toFixed(2)}%)
+                             </span>
+                           </div>
+                         )}
+                      </div>
+
+                      <div className="mt-4 pt-4 border-t border-app-border/30 flex justify-between items-center">
+                        <div>
+                          <div className="text-[10px] text-app-text/60 font-bold uppercase tracking-wider mb-1">Modal Awal</div>
+                          <div className="text-sm font-bold text-app-text-bright">Rp {(inv.price * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-[10px] text-app-text/60 font-bold uppercase tracking-wider mb-1">Nilai Sekarang</div>
+                          <div className={`text-sm font-bold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>Rp {(livePrice * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
+                        </div>
+                      </div>
+                      </div>
+                    </StaggerItem>
+                  );
+                })
+              )}
+            </StaggerContainer>
+          )}
           <button
             onClick={openPortfolioModal}
             className="mt-4 flex items-center justify-center p-4 rounded-2xl border border-dashed border-app-border hover:border-app-text/50 transition cursor-pointer text-app-text/70 text-sm font-medium"
@@ -1065,6 +1798,29 @@ export default function Investments() {
           </button>
         </div>
       </div>
+
+      {/* Modal Simulasi ARA/ARB */}
+      {isSimulatorOpen && (
+        <div className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-app-card text-app-text w-full max-w-5xl rounded-3xl shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+            <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg shrink-0">
+              <h2 className="text-lg font-bold text-app-text-bright flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-app-accent1" />
+                Simulasi ARA & ARB Saham (BEI)
+              </h2>
+              <button
+                onClick={() => setIsSimulatorOpen(false)}
+                className="p-2 hover:bg-app-hover rounded-full transition-colors text-app-text/70 hover:text-app-text-bright"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1">
+              <AraArbSimulator ownedStocks={ownedStocks} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal Tambah Portofolio */}
       {isPortfolioModalOpen && (
@@ -1241,7 +1997,7 @@ export default function Investments() {
                           </label>
                           <input
                             type="text"
-                            inputMode="numeric"
+                            inputMode="decimal"
                             value={portoPrice}
                             onChange={(e) => setPortoPrice(formatNumberInput(e.target.value))}
                             className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
@@ -1341,7 +2097,7 @@ export default function Investments() {
                           </label>
                           <input
                             type="text"
-                            inputMode="numeric"
+                            inputMode="decimal"
                             value={portoPrice}
                             onChange={(e) => setPortoPrice(formatNumberInput(e.target.value))}
                             className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
@@ -1376,7 +2132,7 @@ export default function Investments() {
                           </label>
                           <input
                             type="text"
-                            inputMode="numeric"
+                            inputMode="decimal"
                             value={portoPrice}
                             onChange={(e) => setPortoPrice(formatNumberInput(e.target.value))}
                             className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
@@ -1450,7 +2206,7 @@ export default function Investments() {
                       </label>
                       <input
                         type="text"
-                        inputMode="numeric"
+                        inputMode="decimal"
                         value={portoPrice}
                         onChange={(e) => setPortoPrice(formatNumberInput(e.target.value))}
                         className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"

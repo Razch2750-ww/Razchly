@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Home, Wallet, Settings, Menu, PlusCircle, ArrowLeftRight, LogOut, X, TrendingUp, Plus, Car, Target, Scan, HandCoins, CalendarCheck, Cpu } from 'lucide-react';
+import { motion } from 'motion/react';
 import { useStore } from '../store/useStore';
 import { auth } from '../lib/firebase';
 import { signOut } from 'firebase/auth';
 import Transactions from './Transactions';
+import { ParallaxBackground } from './MotionWrappers';
 
 const NAV_ITEMS = [
   { path: '/', label: 'Beranda', icon: Home },
@@ -22,8 +24,11 @@ const NAV_ITEMS = [
 export default function Layout() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
+  const [hoveredPath, setHoveredPath] = useState<string | null>(null);
+  const [hoveredMobilePath, setHoveredMobilePath] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, hiddenTabs, setGlobalAddModalOpen, setGlobalGrabModalOpen } = useStore();
+  const mainRef = useRef<HTMLElement>(null);
 
   const visibleNavItems = NAV_ITEMS.filter((item) => !hiddenTabs.includes(item.path));
 
@@ -43,8 +48,8 @@ export default function Layout() {
           {isSidebarOpen && <span className="font-bold text-app-text-bright text-xl tracking-tight ml-3">Razchly</span>}
         </div>
         
-        <nav className="flex-1 px-4 flex flex-col gap-2">
-          <button onClick={() => setSidebarOpen(!isSidebarOpen)} className={`flex items-center w-full py-2 my-2 text-xs border border-app-border rounded-lg hover:bg-app-hover transition-colors opacity-70 ${!isSidebarOpen ? 'justify-center px-0' : 'px-4'}`}>
+        <nav className="flex-1 px-4 flex flex-col gap-2 relative">
+          <button onClick={() => setSidebarOpen(!isSidebarOpen)} className={`flex items-center w-full py-2 my-2 text-xs border border-app-border rounded-lg hover:bg-app-hover transition-all opacity-70 ${!isSidebarOpen ? 'justify-center px-0' : 'px-4'}`}>
             <Menu className={`w-4 h-4 ${isSidebarOpen ? 'mr-2' : ''}`} />
             {isSidebarOpen && "Toggle Sidebar"}
           </button>
@@ -52,11 +57,39 @@ export default function Layout() {
             <NavLink 
               key={item.path} 
               to={item.path}
-              className={({ isActive }) => `flex items-center gap-4 py-3 rounded-xl transition-all ${isActive ? 'bg-app-card text-app-text-bright border border-app-border shadow-sm' : 'hover:bg-app-hover cursor-pointer'} ${!isSidebarOpen ? 'justify-center px-0' : 'px-4'}`}
+              onMouseEnter={() => setHoveredPath(item.path)}
+              onMouseLeave={() => setHoveredPath(null)}
+              className={({ isActive }) => `relative flex items-center gap-4 py-3 rounded-xl transition-all ${isActive ? 'text-app-text-bright' : 'hover:text-app-text-bright cursor-pointer'} ${!isSidebarOpen ? 'justify-center px-0' : 'px-4'}`}
               title={item.label}
             >
-              <item.icon className="w-5 h-5 shrink-0" />
-              {isSidebarOpen && <span className="truncate font-medium">{item.label}</span>}
+              {/* Dynamic Sliding Capsule Background for Active Item */}
+              {item.path === window.location.pathname && (
+                <motion.div 
+                  layoutId="sidebar-active-bg"
+                  className="absolute inset-0 bg-app-card border border-app-border rounded-xl shadow-sm -z-10"
+                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                />
+              )}
+              {/* Dynamic Hover Sliding Background */}
+              {item.path !== window.location.pathname && hoveredPath === item.path && (
+                <motion.div 
+                  layoutId="sidebar-hover-bg"
+                  className="absolute inset-0 bg-app-hover rounded-xl -z-10"
+                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                />
+              )}
+              
+              {/* Elegant dynamic vertical accent line on the left */}
+              {item.path === window.location.pathname && (
+                <motion.div 
+                  layoutId="sidebar-accent-line"
+                  className="absolute left-0 top-3 bottom-3 w-1 bg-app-accent1 rounded-r-md"
+                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                />
+              )}
+
+              <item.icon className="w-5 h-5 shrink-0 relative z-10" />
+              {isSidebarOpen && <span className="truncate font-medium relative z-10">{item.label}</span>}
             </NavLink>
           ))}
         </nav>
@@ -70,7 +103,8 @@ export default function Layout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 relative bg-app-bg flex flex-col">
+      <main ref={mainRef} className="flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 relative bg-app-bg flex flex-col">
+        <ParallaxBackground containerRef={mainRef} />
         <Outlet />
         <Transactions modalOnly />
       </main>
@@ -138,10 +172,30 @@ export default function Layout() {
           <NavLink 
             key={item.path} 
             to={item.path}
-            className={({ isActive }) => `flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-all ${isActive ? 'text-app-accent1 font-medium' : 'text-app-text/60'}`}
+            onMouseEnter={() => setHoveredMobilePath(item.path)}
+            onMouseLeave={() => setHoveredMobilePath(null)}
+            className={({ isActive }) => `relative flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-all ${isActive ? 'text-app-accent1 font-medium' : 'text-app-text/60'}`}
           >
-            <item.icon className="w-5 h-5 mb-1" />
-            <span className="text-[10px]">{item.label}</span>
+            <item.icon className="w-5 h-5 mb-1 relative z-10" />
+            <span className="text-[10px] relative z-10">{item.label}</span>
+            
+            {/* Dynamic Sliding Underline for Mobile active navigation */}
+            {item.path === window.location.pathname && (
+              <motion.div 
+                layoutId="mobile-nav-underline"
+                className="absolute bottom-1.5 left-2 right-2 h-[3px] bg-app-accent1 rounded-full shadow-[0_1px_4px_rgba(var(--accent1-color),0.4)]"
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              />
+            )}
+            
+            {/* Dynamic sliding line for hovered navigation */}
+            {item.path !== window.location.pathname && hoveredMobilePath === item.path && (
+              <motion.div 
+                layoutId="mobile-nav-hover-line"
+                className="absolute bottom-1.5 left-4 right-4 h-[2px] bg-app-accent1/30 rounded-full"
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              />
+            )}
           </NavLink>
         ))}
       </nav>

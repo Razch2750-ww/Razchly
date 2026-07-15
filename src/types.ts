@@ -50,6 +50,9 @@ export interface Loan {
   status: 'active' | 'paid';
   paidAmount?: number;
   paidPaymentsCount?: number;
+  type?: 'borrow' | 'lend';
+  dueDate?: number;
+  deductFromAccount?: boolean;
 }
 
 export interface WorkSchedule {
@@ -70,6 +73,7 @@ export interface WorkSchedule {
 }
 
 export interface Transaction {
+  id?: string;
   type: TransactionType;
   amount: number;
   accountId?: string; // For income/expense

@@ -42,6 +42,8 @@ import {
   RiskParams 
 } from "../utils/indicators";
 import TradingViewChart from "./TradingViewChart";
+import { TextReveal } from "./MotionWrappers";
+import { authFetch } from "../utils/api";
 
 export default function AiTrading() {
   // Tabs: signals, autotrade, risk, backtest, mql5
@@ -863,9 +865,8 @@ void OnTradeTransaction(const MqlTradeTransaction& trans,
     try {
       // Generate some candles to pass to model
       const historicalCandles = generateHistoricalData(selectedSymbol, 15);
-      const response = await fetch("/api/gemini/trading-analysis", {
+      const response = await authFetch("/api/gemini/trading-analysis", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           symbol: selectedSymbol,
           currentPrice: quote.price,
@@ -1061,9 +1062,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
       if (selectedBroker === "Bybit MT5" && bybitApiKey && bybitSecret) {
         addLog(`[RIIL] Mengirim market order ke Bybit V5 (${isBybitTestnet ? "Testnet" : "Mainnet"})...`);
         try {
-          const response = await fetch("/api/trade/bybit-execute", {
+          const response = await authFetch("/api/trade/bybit-execute", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               apiKey: bybitApiKey,
               apiSecret: bybitSecret,
@@ -1101,9 +1101,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
       if (webhookUrl) {
         addLog(`[RIIL] Mengirim data sinyal trading ke Webhook MT5 Bridge: ${webhookUrl}...`);
         try {
-          const response = await fetch("/api/trade/webhook-send", {
+          const response = await authFetch("/api/trade/webhook-send", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               webhookUrl,
               payload: {
@@ -1197,8 +1196,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-app-border pb-5 mb-6" id="ai-trading-header">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-app-text-bright flex items-center gap-2">
-            <Cpu className="w-7 h-7 text-app-accent1" />
-            OpenAlice Neural Trading Suite
+            <Cpu className="w-7 h-7 text-app-accent1 shrink-0" />
+            <TextReveal text="OpenAlice Neural Trading Suite" />
           </h1>
           <p className="text-sm text-app-text/70 mt-1">
             Sistem trading kuantitatif multi-layer ultra presisi. Mengintegrasikan model kecerdasan buatan, grid-hedging otomatis, dan perlindungan ekuitas modal.
