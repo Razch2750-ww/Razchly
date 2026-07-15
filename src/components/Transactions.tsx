@@ -83,6 +83,7 @@ import {
 import { formatNumberInput, parseNumberInput } from "../utils/numberFormat";
 import { toast } from "react-hot-toast";
 import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal, MicroLoop } from "./MotionWrappers";
+import { ActionBtn } from "./PageShell";
 
 export default function Transactions({ modalOnly = false }: { modalOnly?: boolean }) {
   const detailRef = useRef<HTMLDivElement>(null);
@@ -1367,39 +1368,38 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       {/* DESKTOP LAYOUT */}
       <div className="hidden md:flex flex-col w-full h-full gap-6">
         {/* HEADER SECTION (Like Dashboard) */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between shrink-0">
+        {/* HEADER SECTION */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1 tracking-tight">
+            <h1 className="text-2xl md:text-[1.75rem] font-bold text-app-text-bright tracking-tight leading-tight">
               <TextReveal text="Laporan Keuangan" />
             </h1>
-            <p className="text-app-text/70 text-sm">
+            <p className="text-app-text/60 text-sm mt-1">
               Unduh dan analisis laporan keuangan bulanan Anda.
             </p>
           </div>
 
-          <div className="flex items-center gap-4 hidden md:flex">
-            <button
+          <div className="flex items-center gap-3">
+            <ActionBtn
+              variant="success"
+              icon={<Car className="w-4 h-4" />}
               onClick={() => setGlobalGrabModalOpen(true)}
-              className="w-10 h-10 rounded-full bg-app-success hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm"
               title="Transaksi Grab"
-            >
-              <Car className="w-5 h-5" />
-            </button>
-            <button
+            />
+            <ActionBtn
+              variant="primary"
+              icon={<Plus className="w-4 h-4" />}
               onClick={() => setGlobalAddModalOpen(true)}
-              className="w-10 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm"
               title="Tambah Transaksi"
             >
-              <Plus className="w-5 h-5" />
-            </button>
+              Tambah
+            </ActionBtn>
             <Link
               to="/settings"
-              className="px-4 h-10 rounded-full bg-app-card flex items-center justify-center text-sm font-semibold text-app-text-bright border border-app-border gap-2 hover:bg-app-hover cursor-pointer transition-colors"
+              state={{ expandSection: 'profile' }}
+              className="flex items-center gap-2.5 h-9 px-3 rounded-xl bg-app-card border border-app-border text-sm font-medium text-app-text-bright hover:bg-app-hover transition-colors cursor-pointer"
             >
-              <span className="opacity-800">
-                {user?.displayName?.toUpperCase() || "USER"}
-              </span>
-              <div className="w-6 h-6 rounded-full bg-app-accent1 text-xs font-bold flex items-center justify-center text-app-bg overflow-hidden flex-shrink-0">
+              <div className="w-6 h-6 rounded-full bg-app-accent1 text-[11px] font-bold flex items-center justify-center text-white overflow-hidden shrink-0">
                 {user?.photoURL ? (
                   <img
                     src={user?.photoURL}
@@ -1410,6 +1410,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   getInitials(user?.displayName || "USER")
                 )}
               </div>
+              <span className="text-app-text/70">{user?.displayName?.split(' ')[0] || "User"}</span>
             </Link>
           </div>
         </header>

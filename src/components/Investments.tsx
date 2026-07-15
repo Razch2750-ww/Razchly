@@ -54,6 +54,7 @@ import { formatNumberInput, parseNumberInput } from "../utils/numberFormat";
 import { toast } from "react-hot-toast";
 import { motion } from "motion/react";
 import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
+import { PageShell, ActionBtn, EmptyState, FieldLabel } from "./PageShell";
 
 export interface Investment {
   id: string;
@@ -1125,94 +1126,35 @@ export default function Investments() {
     return investments.filter((inv) => inv.category === "saham");
   }, [investments]);
 
+  const actionsInvestments = (
+    <div className="flex items-center gap-2">
+      <ActionBtn variant="secondary" icon={<TrendingUp className="w-4 h-4 text-app-accent1" />} onClick={() => setIsSimulatorOpen(true)} title="Simulasi ARA/ARB">
+        Simulasi ARA/ARB
+      </ActionBtn>
+      <ActionBtn variant="secondary" icon={<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-app-accent1' : ''}`} />} onClick={handleRefresh} disabled={isRefreshing} title="Refresh Data">
+        Refresh
+      </ActionBtn>
+      <ActionBtn variant="primary" icon={<Plus className="w-4 h-4" />} onClick={openPortfolioModal} title="Tambah Portofolio">
+        Tambah Portofolio
+      </ActionBtn>
+    </div>
+  );
+
+  const mobileActionsInvestments = (
+    <div className="flex items-center gap-1.5">
+      <ActionBtn variant="secondary" icon={<TrendingUp className="w-4 h-4 text-app-accent1" />} onClick={() => setIsSimulatorOpen(true)} title="Simulasi ARA/ARB" />
+      <ActionBtn variant="secondary" icon={<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-app-accent1' : ''}`} />} onClick={handleRefresh} disabled={isRefreshing} title="Refresh Data" />
+      <ActionBtn variant="primary" icon={<Plus className="w-4 h-4" />} onClick={openPortfolioModal} title="Tambah Portofolio" />
+    </div>
+  );
+
   return (
-    <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
-      {/* HEADER */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6">
-        <div className="flex justify-between items-center w-full md:w-auto">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1">
-              <TextReveal text="Investasi Anda" />
-            </h1>
-            <p className="text-app-text/70 text-sm">
-              Berikut ringkasan performa investasi Anda.
-            </p>
-          </div>
-
-          <div className="md:hidden flex items-center gap-2">
-            <button
-              onClick={() => setIsSimulatorOpen(true)}
-              className="px-3 h-10 rounded-full bg-app-card border border-app-border hover:bg-app-hover flex items-center justify-center text-app-text-bright transition-colors shadow-sm font-bold"
-              title="Simulasi ARA/ARB"
-            >
-              <TrendingUp className="w-4 h-4 text-app-accent1" />
-            </button>
-            <button
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="px-3 h-10 rounded-full bg-app-card border border-app-border hover:bg-app-hover flex items-center justify-center text-app-text-bright transition-colors shadow-sm font-bold disabled:opacity-50"
-              title="Refresh Data"
-            >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-app-accent1' : ''}`} />
-            </button>
-            <button
-              onClick={openPortfolioModal}
-              className="px-3 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm font-bold text-sm"
-              title="Tambah Portofolio"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              Tambah
-            </button>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4 hidden md:flex">
-          <button
-            onClick={() => setIsSimulatorOpen(true)}
-            className="px-4 h-10 rounded-full bg-app-card border border-app-border hover:bg-app-hover flex items-center justify-center text-app-text-bright transition-colors shadow-sm font-bold text-sm gap-2"
-            title="Simulasi ARA/ARB"
-          >
-            <TrendingUp className="w-4 h-4 text-app-accent1" />
-            Simulasi ARA/ARB
-          </button>
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="px-4 h-10 rounded-full bg-app-card border border-app-border hover:bg-app-hover flex items-center justify-center text-app-text-bright transition-colors shadow-sm font-bold text-sm disabled:opacity-50"
-            title="Refresh Data"
-          >
-            <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin text-app-accent1' : ''}`} />
-            Refresh
-          </button>
-          <button
-            onClick={openPortfolioModal}
-            className="px-4 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm font-bold text-sm"
-            title="Tambah Portofolio"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Portofolio
-          </button>
-          <Link
-            to="/settings"
-            className="px-4 h-10 rounded-full bg-app-card flex items-center justify-center text-sm font-semibold text-app-text-bright border border-app-border gap-2 hover:bg-app-hover cursor-pointer transition-colors"
-          >
-            <span className="opacity-70">
-              {user?.displayName?.toUpperCase() || "USER"}
-            </span>
-            <div className="w-6 h-6 rounded-full bg-app-accent1 text-xs font-bold flex items-center justify-center text-app-bg overflow-hidden">
-              {user?.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt="avatar"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                getInitials(user?.displayName || "USER")
-              )}
-            </div>
-          </Link>
-        </div>
-      </header>
+    <PageShell
+      title="Investasi Anda"
+      subtitle="Berikut ringkasan performa investasi Anda."
+      actions={actionsInvestments}
+      mobileActions={mobileActionsInvestments}
+    >
       {/* WIDGETS (STACK ON MOBILE, GRID ON DESKTOP) */}
       <div className="flex flex-col gap-4 mb-6 md:grid md:grid-cols-3 md:gap-6 md:mb-8">
         {/* TOTAL INVESTASI */}
@@ -2317,6 +2259,6 @@ export default function Investments() {
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }

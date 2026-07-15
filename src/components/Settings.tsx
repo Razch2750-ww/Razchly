@@ -11,10 +11,10 @@ import { AccountIcon, ACCOUNT_ICONS, getAccountIconDetails } from './AccountIcon
 import { CategoryIcon } from './CategoryIcon';
 import { CategoryModal } from './CategoryModal';
 import { toast } from 'react-hot-toast';
-
 import { AccountModal } from './AccountModal';
 import { motion } from "motion/react";
 import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
+import { PageShell, ActionBtn } from "./PageShell";
 
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
@@ -400,36 +400,7 @@ export default function Settings() {
   const getInitials = (name: string) => name.substring(0, 2).toUpperCase() || 'US';
 
   return (
-    <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
-      
-      {/* HEADER */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1 tracking-tight">
-            <TextReveal text="Pengaturan" />
-          </h1>
-          <p className="text-sm text-app-text/70">Sesuaikan profil, rekening, dan preferensi aplikasi Anda.</p>
-        </div>
-        
-        <div className="flex items-center gap-4 hidden md:flex">
-          <button onClick={() => { setGlobalGrabModalOpen(true); navigate('/transactions'); }} className="w-10 h-10 rounded-full bg-app-success hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm" title="Transaksi Grab">
-             <Car className="w-5 h-5" />
-          </button>
-          <button onClick={() => { setGlobalAddModalOpen(true); navigate('/transactions'); }} className="w-10 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm" title="Tambah Transaksi">
-             <Plus className="w-5 h-5" />
-          </button>
-          <Link to="/settings" className="px-4 h-10 rounded-full bg-app-card flex items-center justify-center text-sm font-semibold text-app-text-bright border border-app-border gap-2 hover:bg-app-hover cursor-pointer transition-colors">
-            <span className="opacity-800">{user?.displayName?.toUpperCase() || 'USER'}</span>
-            <div className="w-6 h-6 rounded-full bg-app-accent1 text-xs font-bold flex items-center justify-center text-app-bg overflow-hidden">
-              {user?.photoURL ? (
-                <img src={user.photoURL} alt="avatar" className="w-full h-full object-cover" />
-              ) : (
-                getInitials(user?.displayName || 'USER')
-              )}
-            </div>
-          </Link>
-        </div>
-      </header>
+    <PageShell title="Pengaturan" subtitle="Sesuaikan profil, rekening, dan preferensi aplikasi Anda.">
 
       <ScrollReveal className="flex-1 space-y-6 pb-10">
         
@@ -438,7 +409,7 @@ export default function Settings() {
           <button type="button" onClick={() => toggleSection('profil')} className={`relative z-10 w-full flex items-center justify-between ${sections.profil ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <UserIcon className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-bold uppercase tracking-widest text-app-text-bright">Profil</h2>
+              <h2 className="text-sm font-semibold text-app-text-bright">Profil</h2>
             </div>
             {sections.profil ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
           </button>
@@ -446,11 +417,11 @@ export default function Settings() {
           {sections.profil && (
           <form onSubmit={handleUpdateProfile} className="space-y-4 animate-in slide-in-from-top-2 duration-200">
             <div>
-              <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">Nama Lengkap / Sapaan</label>
+              <label className="text-xs font-medium text-app-text/70 mb-1.5 block">Nama Lengkap / Sapaan</label>
               <input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)} className="w-full bg-app-bg border border-app-border rounded-lg px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright placeholder-app-text/30" placeholder="Masukkan nama..." />
             </div>
             <div>
-              <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">URL Foto Profil</label>
+              <label className="text-xs font-medium text-app-text/70 mb-1.5 block">URL Foto Profil</label>
               <input type="url" value={photoURL} onChange={e => setPhotoURL(e.target.value)} className="w-full bg-app-bg border border-app-border rounded-lg px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright placeholder-app-text/30" placeholder="https://..." />
             </div>
             <div className="pt-2">
@@ -467,7 +438,7 @@ export default function Settings() {
           <button type="button" onClick={() => toggleSection('rekening')} className={`relative z-10 w-full flex items-center justify-between ${sections.rekening ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <Wallet className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-bold uppercase tracking-widest text-app-text-bright">Daftar Rekening</h2>
+              <h2 className="text-sm font-semibold text-app-text-bright">Daftar Rekening</h2>
             </div>
             {sections.rekening ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
           </button>
@@ -1014,6 +985,6 @@ export default function Settings() {
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }

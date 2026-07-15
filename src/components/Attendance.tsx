@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, differenceInMinutes, startOfWeek, endOfWeek, isWithinInterval, parseISO, getDay } from "date-fns";
+import { id as localeId } from "date-fns/locale";
 import { collection, onSnapshot, doc, setDoc, deleteDoc, query, orderBy, getDocs, where, updateDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useStore } from "../store/useStore";
 import { sendDeviceNotification } from "../utils/notification";
 import { AttendanceRecord } from "../types";
-import { Calendar, Clock, CheckCircle, XCircle, FileText, Activity, Plus, Edit2, Trash2, X, MapPin } from "lucide-react";
+import { Calendar, Clock, CheckCircle, XCircle, FileText, Activity, Plus, Edit2, Trash2, X, MapPin, ChevronLeft, ChevronRight, BarChart3, Timer, Award, Target } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { motion } from "motion/react";
 import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
+import { PageShell, ActionBtn, EmptyState } from "./PageShell";
 
 const CurrencyInput = ({ value, onChange }: { value: number, onChange: (val: number) => void }) => {
   const displayValue = value ? `Rp${value.toLocaleString('id-ID')}` : '';
@@ -372,28 +375,18 @@ export default function Attendance() {
   const todayDay = new Date().getDay().toString();
   const todaySchedule = workSchedule?.days[todayDay];
 
-  return (
-    <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
-      <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1 tracking-tight">
-            <TextReveal text="Absensi" />
-          </h1>
-          <p className="text-app-text/70 text-sm">
-            Catat dan pantau kehadiran Anda
-          </p>
-        </div>
-        <div className="hidden md:flex items-center gap-4">
-          <button 
-            onClick={() => setIsScheduleModalOpen(true)} 
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-app-card border border-app-border rounded-xl text-sm font-medium text-app-text-bright hover:bg-app-hover transition-colors"
-          >
-            <Calendar className="w-4 h-4" />
-            Pengaturan Jadwal
-          </button>
-        </div>
-      </header>
+  const attendanceActions = (
+    <ActionBtn variant="secondary" icon={<Calendar className="w-4 h-4" />} onClick={() => setIsScheduleModalOpen(true)}>
+      Pengaturan Jadwal
+    </ActionBtn>
+  );
 
+  return (
+    <PageShell
+      title="Absensi"
+      subtitle="Catat dan pantau kehadiran Anda."
+      actions={attendanceActions}
+    >
       <div className="space-y-6 md:space-y-8">
 
         {/* Today's Actions */}
@@ -464,7 +457,7 @@ export default function Attendance() {
             ) : (
               <div className="space-y-6">
                 <div>
-                  <label className="block text-xs font-bold text-app-text/70 mb-3 uppercase tracking-wider">
+                  <label className="block text-xs font-medium text-app-text/70 mb-3">
                     Status Kehadiran Hari Ini
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -484,7 +477,7 @@ export default function Attendance() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">
+                  <label className="block text-xs font-medium text-app-text/70 mb-2">
                     Catatan (Opsional)
                   </label>
                   <input
@@ -1209,6 +1202,6 @@ export default function Attendance() {
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }

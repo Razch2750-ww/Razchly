@@ -9,6 +9,7 @@ import { parseNumberInput, formatNumberInput } from "../utils/numberFormat";
 import { toast } from "react-hot-toast";
 import { motion } from "motion/react";
 import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
+import { PageShell, ActionBtn, EmptyState, FieldLabel } from "./PageShell";
 
 function calculateLoanDetails(loan: Loan) {
   const duration = loan.tenorDuration;
@@ -878,47 +879,32 @@ export default function Loans() {
     }
   };
 
+  const mobileActionsLoans = (
+    <ActionBtn variant="primary" icon={<Plus className="w-4 h-4" />} onClick={openAddModal}>
+      Tambah
+    </ActionBtn>
+  );
+  const desktopActionsLoans = (
+    <ActionBtn variant="primary" icon={<Plus className="w-4 h-4" />} onClick={openAddModal}>
+      Tambah Pinjaman
+    </ActionBtn>
+  );
+
   return (
-    <div className="flex-1 flex flex-col w-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 bg-app-bg text-app-text animate-in fade-in zoom-in-95 duration-300">
-      <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6">
-        <div className="flex justify-between items-center w-full md:w-auto">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1">
-              <TextReveal text="Pinjaman Anda" />
-            </h1>
-            <p className="text-app-text/70 text-sm">
-              Kelola data pinjaman Anda beserta bunga dan pengaturan auto debit.
-            </p>
-          </div>
-
-          <div className="md:hidden flex items-center gap-2">
-            <button
-              onClick={openAddModal}
-              className="px-3 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm font-bold text-sm"
-              title="Tambah Pinjaman"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              Tambah
-            </button>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4 hidden md:flex">
-          <button
-            onClick={openAddModal}
-            className="px-4 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm font-bold text-sm"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Pinjaman
-          </button>
-        </div>
-      </header>
+    <PageShell
+      title="Pinjaman"
+      subtitle="Kelola data pinjaman beserta bunga dan auto debit."
+      mobileActions={mobileActionsLoans}
+      actions={desktopActionsLoans}
+    >
 
       {loans.length === 0 ? (
-        <div className="py-12 flex flex-col items-center justify-center text-app-text/50 border border-dashed border-app-border rounded-3xl">
-          <HandCoins className="w-12 h-12 mb-3 text-app-text/30 animate-waggle" />
-          <p>Belum ada data pinjaman.</p>
-        </div>
+        <EmptyState
+          icon={<HandCoins className="w-6 h-6" />}
+          title="Belum ada pinjaman"
+          description="Catat pinjaman atau piutang untuk memantau arus kasnya."
+          action={<ActionBtn variant="primary" icon={<Plus className="w-4 h-4" />} onClick={openAddModal}>Tambah Pinjaman</ActionBtn>}
+        />
       ) : (
         <StaggerContainer className="columns-1 md:columns-2 lg:columns-3 gap-6 w-full">
           {[...loans]
@@ -999,7 +985,7 @@ export default function Loans() {
 
               {/* Nama Pinjaman/Piutang */}
               <div>
-                <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">
+                <label className="block text-xs font-medium text-app-text/70 mb-2">
                   {type === 'lend' ? "Nama Piutang" : "Nama Pinjaman"}
                 </label>
                 <input
@@ -1341,6 +1327,6 @@ export default function Loans() {
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }

@@ -45,6 +45,10 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from "recharts";
 import { format, subDays, isSameDay, isSameMonth } from "date-fns";
 import { id as localeId } from "date-fns/locale";
@@ -130,6 +134,47 @@ export default function Dashboard() {
   const totalInvestmentReturnPercent = totalInvestmentCapital > 0 
     ? (totalInvestmentReturn / totalInvestmentCapital) * 100 
     : 0;
+
+  const accountPieData = useMemo(() => {
+    return accounts.map(acc => {
+      const details = getAccountIconDetails(acc.icon);
+      return {
+        name: acc.name,
+        value: Math.max(0, acc.balance),
+        color: details?.color || "var(--color-app-accent1)"
+      };
+    }).filter(item => item.value > 0);
+  }, [accounts]);
+
+  const categoryPieData = useMemo(() => {
+    const expenseTransactions = recentTransactions.filter(t => t.type === 'expense');
+    const catSums: Record<string, { name: string, value: number, color: string }> = {};
+    const colors = [
+      "var(--color-app-danger)",
+      "var(--color-app-accent1)",
+      "var(--color-app-success)",
+      "#F59E0B",
+      "#8B5CF6",
+      "#EC4899",
+      "#3B82F6",
+      "#10B981"
+    ];
+    let colorIdx = 0;
+    expenseTransactions.forEach(t => {
+      const name = t.categoryName || 'Lainnya';
+      const amount = t.amount || 0;
+      if (!catSums[name]) {
+        catSums[name] = {
+          name,
+          value: 0,
+          color: colors[colorIdx % colors.length]
+        };
+        colorIdx++;
+      }
+      catSums[name].value += amount;
+    });
+    return Object.values(catSums).sort((a, b) => b.value - a.value);
+  }, [recentTransactions]);
 
   useEffect(() => {
     if (!user) return;
@@ -963,6 +1008,122 @@ export default function Dashboard() {
               Rp {chartData.reduce((acc, curr) => acc + (curr.income - curr.expense), 0).toLocaleString("id-ID")}
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* DESKTOP & MOBILE VISUAL ANALYTICS (PIE CHARTS) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* PIE CHART 1: ALOKASI SALDO DOMPET */}
+        <div className="bg-app-card rounded-3xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+          <h2 className="text-app-text-bright font-bold mb-4 relative z-10 text-base">Alokasi Saldo Dompet</h2>
+          {accountPieData.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-app-text/50 text-sm py-12 min-h-[240px]">
+              <Wallet className="w-8 h-8 text-app-text/30 mb-2" />
+              Tidak ada data saldo dompet aktif
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col sm:flex-row items-center justify-between gap-6 min-h-[240px]">
+              <div className="w-full sm:w-1/2 h-[240px] flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={accountPieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      {accountPieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number) => [`Rp ${value.toLocaleString("id-ID")}`, "Saldo"]}
+                      contentStyle={{
+                        backgroundColor: "var(--color-app-card)",
+                        border: "1px solid var(--color-app-border)",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="w-full sm:w-1/2 space-y-2 max-h-[240px] overflow-y-auto pr-1 scrollbar-thin">
+                {accountPieData.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                      <span className="text-app-text/80 truncate">{item.name}</span>
+                    </div>
+                    <span className="text-app-text-bright font-mono font-semibold ml-2">
+                      {((item.value / (totalBalance || 1)) * 100).toFixed(1)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* PIE CHART 2: DISTRIBUSI PENGELUARAN */}
+        <div className="bg-app-card rounded-3xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+          <h2 className="text-app-text-bright font-bold mb-4 relative z-10 text-base">Distribusi Pengeluaran Bulan Ini</h2>
+          {categoryPieData.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-app-text/50 text-sm py-12 min-h-[240px]">
+              <TrendingDown className="w-8 h-8 text-app-text/30 mb-2" />
+              Tidak ada data pengeluaran bulan ini
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col sm:flex-row items-center justify-between gap-6 min-h-[240px]">
+              <div className="w-full sm:w-1/2 h-[240px] flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={categoryPieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      {categoryPieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number) => [`Rp ${value.toLocaleString("id-ID")}`, "Pengeluaran"]}
+                      contentStyle={{
+                        backgroundColor: "var(--color-app-card)",
+                        border: "1px solid var(--color-app-border)",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="w-full sm:w-1/2 space-y-2 max-h-[240px] overflow-y-auto pr-1 scrollbar-thin">
+                {categoryPieData.map((item, index) => {
+                  const totalExpense = categoryPieData.reduce((s, i) => s + i.value, 0);
+                  return (
+                    <div key={index} className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                        <span className="text-app-text/80 truncate">{item.name}</span>
+                      </div>
+                      <span className="text-app-text-bright font-mono font-semibold ml-2">
+                        {((item.value / (totalExpense || 1)) * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
