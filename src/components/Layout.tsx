@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Home, Wallet, Settings, Menu, PlusCircle, ArrowLeftRight, LogOut, X, TrendingUp, Plus, Car, Target, Scan, HandCoins, CalendarCheck, Cpu } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useStore } from '../store/useStore';
@@ -27,6 +27,7 @@ export default function Layout() {
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
   const [hoveredMobilePath, setHoveredMobilePath] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, hiddenTabs, setGlobalAddModalOpen, setGlobalGrabModalOpen } = useStore();
   const mainRef = useRef<HTMLElement>(null);
 
@@ -127,7 +128,15 @@ export default function Layout() {
       {/* Main Content Area */}
       <main ref={mainRef} className="flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 relative bg-app-bg flex flex-col">
         <ParallaxBackground containerRef={mainRef} />
-        <Outlet />
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+          className="flex-1 w-full flex flex-col"
+        >
+          <Outlet />
+        </motion.div>
         <Transactions modalOnly />
       </main>
 
