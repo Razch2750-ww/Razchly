@@ -166,7 +166,7 @@ export default function SavingsTarget() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <ScrollReveal className="lg:col-span-2">
-          <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden h-full">
+          <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden h-full">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <h2 className="text-app-text-bright font-bold mb-6 flex items-center gap-2 relative z-10">
             <Target className="w-5 h-5 text-app-accent1" /> Atur Target Finansial
@@ -314,20 +314,20 @@ export default function SavingsTarget() {
         <StaggerContainer className="lg:col-span-1 flex flex-col gap-6">
           {/* Laba Bersih Card */}
           <StaggerItem className="flex-1">
-            <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden h-full min-h-[140px]">
+            <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col justify-center relative overflow-hidden h-full min-h-[140px] w-full">
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
             <div className="absolute top-0 right-0 p-4 opacity-10">
-              <TrendingUp className="w-16 h-16 text-app-success" />
+               <TrendingUp className="w-16 h-16 text-app-success" />
             </div>
             <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-2 relative z-10">Laba Bersih Bulan Ini</p>
-            <h3 className="text-3xl font-bold text-app-text-bright relative z-10">Rp {Math.max(savingsThisMonth, 0).toLocaleString("id-ID")}</h3>
+            <h3 className="text-3xl font-bold text-app-text-bright relative z-10 font-mono">Rp {Math.max(savingsThisMonth, 0).toLocaleString("id-ID")}</h3>
             <p className="text-xs text-app-text/50 mt-2 relative z-10">Masuk akal untuk ditabung</p>
-            </div>
+            </HoverCard>
           </StaggerItem>
 
           {/* Predictive analysis card */}
           <StaggerItem className="flex-1">
-            <div className={`rounded-3xl p-6 border shadow-sm flex flex-col relative overflow-hidden h-full ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
+            <HoverCard className={`rounded-[24px] p-6 border shadow-sm flex flex-col relative overflow-hidden h-full w-full ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-transparent via-transparent pointer-events-none opacity-80 block" />
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-3">
@@ -393,13 +393,13 @@ export default function SavingsTarget() {
                 </div>
               )}
             </div>
-            </div>
+            </HoverCard>
           </StaggerItem>
         </StaggerContainer>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Tabungan Bulanan Berlayer */}
-        <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/5 via-transparent to-transparent pointer-events-none" />
           <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <Star className="w-5 h-5 text-app-accent1" /> Tabungan Layered
@@ -460,7 +460,7 @@ export default function SavingsTarget() {
         </div>
 
         {/* Penghasilan Harian Berlayer */}
-        <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/5 via-transparent to-transparent pointer-events-none" />
           <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowUp className="w-5 h-5 text-app-success" /> Penghasilan Layered
@@ -521,7 +521,7 @@ export default function SavingsTarget() {
         </div>
 
         {/* Pengeluaran Harian Berlayer */}
-        <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/5 via-transparent to-transparent pointer-events-none" />
           <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowDown className="w-5 h-5 text-app-danger" /> Pengeluaran Layered

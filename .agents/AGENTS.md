@@ -42,3 +42,7 @@ Not lazy about: understanding the problem (read it fully and trace the real flow
 2. **Writing Plans:** Define clear tasks, architecture modifications, and validation steps in an implementation plan first.
 3. **Test-Driven Development (TDD):** Write a failing test before writing code to fix a bug or add a feature where applicable.
 4. **Verification:** Validate code builds and passes all tests before concluding.
+
+## Git Workflow Rules
+1. **Pull Before Editing**: Always run `git pull` (stashing local modifications first if needed) before starting any code editing or file modifications.
+2. **Push After Editing**: Commit and push all verified changes back to GitHub once the edits are complete and lint checks pass.

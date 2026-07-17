@@ -390,7 +390,7 @@ export default function Attendance() {
       <div className="space-y-6 md:space-y-8">
 
         {/* Today's Actions */}
-        <div className="bg-app-card rounded-2xl border border-app-border p-5 shadow-sm relative overflow-hidden group hover:border-app-accent1/30 transition-colors">
+        <HoverCard className="bg-app-card rounded-[24px] border border-app-border/40 p-5 shadow-sm relative overflow-hidden group transition-colors w-full">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
           <div className="relative z-10">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
@@ -499,7 +499,7 @@ export default function Attendance() {
               </div>
             )}
           </div>
-        </div>
+        </HoverCard>
 
         {/* History */}
         <div>
@@ -546,7 +546,7 @@ export default function Attendance() {
            <StaggerContainer className="space-y-3">
              {records.length > 0 ? records.map(record => (
                <StaggerItem key={record.id}>
-                 <div className="bg-app-card rounded-xl border border-app-border p-4 flex items-center justify-between">
+                 <div className="bg-app-card rounded-xl border border-app-border/40 p-4 flex items-center justify-between hover:border-app-accent1/20 transition-colors">
                  <div className="flex items-center gap-4">
                    <div className="w-12 h-12 rounded-lg bg-app-bg border border-app-border flex flex-col items-center justify-center shrink-0">
                      <span className="text-xs text-app-text/70">{new Date(record.date).toLocaleDateString('id-ID', { weekday: 'short' })}</span>
@@ -597,7 +597,7 @@ export default function Attendance() {
                </div>
                </StaggerItem>
              )) : (
-               <div className="bg-app-card rounded-xl border border-app-border p-8 text-center text-app-text/50">
+               <div className="bg-app-card rounded-xl border border-app-border/40 p-8 text-center text-app-text/50">
                  Belum ada data absensi bulan ini.
                </div>
              )}
@@ -609,7 +609,7 @@ export default function Attendance() {
 
       {isScheduleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-3xl rounded-3xl border border-app-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-app-bg w-full max-w-3xl rounded-[24px] border border-app-border/40 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
               <h2 className="font-bold text-app-text-bright">Pengaturan Jadwal & Periode</h2>
               <button onClick={() => setIsScheduleModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
@@ -619,7 +619,7 @@ export default function Attendance() {
             
             <div className="p-6 overflow-y-auto flex-1 space-y-6">
               
-              <div className="bg-app-card p-4 rounded-2xl border border-app-border">
+              <div className="bg-app-card p-4 rounded-xl border border-app-border/40">
                 <h3 className="font-bold text-app-text-bright mb-4 text-sm flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-app-accent1" />
                   Pengaturan Periode Absensi
@@ -661,7 +661,7 @@ export default function Attendance() {
                 <p className="text-xs text-app-text/50 mt-3">Perubahan periode akan langsung tersimpan. Contoh: Awal 19, Akhir 18.</p>
               </div>
 
-              <div className="bg-app-card p-4 rounded-2xl border border-app-border">
+              <div className="bg-app-card p-4 rounded-xl border border-app-border/40">
                  <div className="flex items-center justify-between mb-4">
                    <h3 className="font-bold text-app-text-bright text-sm">Pratinjau Kalender Periode Ini</h3>
                    <div className="flex items-center gap-2">
@@ -800,7 +800,7 @@ export default function Attendance() {
               </div>
 
                {/* Salary Calculation */}
-               <div className="bg-app-card p-4 rounded-2xl border border-app-border overflow-x-auto shadow-sm">
+               <div className="bg-app-card p-4 rounded-[24px] border border-app-border/40 overflow-x-auto shadow-sm">
                   <h3 className="font-bold text-app-text-bright mb-4 text-sm flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-app-accent1" />
                     Perhitungan Gaji
@@ -966,7 +966,7 @@ export default function Attendance() {
 
       {selectedDateForHours && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-sm rounded-3xl border border-app-border shadow-2xl overflow-hidden flex flex-col">
+          <div className="bg-app-bg w-full max-w-sm rounded-[24px] border border-app-border/40 shadow-2xl overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
               <h2 className="font-bold text-app-text-bright">Jam Kerja ({selectedDateForHours.toLocaleDateString('id-ID')})</h2>
               <button onClick={() => setSelectedDateForHours(null)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
@@ -1066,7 +1066,7 @@ export default function Attendance() {
 
       {selectedDateActionMenu && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-xs rounded-3xl border border-app-border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
+          <div className="bg-app-bg w-full max-w-xs rounded-[24px] border border-app-border/40 shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between p-4 border-b border-app-border bg-app-card/30">
               <h2 className="font-bold text-app-text-bright text-sm">Pilih Tindakan</h2>
               <button 
@@ -1118,7 +1118,7 @@ export default function Attendance() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-md rounded-3xl border border-app-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-app-bg w-full max-w-md rounded-[24px] border border-app-border/40 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
               <h2 className="font-bold text-app-text-bright">{editingRecord ? 'Edit Absensi' : 'Tambah Absensi Manual'}</h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">

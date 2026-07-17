@@ -1497,7 +1497,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         <ScrollReveal>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 shrink-0">
           {/* TOTAL KEUNTUNGAN BERSIH */}
-          <div className="lg:col-span-2 bg-app-card rounded-3xl p-6 md:p-8 border border-app-border shadow-sm flex flex-col justify-between relative overflow-hidden">
+          <div className="lg:col-span-2 bg-app-card rounded-[24px] p-6 md:p-8 border border-app-border/40 shadow-sm flex flex-col justify-between relative overflow-hidden">
             {/* DECORATIVE LIGHTING - optional aesthetic */}
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
 
@@ -1543,7 +1543,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           </div>
 
           {/* AI INSIGHT */}
-          <div className="bg-app-card rounded-3xl p-6 md:p-8 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
+          <div className="bg-app-card rounded-[24px] p-6 md:p-8 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
             <div className="flex items-center gap-2 mb-6 relative z-10">
               <Sparkles className="w-5 h-5 text-app-accent1" />
@@ -1597,12 +1597,12 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 Lihat Detail
               </button>
             </div>
-            <div
+            <HoverCard
               onClick={() => {
                 setTab("Pemasukan");
                 detailRef.current?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="bg-app-card border border-app-border rounded-2xl p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors"
+              className="bg-app-card border border-app-border/40 rounded-[24px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
             >
               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
               <div className="flex items-center gap-4 relative z-10">
@@ -1626,7 +1626,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               <p className="text-xl font-bold text-app-success relative z-10">
                 Rp {stats.income.toLocaleString("id-ID")}
               </p>
-            </div>
+            </HoverCard>
           </div>
           <div>
             <div className="flex items-center justify-between mb-4">
@@ -1643,12 +1643,12 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 Optimasi Biaya
               </button>
             </div>
-            <div
+            <HoverCard
               onClick={() => {
                 setTab("Pengeluaran");
                 detailRef.current?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="bg-app-card border border-app-border rounded-2xl p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors"
+              className="bg-app-card border border-app-border/40 rounded-[24px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
             >
               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/5 via-transparent to-transparent pointer-events-none opacity-80 block" />
               <div className="flex items-center gap-4 relative z-10">
@@ -1672,7 +1672,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               <p className="text-xl font-bold text-app-danger relative z-10">
                 Rp {stats.expense.toLocaleString("id-ID")}
               </p>
-            </div>
+            </HoverCard>
           </div>
         </div>
         </ScrollReveal>
@@ -1712,7 +1712,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </div>
           </div>
 
-          <div className="bg-app-card border border-app-border rounded-3xl p-6 shadow-sm mb-6 flex-1 overflow-hidden relative flex flex-col">
+          <div className="bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm mb-6 flex-1 overflow-hidden relative flex flex-col">
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
             {filteredTransactions.length === 0 ? (
               <div className="p-8 text-center text-app-text/50 rounded-2xl border border-dashed border-app-border mt-4 relative z-10 flex flex-col items-center justify-center gap-3">
@@ -1845,7 +1845,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       {/* Modal Add */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-[60] flex flex-col justify-end md:items-center md:justify-center backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full md:max-w-xl md:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-app-border animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
+          <div className="bg-app-card text-app-text w-full md:max-w-xl md:rounded-[24px] rounded-t-[24px] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-app-border/40 animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
                 {editingTransaction ? "Edit Transaksi" : "Catat Transaksi"}
@@ -2099,7 +2099,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       {/* Modal Add Grab */}
       {isGrabModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-[60] flex flex-col justify-end md:items-center md:justify-center backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full md:max-w-xl md:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-app-border animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
+          <div className="bg-app-card text-app-text w-full md:max-w-xl md:rounded-[24px] rounded-t-[24px] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-app-border/40 animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright flex items-center gap-2">
                 <Car className="w-5 h-5 text-app-success" /> Transaksi Grab
@@ -2325,7 +2325,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       {/* Confirm Delete Modal */}
       {tsxToDelete && (
         <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full max-w-sm rounded-3xl shadow-2xl border border-app-border p-6 animate-in zoom-in-95 duration-200">
+          <div className="bg-app-card text-app-text w-full max-w-sm rounded-[24px] shadow-2xl border border-app-border/40 p-6 animate-in zoom-in-95 duration-200">
             <h3 className="text-lg font-bold text-app-text-bright mb-2">
               Hapus Transaksi?
             </h3>

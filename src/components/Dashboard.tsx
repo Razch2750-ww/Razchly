@@ -479,7 +479,7 @@ export default function Dashboard() {
       <ScrollReveal className="md:hidden mb-5">
         <HoverCard 
           onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
-          className="bg-app-card border border-app-border rounded-[1.25rem] p-4 relative overflow-hidden text-app-text shadow-sm cursor-pointer"
+          className="bg-app-card border border-app-border/40 rounded-[24px] p-5 relative overflow-hidden text-app-text shadow-sm cursor-pointer"
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-app-accent1/5 rounded-full blur-[20px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
           
@@ -520,7 +520,7 @@ export default function Dashboard() {
         <ScrollReveal delay={0.08} className="h-full">
           <HoverCard 
             onClick={() => navigate("/investments")}
-            className="bg-app-card border border-app-border rounded-[1.25rem] p-3.5 relative overflow-hidden text-app-text shadow-sm cursor-pointer h-full flex flex-col"
+            className="bg-app-card border border-app-border/40 rounded-[24px] p-4 relative overflow-hidden text-app-text shadow-sm cursor-pointer h-full flex flex-col"
           >
             <div className="absolute top-0 right-0 w-24 h-24 bg-app-accent1/5 rounded-full blur-[20px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
             
@@ -560,7 +560,7 @@ export default function Dashboard() {
         <ScrollReveal delay={0.12} className="h-full">
           <HoverCard 
             onClick={() => navigate("/loans")}
-            className="bg-app-card border border-app-border rounded-[1.25rem] p-3.5 relative overflow-hidden text-app-text shadow-sm cursor-pointer h-full flex flex-col"
+            className="bg-app-card border border-app-border/40 rounded-[24px] p-4 relative overflow-hidden text-app-text shadow-sm cursor-pointer h-full flex flex-col"
           >
             <div className="absolute top-0 right-0 w-24 h-24 bg-app-accent1/5 rounded-full blur-[20px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
             
@@ -598,7 +598,7 @@ export default function Dashboard() {
         <ScrollReveal className="col-span-2">
           <HoverCard
             onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
-            className="bg-app-card rounded-2xl p-8 border border-app-border shadow-sm cursor-pointer overflow-hidden relative min-h-[160px] flex flex-col justify-between w-full"
+            className="bg-app-card rounded-[24px] p-6 md:p-8 border border-app-border/40 shadow-sm cursor-pointer overflow-hidden relative min-h-[160px] flex flex-col justify-between w-full"
           >
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/8 via-transparent to-transparent pointer-events-none" />
             <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-app-accent1/6 blur-3xl pointer-events-none" />
@@ -630,7 +630,7 @@ export default function Dashboard() {
             <ScrollReveal delay={0.05}>
               <HoverCard
                 onClick={() => navigate("/transactions", { state: { tab: "Pemasukan" } })}
-                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
+                className="bg-app-card rounded-[24px] p-5 md:p-6 border border-app-border/40 shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
               >
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/8 via-transparent to-transparent pointer-events-none" />
                 <div className="relative z-10 flex items-center gap-2 mb-1">
@@ -648,7 +648,7 @@ export default function Dashboard() {
             <ScrollReveal delay={0.08}>
               <HoverCard
                 onClick={() => navigate("/transactions", { state: { tab: "Pengeluaran" } })}
-                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
+                className="bg-app-card rounded-[24px] p-5 md:p-6 border border-app-border/40 shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
               >
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/6 via-transparent to-transparent pointer-events-none" />
                 <div className="relative z-10 flex items-center gap-2 mb-1">
@@ -669,7 +669,7 @@ export default function Dashboard() {
             <ScrollReveal delay={0.1}>
               <HoverCard
                 onClick={() => navigate("/investments")}
-                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
+                className="bg-app-card rounded-[24px] p-5 md:p-6 border border-app-border/40 shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
               >
                 <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${totalInvestmentReturn >= 0 ? "from-app-success/8" : "from-app-danger/6"} via-transparent to-transparent pointer-events-none`} />
                 <div className="relative z-10 flex items-center gap-2 mb-1">
@@ -689,7 +689,7 @@ export default function Dashboard() {
             <ScrollReveal delay={0.12}>
               <HoverCard
                 onClick={() => navigate("/loans")}
-                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
+                className="bg-app-card rounded-[24px] p-5 md:p-6 border border-app-border/40 shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
               >
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/8 via-transparent to-transparent pointer-events-none" />
                 <div className="relative z-10 flex items-center gap-2 mb-1">
@@ -776,7 +776,7 @@ export default function Dashboard() {
       {/* DESKTOP MIDDLE SECTION */}
       <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         {/* DOMPET SAYA */}
-        <div className="md:col-span-1 bg-app-card rounded-3xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="md:col-span-1 bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
           <div className="flex justify-between items-center mb-6 relative z-50">
             <h2 className="text-app-text-bright font-bold">Dompet Saya</h2>
             <div className="relative">
@@ -837,7 +837,7 @@ export default function Dashboard() {
                     setEditingAccount(acc);
                     setIsAccountModalOpen(true);
                   }}
-                  className="flex items-center justify-between p-4 rounded-2xl bg-app-bg border border-app-border hover:border-app-accent1/50 transition cursor-pointer relative overflow-hidden group"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-app-bg border border-app-border/40 hover:border-app-accent1/50 transition cursor-pointer relative overflow-hidden group"
                 >
                   {hasCustomColor ? (
                     <div 
@@ -882,7 +882,7 @@ export default function Dashboard() {
         </div>
 
         {/* ALUR KAS (CHART) */}
-        <div className="md:col-span-2 bg-app-card rounded-3xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="md:col-span-2 bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
           <div className="flex items-center justify-between mb-6 relative z-10">
             <h2 className="text-app-text-bright font-bold">Alur Kas</h2>
@@ -1014,7 +1014,7 @@ export default function Dashboard() {
       {/* DESKTOP & MOBILE VISUAL ANALYTICS (PIE CHARTS) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* PIE CHART 1: ALOKASI SALDO DOMPET */}
-        <div className="bg-app-card rounded-3xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
           <h2 className="text-app-text-bright font-bold mb-4 relative z-10 text-base">Alokasi Saldo Dompet</h2>
           {accountPieData.length === 0 ? (
@@ -1069,7 +1069,7 @@ export default function Dashboard() {
         </div>
 
         {/* PIE CHART 2: DISTRIBUSI PENGELUARAN */}
-        <div className="bg-app-card rounded-3xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
           <h2 className="text-app-text-bright font-bold mb-4 relative z-10 text-base">Distribusi Pengeluaran Bulan Ini</h2>
           {categoryPieData.length === 0 ? (
@@ -1192,7 +1192,7 @@ export default function Dashboard() {
       </div>
 
       {/* DESKTOP BOTTOM SECTION - TRANSACTIONS */}
-      <div className="hidden md:flex bg-app-card rounded-3xl p-6 border border-app-border flex-col shadow-sm shrink-0 overflow-hidden relative">
+      <div className="hidden md:flex bg-app-card rounded-[24px] p-6 border border-app-border/40 flex-col shadow-sm shrink-0 overflow-hidden relative">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
         <div className="flex items-center justify-between mb-6 relative z-10">
           <h2 className="text-app-text-bright font-bold">Transaksi Terakhir</h2>
@@ -1219,7 +1219,7 @@ export default function Dashboard() {
                 <div
                   key={t.id}
                   onClick={() => navigate('/transactions', { state: { tab: "Semua" } })}
-                  className="flex items-center justify-between p-4 rounded-2xl bg-app-bg border border-app-border hover:border-app-accent1/50 transition cursor-pointer relative overflow-hidden"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-app-bg border border-app-border/40 hover:border-app-accent1/50 transition cursor-pointer relative overflow-hidden"
                 >
                   <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-accent1/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
                   <div className="flex items-center gap-4 relative z-10">

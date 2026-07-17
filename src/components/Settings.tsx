@@ -404,7 +404,7 @@ export default function Settings() {
 
       <ScrollReveal className="flex-1 space-y-6 pb-10">
         
-        <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <button type="button" onClick={() => toggleSection('profil')} className={`relative z-10 w-full flex items-center justify-between ${sections.profil ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
@@ -433,7 +433,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <button type="button" onClick={() => toggleSection('rekening')} className={`relative z-10 w-full flex items-center justify-between ${sections.rekening ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
@@ -519,7 +519,7 @@ export default function Settings() {
         </section>
 
         {/* SECTION: DAFTAR KATEGORI */}
-        <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <button type="button" onClick={() => toggleSection('kategori')} className={`relative z-10 w-full flex items-center justify-between ${sections.kategori ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
@@ -618,7 +618,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <button type="button" onClick={() => toggleSection('grab')} className={`relative z-10 w-full flex items-center justify-between ${sections.grab ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
@@ -659,7 +659,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-warning/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <button type="button" onClick={() => toggleSection('jadwal')} className={`relative z-10 w-full flex items-center justify-between ${sections.jadwal ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
@@ -720,7 +720,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <button type="button" onClick={() => toggleSection('bahasa')} className={`relative z-10 w-full flex items-center justify-between ${sections.bahasa ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
@@ -748,7 +748,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <button type="button" onClick={() => toggleSection('tema')} className={`relative z-10 w-full flex items-center justify-between ${sections.tema ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
@@ -794,7 +794,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <button type="button" onClick={() => toggleSection('navigasi')} className={`relative z-10 w-full flex items-center justify-between ${sections.navigasi ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
@@ -858,7 +858,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-3xl border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <button type="button" onClick={() => toggleSection('font')} className={`relative z-10 w-full flex items-center justify-between ${sections.font ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
@@ -941,7 +941,7 @@ export default function Settings() {
       {/* Confirm Delete Category Modal */}
       {categoryToDelete && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full max-w-sm rounded-3xl shadow-2xl border border-app-border p-6 animate-in zoom-in-95 duration-200">
+          <div className="bg-app-card text-app-text w-full max-w-sm rounded-[24px] shadow-2xl border border-app-border/40 p-6 animate-in zoom-in-95 duration-200">
             <h3 className="text-lg font-bold text-app-text-bright mb-2">Hapus Kategori?</h3>
             <p className="text-sm text-app-text/70 mb-6">Tindakan ini tidak dapat dibatalkan.</p>
             <div className="flex gap-3">
@@ -965,7 +965,7 @@ export default function Settings() {
       {/* Confirm Delete Account Modal */}
       {accountToDelete && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full max-w-sm rounded-3xl shadow-2xl border border-app-border p-6 animate-in zoom-in-95 duration-200">
+          <div className="bg-app-card text-app-text w-full max-w-sm rounded-[24px] shadow-2xl border border-app-border/40 p-6 animate-in zoom-in-95 duration-200">
             <h3 className="text-lg font-bold text-app-text-bright mb-2">Hapus Rekening?</h3>
             <p className="text-sm text-app-text/70 mb-6">Tindakan ini tidak dapat dibatalkan. Semua transaksi yang terikat dengan rekening ini mungkin terdampak.</p>
             <div className="flex gap-3">

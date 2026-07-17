@@ -32,7 +32,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { TextReveal } from "./MotionWrappers";
+import { TextReveal, HoverCard } from "./MotionWrappers";
 
 interface ParsedGrabOrder {
   id: string;
@@ -317,7 +317,7 @@ export default function GrabDetails() {
       {/* STATS OVERVIEW */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
         {/* TOTAL PENDAPATAN */}
-        <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden">
+        <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
              <div className="absolute top-0 right-0 p-4 opacity-10">
                <TrendingUp className="w-16 h-16 text-app-success" />
@@ -325,13 +325,13 @@ export default function GrabDetails() {
              <p className="text-app-text/70 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
                 Total Pendapatan
              </p>
-             <h3 className="text-xl md:text-3xl font-bold text-app-text-bright relative z-10">
+             <h3 className="text-xl md:text-3xl font-bold text-app-text-bright relative z-10 font-mono">
                Rp {totalNominal.toLocaleString("id-ID")}
              </h3>
-        </div>
+        </HoverCard>
 
         {/* TOTAL ORDERAN */}
-        <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden">
+        <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
              <div className="absolute top-0 right-0 p-4 opacity-10">
                <Receipt className="w-16 h-16 text-blue-500" />
@@ -339,13 +339,13 @@ export default function GrabDetails() {
              <p className="text-app-text/70 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
                 Total Orderan
              </p>
-             <h3 className="text-xl md:text-3xl font-bold text-app-text-bright relative z-10">
+             <h3 className="text-xl md:text-3xl font-bold text-app-text-bright relative z-10 font-mono">
                {totalOrders}
              </h3>
-        </div>
+        </HoverCard>
 
         {/* TOTAL HEMAT */}
-        <div className="bg-app-card border border-app-border rounded-3xl p-6 shadow-sm flex flex-col justify-center relative overflow-hidden">
+        <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
             <div className="absolute top-0 right-0 p-4 opacity-10">
                <Tags className="w-16 h-16 text-app-accent1" />
@@ -353,13 +353,13 @@ export default function GrabDetails() {
             <p className="text-app-text/70 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
               Total Order Hemat
             </p>
-            <h3 className="text-xl md:text-3xl font-bold text-app-text-bright relative z-10">
+            <h3 className="text-xl md:text-3xl font-bold text-app-text-bright relative z-10 font-mono">
               {hematOrdersFound}
             </h3>
-        </div>
+        </HoverCard>
 
         {/* NOMINAL POTONGAN HEMAT */}
-        <div className="bg-app-card border border-app-danger/30 rounded-3xl p-6 shadow-sm flex flex-col justify-center relative overflow-hidden">
+        <HoverCard className="bg-app-card border border-app-danger/30 rounded-[24px] p-6 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
              <div className="absolute top-0 right-0 p-4 opacity-5">
                <PiggyBank className="w-16 h-16 text-app-danger" />
@@ -367,10 +367,10 @@ export default function GrabDetails() {
              <p className="text-app-danger/80 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
                 Nominal Potongan Hemat
              </p>
-             <h3 className="text-xl md:text-3xl font-bold text-app-danger relative z-10">
+             <h3 className="text-xl md:text-3xl font-bold text-app-danger relative z-10 font-mono">
                -Rp {simulatedHematDeduction.toLocaleString("id-ID")}
              </h3>
-        </div>
+        </HoverCard>
       </div>
 
       {/* TOTAL PER KATEGORI */}
@@ -396,7 +396,7 @@ export default function GrabDetails() {
       </div>
 
       {/* GRAFIK PENDAPATAN */}
-      <div className="bg-app-card border border-app-border rounded-3xl p-6 shadow-sm mb-8 relative overflow-hidden">
+      <div className="bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm mb-8 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
         <h3 className="text-lg font-bold text-app-text-bright mb-6 flex items-center gap-2 relative z-10">
           <LineChartIcon className="w-5 h-5 text-app-accent1" /> Grafik Pendapatan

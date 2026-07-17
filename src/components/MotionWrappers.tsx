@@ -18,10 +18,13 @@ interface HoverCardProps {
 export function HoverCard({ children, className = '', onClick, id }: HoverCardProps) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const spotlightX = useMotionValue(0);
+  const spotlightY = useMotionValue(0);
+  const [isHovered, setIsHovered] = React.useState(false);
 
-  // Map mouse coordinate ratios (-0.5 to 0.5) to a rotation range (-1.5 to 1.5 degrees)
-  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [1.5, -1.5]), cardSpringConfig);
-  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-1.5, 1.5]), cardSpringConfig);
+  // Map mouse coordinate ratios (-0.5 to 0.5) to a rotation range (-1.2 to 1.2 degrees)
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [1.2, -1.2]), cardSpringConfig);
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-1.2, 1.2]), cardSpringConfig);
   const scale = useSpring(1, cardSpringConfig);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -36,22 +39,33 @@ export function HoverCard({ children, className = '', onClick, id }: HoverCardPr
     
     x.set(mouseX / width);
     y.set(mouseY / height);
+
+    spotlightX.set(e.clientX - rect.left);
+    spotlightY.set(e.clientY - rect.top);
   };
 
   const handleMouseEnter = () => {
-    scale.set(1.02); // slight scale up (scale-102) as requested
+    setIsHovered(true);
+    scale.set(1.015); // subtle scale up for extra premium touch
   };
 
   const handleMouseLeave = () => {
+    setIsHovered(false);
     scale.set(1);
     x.set(0);
     y.set(0);
   };
 
+  // Convert spotlight positions into a dynamic radial gradient background
+  const spotlightBackground = useTransform(
+    [spotlightX, spotlightY],
+    ([xVal, yVal]) => `radial-gradient(180px circle at ${xVal}px ${yVal}px, var(--color-app-accent1), transparent 80%)`
+  );
+
   return (
     <motion.div
       id={id}
-      className={`${className} select-none`}
+      className={`relative ${className} select-none overflow-hidden group`}
       onClick={onClick}
       style={{
         rotateX,
@@ -62,7 +76,23 @@ export function HoverCard({ children, className = '', onClick, id }: HoverCardPr
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="h-full w-full">
+      {/* Spotlight Backglow effect */}
+      <motion.div
+        className="absolute inset-0 -z-10 pointer-events-none transition-opacity duration-300"
+        style={{
+          background: spotlightBackground,
+          opacity: isHovered ? 0.08 : 0,
+        }}
+      />
+      {/* Outer border glow effect on hover */}
+      <div 
+        className="absolute inset-0 rounded-[inherit] border border-app-accent1/20 transition-opacity duration-300 pointer-events-none -z-10"
+        style={{
+          boxShadow: '0 0 20px -3px var(--color-app-accent1)',
+          opacity: isHovered ? 0.12 : 0,
+        }}
+      />
+      <div className="h-full w-full relative z-10">
         {children}
       </div>
     </motion.div>

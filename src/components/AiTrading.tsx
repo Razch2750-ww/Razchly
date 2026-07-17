@@ -42,7 +42,7 @@ import {
   RiskParams 
 } from "../utils/indicators";
 import TradingViewChart from "./TradingViewChart";
-import { TextReveal } from "./MotionWrappers";
+import { TextReveal, HoverCard } from "./MotionWrappers";
 import { authFetch } from "../utils/api";
 
 export default function AiTrading() {
@@ -1272,7 +1272,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
       </div>
 
       {/* Asset Search & Selector panel */}
-      <div className="bg-app-card border border-app-border rounded-2xl p-4 shadow-sm" id="asset-selector-panel">
+      <div className="bg-app-card border border-app-border/40 rounded-[24px] p-4 shadow-sm" id="asset-selector-panel">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-app-text/40" />
@@ -1390,7 +1390,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
         {activeTab === "signals" && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" id="tab-signals">
             {/* Left Control Panel */}
-            <div className="bg-app-card border border-app-border rounded-2xl p-5 shadow-sm space-y-4">
+            <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4 w-full">
               <h3 className="font-bold text-app-text-bright flex items-center gap-2">
                 <Cpu className="w-5 h-5 text-app-accent1" />
                 OpenAlice Engine Matrix
@@ -1520,10 +1520,10 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   </>
                 )}
               </div>
-            </div>
+            </HoverCard>
 
             {/* Middle/Right: AI Analysis Results Card */}
-            <div className="lg:col-span-2 bg-app-card border border-app-border rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div className="lg:col-span-2 bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm flex flex-col justify-between">
               {aiSignal ? (
                 <div className="space-y-6" id="ai-signal-result">
                   <div className="flex items-start justify-between border-b border-app-border pb-4">
@@ -1628,7 +1628,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             {/* Left controls column */}
             <div className="lg:col-span-1 space-y-6">
               {/* Broker connection box */}
-              <div className="bg-app-card border border-app-border rounded-2xl p-5 shadow-sm space-y-4">
+              <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4 w-full">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-app-text-bright flex items-center gap-2">
                   <Lock className="w-5 h-5 text-app-accent1" />
@@ -1871,10 +1871,10 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   </button>
                 </div>
               )}
-            </div>
+            </HoverCard>
 
             {/* Active Strategy Panel for Auto-trading */}
-            <div className="bg-app-card border border-app-border rounded-2xl p-5 shadow-sm space-y-4">
+            <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4 w-full">
               <h3 className="font-bold text-app-text-bright flex items-center gap-2 text-sm">
                 <Activity className="w-5 h-5 text-app-accent1" />
                 Konfigurasi Strategi Autotrade
@@ -2032,7 +2032,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   </div>
                 </div>
               </div>
-            </div>
+            </HoverCard>
             </div>
 
             {/* Trading logs and console Terminal */}
@@ -2060,7 +2060,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               </div>
 
               {/* Active Session Performance Dashboard (Matches Backtest metrics exactly) */}
-              <div className="bg-app-card border border-app-border rounded-2xl p-5 shadow-sm space-y-4">
+              <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4 w-full">
                 <h3 className="font-bold text-app-text-bright text-sm flex items-center gap-2">
                   <Activity className="w-5 h-5 text-app-accent1" />
                   Kinerja Real-Time Auto-Trade (Sesi Aktif)
@@ -2131,10 +2131,10 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     <span className="font-semibold text-app-text-bright">{liveTrades.length} Trades</span>
                   </div>
                 </div>
-              </div>
+              </HoverCard>
 
               {/* Simulated Live Trades Table */}
-              <div className="bg-app-card border border-app-border rounded-2xl p-5 shadow-sm space-y-4">
+              <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4 w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-app-border/60 pb-3">
                   <h3 className="font-bold text-app-text-bright text-sm flex items-center gap-2">
                     <Check className="w-5 h-5 text-app-accent1" />
@@ -2256,7 +2256,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     Belum ada aktivitas transaksi terpicu. Aktifkan auto-trade dan hasilkan sinyal AI untuk menguji.
                   </div>
                 )}
-              </div>
+              </HoverCard>
 
             </div>
 
@@ -2265,7 +2265,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
 
         {/* TAB 3: RISK MANAGEMENT */}
         {activeTab === "risk" && (
-          <div className="bg-app-card border border-app-border rounded-2xl p-6 shadow-sm max-w-3xl mx-auto space-y-6" id="tab-risk">
+          <div className="bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm max-w-3xl mx-auto space-y-6" id="tab-risk">
             <div>
               <h3 className="font-bold text-app-text-bright text-lg flex items-center gap-2">
                 <ShieldAlert className="w-5.5 h-5.5 text-app-accent1" />
@@ -2352,7 +2352,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
           <div className="space-y-6" id="tab-backtest">
             
             {/* Strategy Configuration */}
-            <div className="bg-app-card border border-app-border rounded-2xl p-5 shadow-sm">
+            <div className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm">
               <h3 className="font-bold text-app-text-bright text-sm flex items-center gap-2 mb-4">
                 <Database className="w-5 h-5 text-app-accent1" />
                 Konfigurasi Strategi Backtest
@@ -2434,7 +2434,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" id="backtest-results-container">
                 
                 {/* Metrics Stats Summary Cards */}
-                <div className="lg:col-span-1 bg-app-card border border-app-border rounded-2xl p-5 shadow-sm space-y-4">
+                <div className="lg:col-span-1 bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4">
                   <h3 className="font-bold text-app-text-bright text-sm border-b border-app-border/40 pb-3">
                     Metrik Kinerja Backtest
                   </h3>
@@ -2515,7 +2515,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 </div>
 
                 {/* Equity Curve Line Chart */}
-                <div className="lg:col-span-2 bg-app-card border border-app-border rounded-2xl p-5 shadow-sm space-y-3">
+                <div className="lg:col-span-2 bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-3">
                   <h3 className="font-bold text-app-text-bright text-sm">
                     Kurva Ekuitas (Simulasi Kinerja Portofolio)
                   </h3>
@@ -2549,7 +2549,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 </div>
 
                 {/* Full History of Simulated Trades executed */}
-                <div className="lg:col-span-3 bg-app-card border border-app-border rounded-2xl p-5 shadow-sm space-y-4">
+                <div className="lg:col-span-3 bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4">
                   <h3 className="font-bold text-app-text-bright text-sm">
                     Riwayat Transaksi Backtest Lengkap (Simulasi Slippage & Komisi Terpenuhi)
                   </h3>
@@ -2604,7 +2604,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             {/* Left Controls Column (lg:col-span-5) */}
             <div className="lg:col-span-5 space-y-6">
               {/* Core Philosophy Header Card */}
-              <div className="bg-gradient-to-br from-[#12161f] to-[#1a2333] border border-app-border rounded-2xl p-5 shadow-sm space-y-3">
+              <div className="bg-gradient-to-br from-[#12161f] to-[#1a2333] border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-3">
                 <div className="flex items-center gap-2">
                   <ShieldAlert className="w-5 h-5 text-amber-500 animate-pulse" />
                   <h3 className="font-bold text-app-text-bright text-base">EA MetaTrader 5 (MQL5) Pro</h3>
@@ -2623,7 +2623,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               </div>
 
               {/* Dynamic Parameter Customizer */}
-              <div className="bg-app-card border border-app-border rounded-2xl p-5 shadow-sm space-y-5">
+              <div className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-5">
                 <div className="flex items-center gap-2 border-b border-app-border pb-3">
                   <Settings className="w-4.5 h-4.5 text-app-accent1" />
                   <h4 className="font-bold text-app-text-bright text-sm">Sesuaikan Parameter EA</h4>

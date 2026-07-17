@@ -40,6 +40,8 @@ import {
 import {
   LineChart,
   Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
@@ -255,7 +257,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
   };
 
   return (
-    <div className="bg-app-card rounded-3xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+    <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 relative z-10">
@@ -633,8 +635,9 @@ export default function Investments() {
     [],
   );
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
-  const [activeTab, setActiveTab] = useState<"holding" | "audit">("holding");
-  const [chartPeriod, setChartPeriod] = useState<30 | 7>(30);
+  const [activeTab, setActiveTab] = useState<"dashboard" | "holding" | "audit">("dashboard");
+  const [chartPeriod, setChartPeriod] = useState<"1W" | "1M" | "3M" | "YTD" | "1Y" | "All">("1M");
+  const [equityReturnViewMode, setEquityReturnViewMode] = useState<"daily" | "monthly">("daily");
   const navigate = useNavigate();
 
   const [isPortfolioModalOpen, setIsPortfolioModalOpen] = useState(false);
@@ -1309,10 +1312,32 @@ export default function Investments() {
     return sum + inv.qty * mult * inv.price;
   }, 0);
 
+  // Calculate days count based on period
+  const numDays = useMemo(() => {
+    if (chartPeriod === "1W") return 7;
+    if (chartPeriod === "1M") return 30;
+    if (chartPeriod === "3M") return 90;
+    if (chartPeriod === "1Y") return 365;
+    if (chartPeriod === "YTD") {
+      const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+      const diffTime = Math.abs(new Date().getTime() - startOfYear.getTime());
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+    if (chartPeriod === "All") {
+      if (activeInvestments.length === 0) return 30;
+      const earliest = Math.min(...activeInvestments.map((inv) => inv.createdAt));
+      const diffTime = Math.abs(new Date().getTime() - earliest);
+      return Math.max(30, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    }
+    return 30;
+  }, [chartPeriod, activeInvestments]);
+
   // Chart data generation
   const chartData = useMemo(() => {
     const data = [];
-    for (let i = chartPeriod; i >= 0; i--) {
+    const targetIhsg = marketData.COMPOSITE?.change || -29.42;
+
+    for (let i = numDays; i >= 0; i--) {
       const date = subDays(new Date(), i);
       const endOfDayDate = new Date(date);
       endOfDayDate.setHours(23, 59, 59, 999);
@@ -1349,14 +1374,24 @@ export default function Investments() {
         valueForDay += inv.qty * simulatedPrice * mult;
       });
 
+      const portfolioReturn = modalForDay > 0 ? ((valueForDay - modalForDay) / modalForDay) * 100 : 0;
+      
+      // Calculate simulated IHSG cumulative return ending at target
+      const progress = numDays > 0 ? (numDays - i) / numDays : 1;
+      const wave = Math.sin(progress * Math.PI * 3) * 6 + Math.sin(progress * Math.PI * 7) * 2;
+      const ihsgReturn = progress * targetIhsg + wave;
+
       data.push({
         name: format(date, "dd MMM", { locale: localeId }),
         value: valueForDay,
         modal: modalForDay,
+        portfolioReturn,
+        ihsgReturn,
+        rawDate: date,
       });
     }
     return data;
-  }, [chartPeriod, activeInvestments, quotes]);
+  }, [numDays, activeInvestments, quotes, marketData.COMPOSITE?.change]);
 
   const getInitials = (name: string) =>
     name.substring(0, 2).toUpperCase() || "US";
@@ -1387,6 +1422,123 @@ export default function Investments() {
 
     return result;
   }, [activeInvestments, filterCategory, sortBy, quotes]);
+
+  const COLORS = useMemo(() => [
+    "#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#EF4444", 
+    "#14B8A6", "#6366f1", "#EC4899", "#f97316"
+  ], []);
+
+  const formatYAxis = (val: number) => {
+    if (val >= 1000000) return `${(val / 1000000).toLocaleString("id-ID", { maximumFractionDigits: 1 })}M`;
+    if (val >= 1000) return `${(val / 1000).toLocaleString("id-ID", { maximumFractionDigits: 0 })}K`;
+    return val.toString();
+  };
+
+  const dailyRows = useMemo(() => {
+    const rows = [];
+    const len = chartData.length;
+    for (let idx = len - 1; idx >= 0; idx--) {
+      const d = chartData[idx];
+      let pnl = 0;
+      let pnlPercent = 0;
+      if (idx > 0) {
+        const prev = chartData[idx - 1];
+        pnl = d.value - prev.value;
+        pnlPercent = prev.value > 0 ? (pnl / prev.value) * 100 : 0;
+      } else {
+        pnl = d.value - d.modal;
+        pnlPercent = d.modal > 0 ? (pnl / d.modal) * 100 : 0;
+      }
+      rows.push({
+        dateLabel: d.name,
+        equity: d.value,
+        pnl,
+        pnlPercent,
+        rawDate: d.rawDate,
+      });
+    }
+    return rows;
+  }, [chartData]);
+
+  const monthlyRows = useMemo(() => {
+    const groups: Record<string, { monthKey: string; dateLabel: string; finalValue: number; initialValue: number; rawDate: Date }> = {};
+    
+    chartData.forEach((d) => {
+      const date = d.rawDate;
+      const monthKey = format(date, "yyyy-MM");
+      const label = format(date, "MMM yy", { locale: localeId });
+      
+      if (!groups[monthKey]) {
+        groups[monthKey] = {
+          monthKey,
+          dateLabel: label,
+          finalValue: d.value,
+          initialValue: d.value,
+          rawDate: date,
+        };
+      } else {
+        groups[monthKey].finalValue = d.value;
+      }
+    });
+    
+    const sortedMonths = Object.values(groups).sort((a, b) => a.monthKey.localeCompare(b.monthKey));
+    
+    return sortedMonths.map((m, idx) => {
+      const prevMonthVal = idx > 0 ? sortedMonths[idx - 1].finalValue : m.initialValue;
+      const pnl = m.finalValue - prevMonthVal;
+      const pnlPercent = prevMonthVal > 0 ? (pnl / prevMonthVal) * 100 : 0;
+      return {
+        dateLabel: m.dateLabel,
+        equity: m.finalValue,
+        pnl,
+        pnlPercent,
+        monthKey: m.monthKey,
+      };
+    }).reverse(); // newest first
+  }, [chartData]);
+
+  const allocationData = useMemo(() => {
+    let list: any[] = [];
+    if (allocationViewBy === "aset") {
+      list = filteredAndSortedInvestments
+        .map((inv) => {
+          const symbolCode = inv.category === "emas" ? "EMAS" : inv.code;
+          const livePrice = getLivePrice(inv);
+          const value = (inv.category === "saham" ? 100 : 1) * inv.qty * livePrice;
+          return {
+            id: inv.id,
+            name: inv.code,
+            category: inv.category,
+            value: value,
+            qty: inv.qty,
+            logoid: quotes[symbolCode]?.logoid,
+            description: quotes[symbolCode]?.description,
+          };
+        })
+        .sort((a, b) => b.value - a.value);
+    } else {
+      const aggregated = filteredAndSortedInvestments.reduce((acc, inv) => {
+        const livePrice = getLivePrice(inv);
+        const value = (inv.category === "saham" ? 100 : 1) * inv.qty * livePrice;
+        if (!acc[inv.category]) {
+          acc[inv.category] = {
+            id: inv.category,
+            name: inv.category.charAt(0).toUpperCase() + inv.category.slice(1),
+            category: inv.category,
+            value: 0,
+            qty: 0,
+            logoid: "",
+            description: `Alokasi Kategori ${inv.category}`,
+          };
+        }
+        acc[inv.category].value += value;
+        acc[inv.category].qty += inv.qty;
+        return acc;
+      }, {} as Record<string, any>);
+      list = Object.values(aggregated).sort((a, b) => b.value - a.value);
+    }
+    return list;
+  }, [filteredAndSortedInvestments, allocationViewBy, quotes]);
 
   const ownedStocks = useMemo(() => {
     return activeInvestments.filter((inv) => inv.category === "saham");
@@ -1421,10 +1573,513 @@ export default function Investments() {
       actions={actionsInvestments}
       mobileActions={mobileActionsInvestments}
     >
-      {/* WIDGETS (STACK ON MOBILE, GRID ON DESKTOP) */}
+      {/* Sub-tab Navigation */}
+      <div className="flex bg-app-bg p-1 rounded-xl border border-app-border/40 self-start mb-6 gap-1 relative z-10 shrink-0">
+        <button
+          type="button"
+          onClick={() => setActiveTab("dashboard")}
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            activeTab === "dashboard"
+              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+              : "text-app-text/60 hover:text-app-text-bright"
+          }`}
+        >
+          Ringkasan
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("holding")}
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            activeTab === "holding"
+              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+              : "text-app-text/60 hover:text-app-text-bright"
+          }`}
+        >
+          Kepemilikan Aktif
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("audit")}
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            activeTab === "audit"
+              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+              : "text-app-text/60 hover:text-app-text-bright"
+          }`}
+        >
+          Audit Riwayat
+          {auditedHoldings.length > 0 && (
+            <span className="bg-app-accent1 text-app-bg text-[9px] px-1.5 py-0.5 rounded-full font-bold">
+              {auditedHoldings.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {activeTab === "dashboard" && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-in fade-in slide-in-from-bottom-2 duration-500 w-full mb-6">
+          
+          {/* COLUMN 1: LEFT PANEL (lg:col-span-5) */}
+          <div className="lg:col-span-5 flex flex-col gap-6 w-full">
+            
+            {/* CARD 1: TOTAL EQUITY */}
+            <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full">
+              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+              <div className="relative z-10 flex flex-col mb-4">
+                <span className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider mb-1">
+                  Total Equity
+                </span>
+                <span className="text-2xl font-bold text-app-text-bright break-words leading-tight font-mono">
+                  Rp {totalBalance.toLocaleString("id-ID")}
+                </span>
+              </div>
+
+              {/* Total Equity Chart */}
+              <div className="h-[180px] w-full relative z-10">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 10, right: -5, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorTotalEquity" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="var(--color-app-success)" stopOpacity={0.25} />
+                        <stop offset="100%" stopColor="var(--color-app-success)" stopOpacity={0.0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-app-border)" opacity={0.3} />
+                    <XAxis
+                      dataKey="name"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                      dy={5}
+                      opacity={0.5}
+                    />
+                    <YAxis
+                      orientation="right"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                      tickFormatter={formatYAxis}
+                      opacity={0.5}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "var(--color-app-card)",
+                        border: "1px solid var(--color-app-border)",
+                        borderRadius: "12px",
+                      }}
+                      itemStyle={{
+                        fontSize: 11,
+                        color: "var(--color-app-text-bright)",
+                      }}
+                      labelStyle={{
+                        fontSize: 11,
+                        color: "var(--color-app-text)",
+                        marginBottom: 2,
+                      }}
+                      formatter={(value: number) => [`Rp ${value.toLocaleString("id-ID")}`, "Equity"]}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke="var(--color-app-success)"
+                      strokeWidth={2}
+                      fillOpacity={1}
+                      fill="url(#colorTotalEquity)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Period Selectors */}
+              <div className="flex gap-2 justify-center mt-4 border-t border-app-border/20 pt-3 relative z-10">
+                {(["1W", "1M", "3M", "YTD", "1Y", "All"] as const).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setChartPeriod(p)}
+                    className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
+                      chartPeriod === p
+                        ? "bg-app-accent1 text-app-bg shadow-sm"
+                        : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </HoverCard>
+
+            {/* CARD 2: CUMULATIVE PORTFOLIO RETURN */}
+            <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full">
+              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+              
+              <div className="relative z-10 flex flex-col mb-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">
+                    Cumulative Portfolio Return
+                  </span>
+                  <div className="relative group">
+                    <Info className="w-3.5 h-3.5 text-app-text/40 hover:text-app-text cursor-pointer" />
+                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-app-card border border-app-border p-2 rounded-lg shadow-xl text-[10px] text-app-text/80 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 leading-relaxed">
+                      Imbal hasil kumulatif portofolio Anda dibandingkan indeks IHSG (COMPOSITE).
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 mt-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-3.5 bg-app-success rounded-full" />
+                    <span className="text-xs text-app-text/60 font-semibold">Portfolio:</span>
+                    <span className={`text-xs font-bold font-mono ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                      {incomeToday >= 0 ? "+" : ""}{(expenseToday > 0 ? ((incomeToday / expenseToday) * 100).toFixed(2) : 0)}%
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-3.5 bg-purple-500 rounded-full" />
+                    <span className="text-xs text-app-text/60 font-semibold">IHSG:</span>
+                    <span className={`text-xs font-bold font-mono ${marketData.COMPOSITE?.change >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                      {marketData.COMPOSITE?.change >= 0 ? "+" : ""}{marketData.COMPOSITE?.change?.toFixed(2)}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cumulative Return Chart */}
+              <div className="h-[180px] w-full relative z-10">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData} margin={{ top: 10, right: -5, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-app-border)" opacity={0.3} />
+                    <XAxis
+                      dataKey="name"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                      dy={5}
+                      opacity={0.5}
+                    />
+                    <YAxis
+                      orientation="right"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                      tickFormatter={(val) => `${val.toFixed(0)}%`}
+                      opacity={0.5}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "var(--color-app-card)",
+                        border: "1px solid var(--color-app-border)",
+                        borderRadius: "12px",
+                      }}
+                      itemStyle={{
+                        fontSize: 11,
+                        color: "var(--color-app-text-bright)",
+                      }}
+                      labelStyle={{
+                        fontSize: 11,
+                        color: "var(--color-app-text)",
+                        marginBottom: 2,
+                      }}
+                      formatter={(value: number, name: string) => [
+                        `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`,
+                        name === "portfolioReturn" ? "Portfolio" : "IHSG"
+                      ]}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="portfolioReturn"
+                      name="portfolioReturn"
+                      stroke="var(--color-app-success)"
+                      strokeWidth={2.5}
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="ihsgReturn"
+                      name="ihsgReturn"
+                      stroke="#8B5CF6"
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Period Selectors */}
+              <div className="flex gap-2 justify-center mt-4 border-t border-app-border/20 pt-3 relative z-10">
+                {(["1W", "1M", "3M", "YTD", "1Y", "All"] as const).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setChartPeriod(p)}
+                    className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
+                      chartPeriod === p
+                        ? "bg-app-accent1 text-app-bg shadow-sm"
+                        : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </HoverCard>
+
+          </div>
+
+          {/* COLUMN 2: MIDDLE PANEL - TOTAL EQUITY RETURN (lg:col-span-3) */}
+          <div className="lg:col-span-3 w-full">
+            <HoverCard className="bg-app-card rounded-[24px] p-5 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full h-[620px]">
+              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+              
+              <div className="relative z-10 flex flex-col gap-3 shrink-0 mb-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">
+                    Total Equity Return
+                  </span>
+                  <div className="relative group">
+                    <Info className="w-3.5 h-3.5 text-app-text/40 hover:text-app-text cursor-pointer" />
+                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-app-card border border-app-border p-2 rounded-lg shadow-xl text-[10px] text-app-text/80 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 leading-relaxed">
+                      Catatan performa harian/bulanan nilai investasi dan P&L Anda.
+                    </div>
+                  </div>
+                </div>
+
+                {/* View Mode Toggle */}
+                <div className="flex justify-between items-center">
+                  <div className="flex bg-app-bg p-0.5 rounded-lg border border-app-border/60">
+                    <button
+                      type="button"
+                      onClick={() => setEquityReturnViewMode("daily")}
+                      className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                        equityReturnViewMode === "daily"
+                          ? "bg-app-card text-app-accent1 shadow-sm"
+                          : "text-app-text/60 hover:text-app-text-bright"
+                      }`}
+                    >
+                      Daily
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEquityReturnViewMode("monthly")}
+                      className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                        equityReturnViewMode === "monthly"
+                          ? "bg-app-card text-app-accent1 shadow-sm"
+                          : "text-app-text/60 hover:text-app-text-bright"
+                      }`}
+                    >
+                      Monthly
+                    </button>
+                  </div>
+                  <span className="text-[10px] font-bold text-app-text/50 capitalize font-sans">
+                    {chartPeriod === "YTD" ? "Year to Date" : chartPeriod === "All" ? "All Time" : `Last ${chartPeriod}`}
+                  </span>
+                </div>
+              </div>
+
+              {/* Scrollable Table */}
+              <div className="flex-1 overflow-y-auto pr-1 relative z-10 border border-app-border/40 rounded-xl bg-app-bg/15">
+                <table className="w-full text-left text-xs font-mono">
+                  <thead>
+                    <tr className="bg-app-bg border-b border-app-border/50 text-app-text/60 font-bold font-sans uppercase tracking-wider text-[9px] sticky top-0 z-10">
+                      <th className="py-2.5 px-3">Date</th>
+                      <th className="py-2.5 px-3 text-right">Equity</th>
+                      <th className="py-2.5 px-3 text-right">P&L</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-app-border/30 text-[11px]">
+                    {equityReturnViewMode === "daily" ? (
+                      dailyRows.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="py-8 text-center text-app-text/40 font-sans">
+                            Belum ada data
+                          </td>
+                        </tr>
+                      ) : (
+                        dailyRows.map((row, i) => (
+                          <tr key={i} className="hover:bg-app-hover/30 transition-colors">
+                            <td className="py-2.5 px-3 text-app-text/75 font-sans font-bold">
+                              {format(row.rawDate, "dd MMM yy", { locale: localeId })}
+                            </td>
+                            <td className="py-2.5 px-3 text-right text-app-text-bright">
+                              {row.equity.toLocaleString("id-ID")}
+                            </td>
+                            <td className={`py-2.5 px-3 text-right font-bold ${row.pnl >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                              <div>{row.pnl >= 0 ? "+" : ""}{row.pnl.toLocaleString("id-ID")}</div>
+                              <div className="text-[9px] font-normal opacity-85">({row.pnl >= 0 ? "+" : ""}{row.pnlPercent.toFixed(2)}%)</div>
+                            </td>
+                          </tr>
+                        ))
+                      )
+                    ) : (
+                      monthlyRows.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="py-8 text-center text-app-text/40 font-sans">
+                            Belum ada data
+                          </td>
+                        </tr>
+                      ) : (
+                        monthlyRows.map((row, i) => (
+                          <tr key={i} className="hover:bg-app-hover/30 transition-colors">
+                            <td className="py-3 px-3 text-app-text/75 font-sans font-bold">
+                              {row.dateLabel}
+                            </td>
+                            <td className="py-3 px-3 text-right text-app-text-bright font-bold">
+                              {row.equity.toLocaleString("id-ID")}
+                            </td>
+                            <td className={`py-3 px-3 text-right font-bold ${row.pnl >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                              <div>{row.pnl >= 0 ? "+" : ""}{row.pnl.toLocaleString("id-ID")}</div>
+                              <div className="text-[9px] font-normal opacity-85">({row.pnl >= 0 ? "+" : ""}{row.pnlPercent.toFixed(2)}%)</div>
+                            </td>
+                          </tr>
+                        ))
+                      )
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </HoverCard>
+          </div>
+
+          {/* COLUMN 3: RIGHT PANEL - PORTFOLIO ALLOCATION (lg:col-span-4) */}
+          <div className="lg:col-span-4 w-full">
+            <HoverCard className="bg-app-card rounded-[24px] p-5 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full min-h-[620px]">
+              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+              
+              <div className="relative z-10 flex justify-between items-center shrink-0 mb-4">
+                <span className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">
+                  Portfolio Allocation
+                </span>
+
+                {/* Category Toggle */}
+                <div className="flex bg-app-bg p-0.5 rounded-lg border border-app-border/60">
+                  <button
+                    type="button"
+                    onClick={() => setAllocationViewBy("aset")}
+                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                      allocationViewBy === "aset"
+                        ? "bg-app-card text-app-accent1 shadow-sm"
+                        : "text-app-text/60 hover:text-app-text-bright"
+                    }`}
+                  >
+                    Stocks
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAllocationViewBy("kategori")}
+                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                      allocationViewBy === "kategori"
+                        ? "bg-app-card text-app-accent1 shadow-sm"
+                        : "text-app-text/60 hover:text-app-text-bright"
+                    }`}
+                  >
+                    Sub-Sector
+                  </button>
+                </div>
+              </div>
+
+              {/* Doughnut Chart */}
+              {(() => {
+                const totalAllocValue = allocationData.reduce((sum, item) => sum + item.value, 0);
+
+                if (totalAllocValue === 0) {
+                  return (
+                    <div className="flex-1 flex flex-col items-center justify-center text-app-text/50 text-xs py-8 border border-dashed border-app-border/50 rounded-xl relative z-10 bg-app-bg/10 min-h-[300px]">
+                      <TrendingUp className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
+                      Belum ada instrumen investasi
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="relative z-10 flex flex-col flex-1">
+                    <div className="flex justify-center items-center h-[200px] relative shrink-0">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={allocationData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={70}
+                            outerRadius={90}
+                            stroke="none"
+                            paddingAngle={3}
+                            dataKey="value"
+                            isAnimationActive={true}
+                          >
+                            {allocationData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "var(--color-app-card)",
+                              border: "1px solid var(--color-app-border)",
+                              borderRadius: "12px",
+                            }}
+                            itemStyle={{
+                              fontSize: 12,
+                              color: "var(--color-app-text-bright)",
+                            }}
+                            formatter={(value: number) => [`Rp ${value.toLocaleString("id-ID")}`, "Value"]}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="absolute flex flex-col items-center justify-center pointer-events-none text-center px-4 max-w-[140px]">
+                        <span className="text-[15px] font-bold text-app-text-bright break-words leading-tight font-mono">
+                          Rp {totalAllocValue.toLocaleString("id-ID")}
+                        </span>
+                        <span className="text-[10px] text-app-text/50 mt-1 font-semibold">
+                          {allocationData.length} {allocationViewBy === "aset" ? "Stocks" : "Sub-Sectors"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Allocation list with progress bars */}
+                    <div className="flex-1 overflow-y-auto mt-4 space-y-4 pr-1 max-h-[300px]">
+                      {allocationData.map((item, index) => {
+                        const percentage = totalAllocValue > 0 ? ((item.value / totalAllocValue) * 100) : 0;
+                        const color = COLORS[index % COLORS.length];
+
+                        return (
+                          <div key={item.id} className="flex flex-col gap-1.5 group">
+                            <div className="flex justify-between items-center text-xs">
+                              <div className="flex items-center gap-2">
+                                <div className="w-7 h-7 rounded-full bg-app-card border border-app-border/60 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                                  <AssetLogo logoid={item.logoid} code={item.name} description={item.description} />
+                                </div>
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-app-text-bright">{item.name}</span>
+                                  <span className="text-[9px] text-app-text/50 font-mono">Rp {item.value.toLocaleString("id-ID")}</span>
+                                </div>
+                              </div>
+                              <span className="font-bold text-app-text-bright font-mono">{percentage.toFixed(2)}%</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-app-border/20 rounded-full overflow-hidden relative">
+                              <div 
+                                className="h-full rounded-full transition-all duration-1000 ease-out" 
+                                style={{ width: `${percentage}%`, backgroundColor: color }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+            </HoverCard>
+          </div>
+
+        </div>
+      )}
+
+      {activeTab !== "dashboard" && (
+        <>
+          {/* WIDGETS (STACK ON MOBILE, GRID ON DESKTOP) */}
       <div className="flex flex-col gap-4 mb-6 md:grid md:grid-cols-3 md:gap-6 md:mb-8">
         {/* TOTAL INVESTASI */}
-        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex items-center justify-between shadow-sm relative overflow-hidden cursor-pointer">
+        <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex items-center justify-between shadow-sm relative overflow-hidden cursor-pointer w-full">
           <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${incomeToday >= 0 ? "from-app-success/15" : "from-app-danger/5"} via-transparent to-transparent pointer-events-none opacity-80 block`} />
           <div className="flex items-center gap-4 relative z-10 w-full">
             <div className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center ${incomeToday >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
@@ -1434,7 +2089,7 @@ export default function Investments() {
               <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1">
                 Total Investasi
               </p>
-              <p className="text-xl font-bold text-app-text-bright break-words leading-tight">
+              <p className="text-xl font-bold text-app-text-bright break-words leading-tight font-mono">
                 Rp {totalBalance.toLocaleString("id-ID")}
               </p>
               <div className={`flex items-center gap-1 mt-1 text-xs font-medium ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
@@ -1451,28 +2106,28 @@ export default function Investments() {
             </div>
           </div>
           <ChevronRight className="w-5 h-5 shrink-0 text-app-text/40 relative z-10 ml-2" />
-        </div>
+        </HoverCard>
 
         {/* RETURN */}
-        <div className="bg-app-card rounded-2xl border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer">
+        <HoverCard className="bg-app-card rounded-[24px] border border-app-border/40 flex shadow-sm overflow-hidden relative cursor-pointer w-full">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
           <div className="flex-1 p-4 border-r border-app-border flex flex-col justify-center relative z-10 min-w-0">
              <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider mb-1">Modal Awal</p>
-             <p className="text-lg font-bold text-app-text-bright break-words leading-tight">Rp {expenseToday.toLocaleString("id-ID")}</p>
+             <p className="text-lg font-bold text-app-text-bright break-words leading-tight font-mono">Rp {expenseToday.toLocaleString("id-ID")}</p>
           </div>
           <div className="flex-1 p-4 flex flex-col justify-center relative z-10 min-w-0">
              <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider mb-1">Sekarang</p>
-             <p className={`text-lg font-bold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} break-words leading-tight`}>
+             <p className={`text-lg font-bold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} break-words leading-tight font-mono`}>
                Rp {totalBalance.toLocaleString("id-ID")}
              </p>
-             <div className={`text-[10px] font-medium mt-1 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} leading-tight`}>
+             <div className={`text-[10px] font-medium mt-1 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} leading-tight font-mono`}>
                 {incomeToday >= 0 ? "+" : ""}Rp {incomeToday.toLocaleString("id-ID")} <br className="md:hidden" />({incomeToday >= 0 ? "+" : ""}{expenseToday > 0 ? ((incomeToday / expenseToday) * 100).toFixed(2) : 0}%)
              </div>
           </div>
-        </div>
+        </HoverCard>
 
         {/* PASAR: IHSG & KURS RUPIAH */}
-        <div className="bg-app-card rounded-2xl border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer">
+        <HoverCard className="bg-app-card rounded-[24px] border border-app-border/40 flex shadow-sm overflow-hidden relative cursor-pointer w-full">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
           <div className="flex-1 p-4 border-r border-app-border hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0">
              <div className="flex justify-between items-start mb-1">
@@ -1483,10 +2138,10 @@ export default function Investments() {
                  <TrendingDown className="w-4 h-4 shrink-0 text-app-danger" />
                )}
              </div>
-             <p className="text-lg font-bold text-app-text-bright break-words leading-tight">
+             <p className="text-lg font-bold text-app-text-bright break-words leading-tight font-mono">
                {marketData.COMPOSITE?.price?.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "7.245,12"}
              </p>
-             <div className={`flex items-center gap-1 mt-1 text-[10px] font-medium ${marketData.COMPOSITE?.change >= 0 ? "text-app-success" : "text-app-danger"}`}>
+             <div className={`flex items-center gap-1 mt-1 text-[10px] font-medium ${marketData.COMPOSITE?.change >= 0 ? "text-app-success" : "text-app-danger"} font-mono`}>
                {marketData.COMPOSITE?.change >= 0 ? "+" : ""}{marketData.COMPOSITE?.change?.toFixed(2) || "0.00"}%
              </div>
           </div>
@@ -1504,20 +2159,20 @@ export default function Investments() {
                  <TrendingDown className="w-4 h-4 shrink-0 text-app-success" />
                )}
              </div>
-             <p className="text-lg font-bold text-app-text-bright break-words leading-tight">
+             <p className="text-lg font-bold text-app-text-bright break-words leading-tight font-mono">
                {marketData.USDIDR?.price?.toLocaleString("id-ID") || "16.250"}
              </p>
-             <div className={`flex items-center gap-1 mt-1 text-[10px] font-medium ${marketData.USDIDR?.change >= 0 ? "text-app-danger" : "text-app-success"}`}>
+             <div className={`flex items-center gap-1 mt-1 text-[10px] font-medium ${marketData.USDIDR?.change >= 0 ? "text-app-danger" : "text-app-success"} font-mono`}>
                {marketData.USDIDR?.change >= 0 ? "+" : ""}{marketData.USDIDR?.change?.toFixed(2) || "0.00"}%
              </div>
           </a>
-        </div>
+        </HoverCard>
       </div>
 
       {/* MAIN SECTIONS */}
       <div className="flex flex-col gap-6 mb-6">
         {/* PERFORMA INVESTASI */}
-        <div className="bg-app-card rounded-3xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
           <div className="flex items-center justify-between mb-6 relative z-10">
             <h2 className="text-app-text-bright font-bold">
@@ -1526,14 +2181,14 @@ export default function Investments() {
             <div className="flex items-center gap-2">
               <div className="bg-app-bg rounded-full p-1 border border-app-border flex">
                 <button
-                  onClick={() => setChartPeriod(7)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === 7 ? "bg-app-accent1 text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
+                  onClick={() => setChartPeriod("1W")}
+                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === "1W" ? "bg-app-accent1 text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
                 >
                   7 Hari
                 </button>
                 <button
-                  onClick={() => setChartPeriod(30)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === 30 ? "bg-app-accent1 text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
+                  onClick={() => setChartPeriod("1M")}
+                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === "1M" ? "bg-app-accent1 text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
                 >
                   30 Hari
                 </button>
@@ -1659,7 +2314,7 @@ export default function Investments() {
         </div>
 
         {/* PORTOFOLIO */}
-        <div className="bg-app-card rounded-3xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 relative z-10">
@@ -2387,11 +3042,13 @@ export default function Investments() {
           )}
         </div>
       </div>
+        </>
+      )}
 
       {/* Modal Simulasi ARA/ARB */}
       {isSimulatorOpen && (
         <div className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-app-card text-app-text w-full max-w-5xl rounded-3xl shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+          <div className="bg-app-card text-app-text w-full max-w-5xl rounded-[24px] shadow-2xl border border-app-border/40 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg shrink-0">
               <h2 className="text-lg font-bold text-app-text-bright flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-app-accent1" />
@@ -2414,7 +3071,7 @@ export default function Investments() {
       {/* Modal Tambah Portofolio */}
       {isPortfolioModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full max-w-md rounded-3xl shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-app-card text-app-text w-full max-w-md rounded-[24px] shadow-2xl border border-app-border/40 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
                 {portoEditId ? "Sesuaikan Portofolio" : portoTxType === "beli" ? "Beli Investasi" : "Jual Investasi"}

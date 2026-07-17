@@ -71,7 +71,7 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-app-card text-app-text w-full max-w-md rounded-3xl shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-app-card text-app-text w-full max-w-md rounded-[24px] shadow-2xl border border-app-border/40 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
           <h2 className="text-lg font-semibold text-app-text-bright">{account ? 'Edit Rekening' : 'Tambah Rekening'}</h2>
           <button 

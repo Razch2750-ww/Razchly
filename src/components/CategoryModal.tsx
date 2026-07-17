@@ -62,7 +62,7 @@ export function CategoryModal({ isOpen, onClose, category, type }: CategoryModal
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-      <div className="bg-app-card w-full max-w-md rounded-3xl p-6 relative border border-app-border shadow-xl">
+      <div className="bg-app-card w-full max-w-md rounded-[24px] p-6 relative border border-app-border/40 shadow-xl">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-app-text hover:text-app-text-bright transition-colors"
