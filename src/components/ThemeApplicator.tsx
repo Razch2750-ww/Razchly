@@ -9,6 +9,11 @@ export default function ThemeApplicator() {
   useEffect(() => {
     const theme = themes.find((t) => t.id === themeId) || themes.find(t => t.id === 'slate-stone') || themes[0];
     
+    const color1 = theme.colors.accent1;
+    const color2 = theme.colors.accent2 || color1;
+    const color3 = theme.colors.accent3 || color2;
+    document.documentElement.style.setProperty('--accent-gradient', `linear-gradient(135deg, ${color1}, ${color2}, ${color3})`);
+
     document.documentElement.style.setProperty('--bg-color', theme.colors.bg);
     document.documentElement.style.setProperty('--text-color', theme.colors.text);
     document.documentElement.style.setProperty('--accent1-color', theme.colors.accent1);
@@ -36,16 +41,19 @@ export default function ThemeApplicator() {
       document.documentElement.style.setProperty('--border-color', '#222222');
       document.documentElement.style.setProperty('--hover-bg', '#1a1a1a');
       document.documentElement.style.setProperty('--text-bright', '#ffffff');
+      document.documentElement.style.setProperty('--inner-border', 'rgba(255, 255, 255, 0.05)');
     } else if (isDark) {
       document.documentElement.style.setProperty('--card-bg', `color-mix(in srgb, ${theme.colors.bg} 92%, white)`);
       document.documentElement.style.setProperty('--border-color', `color-mix(in srgb, ${theme.colors.bg} 85%, white)`);
       document.documentElement.style.setProperty('--hover-bg', `color-mix(in srgb, ${theme.colors.bg} 90%, white)`);
       document.documentElement.style.setProperty('--text-bright', '#ffffff');
+      document.documentElement.style.setProperty('--inner-border', 'rgba(255, 255, 255, 0.06)');
     } else {
       document.documentElement.style.setProperty('--card-bg', `color-mix(in srgb, ${theme.colors.bg} 95%, black)`);
       document.documentElement.style.setProperty('--border-color', `color-mix(in srgb, ${theme.colors.bg} 90%, black)`);
       document.documentElement.style.setProperty('--hover-bg', `color-mix(in srgb, ${theme.colors.bg} 92%, black)`);
       document.documentElement.style.setProperty('--text-bright', '#000000');
+      document.documentElement.style.setProperty('--inner-border', 'rgba(255, 255, 255, 0.35)');
     }
   }, [themeId]);
 

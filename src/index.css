@@ -26,6 +26,22 @@
 }
 
 /* Custom premium styles */
+.bg-app-card {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03), inset 0 1px 0 var(--inner-border);
+}
+
+.bg-accent-gradient {
+  background: var(--accent-gradient);
+}
+
+.text-gradient {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .shimmer-element {
   position: relative;
   overflow: hidden;
@@ -152,6 +168,7 @@
     overscroll-behavior-y: none;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    letter-spacing: -0.015em;
     @apply font-sans;
   }
   
