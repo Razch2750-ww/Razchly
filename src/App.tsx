@@ -1,4 +1,4 @@
-import { useEffect, Suspense, lazy } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './lib/firebase';
@@ -9,18 +9,17 @@ import { Toaster } from 'react-hot-toast';
 import Layout from './components/Layout';
 import GlobalGoalNotifier from './components/GlobalGoalNotifier';
 
-// Lazy loaded components for code splitting
-const Login = lazy(() => import('./components/Login'));
+import Login from './components/Login';
 import Transactions from './components/Transactions';
-const Dashboard = lazy(() => import('./components/Dashboard'));
-const Investments = lazy(() => import('./components/Investments'));
-const Loans = lazy(() => import('./components/Loans'));
-const Attendance = lazy(() => import('./components/Attendance'));
-const Settings = lazy(() => import('./components/Settings'));
-const GrabDetails = lazy(() => import('./components/GrabDetails'));
-const SavingsTarget = lazy(() => import('./components/SavingsTarget'));
-const ImageAnalysis = lazy(() => import('./components/ImageAnalysis'));
-const AiTrading = lazy(() => import('./components/AiTrading'));
+import Dashboard from './components/Dashboard';
+import Investments from './components/Investments';
+import Loans from './components/Loans';
+import Attendance from './components/Attendance';
+import Settings from './components/Settings';
+import GrabDetails from './components/GrabDetails';
+import SavingsTarget from './components/SavingsTarget';
+import ImageAnalysis from './components/ImageAnalysis';
+import AiTrading from './components/AiTrading';
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center w-full h-full min-h-[60vh] animate-in fade-in duration-300">
@@ -344,27 +343,25 @@ export default function App() {
           border: '1px solid var(--color-app-border)',
         },
       }} />
-      <Suspense fallback={<LoadingFallback />}>
-        <Routes>
-          {!user ? (
-            <Route path="*" element={<Login />} />
-          ) : (
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="transactions" element={<Transactions />} />
-              <Route path="investments" element={<Investments />} />
-              <Route path="ai-trading" element={<AiTrading />} />
-              <Route path="loans" element={<Loans />} />
-              <Route path="attendance" element={<Attendance />} />
-              <Route path="grab" element={<GrabDetails />} />
-              <Route path="savings" element={<SavingsTarget />} />
-              <Route path="analyze" element={<ImageAnalysis />} />
-              <Route path="settings" element={<Settings />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
-          )}
-        </Routes>
-      </Suspense>
+      <Routes>
+        {!user ? (
+          <Route path="*" element={<Login />} />
+        ) : (
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="transactions" element={<Transactions />} />
+            <Route path="investments" element={<Investments />} />
+            <Route path="ai-trading" element={<AiTrading />} />
+            <Route path="loans" element={<Loans />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="grab" element={<GrabDetails />} />
+            <Route path="savings" element={<SavingsTarget />} />
+            <Route path="analyze" element={<ImageAnalysis />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        )}
+      </Routes>
     </BrowserRouter>
   );
 }

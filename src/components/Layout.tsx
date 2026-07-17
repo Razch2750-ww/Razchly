@@ -83,7 +83,7 @@ export default function Layout() {
                 <motion.div 
                   layoutId="sidebar-active-bg"
                   className="absolute inset-0 bg-app-accent1/12 border border-app-accent1/20 rounded-xl -z-10"
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                 />
               )}
               {/* Hover background */}
@@ -132,7 +132,7 @@ export default function Layout() {
           key={location.pathname}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.22, ease: "easeOut" }}
+          transition={{ duration: 0.12, ease: "easeOut" }}
           className="flex-1 w-full flex flex-col"
         >
           <Outlet />
