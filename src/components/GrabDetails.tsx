@@ -318,7 +318,7 @@ export default function GrabDetails() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
         {/* TOTAL PENDAPATAN */}
         <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
-             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
+             
              <div className="absolute top-0 right-0 p-4 opacity-10">
                <TrendingUp className="w-16 h-16 text-app-success" />
              </div>
@@ -332,7 +332,7 @@ export default function GrabDetails() {
 
         {/* TOTAL ORDERAN */}
         <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
-             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
+             
              <div className="absolute top-0 right-0 p-4 opacity-10">
                <Receipt className="w-16 h-16 text-blue-500" />
              </div>
@@ -346,7 +346,7 @@ export default function GrabDetails() {
 
         {/* TOTAL HEMAT */}
         <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
-             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
+             
             <div className="absolute top-0 right-0 p-4 opacity-10">
                <Tags className="w-16 h-16 text-app-accent1" />
              </div>
@@ -360,7 +360,7 @@ export default function GrabDetails() {
 
         {/* NOMINAL POTONGAN HEMAT */}
         <HoverCard className="bg-app-card border border-app-danger/30 rounded-[24px] p-6 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
-             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
+             
              <div className="absolute top-0 right-0 p-4 opacity-5">
                <PiggyBank className="w-16 h-16 text-app-danger" />
              </div>
@@ -380,7 +380,7 @@ export default function GrabDetails() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {categoryStats.map((cat) => (
           <div key={cat.label} className="bg-app-card border border-app-border rounded-2xl p-4 shadow-sm flex flex-col items-center text-center hover:border-app-accent1/50 transition-colors relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/5 via-transparent to-transparent pointer-events-none opacity-80 block" />
+            
             <div className="relative z-10 w-full">
               <p className="text-app-text/70 text-xs font-bold uppercase tracking-wider mb-2">{cat.label}</p>
               <h4 className="text-app-success font-bold mb-1">Rp {cat.total.toLocaleString("id-ID")}</h4>
@@ -397,7 +397,7 @@ export default function GrabDetails() {
 
       {/* GRAFIK PENDAPATAN */}
       <div className="bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm mb-8 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+        
         <h3 className="text-lg font-bold text-app-text-bright mb-6 flex items-center gap-2 relative z-10">
           <LineChartIcon className="w-5 h-5 text-app-accent1" /> Grafik Pendapatan
         </h3>

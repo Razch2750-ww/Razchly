@@ -405,7 +405,7 @@ export default function Settings() {
       <ScrollReveal className="flex-1 space-y-6 pb-10">
         
         <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
+          
           <button type="button" onClick={() => toggleSection('profil')} className={`relative z-10 w-full flex items-center justify-between ${sections.profil ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <UserIcon className="w-5 h-5 text-app-accent1" />
@@ -520,7 +520,7 @@ export default function Settings() {
 
         {/* SECTION: DAFTAR KATEGORI */}
         <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
+          
           <button type="button" onClick={() => toggleSection('kategori')} className={`relative z-10 w-full flex items-center justify-between ${sections.kategori ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <LayoutGrid className="w-5 h-5 text-app-accent1" />
@@ -619,7 +619,7 @@ export default function Settings() {
         </section>
 
         <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
+          
           <button type="button" onClick={() => toggleSection('grab')} className={`relative z-10 w-full flex items-center justify-between ${sections.grab ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <Car className="w-5 h-5 text-app-success" />
@@ -660,7 +660,7 @@ export default function Settings() {
         </section>
 
         <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-warning/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
+          
           <button type="button" onClick={() => toggleSection('jadwal')} className={`relative z-10 w-full flex items-center justify-between ${sections.jadwal ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-app-warning" />
@@ -721,7 +721,7 @@ export default function Settings() {
         </section>
 
         <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
+          
           <button type="button" onClick={() => toggleSection('bahasa')} className={`relative z-10 w-full flex items-center justify-between ${sections.bahasa ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-app-accent1" />
@@ -749,7 +749,7 @@ export default function Settings() {
         </section>
 
         <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
+          
           <button type="button" onClick={() => toggleSection('tema')} className={`relative z-10 w-full flex items-center justify-between ${sections.tema ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <Palette className="w-5 h-5 text-app-accent1" />
@@ -795,7 +795,7 @@ export default function Settings() {
         </section>
 
         <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
+          
           <button type="button" onClick={() => toggleSection('navigasi')} className={`relative z-10 w-full flex items-center justify-between ${sections.navigasi ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <LayoutGrid className="w-5 h-5 text-app-accent1" />
@@ -859,7 +859,7 @@ export default function Settings() {
         </section>
 
         <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
+          
           <button type="button" onClick={() => toggleSection('font')} className={`relative z-10 w-full flex items-center justify-between ${sections.font ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <Type className="w-5 h-5 text-app-accent1" />

@@ -391,7 +391,7 @@ export default function Attendance() {
 
         {/* Today's Actions */}
         <HoverCard className="bg-app-card rounded-[24px] border border-app-border/40 p-5 shadow-sm relative overflow-hidden group transition-colors w-full">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
+          
           <div className="relative z-10">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
               <h2 className="font-bold text-app-text-bright flex items-center gap-2">

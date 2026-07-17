@@ -56,12 +56,6 @@ export function HoverCard({ children, className = '', onClick, id }: HoverCardPr
     y.set(0);
   };
 
-  // Convert spotlight positions into a dynamic radial gradient background
-  const spotlightBackground = useTransform(
-    [spotlightX, spotlightY],
-    ([xVal, yVal]) => `radial-gradient(180px circle at ${xVal}px ${yVal}px, var(--color-app-accent1), transparent 80%)`
-  );
-
   return (
     <motion.div
       id={id}
@@ -80,8 +74,8 @@ export function HoverCard({ children, className = '', onClick, id }: HoverCardPr
       <motion.div
         className="absolute inset-0 -z-10 pointer-events-none transition-opacity duration-300"
         style={{
-          background: spotlightBackground,
-          opacity: isHovered ? 0.08 : 0,
+          background: 'var(--color-app-accent1)',
+          opacity: isHovered ? 0.04 : 0,
         }}
       />
       {/* Outer border glow effect on hover */}
@@ -403,12 +397,12 @@ export function ParallaxBackground({ containerRef }: ParallaxBackgroundProps) {
       {/* Glow blob 1 - Depth layer 1 */}
       <motion.div
         style={{ y: y1 }}
-        className="absolute top-24 left-[10%] w-[25vw] h-[25vw] rounded-full bg-gradient-to-tr from-app-accent1/10 to-transparent blur-[80px] opacity-35"
+        className="absolute top-24 left-[10%] w-[25vw] h-[25vw] rounded-full bg-app-accent1/10 blur-[80px] opacity-35"
       />
       {/* Glow blob 2 - Depth layer 2 */}
       <motion.div
         style={{ y: y2 }}
-        className="absolute top-[50vh] right-[15%] w-[30vw] h-[30vw] rounded-full bg-gradient-to-br from-app-accent2/8 to-transparent blur-[100px] opacity-25"
+        className="absolute top-[50vh] right-[15%] w-[30vw] h-[30vw] rounded-full bg-app-accent2/8 blur-[100px] opacity-25"
       />
       {/* Fine particle ring / Accent Blob 3 - Depth layer 3 */}
       <motion.div

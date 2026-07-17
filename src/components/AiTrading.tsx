@@ -2507,7 +2507,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                       addLog(`System: Berhasil menerapkan parameter dari hasil backtest terbaik! Strategi Aktif: ${backtestStrategy === "QUANTUM_6L" ? "QUANTUM_6L (MQL5 EA)" : "AI Gemini"}, SL: ${riskSettings.stopLossPercent}%, TP: ${riskSettings.takeProfitPercent}%, Resiko Per Trade: ${riskSettings.maxRiskPerTrade}%.`);
                       setActiveTab("autotrade");
                     }}
-                    className="w-full mt-3 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-[11px] uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
+                    className="w-full mt-3 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[11px] uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
                   >
                     <ArrowLeftRight className="w-3.5 h-3.5" />
                     Terapkan Hasil Backtest ke Auto Trade
@@ -2604,7 +2604,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             {/* Left Controls Column (lg:col-span-5) */}
             <div className="lg:col-span-5 space-y-6">
               {/* Core Philosophy Header Card */}
-              <div className="bg-gradient-to-br from-[#12161f] to-[#1a2333] border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-3">
+              <div className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-3">
                 <div className="flex items-center gap-2">
                   <ShieldAlert className="w-5 h-5 text-amber-500 animate-pulse" />
                   <h3 className="font-bold text-app-text-bright text-base">EA MetaTrader 5 (MQL5) Pro</h3>

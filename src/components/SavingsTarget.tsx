@@ -167,7 +167,7 @@ export default function SavingsTarget() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <ScrollReveal className="lg:col-span-2">
           <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden h-full">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
+
           <h2 className="text-app-text-bright font-bold mb-6 flex items-center gap-2 relative z-10">
             <Target className="w-5 h-5 text-app-accent1" /> Atur Target Finansial
           </h2>
@@ -315,7 +315,7 @@ export default function SavingsTarget() {
           {/* Laba Bersih Card */}
           <StaggerItem className="flex-1">
             <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col justify-center relative overflow-hidden h-full min-h-[140px] w-full">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
+
             <div className="absolute top-0 right-0 p-4 opacity-10">
                <TrendingUp className="w-16 h-16 text-app-success" />
             </div>
@@ -328,7 +328,7 @@ export default function SavingsTarget() {
           {/* Predictive analysis card */}
           <StaggerItem className="flex-1">
             <HoverCard className={`rounded-[24px] p-6 border shadow-sm flex flex-col relative overflow-hidden h-full w-full ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-transparent via-transparent pointer-events-none opacity-80 block" />
+
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-3">
                 {monthlyExpenseBudget > 0 ? (
@@ -400,7 +400,7 @@ export default function SavingsTarget() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Tabungan Bulanan Berlayer */}
         <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/5 via-transparent to-transparent pointer-events-none" />
+
           <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <Star className="w-5 h-5 text-app-accent1" /> Tabungan Layered
           </h2>
@@ -431,7 +431,7 @@ export default function SavingsTarget() {
      
                     <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2 shadow-inner">
                       <div 
-                        className="h-full bg-gradient-to-r from-app-accent1/80 to-app-accent1 transition-all duration-1000 ease-out relative"
+                        className="h-full bg-app-accent1 transition-all duration-1000 ease-out relative"
                         style={{ width: `${savingsProgress}%` }}
                       >
                         <div className="absolute inset-0 bg-white/20 animate-pulse" />
@@ -461,7 +461,7 @@ export default function SavingsTarget() {
 
         {/* Penghasilan Harian Berlayer */}
         <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/5 via-transparent to-transparent pointer-events-none" />
+
           <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowUp className="w-5 h-5 text-app-success" /> Penghasilan Layered
           </h2>
@@ -492,7 +492,7 @@ export default function SavingsTarget() {
      
                     <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2 shadow-inner">
                       <div 
-                        className="h-full bg-gradient-to-r from-app-success/80 to-app-success transition-all duration-1000 ease-out relative"
+                        className="h-full bg-app-success transition-all duration-1000 ease-out relative"
                         style={{ width: `${incomeProgress}%` }}
                       >
                         <div className="absolute inset-0 bg-white/20 animate-pulse" />
@@ -522,7 +522,7 @@ export default function SavingsTarget() {
 
         {/* Pengeluaran Harian Berlayer */}
         <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/5 via-transparent to-transparent pointer-events-none" />
+
           <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowDown className="w-5 h-5 text-app-danger" /> Pengeluaran Layered
           </h2>
@@ -553,7 +553,7 @@ export default function SavingsTarget() {
      
                     <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2 shadow-inner">
                       <div 
-                        className={`h-full transition-all duration-1000 ease-out relative ${expenseProgress >= 100 ? 'bg-app-danger' : 'bg-gradient-to-r from-app-warning to-app-warning/80'}`}
+                        className={`h-full transition-all duration-1000 ease-out relative ${expenseProgress >= 100 ? 'bg-app-danger' : 'bg-app-warning'}`}
                         style={{ width: `${expenseProgress}%` }}
                       >
                         <div className="absolute inset-0 bg-white/20 animate-pulse" />

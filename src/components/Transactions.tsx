@@ -1239,7 +1239,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             Daftar Transaksi
           </h3>
           <div className="bg-app-card border border-app-border rounded-2xl p-4 shadow-lg space-y-3 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+            
             {mobileFilteredTransactions.length === 0 ? (
               <div className="py-8 flex flex-col items-center justify-center text-center text-app-text/50 text-xs rounded-xl border border-dashed border-app-border relative z-10 bg-app-card/30">
                 <FileText className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
@@ -1252,7 +1252,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                     <div
                       className="flex items-center justify-between p-3.5 bg-app-bg hover:bg-app-hover rounded-xl transition-colors border border-app-border/40 hover:border-app-border relative overflow-hidden"
                     >
-                    <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-accent1/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
+                    
                     <div className="flex items-center gap-3 relative z-10 min-w-0 flex-1">
                       <div
                         className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border
@@ -1418,7 +1418,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         {/* FILTER & EXPORT BAR */}
         <ScrollReveal>
           <div className="bg-app-card border border-app-border rounded-2xl p-4 md:p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm shrink-0 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+          
           <div className="relative z-10">
             <h2 className="text-app-text-bright font-bold text-lg">
               Laporan Keuangan
@@ -1499,7 +1499,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           {/* TOTAL KEUNTUNGAN BERSIH */}
           <div className="lg:col-span-2 bg-app-card rounded-[24px] p-6 md:p-8 border border-app-border/40 shadow-sm flex flex-col justify-between relative overflow-hidden">
             {/* DECORATIVE LIGHTING - optional aesthetic */}
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+            
 
             <div className="relative z-10 mb-8">
               <div className="inline-block px-3 py-1 bg-app-success/10 text-app-success text-[10px] font-bold tracking-wider rounded-full mb-4 uppercase">
@@ -1544,7 +1544,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
           {/* AI INSIGHT */}
           <div className="bg-app-card rounded-[24px] p-6 md:p-8 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+            
             <div className="flex items-center gap-2 mb-6 relative z-10">
               <Sparkles className="w-5 h-5 text-app-accent1" />
               <span className="text-app-accent1 text-[10px] font-bold tracking-widest uppercase">
@@ -1604,7 +1604,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               }}
               className="bg-app-card border border-app-border/40 rounded-[24px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
             >
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/15 via-transparent to-transparent pointer-events-none opacity-80 block" />
+              
               <div className="flex items-center gap-4 relative z-10">
                 <div className="w-12 h-12 rounded-xl bg-app-success/10 flex items-center justify-center shrink-0">
                   <TrendingUp className="w-6 h-6 text-app-success" />
@@ -1650,7 +1650,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               }}
               className="bg-app-card border border-app-border/40 rounded-[24px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
             >
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/5 via-transparent to-transparent pointer-events-none opacity-80 block" />
+              
               <div className="flex items-center gap-4 relative z-10">
                 <div className="w-12 h-12 rounded-xl bg-app-danger/10 flex items-center justify-center shrink-0">
                   <TrendingDown className="w-6 h-6 text-app-danger" />
@@ -1713,7 +1713,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           </div>
 
           <div className="bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm mb-6 flex-1 overflow-hidden relative flex flex-col">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+            
             {filteredTransactions.length === 0 ? (
               <div className="p-8 text-center text-app-text/50 rounded-2xl border border-dashed border-app-border mt-4 relative z-10 flex flex-col items-center justify-center gap-3">
                 <MicroLoop type="waggle">
@@ -1728,7 +1728,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                     <div
                       className="flex items-center justify-between p-4 bg-app-bg hover:bg-app-hover rounded-2xl transition-colors border border-app-border/50 hover:border-app-border cursor-pointer group relative overflow-hidden"
                     >
-                    <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-accent1/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
+                    
                     <div className="flex items-center gap-4 relative z-10">
                       <div
                         className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border
@@ -2371,8 +2371,8 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="bg-app-card border border-app-border w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl relative z-10 flex flex-col max-h-[85vh]"
             >
-              {/* Decorative gradient beam */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-app-accent1 via-app-accent2 to-app-success" />
+              {/* Decorative solid accent line */}
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-app-accent1" />
 
               {/* Header */}
               <div className="p-6 border-b border-app-border flex items-center justify-between shrink-0 bg-app-bg/50">
@@ -2422,7 +2422,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 ) : strategyRecommendation ? (
                   <>
                     {/* EXECUTIVE SUMMARY CARD */}
-                    <div className="p-5 rounded-2xl bg-gradient-to-br from-app-accent1/10 to-transparent border border-app-accent1/20 relative overflow-hidden">
+                    <div className="p-5 rounded-2xl bg-app-accent1/10 border border-app-accent1/20 relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-app-accent1/5 rounded-full blur-xl pointer-events-none" />
                       <p className="text-sm text-app-text-bright font-medium leading-relaxed">
                         {strategyRecommendation.summary}

@@ -258,7 +258,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
 
   return (
     <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+      
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 relative z-10">
         <div>
@@ -1623,7 +1623,7 @@ export default function Investments() {
             
             {/* CARD 1: TOTAL EQUITY */}
             <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full">
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+              
               <div className="relative z-10 flex flex-col mb-4">
                 <span className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider mb-1">
                   Total Equity
@@ -1710,7 +1710,7 @@ export default function Investments() {
 
             {/* CARD 2: CUMULATIVE PORTFOLIO RETURN */}
             <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full">
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+              
               
               <div className="relative z-10 flex flex-col mb-4">
                 <div className="flex items-center gap-1.5">
@@ -1830,7 +1830,7 @@ export default function Investments() {
           {/* COLUMN 2: MIDDLE PANEL - TOTAL EQUITY RETURN (lg:col-span-3) */}
           <div className="lg:col-span-3 w-full">
             <HoverCard className="bg-app-card rounded-[24px] p-5 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full h-[620px]">
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+              
               
               <div className="relative z-10 flex flex-col gap-3 shrink-0 mb-4">
                 <div className="flex items-center gap-1.5">
@@ -1944,7 +1944,7 @@ export default function Investments() {
           {/* COLUMN 3: RIGHT PANEL - PORTFOLIO ALLOCATION (lg:col-span-4) */}
           <div className="lg:col-span-4 w-full">
             <HoverCard className="bg-app-card rounded-[24px] p-5 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full min-h-[620px]">
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+              
               
               <div className="relative z-10 flex justify-between items-center shrink-0 mb-4">
                 <span className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">
@@ -2080,7 +2080,7 @@ export default function Investments() {
       <div className="flex flex-col gap-4 mb-6 md:grid md:grid-cols-3 md:gap-6 md:mb-8">
         {/* TOTAL INVESTASI */}
         <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex items-center justify-between shadow-sm relative overflow-hidden cursor-pointer w-full">
-          <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${incomeToday >= 0 ? "from-app-success/15" : "from-app-danger/5"} via-transparent to-transparent pointer-events-none opacity-80 block`} />
+          
           <div className="flex items-center gap-4 relative z-10 w-full">
             <div className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center ${incomeToday >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
               <BarChart3 className={`w-6 h-6 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`} />
@@ -2110,7 +2110,7 @@ export default function Investments() {
 
         {/* RETURN */}
         <HoverCard className="bg-app-card rounded-[24px] border border-app-border/40 flex shadow-sm overflow-hidden relative cursor-pointer w-full">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+          
           <div className="flex-1 p-4 border-r border-app-border flex flex-col justify-center relative z-10 min-w-0">
              <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider mb-1">Modal Awal</p>
              <p className="text-lg font-bold text-app-text-bright break-words leading-tight font-mono">Rp {expenseToday.toLocaleString("id-ID")}</p>
@@ -2128,7 +2128,7 @@ export default function Investments() {
 
         {/* PASAR: IHSG & KURS RUPIAH */}
         <HoverCard className="bg-app-card rounded-[24px] border border-app-border/40 flex shadow-sm overflow-hidden relative cursor-pointer w-full">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+          
           <div className="flex-1 p-4 border-r border-app-border hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0">
              <div className="flex justify-between items-start mb-1">
                <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">IHSG</p>
@@ -2173,7 +2173,7 @@ export default function Investments() {
       <div className="flex flex-col gap-6 mb-6">
         {/* PERFORMA INVESTASI */}
         <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+          
           <div className="flex items-center justify-between mb-6 relative z-10">
             <h2 className="text-app-text-bright font-bold">
               Performa Investasi
@@ -2315,7 +2315,7 @@ export default function Investments() {
 
         {/* PORTOFOLIO */}
         <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+          
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 relative z-10">
             <div className="flex flex-col gap-1.5 w-full md:w-auto">

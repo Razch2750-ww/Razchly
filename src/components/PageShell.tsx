@@ -1,4 +1,4 @@
-﻿/**
+/**
  * PageShell — shared layout wrapper per Impeccable Product Register.
  *
  * Eliminates:
@@ -192,7 +192,7 @@ export function KpiCard({ label, value, sub, icon, onClick, color = "accent" }: 
         onClick ? "cursor-pointer hover:border-app-accent1/30 transition-colors" : "",
       ].join(" ")}
     >
-      <div className={`absolute inset-0 bg-gradient-to-br ${kpiTint[color]} via-transparent to-transparent pointer-events-none`} />
+      
       <div className="relative z-10 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-app-text/60 text-xs font-medium mb-2">{label}</p>

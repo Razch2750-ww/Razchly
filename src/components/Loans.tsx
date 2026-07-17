@@ -224,7 +224,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
 
   return (
     <HoverCard className={`bg-app-card rounded-[24px] border ${isLend ? 'border-app-success/20 hover:border-app-success/40' : 'border-app-accent1/20 hover:border-app-accent1/40'} p-5 shadow-sm flex flex-col relative overflow-hidden group transition-colors w-full`}>
-      <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${isLend ? 'from-app-success/15' : 'from-app-accent1/15'} via-transparent to-transparent pointer-events-none opacity-80 block`} />
+
       <div className="flex justify-between items-center mb-4 relative z-10">
         <div className="flex items-center gap-3">
           {isLend ? (

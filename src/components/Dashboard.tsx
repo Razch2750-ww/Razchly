@@ -595,12 +595,12 @@ export default function Dashboard() {
       {/* DESKTOP TOP WIDGETS — bento asymmetric layout */}
       <div className="hidden md:grid grid-cols-3 gap-4 mb-6">
         {/* HERO: TOTAL SALDO — takes 2 cols, taller */}
-        <ScrollReveal className="col-span-2">
+        <ScrollReveal className="col-span-2 h-full">
           <HoverCard
             onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
-            className="bg-app-card rounded-[24px] p-6 md:p-8 border border-app-border/40 shadow-sm cursor-pointer overflow-hidden relative min-h-[160px] flex flex-col justify-between w-full"
+            className="bg-app-card rounded-[24px] p-6 md:p-8 border border-app-border/40 shadow-sm cursor-pointer overflow-hidden relative min-h-[160px] flex flex-col justify-between w-full h-full"
           >
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/8 via-transparent to-transparent pointer-events-none" />
+            
             <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-app-accent1/6 blur-3xl pointer-events-none" />
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-5">
@@ -632,7 +632,7 @@ export default function Dashboard() {
                 onClick={() => navigate("/transactions", { state: { tab: "Pemasukan" } })}
                 className="bg-app-card rounded-[24px] p-5 md:p-6 border border-app-border/40 shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
               >
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-success/8 via-transparent to-transparent pointer-events-none" />
+                
                 <div className="relative z-10 flex items-center gap-2 mb-1">
                   <TrendingUp className="w-3.5 h-3.5 text-app-success" />
                   <span className="text-app-text/60 text-[11px] font-medium">Masuk</span>
@@ -650,7 +650,7 @@ export default function Dashboard() {
                 onClick={() => navigate("/transactions", { state: { tab: "Pengeluaran" } })}
                 className="bg-app-card rounded-[24px] p-5 md:p-6 border border-app-border/40 shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
               >
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/6 via-transparent to-transparent pointer-events-none" />
+                
                 <div className="relative z-10 flex items-center gap-2 mb-1">
                   <TrendingDown className="w-3.5 h-3.5 text-app-danger" />
                   <span className="text-app-text/60 text-[11px] font-medium">Keluar</span>
@@ -671,7 +671,7 @@ export default function Dashboard() {
                 onClick={() => navigate("/investments")}
                 className="bg-app-card rounded-[24px] p-5 md:p-6 border border-app-border/40 shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
               >
-                <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${totalInvestmentReturn >= 0 ? "from-app-success/8" : "from-app-danger/6"} via-transparent to-transparent pointer-events-none`} />
+                
                 <div className="relative z-10 flex items-center gap-2 mb-1">
                   <TrendingUp className={`w-3.5 h-3.5 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`} />
                   <span className="text-app-text/60 text-[11px] font-medium">Investasi</span>
@@ -691,7 +691,7 @@ export default function Dashboard() {
                 onClick={() => navigate("/loans")}
                 className="bg-app-card rounded-[24px] p-5 md:p-6 border border-app-border/40 shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col gap-1.5"
               >
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/8 via-transparent to-transparent pointer-events-none" />
+                
                 <div className="relative z-10 flex items-center gap-2 mb-1">
                   <HandCoins className="w-3.5 h-3.5 text-app-accent1" />
                   <span className="text-app-text/60 text-[11px] font-medium">Pinjaman</span>
@@ -883,7 +883,7 @@ export default function Dashboard() {
 
         {/* ALUR KAS (CHART) */}
         <div className="md:col-span-2 bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+          
           <div className="flex items-center justify-between mb-6 relative z-10">
             <h2 className="text-app-text-bright font-bold">Alur Kas</h2>
             <div className="flex items-center gap-2">
@@ -1015,7 +1015,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* PIE CHART 1: ALOKASI SALDO DOMPET */}
         <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+          
           <h2 className="text-app-text-bright font-bold mb-4 relative z-10 text-base">Alokasi Saldo Dompet</h2>
           {accountPieData.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-app-text/50 text-sm py-12 min-h-[240px]">
@@ -1070,7 +1070,7 @@ export default function Dashboard() {
 
         {/* PIE CHART 2: DISTRIBUSI PENGELUARAN */}
         <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-danger/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+
           <h2 className="text-app-text-bright font-bold mb-4 relative z-10 text-base">Distribusi Pengeluaran Bulan Ini</h2>
           {categoryPieData.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-app-text/50 text-sm py-12 min-h-[240px]">
@@ -1147,7 +1147,7 @@ export default function Dashboard() {
            <div className="space-y-3">
               {todayMobileTransactions.map((t) => (
                  <div key={t.id} onClick={() => navigate('/transactions', { state: { tab: "Semua" } })} className="flex items-center justify-between p-4 rounded-2xl bg-app-card border border-app-border active:scale-[0.98] transition-transform relative overflow-hidden">
-                     <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-accent1/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
+                     
                      <div className="flex items-center gap-4 relative z-10">
                        <div className={`w-12 h-12 rounded-[1.1rem] flex items-center justify-center shrink-0 ${t.type === "income" ? "bg-app-success/10 text-app-success" : t.type === "expense" ? "bg-app-danger/10 text-app-danger" : "bg-app-accent1/10 text-app-accent1"}`}>
                          {t.type === "income" && <TrendingUp className="w-5 h-5" />}
@@ -1193,7 +1193,7 @@ export default function Dashboard() {
 
       {/* DESKTOP BOTTOM SECTION - TRANSACTIONS */}
       <div className="hidden md:flex bg-app-card rounded-[24px] p-6 border border-app-border/40 flex-col shadow-sm shrink-0 overflow-hidden relative">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-80 block" />
+        
         <div className="flex items-center justify-between mb-6 relative z-10">
           <h2 className="text-app-text-bright font-bold">Transaksi Terakhir</h2>
           <Link
@@ -1221,7 +1221,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/transactions', { state: { tab: "Semua" } })}
                   className="flex items-center justify-between p-4 rounded-2xl bg-app-bg border border-app-border/40 hover:border-app-accent1/50 transition cursor-pointer relative overflow-hidden"
                 >
-                  <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${t.type === 'income' ? 'from-app-success/10' : t.type === 'expense' ? 'from-app-danger/10' : 'from-app-accent1/10'} via-transparent to-transparent pointer-events-none opacity-50 block`} />
+                  
                   <div className="flex items-center gap-4 relative z-10">
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 
