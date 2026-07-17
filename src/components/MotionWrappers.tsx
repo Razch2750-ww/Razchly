@@ -65,6 +65,10 @@ export function HoverCard({ children, className = '', onClick, id }: HoverCardPr
         rotateX,
         rotateY,
         scale,
+        transformStyle: 'preserve-3d',
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
+        willChange: 'transform',
       }}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}

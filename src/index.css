@@ -30,6 +30,9 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03), inset 0 1px 0 var(--inner-border);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .bg-accent-gradient {
@@ -160,6 +163,9 @@
                 background-color 180ms ease-in-out, 
                 box-shadow 180ms ease-in-out, 
                 filter 150ms ease-in-out;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
   }
   
   button:not(:disabled):hover, .btn-interactive:hover {
