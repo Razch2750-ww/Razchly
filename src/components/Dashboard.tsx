@@ -1177,10 +1177,10 @@ export default function Dashboard() {
                        </div>
                      </div>
                      <p className={`text-[15px] font-bold whitespace-nowrap relative z-10 ${t.type === "income" ? "text-app-success" : t.type === "expense" ? "text-app-danger" : "text-app-text"}`}>
-                       {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""} Rp {t.amount.toLocaleString("id-ID")}
+                       {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""} Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(t.amount)}
                        {t.adminFee && (
                          <span className="block text-[10px] text-app-danger font-semibold text-right mt-0.5">
-                           Fee: -Rp {t.adminFee.toLocaleString("id-ID")}
+                           Fee: -Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(t.adminFee)}
                          </span>
                        )}
                      </p>
@@ -1278,11 +1278,11 @@ export default function Dashboard() {
                         }`}
                   >
                     {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""}{" "}
-                    Rp {t.amount.toLocaleString("id-ID")}
+                    Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(t.amount)}
                   </p>
                   {t.adminFee && (
                     <p className="text-[10px] text-app-danger font-semibold mt-0.5">
-                      Fee: -Rp {t.adminFee.toLocaleString("id-ID")}
+                      Fee: -Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(t.adminFee)}
                     </p>
                   )}
                 </div>

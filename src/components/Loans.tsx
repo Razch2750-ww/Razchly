@@ -40,7 +40,9 @@ function calculateLoanDetails(loan: Loan) {
 }
 
 function getNextPaymentDate(loan: Loan) {
-  if (loan.hasTenor === false) return null;
+  if (loan.hasTenor === false) {
+    return loan.dueDate ? new Date(loan.dueDate) : null;
+  }
   const createdDate = new Date(loan.createdAt);
   let nextDate = new Date(createdDate);
   const paidCount = loan.paidPaymentsCount || 0;
@@ -328,22 +330,19 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
         />
       </div>
 
-      {((loan.hasTenor !== false && nextPaymentDate) || (loan.hasTenor === false && loan.dueDate)) && (
+      {nextPaymentDate && (
         <div className="bg-app-bg/50 rounded-xl p-3 border border-app-border/50 flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-app-text/70" />
             <span className="text-sm text-app-text-bright">
               {loan.hasTenor === false ? "Jatuh Tempo: " : ""}
-              {loan.hasTenor === false 
-                ? new Date(loan.dueDate!).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-                : nextPaymentDate!.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-              }
+              {nextPaymentDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
           </div>
           {(() => {
             const todayDate = new Date();
             todayDate.setHours(0, 0, 0, 0);
-            const targetDate = loan.hasTenor === false ? new Date(loan.dueDate!) : nextPaymentDate!;
+            const targetDate = nextPaymentDate;
             const nextDateNoTime = new Date(targetDate);
             nextDateNoTime.setHours(0, 0, 0, 0);
             const diffTime = nextDateNoTime.getTime() - todayDate.getTime();

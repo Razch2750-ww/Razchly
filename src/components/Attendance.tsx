@@ -325,6 +325,10 @@ export default function Attendance() {
       } else if (action === 'checkOut') {
          const data: any = { checkOut: Date.now() };
          if (location) data.checkOutLocation = location;
+         if (notes) {
+           const existingNotes = todayRecord?.notes;
+           data.notes = existingNotes ? `${existingNotes} | ${notes}` : notes;
+         }
          await setDoc(docRef, data, { merge: true });
 
          // Notify device
@@ -386,6 +390,7 @@ export default function Attendance() {
       title="Absensi"
       subtitle="Catat dan pantau kehadiran Anda."
       actions={attendanceActions}
+      mobileActions={attendanceActions}
     >
       <div className="space-y-6 md:space-y-8">
 
@@ -435,13 +440,24 @@ export default function Attendance() {
                  {todayRecord.status === 'present' && !todayRecord.checkOut && (
                     <div className="w-full max-w-sm mt-4">
                        {todayRecord.checkIn && (Date.now() - todayRecord.checkIn > 3 * 60 * 60 * 1000) ? (
-                          <button
-                            onClick={() => handleAction('checkOut')}
-                            className="w-full py-4 bg-app-danger text-app-bg rounded-xl font-bold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                          >
-                            <Clock className="w-5 h-5" />
-                            Absen Keluar
-                          </button>
+                          <div className="space-y-4">
+                            <div>
+                              <input
+                                type="text"
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                                placeholder="Catatan Pulang (Opsional)"
+                                className="w-full bg-app-bg border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-4 outline-none focus:border-app-accent1"
+                              />
+                            </div>
+                            <button
+                              onClick={() => handleAction('checkOut')}
+                              className="w-full py-4 bg-app-danger text-app-bg rounded-xl font-bold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                            >
+                              <Clock className="w-5 h-5" />
+                              Absen Keluar
+                            </button>
+                          </div>
                        ) : (
                           <div className="text-center p-4 bg-app-warning/10 border border-app-warning/20 rounded-xl text-app-warning text-sm font-medium">
                             Anda sudah Check In. Tombol Check Out akan muncul setelah 3 jam.
@@ -543,65 +559,109 @@ export default function Attendance() {
              </div>
            </div>
 
-           <StaggerContainer className="space-y-3">
-             {records.length > 0 ? records.map(record => (
-               <StaggerItem key={record.id}>
-                 <div className="bg-app-card rounded-xl border border-app-border/40 p-4 flex items-center justify-between hover:border-app-accent1/20 transition-colors">
-                 <div className="flex items-center gap-4">
-                   <div className="w-12 h-12 rounded-lg bg-app-bg border border-app-border flex flex-col items-center justify-center shrink-0">
-                     <span className="text-xs text-app-text/70">{new Date(record.date).toLocaleDateString('id-ID', { weekday: 'short' })}</span>
-                     <span className="text-lg font-bold text-app-text-bright leading-none">{new Date(record.date).getDate()}</span>
-                   </div>
-                   <div>
-                     <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider mb-1 border ${getStatusColor(record.status)}`}>
-                        {getStatusIcon(record.status)}
-                        {getStatusLabel(record.status)}
-                     </div>
-                     {record.notes && <p className="text-xs text-app-text/60 line-clamp-1">{record.notes}</p>}
-                   </div>
-                 </div>
-                 <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end mt-4 md:mt-0">
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => openEditModal(record)} className="p-2 text-app-text/50 hover:text-app-accent1 bg-app-bg rounded-md border border-app-border transition-colors">
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => handleDelete(record)} className="p-2 text-app-text/50 hover:text-app-danger bg-app-bg rounded-md border border-app-border transition-colors">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="text-right flex flex-col gap-1">
-                   {record.checkIn && (
-                     <div className="flex items-center justify-end gap-1.5 text-xs">
-                       <span className="text-app-text/50">Masuk:</span>
-                       <span className="font-medium text-app-text-bright">{new Date(record.checkIn).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
-                       {record.checkInLocation && (
-                         <a href={`https://maps.google.com/?q=${record.checkInLocation.lat},${record.checkInLocation.lng}`} target="_blank" rel="noreferrer" className="text-app-accent1 hover:opacity-80">
-                           <MapPin className="w-3 h-3" />
-                         </a>
-                       )}
-                     </div>
-                   )}
-                   {record.checkOut && (
-                     <div className="flex items-center justify-end gap-1.5 text-xs">
-                       <span className="text-app-text/50">Keluar:</span>
-                       <span className="font-medium text-app-text-bright">{new Date(record.checkOut).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
-                       {record.checkOutLocation && (
-                         <a href={`https://maps.google.com/?q=${record.checkOutLocation.lat},${record.checkOutLocation.lng}`} target="_blank" rel="noreferrer" className="text-app-accent1 hover:opacity-80">
-                           <MapPin className="w-3 h-3" />
-                         </a>
-                       )}
-                     </div>
-                   )}
-                 </div>
-                 </div>
-               </div>
-               </StaggerItem>
-             )) : (
-               <div className="bg-app-card rounded-xl border border-app-border/40 p-8 text-center text-app-text/50">
-                 Belum ada data absensi bulan ini.
-               </div>
-             )}
-           </StaggerContainer>
+           <div className="bg-app-card p-4 rounded-xl border border-app-border/40">
+             <div className="grid grid-cols-7 gap-1 text-center mb-2">
+               {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(d => (
+                 <div key={d} className="text-[10px] font-bold text-app-text/50 uppercase py-1">{d}</div>
+               ))}
+             </div>
+             <div className="grid grid-cols-7 gap-1">
+               {(() => {
+                  const startOfPeriod = new Date(selectedPeriodStart);
+                  
+                  const endOfPeriodDate = new Date(selectedPeriodStart);
+                  if (attendancePeriodEnd < attendancePeriodStart) {
+                      endOfPeriodDate.setMonth(endOfPeriodDate.getMonth() + 1);
+                  }
+                  const targetMonth = endOfPeriodDate.getMonth();
+                  endOfPeriodDate.setDate(attendancePeriodEnd);
+                  if (endOfPeriodDate.getMonth() !== targetMonth) {
+                     endOfPeriodDate.setDate(0);
+                  }
+                  
+                  const startDay = startOfPeriod.getDay();
+                  
+                  const daysCount = Math.round((endOfPeriodDate.getTime() - startOfPeriod.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                  
+                  const blanks = Array(startDay).fill(null);
+                  const days = Array.from({length: daysCount}, (_, i) => {
+                     const d = new Date(startOfPeriod);
+                     d.setDate(d.getDate() + i);
+                     return d;
+                  });
+                  
+                  const today = new Date();
+                  
+                  return [...blanks, ...days].map((d, i) => {
+                    if (!d) return <div key={`history-blank-${i}`} />;
+                    
+                    const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+                    
+                    const dStart = new Date(d);
+                    dStart.setHours(0,0,0,0);
+                    const dEnd = new Date(d);
+                    dEnd.setHours(23,59,59,999);
+                    const hasRecord = records.find(r => r.date >= dStart.getTime() && r.date <= dEnd.getTime());
+                    
+                    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    const dayId = d.getDay().toString();
+                    const defaultSchedule = workSchedule?.days?.[dayId] || { isActive: true, start: '08:00', end: '17:00' };
+                    const currentSchedule = workSchedule?.overrides?.[dateStr] || defaultSchedule;
+                    
+                    return (
+                      <div 
+                        key={`history-${i}`} 
+                        onClick={() => {
+                          setSelectedDateActionMenu({ date: d, hasRecord });
+                        }}
+                        className={`p-1.5 min-h-[4.2rem] flex flex-col justify-between rounded-lg relative cursor-pointer hover:bg-app-card transition-colors border ${isToday ? 'bg-app-accent1/10 border-app-accent1 text-app-accent1' : 'bg-app-bg border-app-border text-app-text-bright'}`}
+                      >
+                         <div className="flex items-center justify-between w-full">
+                           <span className="text-xs font-bold pl-0.5">{d.getDate()}</span>
+                           {isToday && <span className="w-1.5 h-1.5 rounded-full bg-app-accent1 mr-0.5" />}
+                         </div>
+                         <div className="flex flex-col items-end text-right pr-0.5 mt-0.5 w-full overflow-hidden">
+                           {hasRecord ? (
+                             hasRecord.status === 'present' ? (
+                               <div className="text-[10px] text-app-success leading-tight flex flex-col font-bold gap-0 w-full">
+                                 <span className="truncate block">{hasRecord.checkIn ? new Date(hasRecord.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
+                                 <span className="truncate block">{hasRecord.checkOut ? new Date(hasRecord.checkOut).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
+                                 {(() => {
+                                    if (hasRecord.checkIn && hasRecord.checkOut) {
+                                        const [sH, sM] = currentSchedule.start.split(':').map(Number);
+                                        const [eH, eM] = currentSchedule.end.split(':').map(Number);
+                                        const schedHours = currentSchedule.isActive ? (eH + eM/60) - (sH + sM/60) : 0;
+                                        const actualHours = (hasRecord.checkOut - hasRecord.checkIn) / 3600000;
+                                        const diff = actualHours - schedHours;
+                                        if (diff >= 0.5) {
+                                            const diffStr = parseFloat(diff.toFixed(2)).toString().replace('.', ',');
+                                             return <span className="text-[9px] text-app-warning mt-0.5 bg-app-warning/10 px-1 py-0.2 rounded block truncate w-full text-center">+{diffStr}j</span>;
+                                        }
+                                    }
+                                    return null;
+                                 })()}
+                               </div>
+                             ) : (
+                               <div className={`text-[10px] mt-0.5 leading-tight font-black truncate w-full ${hasRecord.status === 'leave' ? 'text-app-warning' : hasRecord.status === 'sick' ? 'text-app-accent1' : 'text-app-danger'}`}>
+                                 {hasRecord.status === 'leave' ? 'IZIN' : hasRecord.status === 'sick' ? 'SAKIT' : 'ALPHA'}
+                               </div>
+                             )
+                           ) : currentSchedule.isActive ? (
+                             <div className="text-[10px] text-app-text/40 leading-tight flex flex-col font-medium w-full">
+                               <span className="truncate block">{currentSchedule.start}</span>
+                               <span className="truncate block">{currentSchedule.end}</span>
+                             </div>
+                           ) : (
+                             <div className="text-[10px] text-app-danger/50 leading-tight font-bold mt-0.5 truncate w-full">Libur</div>
+                           )}
+                         </div>
+                         {hasRecord && <div className={`w-1 h-1 rounded-full absolute bottom-1 left-1 ${hasRecord.status === 'present' ? 'bg-app-success' : hasRecord.status === 'absent' ? 'bg-app-danger' : hasRecord.status === 'leave' ? 'bg-app-warning' : 'bg-app-accent1'}`} />}
+                      </div>
+                    );
+                  });
+               })()}
+             </div>
+           </div>
         </div>
 
 
@@ -1084,21 +1144,96 @@ export default function Attendance() {
                 </span>
               </div>
               
-              <button
-                onClick={() => {
-                  const { date, hasRecord } = selectedDateActionMenu;
-                  setSelectedDateActionMenu(null);
-                  if (hasRecord) {
-                    openEditModal(hasRecord);
-                  } else {
-                    openAddModalForDate(date);
+              {(() => {
+                if (selectedDateActionMenu.hasRecord) {
+                  const record = selectedDateActionMenu.hasRecord;
+                  
+                  let diffStr = '';
+                  if (record.status === 'present' && record.checkIn && record.checkOut) {
+                    const d = selectedDateActionMenu.date;
+                    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    const dayId = d.getDay().toString();
+                    const defaultSchedule = workSchedule?.days?.[dayId] || { isActive: true, start: '08:00', end: '17:00' };
+                    const currentSchedule = workSchedule?.overrides?.[dateStr] || defaultSchedule;
+                    
+                    const [sH, sM] = currentSchedule.start.split(':').map(Number);
+                    const [eH, eM] = currentSchedule.end.split(':').map(Number);
+                    const schedHours = currentSchedule.isActive ? (eH + eM/60) - (sH + sM/60) : 0;
+                    const actualHours = (record.checkOut - record.checkIn) / 3600000;
+                    const diff = actualHours - schedHours;
+                    
+                    if (diff >= 0.5) {
+                       diffStr = parseFloat(diff.toFixed(2)).toString().replace('.', ',') + ' Jam';
+                    }
                   }
-                }}
-                className="w-full py-3 px-4 bg-app-accent1 text-app-bg hover:opacity-90 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
-              >
-                <Calendar className="w-4 h-4" />
-                {selectedDateActionMenu.hasRecord ? 'Edit Absensi' : 'Tambah Absensi'}
-              </button>
+
+                  return (
+                    <div className="bg-app-card rounded-xl p-3 border border-app-border space-y-2 mb-3">
+                       <div className="flex justify-between items-center text-xs">
+                         <span className="text-app-text/60">Status</span>
+                         <span className={`font-bold ${getStatusColor(record.status)} px-2 py-0.5 rounded border text-[10px] uppercase`}>{getStatusLabel(record.status)}</span>
+                       </div>
+                       {record.status === 'present' && (
+                         <>
+                           <div className="flex justify-between items-center text-xs">
+                             <span className="text-app-text/60">Masuk</span>
+                             <span className="font-medium text-app-text-bright">{record.checkIn ? new Date(record.checkIn).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-'}</span>
+                           </div>
+                           <div className="flex justify-between items-center text-xs">
+                             <span className="text-app-text/60">Keluar</span>
+                             <span className="font-medium text-app-text-bright">{record.checkOut ? new Date(record.checkOut).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-'}</span>
+                           </div>
+                           {diffStr && (
+                             <div className="flex justify-between items-center text-xs">
+                               <span className="text-app-text/60">Total Lembur</span>
+                               <span className="font-bold text-app-warning">{diffStr}</span>
+                             </div>
+                           )}
+                         </>
+                       )}
+                       {record.notes && (
+                         <div className="pt-2 border-t border-app-border/50 mt-2">
+                           <span className="block text-[10px] text-app-text/50 uppercase font-bold mb-1">Catatan</span>
+                           <p className="text-xs text-app-text-bright bg-app-bg p-2 rounded-lg border border-app-border/50">{record.notes}</p>
+                         </div>
+                       )}
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
+              <div className={selectedDateActionMenu.hasRecord ? "grid grid-cols-2 gap-2" : ""}>
+                <button
+                  onClick={() => {
+                    const { date, hasRecord } = selectedDateActionMenu;
+                    setSelectedDateActionMenu(null);
+                    if (hasRecord) {
+                      openEditModal(hasRecord);
+                    } else {
+                      openAddModalForDate(date);
+                    }
+                  }}
+                  className="w-full py-3 px-4 bg-app-accent1 text-app-bg hover:opacity-90 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
+                >
+                  <Calendar className="w-4 h-4" />
+                  {selectedDateActionMenu.hasRecord ? 'Edit Absensi' : 'Tambah Absensi'}
+                </button>
+                
+                {selectedDateActionMenu.hasRecord && (
+                  <button
+                    onClick={() => {
+                      const { hasRecord } = selectedDateActionMenu;
+                      setSelectedDateActionMenu(null);
+                      handleDelete(hasRecord);
+                    }}
+                    className="w-full py-3 px-4 bg-app-danger/10 text-app-danger hover:bg-app-danger/20 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Hapus
+                  </button>
+                )}
+              </div>
 
               <button
                 onClick={() => {

@@ -1337,6 +1337,10 @@ export default function Investments() {
     const data = [];
     const targetIhsg = marketData.COMPOSITE?.change || -29.42;
 
+    const chronologicalTx = [...allTransactions]
+      .filter((tx) => !!tx.date)
+      .sort((a, b) => (a.date || 0) - (b.date || 0));
+
     for (let i = numDays; i >= 0; i--) {
       const date = subDays(new Date(), i);
       const endOfDayDate = new Date(date);
@@ -1345,45 +1349,95 @@ export default function Investments() {
 
       let modalForDay = 0;
       let valueForDay = 0;
+      let realizedPL = 0;
+      let historicalModal = 0;
 
-      activeInvestments.forEach((inv) => {
-        const mult = inv.category === "saham" ? 100 : 1;
-        modalForDay += inv.qty * inv.price * mult;
-        
-        const finalPrice = getLivePrice(inv);
-        let simulatedPrice = finalPrice;
-        
-        const daysSinceBuy = Math.max(1, Math.floor((new Date().getTime() - inv.createdAt) / (1000 * 60 * 60 * 24)));
-        const daysFromBuyToCurrentPoint = Math.floor((timeMs - inv.createdAt) / (1000 * 60 * 60 * 24));
-        
-        if (timeMs < inv.createdAt) {
-          // Prior to purchase: backfill the value starting from buy price with realistic noise
-          const noiseSeed = i + inv.code.charCodeAt(0) + (inv.code.charCodeAt(inv.code.length-1) || 0);
-          const noise = Math.sin(noiseSeed) * 0.008; // slightly more variation for historical pre-purchase
-          simulatedPrice = inv.price * (1 + noise);
-        } else if (i > 0) {
-          // After purchase, but before today: linear interpolate to live price
-          const progress = Math.max(0, Math.min(1, daysFromBuyToCurrentPoint / daysSinceBuy));
-          const basePrice = inv.price + (finalPrice - inv.price) * progress;
-          
-          const noiseSeed = i + inv.code.charCodeAt(0) + (inv.code.charCodeAt(inv.code.length-1) || 0);
-          const noise = Math.sin(noiseSeed) * 0.005;
-          simulatedPrice = basePrice * (1 + noise);
+      const holdingsForDay: Record<string, { qty: number; avgPrice: number; category: string; code: string; earliestTxDate: number }> = {};
+
+      chronologicalTx.forEach((tx) => {
+        if (!tx.date || tx.date > timeMs) return;
+        const parsed = parseInvestmentFromTransaction(tx);
+        if (!parsed) return;
+
+        const key = `${parsed.category}-${parsed.code}`;
+        const mult = parsed.category === "saham" ? 100 : 1;
+
+        if (!holdingsForDay[key]) {
+          holdingsForDay[key] = {
+            category: parsed.category,
+            code: parsed.code,
+            qty: 0,
+            avgPrice: 0,
+            earliestTxDate: tx.date
+          };
         }
 
-        valueForDay += inv.qty * simulatedPrice * mult;
+        const h = holdingsForDay[key];
+
+        if (parsed.type === "buy") {
+          const buyQty = parsed.qty;
+          const buyAmount = parsed.amount;
+          const buyPricePerUnit = buyQty > 0 ? (buyAmount / (buyQty * mult)) : 0;
+          const newTotalQty = h.qty + buyQty;
+          if (newTotalQty > 0) {
+            h.avgPrice = ((h.avgPrice * h.qty) + (buyPricePerUnit * buyQty)) / newTotalQty;
+          } else {
+            h.avgPrice = buyPricePerUnit;
+          }
+          h.qty = newTotalQty;
+          historicalModal += buyAmount;
+        } else {
+          const sellQty = parsed.qty;
+          const sellAmount = parsed.amount;
+          const sellPricePerUnit = sellQty > 0 ? (sellAmount / (sellQty * mult)) : 0;
+          
+          if (h.qty > 0) {
+             const profitPerUnit = sellPricePerUnit - h.avgPrice;
+             realizedPL += profitPerUnit * sellQty * mult;
+          } else {
+             realizedPL += sellAmount;
+          }
+          h.qty = Math.max(0, h.qty - sellQty);
+        }
       });
 
-      const portfolioReturn = modalForDay > 0 ? ((valueForDay - modalForDay) / modalForDay) * 100 : 0;
+      Object.values(holdingsForDay).forEach((h) => {
+        if (h.qty <= 0) return;
+        const mult = h.category === "saham" ? 100 : 1;
+        modalForDay += h.qty * h.avgPrice * mult;
+        
+        let finalPrice = getLivePrice({ category: h.category, code: h.code, price: h.avgPrice } as Investment);
+        
+        const daysSinceBuy = Math.max(1, Math.floor((new Date().getTime() - h.earliestTxDate) / (1000 * 60 * 60 * 24)));
+        const daysFromBuyToCurrentPoint = Math.floor((timeMs - h.earliestTxDate) / (1000 * 60 * 60 * 24));
+        
+        let simulatedPrice = finalPrice;
+        
+        if (timeMs < h.earliestTxDate) {
+           const noiseSeed = i + h.code.charCodeAt(0) + (h.code.charCodeAt(h.code.length-1) || 0);
+           const noise = Math.sin(noiseSeed) * 0.008;
+           simulatedPrice = h.avgPrice * (1 + noise);
+        } else if (i > 0) {
+           const progress = Math.max(0, Math.min(1, daysFromBuyToCurrentPoint / daysSinceBuy));
+           const basePrice = h.avgPrice + (finalPrice - h.avgPrice) * progress;
+           const noiseSeed = i + h.code.charCodeAt(0) + (h.code.charCodeAt(h.code.length-1) || 0);
+           const noise = Math.sin(noiseSeed) * 0.005;
+           simulatedPrice = basePrice * (1 + noise);
+        }
+
+        valueForDay += h.qty * simulatedPrice * mult;
+      });
+
+      const totalEquity = valueForDay + realizedPL;
+      const portfolioReturn = historicalModal > 0 ? ((totalEquity - modalForDay) / historicalModal) * 100 : 0;
       
-      // Calculate simulated IHSG cumulative return ending at target
       const progress = numDays > 0 ? (numDays - i) / numDays : 1;
       const wave = Math.sin(progress * Math.PI * 3) * 6 + Math.sin(progress * Math.PI * 7) * 2;
       const ihsgReturn = progress * targetIhsg + wave;
 
       data.push({
         name: format(date, "dd MMM", { locale: localeId }),
-        value: valueForDay,
+        value: totalEquity,
         modal: modalForDay,
         portfolioReturn,
         ihsgReturn,
@@ -1391,7 +1445,7 @@ export default function Investments() {
       });
     }
     return data;
-  }, [numDays, activeInvestments, quotes, marketData.COMPOSITE?.change]);
+  }, [numDays, allTransactions, quotes, marketData.COMPOSITE?.change]);
 
   const getInitials = (name: string) =>
     name.substring(0, 2).toUpperCase() || "US";
