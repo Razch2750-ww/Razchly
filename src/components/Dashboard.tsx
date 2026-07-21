@@ -32,6 +32,7 @@ import {
   Edit2,
   BarChart2,
   Eye,
+  EyeOff,
   Target,
   Scan,
   HandCoins,
@@ -51,7 +52,8 @@ import {
   Legend,
 } from "recharts";
 import { format, subDays, isSameDay, isSameMonth } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { id as localeId, enUS as localeEn } from "date-fns/locale";
+import { useTranslation } from "../utils/translations";
 import { AccountModal } from "./AccountModal";
 import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
 
@@ -65,9 +67,15 @@ export interface Investment {
 }
 
 export default function Dashboard() {
+  const { t, language } = useTranslation();
+  const currentLocale = language === "en" ? localeEn : localeId;
   const user = useStore((state) => state.user);
-  const { themeId, setThemeId, setGlobalAddModalOpen, setGlobalGrabModalOpen } =
-    useStore();
+  const themeId = useStore((state) => state.themeId);
+  const setThemeId = useStore((state) => state.setThemeId);
+  const setGlobalAddModalOpen = useStore((state) => state.setGlobalAddModalOpen);
+  const setGlobalGrabModalOpen = useStore((state) => state.setGlobalGrabModalOpen);
+  const hideBalances = useStore((state) => state.hideBalances);
+  const toggleHideBalances = useStore((state) => state.toggleHideBalances);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>(
     [],
@@ -289,6 +297,28 @@ export default function Dashboard() {
     };
   }, [user]);
 
+  const formatRp = (value: number, options?: { showSign?: boolean; forceSign?: string; noRp?: boolean }) => {
+    if (hideBalances) {
+      const rpStr = options?.noRp ? "" : "Rp";
+      if (options?.forceSign) return `${options.forceSign}${rpStr}*******`;
+      if (options?.showSign) return `${value >= 0 ? "+" : "-"}${rpStr}*******`;
+      return `${rpStr}*******`;
+    }
+    let sign = "";
+    if (options?.forceSign) {
+      sign = options.forceSign;
+    } else if (options?.showSign) {
+      sign = value >= 0 ? "+" : "-";
+    }
+    
+    const formattedVal = Math.abs(value).toLocaleString("id-ID");
+    const rpStr = options?.noRp ? "" : "Rp ";
+    if (value < 0 && !options?.showSign && !options?.forceSign) {
+      return `${rpStr}-${formattedVal}`;
+    }
+    return `${sign}${rpStr}${formattedVal}`;
+  };
+
   const totalBalance = accounts.filter(a => !a.excludeFromTotal).reduce((acc, curr) => acc + curr.balance, 0);
 
   // Income & Expense calculation for "Today"
@@ -487,11 +517,25 @@ export default function Dashboard() {
              <div className="min-w-0 pr-2">
                 <p className="text-app-text/70 text-[10px] font-bold tracking-wider mb-1 uppercase break-words">Total Saldo</p>
                 <div className="flex items-center gap-2 mb-1">
-                   <h2 className="text-2xl font-bold text-app-text-bright break-words leading-tight">Rp {totalBalance.toLocaleString("id-ID")}</h2>
+                   <h2 className="text-2xl font-bold text-app-text-bright break-words leading-tight">{formatRp(totalBalance)}</h2>
                 </div>
                 <p className="text-app-text/60 text-[10px] font-medium leading-tight break-words">Seluruh dompet • {format(new Date(), "MMMM yyyy", { locale: localeId })}</p>
              </div>
-             <Eye className="w-5 h-5 text-app-text/70 shrink-0" />
+             <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleHideBalances();
+                }}
+                className="p-1 rounded-lg hover:bg-app-hover text-app-text/60 hover:text-app-text-bright transition-colors shrink-0"
+                title={hideBalances ? (language === 'en' ? "Show Balances" : "Tampilkan Saldo") : (language === 'en' ? "Hide Balances" : "Sembunyikan Saldo")}
+             >
+                {hideBalances ? (
+                  <EyeOff className="w-5 h-5 text-app-accent1" />
+                ) : (
+                  <Eye className="w-5 h-5 text-app-text/70" />
+                )}
+             </button>
           </div>
 
           <div className="h-px w-full bg-app-border mt-3 mb-3 relative z-10"></div>
@@ -500,16 +544,16 @@ export default function Dashboard() {
              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-1">
                    <div className="w-1.5 h-1.5 rounded-full bg-app-success shrink-0"></div>
-                   <span className="text-app-text/80 text-[10px] leading-tight break-words">Pemasukan (Hari Ini)</span>
+                   <span className="text-app-text/80 text-[10px] leading-tight break-words">{t('dashboard.incomeToday')}</span>
                 </div>
-                <p className="text-app-success font-bold text-sm leading-tight break-words">+Rp {incomeToday.toLocaleString("id-ID")}</p>
+                <p className="text-app-success font-bold text-sm leading-tight break-words">{formatRp(incomeToday, { forceSign: "+" })}</p>
              </div>
              <div className="flex-1 min-w-0 text-right">
                 <div className="flex items-center justify-end gap-1.5 mb-1">
                    <div className="w-1.5 h-1.5 rounded-full bg-app-danger shrink-0"></div>
-                   <span className="text-app-text/80 text-[10px] leading-tight break-words">Pengeluaran (Hari Ini)</span>
+                   <span className="text-app-text/80 text-[10px] leading-tight break-words">{t('dashboard.expenseToday')}</span>
                 </div>
-                <p className="text-app-danger font-bold text-sm leading-tight break-words">-Rp {expenseToday.toLocaleString("id-ID")}</p>
+                <p className="text-app-danger font-bold text-sm leading-tight break-words">{formatRp(expenseToday, { forceSign: "-" })}</p>
              </div>
           </div>
         </HoverCard>
@@ -526,8 +570,8 @@ export default function Dashboard() {
             
             <div className="flex justify-between items-start relative z-10 mb-3 mt-0.5">
                <div className="min-w-0 pr-1">
-                  <p className="text-app-text/70 text-[10px] font-bold tracking-wider mb-1 uppercase break-words leading-tight">Investasi</p>
-                  <h2 className="text-[15px] font-bold text-app-text-bright break-words leading-tight">Rp {totalInvestmentValue.toLocaleString("id-ID")}</h2>
+                  <p className="text-app-text/70 text-[10px] font-bold tracking-wider mb-1 uppercase break-words leading-tight">{t('dashboard.investments')}</p>
+                  <h2 className="text-[15px] font-bold text-app-text-bright break-words leading-tight">{formatRp(totalInvestmentValue)}</h2>
                </div>
                {totalInvestmentReturn >= 0 ? (
                   <TrendingUp className="w-3.5 h-3.5 text-app-success shrink-0 mt-0.5" />
@@ -540,17 +584,17 @@ export default function Dashboard() {
                <div>
                   <div className="flex items-center gap-1.5 mb-0.5">
                      <div className="w-1.5 h-1.5 rounded-full bg-app-text/40 shrink-0"></div>
-                     <span className="text-app-text/80 text-[10px] leading-tight break-words">Modal</span>
+                     <span className="text-app-text/80 text-[10px] leading-tight break-words">{t('dashboard.capital')}</span>
                   </div>
-                  <p className="text-app-text-bright font-bold text-xs break-words leading-tight">Rp {totalInvestmentCapital.toLocaleString("id-ID")}</p>
+                  <p className="text-app-text-bright font-bold text-xs break-words leading-tight">{formatRp(totalInvestmentCapital)}</p>
                </div>
                <div>
                   <div className="flex items-center gap-1.5 mb-0.5">
                      <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${totalInvestmentReturn >= 0 ? "bg-app-success" : "bg-app-danger"}`}></div>
-                     <span className="text-app-text/80 text-[10px] leading-tight break-words">Imbal Hasil</span>
+                     <span className="text-app-text/80 text-[10px] leading-tight break-words">{t('dashboard.returns')}</span>
                   </div>
                   <p className={`font-bold text-[11px] break-words leading-tight ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                     {totalInvestmentReturn >= 0 ? "+" : ""}Rp {totalInvestmentReturn.toLocaleString("id-ID")}
+                     {formatRp(totalInvestmentReturn, { showSign: true })}
                   </p>
                </div>
             </div>
@@ -566,8 +610,8 @@ export default function Dashboard() {
             
             <div className="flex justify-between items-start relative z-10 mb-3 mt-0.5">
                <div className="min-w-0 pr-1">
-                  <p className="text-app-text/70 text-[10px] font-bold tracking-wider mb-1 uppercase break-words leading-tight">Hutang & Piutang</p>
-                  <h2 className="text-[15px] font-bold text-app-text-bright break-words leading-tight">Rp {(loanStats.totalPiutang - loanStats.totalHutang).toLocaleString("id-ID")}</h2>
+                  <p className="text-app-text/70 text-[10px] font-bold tracking-wider mb-1 uppercase break-words leading-tight">{language === 'en' ? 'Loans & Receivables' : 'Hutang & Piutang'}</p>
+                  <h2 className="text-[15px] font-bold text-app-text-bright break-words leading-tight">{formatRp(loanStats.totalPiutang - loanStats.totalHutang)}</h2>
                </div>
                <HandCoins className="w-3.5 h-3.5 text-app-accent1 shrink-0 mt-0.5" />
             </div>
@@ -576,16 +620,16 @@ export default function Dashboard() {
                <div>
                   <div className="flex items-center gap-1.5 mb-0.5">
                      <div className="w-1.5 h-1.5 rounded-full bg-app-success shrink-0"></div>
-                     <span className="text-app-text/80 text-[10px] leading-tight break-words">Piutang</span>
+                     <span className="text-app-text/80 text-[10px] leading-tight break-words">{language === 'en' ? 'Receivable' : 'Piutang'}</span>
                   </div>
-                  <p className="text-app-success font-bold text-xs break-words leading-tight">Rp {loanStats.totalPiutang.toLocaleString("id-ID")}</p>
+                  <p className="text-app-success font-bold text-xs break-words leading-tight">{formatRp(loanStats.totalPiutang)}</p>
                </div>
                <div>
                   <div className="flex items-center gap-1.5 mb-0.5">
                      <div className="w-1.5 h-1.5 rounded-full bg-app-danger shrink-0"></div>
-                     <span className="text-app-text/80 text-[10px] leading-tight break-words">Hutang</span>
+                     <span className="text-app-text/80 text-[10px] leading-tight break-words">{language === 'en' ? 'Debt' : 'Hutang'}</span>
                   </div>
-                  <p className="text-app-danger font-bold text-xs break-words leading-tight">Rp {loanStats.totalHutang.toLocaleString("id-ID")}</p>
+                  <p className="text-app-danger font-bold text-xs break-words leading-tight">{formatRp(loanStats.totalHutang)}</p>
                </div>
             </div>
           </HoverCard>
@@ -608,15 +652,29 @@ export default function Dashboard() {
                   <div className="w-9 h-9 rounded-xl bg-app-accent1/15 flex items-center justify-center">
                     <Wallet className="w-4.5 h-4.5 text-app-accent1" />
                   </div>
-                  <span className="text-app-text/70 text-sm font-medium">Total Saldo</span>
+                  <span className="text-app-text/70 text-sm font-medium">{t('dashboard.totalBalance')}</span>
                 </div>
-                <Eye className="w-4 h-4 text-app-text/30" />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleHideBalances();
+                  }}
+                  className="p-1.5 rounded-lg hover:bg-app-hover text-app-text/60 hover:text-app-text-bright transition-colors"
+                  title={hideBalances ? (language === 'en' ? "Show Balances" : "Tampilkan Saldo") : (language === 'en' ? "Hide Balances" : "Sembunyikan Saldo")}
+                >
+                  {hideBalances ? (
+                    <EyeOff className="w-4.5 h-4.5 text-app-accent1" />
+                  ) : (
+                    <Eye className="w-4.5 h-4.5 text-app-text/30" />
+                  )}
+                </button>
               </div>
               <p className="text-4xl font-bold text-app-text-bright tracking-tight leading-none">
-                Rp {totalBalance.toLocaleString("id-ID")}
+                {formatRp(totalBalance)}
               </p>
               <p className="text-app-text/50 text-xs mt-3 font-medium">
-                {accounts.length} dompet aktif · {format(new Date(), "MMMM yyyy", { locale: localeId })}
+                {accounts.length} {t('dashboard.allWallets')} · {format(new Date(), "MMMM yyyy", { locale: currentLocale })}
               </p>
             </div>
           </HoverCard>
@@ -635,12 +693,12 @@ export default function Dashboard() {
                 
                 <div className="relative z-10 flex items-center gap-2 mb-1">
                   <TrendingUp className="w-3.5 h-3.5 text-app-success" />
-                  <span className="text-app-text/60 text-[11px] font-medium">Masuk</span>
+                  <span className="text-app-text/60 text-[11px] font-medium">{language === 'en' ? 'Income' : 'Masuk'}</span>
                 </div>
                 <p className="text-app-text-bright font-bold text-lg relative z-10 leading-none">
-                  Rp {incomeToday.toLocaleString("id-ID")}
+                  {formatRp(incomeToday)}
                 </p>
-                <p className="text-app-text/40 text-[10px] relative z-10">Hari ini</p>
+                <p className="text-app-text/40 text-[10px] relative z-10">{t('common.today')}</p>
               </HoverCard>
             </ScrollReveal>
 
@@ -653,12 +711,12 @@ export default function Dashboard() {
                 
                 <div className="relative z-10 flex items-center gap-2 mb-1">
                   <TrendingDown className="w-3.5 h-3.5 text-app-danger" />
-                  <span className="text-app-text/60 text-[11px] font-medium">Keluar</span>
+                  <span className="text-app-text/60 text-[11px] font-medium">{language === 'en' ? 'Expenses' : 'Keluar'}</span>
                 </div>
                 <p className="text-app-text-bright font-bold text-lg relative z-10 leading-none">
-                  Rp {expenseToday.toLocaleString("id-ID")}
+                  {formatRp(expenseToday)}
                 </p>
-                <p className="text-app-text/40 text-[10px] relative z-10">Hari ini</p>
+                <p className="text-app-text/40 text-[10px] relative z-10">{t('common.today')}</p>
               </HoverCard>
             </ScrollReveal>
           </div>
@@ -674,10 +732,10 @@ export default function Dashboard() {
                 
                 <div className="relative z-10 flex items-center gap-2 mb-1">
                   <TrendingUp className={`w-3.5 h-3.5 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`} />
-                  <span className="text-app-text/60 text-[11px] font-medium">Investasi</span>
+                  <span className="text-app-text/60 text-[11px] font-medium">{t('dashboard.investments')}</span>
                 </div>
                 <p className="text-app-text-bright font-bold text-lg relative z-10 leading-none">
-                  Rp {totalInvestmentValue.toLocaleString("id-ID")}
+                  {formatRp(totalInvestmentValue)}
                 </p>
                 <p className={`text-[10px] font-semibold relative z-10 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
                   {totalInvestmentReturn >= 0 ? "+" : ""}{totalInvestmentReturnPercent.toFixed(2)}%
@@ -694,14 +752,14 @@ export default function Dashboard() {
                 
                 <div className="relative z-10 flex items-center gap-2 mb-1">
                   <HandCoins className="w-3.5 h-3.5 text-app-accent1" />
-                  <span className="text-app-text/60 text-[11px] font-medium">Pinjaman</span>
+                  <span className="text-app-text/60 text-[11px] font-medium">{t('dashboard.loans')}</span>
                 </div>
                 <p className="text-app-text-bright font-bold text-lg relative z-10 leading-none">
-                  Rp {(loanStats.totalPiutang - loanStats.totalHutang).toLocaleString("id-ID")}
+                  {formatRp(loanStats.totalPiutang - loanStats.totalHutang)}
                 </p>
                 <div className="text-[10px] font-semibold relative z-10 flex gap-2">
-                  <span className="text-app-success">+{loanStats.totalPiutang.toLocaleString("id-ID")}</span>
-                  <span className="text-app-danger">-{loanStats.totalHutang.toLocaleString("id-ID")}</span>
+                  <span className="text-app-success">{formatRp(loanStats.totalPiutang, { forceSign: "+", noRp: true })}</span>
+                  <span className="text-app-danger">{formatRp(loanStats.totalHutang, { forceSign: "-", noRp: true })}</span>
                 </div>
               </HoverCard>
             </ScrollReveal>
@@ -715,8 +773,8 @@ export default function Dashboard() {
         {/* DOMPET SAYA */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4 px-1">
-              <h2 className="text-app-text-bright font-bold text-lg">Dompet saya</h2>
-              <Link to="/settings" state={{ expandSection: "accounts" }} className="text-app-accent1 text-[13px] font-medium">Lihat semua</Link>
+              <h2 className="text-app-text-bright font-bold text-lg">{t('dashboard.myWallets')}</h2>
+              <Link to="/settings" state={{ expandSection: "accounts" }} className="text-app-accent1 text-[13px] font-medium">{t('dashboard.viewAll')}</Link>
           </div>
           <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
              {sortedAccounts.map(acc => {
@@ -737,10 +795,10 @@ export default function Dashboard() {
                      <AccountIcon iconId={acc.icon} className="w-10 h-10 shrink-0 mb-4" />
                      <div>
                         <p className="text-app-text-bright text-[13px] mb-1 line-clamp-1 uppercase font-bold">{acc.name}</p>
-                        <p className="text-app-success font-bold text-[15px] mb-2">Rp {acc.balance.toLocaleString("id-ID")}</p>
+                        <p className="text-app-success font-bold text-[15px] mb-2">{formatRp(acc.balance)}</p>
                         <div className="flex items-center gap-1.5 text-app-text/60 text-[11px]">
                            <Edit2 className="w-3.5 h-3.5" />
-                           <span>Sesuaikan</span>
+                           <span>{language === 'en' ? 'Adjust' : 'Sesuaikan'}</span>
                         </div>
                      </div>
                   </div>
@@ -751,7 +809,7 @@ export default function Dashboard() {
                 <div className="w-12 h-12 rounded-full bg-app-hover flex items-center justify-center mb-3">
                    <Plus className="w-6 h-6 text-app-accent1" />
                 </div>
-                <p className="text-app-text/60 text-[13px] text-center">Kelola<br/>Dompet</p>
+                <p className="text-app-text/60 text-[13px] text-center">{language === 'en' ? 'Manage' : 'Kelola'}<br/>{language === 'en' ? 'Wallets' : 'Dompet'}</p>
              </div>
           </div>
         </div>
@@ -762,13 +820,13 @@ export default function Dashboard() {
                 <div className="w-10 h-10 rounded-full bg-app-accent1/10 flex items-center justify-center">
                    <BarChart2 className="w-5 h-5 text-app-accent1" />
                 </div>
-                <span className="text-app-text-bright font-semibold text-[13px] text-center leading-tight">Laporan</span>
+                <span className="text-app-text-bright font-semibold text-[13px] text-center leading-tight">{language === 'en' ? 'Reports' : 'Laporan'}</span>
             </button>
             <button onClick={() => navigate('/grab')} className="flex-1 bg-app-card border border-app-border py-4 px-2 rounded-[1.2rem] flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-app-hover">
                 <div className="w-10 h-10 rounded-full bg-app-accent1/10 flex items-center justify-center">
                    <TrendingUp className="w-5 h-5 text-app-accent1" />
                 </div>
-                <span className="text-app-text-bright font-semibold text-[13px] text-center leading-tight">Analisis Usaha</span>
+                <span className="text-app-text-bright font-semibold text-[13px] text-center leading-tight">{language === 'en' ? 'Business Analytics' : 'Analisis Usaha'}</span>
             </button>
         </div>
       </div>
@@ -778,15 +836,15 @@ export default function Dashboard() {
         {/* DOMPET SAYA */}
         <div className="md:col-span-1 bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
           <div className="flex justify-between items-center mb-6 relative z-50">
-            <h2 className="text-app-text-bright font-bold">Dompet Saya</h2>
+            <h2 className="text-app-text-bright font-bold">{t('dashboard.myWallets')}</h2>
             <div className="relative">
               <button 
                 onClick={() => setShowSortMenu(!showSortMenu)}
                 className="flex items-center gap-1.5 text-xs font-semibold text-app-text/70 hover:text-app-text px-2 py-1 rounded-lg hover:bg-app-hover transition-colors"
-                title="Urutkan"
+                title={language === 'en' ? 'Sort' : 'Urutkan'}
               >
                 <ArrowUpDown className="w-3.5 h-3.5" />
-                Urutkan
+                {language === 'en' ? 'Sort' : 'Urutkan'}
               </button>
               {showSortMenu && (
                 <>
@@ -796,14 +854,14 @@ export default function Dashboard() {
                       onClick={() => { setAccountSort("balance_desc"); setShowSortMenu(false); }}
                       className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-app-hover text-app-text transition-colors flex items-center justify-between"
                     >
-                      Saldo Tertinggi
+                      {t('dashboard.sortBalanceDesc')}
                       {accountSort === "balance_desc" && <Check className="w-3.5 h-3.5 text-app-accent1" />}
                     </button>
                     <button
                       onClick={() => { setAccountSort("balance_asc"); setShowSortMenu(false); }}
                       className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-app-hover text-app-text transition-colors flex items-center justify-between"
                     >
-                      Saldo Terendah
+                      {t('dashboard.sortBalanceAsc')}
                       {accountSort === "balance_asc" && <Check className="w-3.5 h-3.5 text-app-accent1" />}
                     </button>
                     <div className="h-px w-full bg-app-border/50 my-1" />
@@ -811,7 +869,7 @@ export default function Dashboard() {
                       onClick={() => { setAccountSort("name_asc"); setShowSortMenu(false); }}
                       className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-app-hover text-app-text transition-colors flex items-center justify-between"
                     >
-                      Nama (A-Z)
+                      {t('dashboard.sortNameAsc')}
                       {accountSort === "name_asc" && <Check className="w-3.5 h-3.5 text-app-accent1" />}
                     </button>
                   </div>
@@ -823,7 +881,7 @@ export default function Dashboard() {
             {sortedAccounts.length === 0 ? (
               <div className="flex flex-col items-center justify-center text-app-text/50 text-sm py-4">
                 <Wallet className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
-                Belum ada dompet
+                {language === 'en' ? 'No wallets yet' : 'Belum ada dompet'}
               </div>
             ) : (
               sortedAccounts.map((acc, index) => {
@@ -856,12 +914,12 @@ export default function Dashboard() {
                         </p>
                         {acc.isPrimary && (
                           <span className="bg-app-accent1/20 text-app-accent1 text-[9px] font-bold px-2 py-0.5 rounded-sm">
-                            UTAMA
+                            {language === 'en' ? 'PRIMARY' : 'UTAMA'}
                           </span>
                         )}
                       </div>
                       <p className="text-app-text/70 text-xs mt-1">
-                        Rp {acc.balance.toLocaleString("id-ID")}
+                        {formatRp(acc.balance)}
                       </p>
                     </div>
                   </div>
@@ -877,7 +935,7 @@ export default function Dashboard() {
             className="mt-4 flex items-center justify-center p-4 rounded-2xl border border-dashed border-app-border hover:border-app-text/50 transition cursor-pointer text-app-text/70 text-sm font-medium"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Tambah Dompet
+            {language === 'en' ? 'Add Wallet' : 'Tambah Dompet'}
           </Link>
         </div>
 
@@ -885,14 +943,14 @@ export default function Dashboard() {
         <div className="md:col-span-2 bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
           
           <div className="flex items-center justify-between mb-6 relative z-10">
-            <h2 className="text-app-text-bright font-bold">Alur Kas</h2>
+            <h2 className="text-app-text-bright font-bold">{t('dashboard.cashflowTitle')}</h2>
             <div className="flex items-center gap-2">
               <select
                 value={selectedChartAccount}
                 onChange={(e) => setSelectedChartAccount(e.target.value)}
                 className="bg-app-bg border border-app-border rounded-lg px-2 py-1.5 text-xs text-app-text-bright focus:outline-none focus:border-app-accent1/50 transition-colors cursor-pointer"
               >
-                <option value="all">Semua Rekening</option>
+                <option value="all">{language === 'en' ? 'All Accounts' : 'Semua Rekening'}</option>
                 {accounts.map(acc => (
                   <option key={acc.id} value={acc.id}>{acc.name}</option>
                 ))}
@@ -902,26 +960,26 @@ export default function Dashboard() {
                   onClick={() => setChartPeriod(0)}
                   className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === 0 ? "bg-app-accent1 text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
                 >
-                  Hari Ini
+                  {t('dashboard.day')}
                 </button>
                 <button
                   onClick={() => setChartPeriod(7)}
                   className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === 7 ? "bg-app-accent1 text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
                 >
-                  7 Hari
+                  {language === 'en' ? '7 Days' : '7 Hari'}
                 </button>
                 <button
                   onClick={() => setChartPeriod(30)}
                   className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === 30 ? "bg-app-accent1 text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
                 >
-                  30 Hari
+                  {language === 'en' ? '30 Days' : '30 Hari'}
                 </button>
               </div>
               <button
                 onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
                 className="text-app-accent1 text-sm font-medium hover:underline ml-2"
               >
-                Lihat Semua
+                {t('dashboard.viewAll')}
               </button>
             </div>
           </div>
@@ -952,6 +1010,7 @@ export default function Dashboard() {
                   opacity={0.5}
                 />
                 <Tooltip
+                  formatter={(value: number) => [hideBalances ? "Rp*******" : `Rp ${value.toLocaleString("id-ID")}`, undefined]}
                   contentStyle={{
                     backgroundColor: "var(--color-app-card)",
                     border: "1px solid var(--color-app-border)",
@@ -969,7 +1028,7 @@ export default function Dashboard() {
                 />
                 <Line
                   type="monotone"
-                  name="Pemasukan"
+                  name={t('dashboard.income')}
                   dataKey="income"
                   stroke="var(--color-app-success)"
                   strokeWidth={2}
@@ -982,7 +1041,7 @@ export default function Dashboard() {
                 />
                 <Line
                   type="monotone"
-                  name="Pengeluaran"
+                  name={t('dashboard.expense')}
                   dataKey="expense"
                   stroke="var(--color-app-danger)"
                   strokeWidth={2}
@@ -1001,11 +1060,11 @@ export default function Dashboard() {
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-app-accent1"></div>
               <span className="text-app-text/70 text-xs font-semibold uppercase tracking-wide">
-                {chartPeriod === 0 ? "Estimasi Laba Bersih Hari Ini" : `Estimasi Laba Bersih ${chartPeriod} Hari Terakhir`}
+                {chartPeriod === 0 ? (language === 'en' ? "Today's Net Profit Estimate" : "Estimasi Laba Bersih Hari Ini") : (language === 'en' ? `Estimated Net Profit Last ${chartPeriod} Days` : `Estimasi Laba Bersih ${chartPeriod} Hari Terakhir`)}
               </span>
             </div>
             <span className="text-app-accent1 font-bold">
-              Rp {chartData.reduce((acc, curr) => acc + (curr.income - curr.expense), 0).toLocaleString("id-ID")}
+              {formatRp(chartData.reduce((acc, curr) => acc + (curr.income - curr.expense), 0))}
             </span>
           </div>
         </div>
@@ -1016,11 +1075,11 @@ export default function Dashboard() {
         {/* PIE CHART 1: ALOKASI SALDO DOMPET */}
         <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
           
-          <h2 className="text-app-text-bright font-bold mb-4 relative z-10 text-base">Alokasi Saldo Dompet</h2>
+          <h2 className="text-app-text-bright font-bold mb-4 relative z-10 text-base">{language === 'en' ? 'Wallet Balance Allocation' : 'Alokasi Saldo Dompet'}</h2>
           {accountPieData.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-app-text/50 text-sm py-12 min-h-[240px]">
               <Wallet className="w-8 h-8 text-app-text/30 mb-2" />
-              Tidak ada data saldo dompet aktif
+              {language === 'en' ? 'No active wallet balance data' : 'Tidak ada data saldo dompet aktif'}
             </div>
           ) : (
             <div className="flex-1 flex flex-col sm:flex-row items-center justify-between gap-6 min-h-[240px]">
@@ -1041,7 +1100,7 @@ export default function Dashboard() {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value: number) => [`Rp ${value.toLocaleString("id-ID")}`, "Saldo"]}
+                      formatter={(value: number) => [hideBalances ? "Rp*******" : `Rp ${value.toLocaleString("id-ID")}`, language === 'en' ? 'Balance' : 'Saldo']}
                       contentStyle={{
                         backgroundColor: "var(--color-app-card)",
                         border: "1px solid var(--color-app-border)",
@@ -1071,11 +1130,11 @@ export default function Dashboard() {
         {/* PIE CHART 2: DISTRIBUSI PENGELUARAN */}
         <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
 
-          <h2 className="text-app-text-bright font-bold mb-4 relative z-10 text-base">Distribusi Pengeluaran Bulan Ini</h2>
+          <h2 className="text-app-text-bright font-bold mb-4 relative z-10 text-base">{language === 'en' ? 'This Month Expense Distribution' : 'Distribusi Pengeluaran Bulan Ini'}</h2>
           {categoryPieData.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-app-text/50 text-sm py-12 min-h-[240px]">
               <TrendingDown className="w-8 h-8 text-app-text/30 mb-2" />
-              Tidak ada data pengeluaran bulan ini
+              {language === 'en' ? 'No expense data this month' : 'Tidak ada data pengeluaran bulan ini'}
             </div>
           ) : (
             <div className="flex-1 flex flex-col sm:flex-row items-center justify-between gap-6 min-h-[240px]">
@@ -1096,7 +1155,7 @@ export default function Dashboard() {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value: number) => [`Rp ${value.toLocaleString("id-ID")}`, "Pengeluaran"]}
+                      formatter={(value: number) => [hideBalances ? "Rp*******" : `Rp ${value.toLocaleString("id-ID")}`, language === 'en' ? 'Expense' : 'Pengeluaran']}
                       contentStyle={{
                         backgroundColor: "var(--color-app-card)",
                         border: "1px solid var(--color-app-border)",
@@ -1195,13 +1254,13 @@ export default function Dashboard() {
       <div className="hidden md:flex bg-app-card rounded-[24px] p-6 border border-app-border/40 flex-col shadow-sm shrink-0 overflow-hidden relative">
         
         <div className="flex items-center justify-between mb-6 relative z-10">
-          <h2 className="text-app-text-bright font-bold">Transaksi Terakhir</h2>
+          <h2 className="text-app-text-bright font-bold">{t('dashboard.recentTransactions')}</h2>
           <Link
             to="/transactions"
             state={{ tab: "Semua" }}
             className="text-app-accent1 text-sm font-medium hover:underline flex items-center"
           >
-            Lihat semua transaksi <ArrowRight className="w-4 h-4 ml-1" />
+            {language === 'en' ? 'View all transactions' : 'Lihat semua transaksi'} <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
 
@@ -1211,13 +1270,13 @@ export default function Dashboard() {
           return todayDesktopTransactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 rounded-2xl bg-app-bg border border-app-border border-dashed relative z-10">
               <FileText className="w-8 h-8 text-app-text/30 mb-3 animate-waggle" />
-              <p className="text-app-text/50 text-sm">Belum ada transaksi hari ini</p>
+              <p className="text-app-text/50 text-sm">{language === 'en' ? 'No transactions today' : 'Belum ada transaksi hari ini'}</p>
             </div>
           ) : (
             <div className="space-y-3 relative z-10">
-              {todayDesktopTransactions.map((t) => (
+              {todayDesktopTransactions.map((tx) => (
                 <div
-                  key={t.id}
+                  key={tx.id}
                   onClick={() => navigate('/transactions', { state: { tab: "Semua" } })}
                   className="flex items-center justify-between p-4 rounded-2xl bg-app-bg border border-app-border/40 hover:border-app-accent1/50 transition cursor-pointer relative overflow-hidden"
                 >
@@ -1226,20 +1285,20 @@ export default function Dashboard() {
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 
                       ${
-                        t.type === "income"
+                        tx.type === "income"
                           ? "bg-app-success/10 text-app-success"
-                          : t.type === "expense"
+                          : tx.type === "expense"
                             ? "bg-app-danger/10 text-app-danger"
                             : "bg-app-accent1/10 text-app-accent1"
                       }`}
                   >
-                    {t.type === "income" && <TrendingUp className="w-5 h-5" />}
-                    {t.type === "expense" && (
+                    {tx.type === "income" && <TrendingUp className="w-5 h-5" />}
+                    {tx.type === "expense" && (
                       <TrendingDown className="w-5 h-5" />
                     )}
-                    {t.type === "transfer" && (
+                    {tx.type === "transfer" && (
                       <AccountIcon
-                        iconId={getAccountIcon(t.fromAccountId)}
+                        iconId={getAccountIcon(tx.fromAccountId)}
                         className="w-5 h-5 border-0 bg-transparent shadow-none"
                       />
                     )}
@@ -1247,22 +1306,22 @@ export default function Dashboard() {
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="text-app-text-bright font-medium text-sm">
-                        {t.note ||
-                          (t.type === "income"
-                            ? "Pemasukan"
-                            : t.type === "expense"
-                              ? "Pengeluaran"
+                        {tx.note ||
+                          (tx.type === "income"
+                            ? t('dashboard.income')
+                            : tx.type === "expense"
+                              ? t('dashboard.expense')
                               : "Transfer")}
                       </p>
-                      {t.categoryId && (
+                      {tx.categoryId && (
                           <span className="px-2 py-0.5 bg-app-card border border-app-border text-app-text text-[10px] font-bold rounded-full hidden sm:flex items-center gap-1">
-                            <CategoryIcon iconId={t.categoryIcon || 'dollar-sign'} className="w-3 h-3 text-app-text/70" />
-                            <span>{t.categoryName}</span>
+                            <CategoryIcon iconId={tx.categoryIcon || 'dollar-sign'} className="w-3 h-3 text-app-text/70" />
+                            <span>{tx.categoryName}</span>
                           </span>
                       )}
                     </div>
                     <p className="text-xs text-app-text/60 mt-0.5">
-                      {format(t.date, "dd MMM yyyy", { locale: localeId })}
+                      {format(tx.date, "dd MMM yyyy", { locale: currentLocale })}
                     </p>
                   </div>
                 </div>
@@ -1270,19 +1329,19 @@ export default function Dashboard() {
                   <p
                     className={`text-sm font-bold whitespace-nowrap relative z-10
                         ${
-                          t.type === "income"
+                          tx.type === "income"
                             ? "text-app-success"
-                            : t.type === "expense"
+                            : tx.type === "expense"
                               ? "text-app-danger"
                               : "text-app-text-bright"
                         }`}
                   >
-                    {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""}{" "}
-                    Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(t.amount)}
+                    {tx.type === "income" ? "+" : tx.type === "expense" ? "-" : ""}{" "}
+                    Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(tx.amount)}
                   </p>
-                  {t.adminFee && (
+                  {tx.adminFee && (
                     <p className="text-[10px] text-app-danger font-semibold mt-0.5">
-                      Fee: -Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(t.adminFee)}
+                      Fee: -Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(tx.adminFee)}
                     </p>
                   )}
                 </div>

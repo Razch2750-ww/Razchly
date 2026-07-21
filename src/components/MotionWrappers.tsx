@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'motion/react';
+import { motion, useMotionValue, useSpring, useTransform, useScroll, useReducedMotion } from 'motion/react';
 
 // Spring config for nice, premium elasticity (spring physics)
 const cardSpringConfig = { damping: 15, stiffness: 120, mass: 0.8 };
@@ -16,6 +16,10 @@ interface HoverCardProps {
  * following the user's cursor with bouncy spring physics, creating a high-end feel.
  */
 export function HoverCard({ children, className = '', onClick, id }: HoverCardProps) {
+  const shouldReduceMotion = useReducedMotion();
+  const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+  const disableInteractiveEffects = shouldReduceMotion || isTouchDevice;
+
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const spotlightX = useMotionValue(0);
@@ -28,6 +32,7 @@ export function HoverCard({ children, className = '', onClick, id }: HoverCardPr
   const scale = useSpring(1, cardSpringConfig);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (disableInteractiveEffects) return;
     const el = e.currentTarget;
     const rect = el.getBoundingClientRect();
     const width = rect.width;
@@ -46,14 +51,18 @@ export function HoverCard({ children, className = '', onClick, id }: HoverCardPr
 
   const handleMouseEnter = () => {
     setIsHovered(true);
-    scale.set(1.015); // subtle scale up for extra premium touch
+    if (!disableInteractiveEffects) {
+      scale.set(1.015); // subtle scale up for extra premium touch
+    }
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    scale.set(1);
-    x.set(0);
-    y.set(0);
+    if (!disableInteractiveEffects) {
+      scale.set(1);
+      x.set(0);
+      y.set(0);
+    }
   };
 
   return (
@@ -62,13 +71,13 @@ export function HoverCard({ children, className = '', onClick, id }: HoverCardPr
       className={`relative ${className} select-none overflow-hidden group`}
       onClick={onClick}
       style={{
-        rotateX,
-        rotateY,
-        scale,
-        transformStyle: 'preserve-3d',
+        rotateX: disableInteractiveEffects ? 0 : rotateX,
+        rotateY: disableInteractiveEffects ? 0 : rotateY,
+        scale: disableInteractiveEffects ? 1 : scale,
+        transformStyle: disableInteractiveEffects ? 'flat' : 'preserve-3d',
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
-        willChange: 'transform',
+        willChange: disableInteractiveEffects ? 'auto' : 'transform',
       }}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
@@ -109,18 +118,21 @@ interface ScrollRevealProps {
  * when entering the viewport, with a clean 400ms transition.
  */
 export function ScrollReveal({ children, className = '', delay = 0, id }: ScrollRevealProps) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <motion.div
       id={id}
       className={className}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
+      initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
+      whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-20px' }}
       transition={{
-        duration: 0.4,
+        duration: shouldReduceMotion ? 0.05 : 0.4,
         ease: 'easeOut',
-        delay: delay,
+        delay: shouldReduceMotion ? 0 : delay,
       }}
+      style={{ willChange: shouldReduceMotion ? 'auto' : 'transform, opacity' }}
     >
       {children}
     </motion.div>
@@ -135,19 +147,19 @@ export const staggerContainerVariants = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.05,
+      staggerChildren: 0.06, // Optimized stagger speed
+      delayChildren: 0.03,
     },
   },
 };
 
 export const staggerItemVariants: any = {
-  hidden: { opacity: 0, y: 15 },
+  hidden: { opacity: 0, y: 12 },
   show: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.4,
+      duration: 0.35,
       ease: 'easeOut',
     },
   },
@@ -167,7 +179,7 @@ export function StaggerContainer({ children, className = '', id }: StaggerContai
       variants={staggerContainerVariants}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, margin: '-20px' }}
+      viewport={{ once: true, margin: '-10px' }}
     >
       {children}
     </motion.div>
@@ -183,11 +195,18 @@ interface StaggerItemProps {
 }
 
 export function StaggerItem({ children, className = '', id, ...props }: StaggerItemProps) {
+  const shouldReduceMotion = useReducedMotion();
+  const variants = shouldReduceMotion ? {
+    hidden: { opacity: 1 },
+    show: { opacity: 1 }
+  } : staggerItemVariants;
+
   return (
     <motion.div
       id={id}
       className={className}
-      variants={staggerItemVariants}
+      variants={variants}
+      style={{ willChange: shouldReduceMotion ? 'auto' : 'transform, opacity' }}
       {...props}
     >
       {children}
@@ -206,7 +225,13 @@ interface TextRevealProps {
  * from an overflow-hidden mask for a highly premium, cinematic layout load.
  */
 export function TextReveal({ text, className = '', id }: TextRevealProps) {
+  const shouldReduceMotion = useReducedMotion();
   const words = text.split(' ');
+  
+  if (shouldReduceMotion) {
+    return <span id={id} className={className}>{text}</span>;
+  }
+
   return (
     <span id={id} className={`${className} inline-flex flex-wrap gap-x-[0.22em] overflow-hidden`}>
       {words.map((word, i) => (
@@ -216,10 +241,11 @@ export function TextReveal({ text, className = '', id }: TextRevealProps) {
             initial={{ y: '115%' }}
             animate={{ y: 0 }}
             transition={{
-              duration: 0.6,
+              duration: 0.5,
               ease: [0.16, 1, 0.3, 1], // fluid ease-out quartic
-              delay: i * 0.035,
+              delay: i * 0.025, // Slightly optimized delay
             }}
+            style={{ willChange: 'transform' }}
           >
             {word}
           </motion.span>
@@ -302,11 +328,12 @@ interface ParallaxBgProps {
  * ParallaxBg adds standard translate-y parallax shift relative to page scrolling.
  */
 export function ParallaxBg({ children, className = '', speed = 0.15 }: ParallaxBgProps) {
+  const shouldReduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 800], [0, -800 * speed]);
 
   return (
-    <motion.div style={{ y }} className={className}>
+    <motion.div style={{ y: shouldReduceMotion ? 0 : y, willChange: shouldReduceMotion ? 'auto' : 'transform' }} className={className}>
       {children}
     </motion.div>
   );
@@ -344,6 +371,7 @@ interface MicroLoopProps {
 }
 
 export function MicroLoop({ children, className = '', type = 'waggle' }: MicroLoopProps) {
+  const shouldReduceMotion = useReducedMotion();
   const variants: any = {
     waggle: {
       rotate: [0, -3, 3, -3, 3, 0],
@@ -376,8 +404,9 @@ export function MicroLoop({ children, className = '', type = 'waggle' }: MicroLo
   return (
     <motion.div
       className={`inline-block ${className}`}
-      animate={type}
+      animate={shouldReduceMotion ? false : type}
       variants={variants}
+      style={{ willChange: shouldReduceMotion ? 'auto' : (type === 'float' ? 'transform' : 'auto') }}
     >
       {children}
     </motion.div>
@@ -389,6 +418,7 @@ interface ParallaxBackgroundProps {
 }
 
 export function ParallaxBackground({ containerRef }: ParallaxBackgroundProps) {
+  const shouldReduceMotion = useReducedMotion();
   const { scrollY } = useScroll({ container: containerRef });
   
   // Multi-layered speed depths (moving 30% to 50% slower than main scrolling content)
@@ -396,21 +426,25 @@ export function ParallaxBackground({ containerRef }: ParallaxBackgroundProps) {
   const y2 = useTransform(scrollY, [0, 1000], [0, -200]);
   const y3 = useTransform(scrollY, [0, 1000], [0, 150]);
 
+  if (shouldReduceMotion) {
+    return null; // completely disable background glow movement when reduced motion is enabled
+  }
+
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden -z-20">
       {/* Glow blob 1 - Depth layer 1 */}
       <motion.div
-        style={{ y: y1 }}
+        style={{ y: y1, willChange: 'transform' }}
         className="absolute top-24 left-[10%] w-[25vw] h-[25vw] rounded-full bg-app-accent1/10 blur-[80px] opacity-35"
       />
       {/* Glow blob 2 - Depth layer 2 */}
       <motion.div
-        style={{ y: y2 }}
+        style={{ y: y2, willChange: 'transform' }}
         className="absolute top-[50vh] right-[15%] w-[30vw] h-[30vw] rounded-full bg-app-accent2/8 blur-[100px] opacity-25"
       />
       {/* Fine particle ring / Accent Blob 3 - Depth layer 3 */}
       <motion.div
-        style={{ y: y3 }}
+        style={{ y: y3, willChange: 'transform' }}
         className="absolute top-[100vh] left-[25%] w-[15vw] h-[15vw] rounded-full border border-app-accent1/10 bg-app-accent1/3 blur-[40px] opacity-20"
       />
     </div>

@@ -7,18 +7,19 @@ import { auth } from '../lib/firebase';
 import { signOut } from 'firebase/auth';
 import Transactions from './Transactions';
 import { ParallaxBackground } from './MotionWrappers';
+import { useTranslation } from '../utils/translations';
 
 const NAV_ITEMS = [
-  { path: '/', label: 'Beranda', icon: Home },
-  { path: '/transactions', label: 'Transaksi', icon: ArrowLeftRight },
-  { path: '/investments', label: 'Investasi', icon: TrendingUp },
-  { path: '/ai-trading', label: 'AI Trading', icon: Cpu },
-  { path: '/loans', label: 'Pinjaman', icon: HandCoins },
-  { path: '/attendance', label: 'Absensi', icon: CalendarCheck },
-  { path: '/grab', label: 'Grab', icon: Car },
-  { path: '/savings', label: 'Target', icon: Target },
-  { path: '/analyze', label: 'Analisis', icon: Scan },
-  { path: '/settings', label: 'Pengaturan', icon: Settings },
+  { path: '/', labelKey: 'nav.home', icon: Home },
+  { path: '/transactions', labelKey: 'nav.transactions', icon: ArrowLeftRight },
+  { path: '/investments', labelKey: 'nav.investments', icon: TrendingUp },
+  { path: '/ai-trading', labelKey: 'nav.aiTrading', icon: Cpu },
+  { path: '/loans', labelKey: 'nav.loans', icon: HandCoins },
+  { path: '/attendance', labelKey: 'nav.attendance', icon: CalendarCheck },
+  { path: '/grab', labelKey: 'nav.grab', icon: Car },
+  { path: '/savings', labelKey: 'nav.savings', icon: Target },
+  { path: '/analyze', labelKey: 'nav.analyze', icon: Scan },
+  { path: '/settings', labelKey: 'nav.settings', icon: Settings },
 ];
 
 export default function Layout() {
@@ -28,10 +29,20 @@ export default function Layout() {
   const [hoveredMobilePath, setHoveredMobilePath] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, hiddenTabs, setGlobalAddModalOpen, setGlobalGrabModalOpen } = useStore();
+  const user = useStore((state) => state.user);
+  const hiddenTabs = useStore((state) => state.hiddenTabs);
+  const setGlobalAddModalOpen = useStore((state) => state.setGlobalAddModalOpen);
+  const setGlobalGrabModalOpen = useStore((state) => state.setGlobalGrabModalOpen);
+  const { t } = useTranslation();
   const mainRef = useRef<HTMLElement>(null);
 
-  const visibleNavItems = NAV_ITEMS.filter((item) => !hiddenTabs.includes(item.path));
+  const visibleNavItems = React.useMemo(() => {
+    return NAV_ITEMS.filter((item) => !hiddenTabs.includes(item.path));
+  }, [hiddenTabs]);
+
+  const mobileNavItems = React.useMemo(() => {
+    return NAV_ITEMS.filter(item => ['/', '/transactions', '/investments', '/loans'].includes(item.path) && !hiddenTabs.includes(item.path));
+  }, [hiddenTabs]);
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -60,7 +71,7 @@ export default function Layout() {
             className={`flex items-center w-full py-2.5 mb-3 text-[11px] font-semibold tracking-wide text-app-text/50 hover:text-app-text rounded-lg hover:bg-app-hover/60 transition-all ${!isSidebarOpen ? 'justify-center px-0' : 'px-3 gap-2'}`}
           >
             <Menu className="w-4 h-4 shrink-0" />
-            {isSidebarOpen && "Collapse"}
+            {isSidebarOpen && t('nav.collapse')}
           </button>
           {visibleNavItems.map((item) => (
             <NavLink 
@@ -76,7 +87,7 @@ export default function Layout() {
                 }
                 ${!isSidebarOpen ? 'justify-center px-0' : 'px-3'}`
               }
-              title={!isSidebarOpen ? item.label : undefined}
+              title={!isSidebarOpen ? t(item.labelKey) : undefined}
             >
               {/* Active pill background */}
               {item.path === window.location.pathname && (
@@ -104,7 +115,7 @@ export default function Layout() {
                 <item.icon className="w-4.5 h-4.5" />
               </span>
               {isSidebarOpen && (
-                <span className="truncate text-sm font-medium relative z-10">{item.label}</span>
+                <span className="truncate text-sm font-medium relative z-10">{t(item.labelKey)}</span>
               )}
             </NavLink>
           ))}
@@ -120,7 +131,7 @@ export default function Layout() {
             <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
               <LogOut className="w-4 h-4" />
             </span>
-            {isSidebarOpen && <span className="text-sm font-medium">Keluar</span>}
+            {isSidebarOpen && <span className="text-sm font-medium">{t('nav.logout')}</span>}
           </button>
         </div>
       </aside>
@@ -175,7 +186,7 @@ export default function Layout() {
                 >
                   <Cpu className="w-5 h-5" />
                 </button>
-                <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border/50">AI Trading</span>
+                <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border/50">{t('nav.aiTrading')}</span>
               </motion.div>
               
               <motion.div 
@@ -194,7 +205,7 @@ export default function Layout() {
                 >
                   <CalendarCheck className="w-5 h-5" />
                 </button>
-                <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border/50">Absensi</span>
+                <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border/50">{t('nav.attendance')}</span>
               </motion.div>
               
               <motion.div 
@@ -213,7 +224,7 @@ export default function Layout() {
                 >
                   <Car className="w-5 h-5" />
                 </button>
-                <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border/50">Grab</span>
+                <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border/50">{t('nav.grab')}</span>
               </motion.div>
 
               <motion.div 
@@ -232,7 +243,7 @@ export default function Layout() {
               >
                 <ArrowLeftRight className="w-5 h-5" />
               </button>
-              <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border/50">Catat</span>
+              <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border/50">{t('common.add')}</span>
               </motion.div>
             </>
           )}
@@ -254,79 +265,71 @@ export default function Layout() {
 
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t border-app-border bg-app-card px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] flex justify-between items-center z-30">
-        {(() => {
-          const mobileNavItems = NAV_ITEMS.filter(item => ['/', '/transactions', '/investments', '/loans'].includes(item.path) && !hiddenTabs.includes(item.path));
-          
-          return (
-            <>
-              <div className="flex justify-around items-center flex-1">
-                {mobileNavItems.slice(0, 2).map((item) => (
-                  <NavLink 
-                    key={item.path} 
-                    to={item.path}
-                    onMouseEnter={() => setHoveredMobilePath(item.path)}
-                    onMouseLeave={() => setHoveredMobilePath(null)}
-                    className={({ isActive }) => `relative flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-all ${isActive ? 'text-[#6BA6EB] font-medium' : 'text-app-text/60'}`}
-                  >
-                    <item.icon className="w-5 h-5 mb-1 relative z-10" />
-                    <span className="text-[10px] relative z-10">{item.label}</span>
-                    
-                    {/* Dynamic Sliding Underline for Mobile active navigation */}
-                    {item.path === window.location.pathname && (
-                      <motion.div 
-                        layoutId="mobile-nav-underline"
-                        className="absolute bottom-1.5 left-2 right-2 h-[3px] bg-[#6BA6EB] rounded-full shadow-[0_1px_4px_rgba(107,166,235,0.4)]"
-                        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                      />
-                    )}
-                    
-                    {/* Dynamic sliding line for hovered navigation */}
-                    {item.path !== window.location.pathname && hoveredMobilePath === item.path && (
-                      <motion.div 
-                        layoutId="mobile-nav-hover-line"
-                        className="absolute bottom-1.5 left-4 right-4 h-[2px] bg-[#6BA6EB]/30 rounded-full"
-                        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                      />
-                    )}
-                  </NavLink>
-                ))}
-              </div>
-              <div className="w-[72px] shrink-0" /> {/* Spacer for FAB */}
-              <div className="flex justify-around items-center flex-1">
-                {mobileNavItems.slice(2).map((item) => (
-                  <NavLink 
-                    key={item.path} 
-                    to={item.path}
-                    onMouseEnter={() => setHoveredMobilePath(item.path)}
-                    onMouseLeave={() => setHoveredMobilePath(null)}
-                    className={({ isActive }) => `relative flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-all ${isActive ? 'text-[#6BA6EB] font-medium' : 'text-app-text/60'}`}
-                  >
-                    <item.icon className="w-5 h-5 mb-1 relative z-10" />
-                    <span className="text-[10px] relative z-10">{item.label}</span>
-                    
-                    {/* Dynamic Sliding Underline for Mobile active navigation */}
-                    {item.path === window.location.pathname && (
-                      <motion.div 
-                        layoutId="mobile-nav-underline"
-                        className="absolute bottom-1.5 left-2 right-2 h-[3px] bg-[#6BA6EB] rounded-full shadow-[0_1px_4px_rgba(107,166,235,0.4)]"
-                        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                      />
-                    )}
-                    
-                    {/* Dynamic sliding line for hovered navigation */}
-                    {item.path !== window.location.pathname && hoveredMobilePath === item.path && (
-                      <motion.div 
-                        layoutId="mobile-nav-hover-line"
-                        className="absolute bottom-1.5 left-4 right-4 h-[2px] bg-[#6BA6EB]/30 rounded-full"
-                        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                      />
-                    )}
-                  </NavLink>
-                ))}
-              </div>
-            </>
-          );
-        })()}
+        <div className="flex justify-around items-center flex-1">
+          {mobileNavItems.slice(0, 2).map((item) => (
+            <NavLink 
+              key={item.path} 
+              to={item.path}
+              onMouseEnter={() => setHoveredMobilePath(item.path)}
+              onMouseLeave={() => setHoveredMobilePath(null)}
+              className={({ isActive }) => `relative flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-all ${isActive ? 'text-[#6BA6EB] font-medium' : 'text-app-text/60'}`}
+            >
+              <item.icon className="w-5 h-5 mb-1 relative z-10" />
+              <span className="text-[10px] relative z-10">{t(item.labelKey)}</span>
+              
+              {/* Dynamic Sliding Underline for Mobile active navigation */}
+              {item.path === window.location.pathname && (
+                <motion.div 
+                  layoutId="mobile-nav-underline"
+                  className="absolute bottom-1.5 left-2 right-2 h-[3px] bg-[#6BA6EB] rounded-full shadow-[0_1px_4px_rgba(107,166,235,0.4)]"
+                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                />
+              )}
+              
+              {/* Dynamic sliding line for hovered navigation */}
+              {item.path !== window.location.pathname && hoveredMobilePath === item.path && (
+                <motion.div 
+                  layoutId="mobile-nav-hover-line"
+                  className="absolute bottom-1.5 left-4 right-4 h-[2px] bg-[#6BA6EB]/30 rounded-full"
+                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                />
+              )}
+            </NavLink>
+          ))}
+        </div>
+        <div className="w-[72px] shrink-0" /> {/* Spacer for FAB */}
+        <div className="flex justify-around items-center flex-1">
+          {mobileNavItems.slice(2).map((item) => (
+            <NavLink 
+              key={item.path} 
+              to={item.path}
+              onMouseEnter={() => setHoveredMobilePath(item.path)}
+              onMouseLeave={() => setHoveredMobilePath(null)}
+              className={({ isActive }) => `relative flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-all ${isActive ? 'text-[#6BA6EB] font-medium' : 'text-app-text/60'}`}
+            >
+              <item.icon className="w-5 h-5 mb-1 relative z-10" />
+              <span className="text-[10px] relative z-10">{t(item.labelKey)}</span>
+              
+              {/* Dynamic Sliding Underline for Mobile active navigation */}
+              {item.path === window.location.pathname && (
+                <motion.div 
+                  layoutId="mobile-nav-underline"
+                  className="absolute bottom-1.5 left-2 right-2 h-[3px] bg-[#6BA6EB] rounded-full shadow-[0_1px_4px_rgba(107,166,235,0.4)]"
+                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                />
+              )}
+              
+              {/* Dynamic sliding line for hovered navigation */}
+              {item.path !== window.location.pathname && hoveredMobilePath === item.path && (
+                <motion.div 
+                  layoutId="mobile-nav-hover-line"
+                  className="absolute bottom-1.5 left-4 right-4 h-[2px] bg-[#6BA6EB]/30 rounded-full"
+                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                />
+              )}
+            </NavLink>
+          ))}
+        </div>
       </nav>
     </div>
   );

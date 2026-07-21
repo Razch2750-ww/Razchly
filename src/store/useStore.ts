@@ -21,6 +21,7 @@ interface AppState {
   hiddenTabs: string[];
   isGlobalAddModalOpen: boolean;
   isGlobalGrabModalOpen: boolean;
+  hideBalances: boolean;
   workSchedule: WorkSchedule;
   attendancePeriodStart: number;
   attendancePeriodEnd: number;
@@ -48,6 +49,7 @@ interface AppState {
   setHiddenTabs: (tabs: string[]) => void;
   setGlobalAddModalOpen: (open: boolean) => void;
   setGlobalGrabModalOpen: (open: boolean) => void;
+  toggleHideBalances: () => void;
   setWorkSchedule: (schedule: WorkSchedule) => void;
   setAttendancePeriodStart: (day: number) => void;
   setAttendancePeriodEnd: (day: number) => void;
@@ -85,6 +87,7 @@ export const useStore = create<AppState>((set) => ({
   hiddenTabs: [],
   isGlobalAddModalOpen: false,
   isGlobalGrabModalOpen: false,
+  hideBalances: localStorage.getItem('hideBalances') === 'true',
   workSchedule: DEFAULT_SCHEDULE,
   attendancePeriodStart: 19,
   attendancePeriodEnd: 18,
@@ -121,6 +124,11 @@ export const useStore = create<AppState>((set) => ({
   setHiddenTabs: (tabs) => set({ hiddenTabs: tabs }),
   setGlobalAddModalOpen: (open) => set({ isGlobalAddModalOpen: open }),
   setGlobalGrabModalOpen: (open) => set({ isGlobalGrabModalOpen: open }),
+  toggleHideBalances: () => set((state) => {
+    const next = !state.hideBalances;
+    localStorage.setItem('hideBalances', String(next));
+    return { hideBalances: next };
+  }),
   setWorkSchedule: (schedule) => set({ workSchedule: schedule }),
   setAttendancePeriodStart: (day) => set({ attendancePeriodStart: day }),
   setAttendancePeriodEnd: (day) => set({ attendancePeriodEnd: day }),

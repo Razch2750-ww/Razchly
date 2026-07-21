@@ -62,7 +62,8 @@ import {
   subWeeks,
   addWeeks
 } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { id as localeId, enUS as localeEn } from "date-fns/locale";
+import { useTranslation } from "../utils/translations";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { sendDeviceNotification } from "../utils/notification";
 import { AccountIcon } from "./AccountIcon";
@@ -86,6 +87,8 @@ import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal, Mic
 import { ActionBtn } from "./PageShell";
 
 export default function Transactions({ modalOnly = false }: { modalOnly?: boolean }) {
+  const { t, language } = useTranslation();
+  const currentLocale = language === "en" ? localeEn : localeId;
   const detailRef = useRef<HTMLDivElement>(null);
   const {
     user,
@@ -805,7 +808,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
     filtered = filtered.filter(t => {
       const tDate = new Date(t.date);
       if (mobileTab === "Harian") return isSameDay(tDate, mobileCurrentDate);
-      if (mobileTab === "Mingguan") return isSameWeek(tDate, mobileCurrentDate, { locale: localeId });
+      if (mobileTab === "Mingguan") return isSameWeek(tDate, mobileCurrentDate, { locale: currentLocale });
       if (mobileTab === "Bulanan") return isSameMonth(tDate, mobileCurrentDate);
       if (mobileTab === "Custom") {
         if (!mobileCustomStartDate || !mobileCustomEndDate) return true;
@@ -887,33 +890,33 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
   const getMobilePeriodText = () => {
     if (mobileTab === "Harian") {
-      if (isSameDay(mobileCurrentDate, new Date())) return "Hari ini - " + format(mobileCurrentDate, "EEEE, d MMM yyyy", { locale: localeId });
-      return format(mobileCurrentDate, "EEEE, d MMM yyyy", { locale: localeId });
+      if (isSameDay(mobileCurrentDate, new Date())) return (language === "en" ? "Today - " : "Hari ini - ") + format(mobileCurrentDate, "EEEE, d MMM yyyy", { locale: currentLocale });
+      return format(mobileCurrentDate, "EEEE, d MMM yyyy", { locale: currentLocale });
     }
     if (mobileTab === "Mingguan") {
-      if (isSameWeek(mobileCurrentDate, new Date(), { locale: localeId })) return "Minggu ini - " + format(mobileCurrentDate, "d MMM yyyy", { locale: localeId });
-      return "Minggu " + format(mobileCurrentDate, "w, MMM yyyy", { locale: localeId });
+      if (isSameWeek(mobileCurrentDate, new Date(), { locale: currentLocale })) return (language === "en" ? "This week - " : "Minggu ini - ") + format(mobileCurrentDate, "d MMM yyyy", { locale: currentLocale });
+      return (language === "en" ? "Week " : "Minggu ") + format(mobileCurrentDate, "w, MMM yyyy", { locale: currentLocale });
     }
     if (mobileTab === "Bulanan") {
-      if (isSameMonth(mobileCurrentDate, new Date())) return "Bulan ini - " + format(mobileCurrentDate, "MMMM yyyy", { locale: localeId });
-      return format(mobileCurrentDate, "MMMM yyyy", { locale: localeId });
+      if (isSameMonth(mobileCurrentDate, new Date())) return (language === "en" ? "This month - " : "Bulan ini - ") + format(mobileCurrentDate, "MMMM yyyy", { locale: currentLocale });
+      return format(mobileCurrentDate, "MMMM yyyy", { locale: currentLocale });
     }
     return "Custom";
   };
 
   const getPeriodText = () => {
     if (selectedReportPeriod === "today")
-      return format(new Date(), "d MMMM yyyy", { locale: localeId });
-    if (selectedReportPeriod === "this_week") return "Minggu Ini";
+      return format(new Date(), "d MMMM yyyy", { locale: currentLocale });
+    if (selectedReportPeriod === "this_week") return language === "en" ? "This Week" : "Minggu Ini";
     if (selectedReportPeriod === "this_month")
-      return format(new Date(), "MMMM yyyy", { locale: localeId });
+      return format(new Date(), "MMMM yyyy", { locale: currentLocale });
     if (selectedReportPeriod === "last_month")
       return format(subMonths(new Date(), 1), "MMMM yyyy", {
-        locale: localeId,
+        locale: currentLocale,
       });
     if (selectedReportPeriod.match(/^\d{4}-\d{2}$/))
       return format(new Date(selectedReportPeriod + "-01"), "MMMM yyyy", {
-        locale: localeId,
+        locale: currentLocale,
       });
     return "";
   };
@@ -1304,7 +1307,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                             : getAccountName(t.accountId)}{" "}
                           •{" "}
                           {format(t.date, "dd MMM, HH:mm", {
-                            locale: localeId,
+                            locale: currentLocale,
                           })}
                         </p>
                       </div>
@@ -1372,10 +1375,10 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
           <div>
             <h1 className="text-2xl md:text-[1.75rem] font-bold text-app-text-bright tracking-tight leading-tight">
-              <TextReveal text="Laporan Keuangan" />
+              <TextReveal text={language === "en" ? "Financial Report" : "Laporan Keuangan"} />
             </h1>
             <p className="text-app-text/60 text-sm mt-1">
-              Unduh dan analisis laporan keuangan bulanan Anda.
+              {language === "en" ? "Download and analyze your monthly financial reports." : "Unduh dan analisis laporan keuangan bulanan Anda."}
             </p>
           </div>
 
@@ -1384,15 +1387,15 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               variant="success"
               icon={<Car className="w-4 h-4" />}
               onClick={() => setGlobalGrabModalOpen(true)}
-              title="Transaksi Grab"
+              title={language === "en" ? "Grab Transactions" : "Transaksi Grab"}
             />
             <ActionBtn
               variant="primary"
               icon={<Plus className="w-4 h-4" />}
               onClick={() => setGlobalAddModalOpen(true)}
-              title="Tambah Transaksi"
+              title={language === "en" ? "Add Transaction" : "Tambah Transaksi"}
             >
-              Tambah
+              {language === "en" ? "Add" : "Tambah"}
             </ActionBtn>
             <Link
               to="/settings"
@@ -1421,10 +1424,10 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           
           <div className="relative z-10">
             <h2 className="text-app-text-bright font-bold text-lg">
-              Laporan Keuangan
+              {language === "en" ? "Financial Report" : "Laporan Keuangan"}
             </h2>
             <p className="text-app-text/60 text-xs mt-1">
-              Periode: {getPeriodText()}
+              {language === "en" ? "Period:" : "Periode:"} {getPeriodText()}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 relative z-10">
@@ -1434,7 +1437,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 onChange={(e) => setSelectedReportAccount(e.target.value)}
                 className="bg-app-bg border border-app-border text-app-text-bright text-sm rounded-xl pl-4 pr-10 py-2.5 appearance-none outline-none focus:border-app-accent1 cursor-pointer"
               >
-                <option value="all">Semua Dompet</option>
+                <option value="all">{language === "en" ? "All Wallets" : "Semua Dompet"}</option>
                 {accounts.map((acc) => (
                   <option key={acc.id} value={acc.id}>
                     {acc.name}
@@ -1460,11 +1463,11 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   }}
                   className="bg-app-bg border border-app-border text-app-text-bright text-sm rounded-xl pl-4 pr-10 py-2.5 appearance-none outline-none focus:border-app-accent1 cursor-pointer"
                 >
-                  <option value="today">Hari Ini</option>
-                  <option value="this_week">Minggu Ini</option>
-                  <option value="this_month">Bulan Ini</option>
-                  <option value="last_month">Bulan Sebelumnya</option>
-                  <option value="custom">Pilih Bulan</option>
+                  <option value="today">{language === "en" ? "Today" : "Hari Ini"}</option>
+                  <option value="this_week">{language === "en" ? "This Week" : "Minggu Ini"}</option>
+                  <option value="this_month">{language === "en" ? "This Month" : "Bulan Ini"}</option>
+                  <option value="last_month">{language === "en" ? "Previous Month" : "Bulan Sebelumnya"}</option>
+                  <option value="custom">{language === "en" ? "Select Month" : "Pilih Bulan"}</option>
                 </select>
                 <ChevronDown className="w-4 h-4 text-app-text/50 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
@@ -1503,14 +1506,13 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
             <div className="relative z-10 mb-8">
               <div className="inline-block px-3 py-1 bg-app-success/10 text-app-success text-[10px] font-bold tracking-wider rounded-full mb-4 uppercase">
-                Total Keuntungan Bersih
+                {language === "en" ? "Total Net Profit" : "Total Keuntungan Bersih"}
               </div>
               <h2 className="text-4xl md:text-5xl font-bold text-app-text-bright mb-2">
                 Rp {stats.netProfit.toLocaleString("id-ID")}
               </h2>
               <div className="flex items-center gap-2 text-app-text/60 text-xs">
-                <Info className="w-4 h-4" /> Belum ada data bulan sebelumnya
-                untuk perbandingan
+                <Info className="w-4 h-4" /> {language === "en" ? "No previous month data available for comparison" : "Belum ada data bulan sebelumnya untuk perbandingan"}
               </div>
             </div>
 
@@ -1520,7 +1522,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   {stats.count}
                 </span>
                 <span className="text-[10px] text-app-text/50 font-bold tracking-wider uppercase">
-                  Total Transaksi
+                  {language === "en" ? "Total Transactions" : "Total Transaksi"}
                 </span>
               </div>
               <div className="bg-app-bg border border-app-border/50 rounded-2xl p-5 flex flex-col items-center justify-center text-center">
@@ -1528,7 +1530,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   Rp {Math.round(stats.avgIncome).toLocaleString("id-ID")}
                 </span>
                 <span className="text-[10px] text-app-text/50 font-bold tracking-wider uppercase">
-                  Rata-rata / Hari
+                  {language === "en" ? "Average / Day" : "Rata-rata / Hari"}
                 </span>
               </div>
               <div className="bg-app-bg border border-app-border/50 rounded-2xl p-5 flex flex-col items-center justify-center text-center">
@@ -1536,7 +1538,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   Rp {Math.round(stats.avgExpense).toLocaleString("id-ID")}
                 </span>
                 <span className="text-[10px] text-app-text/50 font-bold tracking-wider uppercase">
-                  Pengeluaran / Hari
+                  {language === "en" ? "Expenses / Day" : "Pengeluaran / Hari"}
                 </span>
               </div>
             </div>

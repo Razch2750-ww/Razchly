@@ -52,7 +52,8 @@ import {
   Cell,
 } from "recharts";
 import { format, subDays, isSameDay } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { id as localeId, enUS as localeEn } from "date-fns/locale";
+import { useTranslation } from "../utils/translations";
 import { formatNumberInput, parseNumberInput } from "../utils/numberFormat";
 import { toast } from "react-hot-toast";
 import { motion } from "motion/react";
@@ -628,6 +629,8 @@ export function parseInvestmentFromTransaction(tx: any) {
 }
 
 export default function Investments() {
+  const { t, language } = useTranslation();
+  const currentLocale = language === "en" ? localeEn : localeId;
   const user = useStore((state) => state.user);
   const { themeId } = useStore();
   const [investments, setInvestments] = useState<Investment[]>([]);
@@ -1600,30 +1603,30 @@ export default function Investments() {
 
   const actionsInvestments = (
     <div className="flex items-center gap-2">
-      <ActionBtn variant="secondary" icon={<TrendingUp className="w-4 h-4 text-app-accent1" />} onClick={() => setIsSimulatorOpen(true)} title="Simulasi ARA/ARB">
-        Simulasi ARA/ARB
+      <ActionBtn variant="secondary" icon={<TrendingUp className="w-4 h-4 text-app-accent1" />} onClick={() => setIsSimulatorOpen(true)} title={language === "en" ? "ARA/ARB Simulation" : "Simulasi ARA/ARB"}>
+        {language === "en" ? "ARA/ARB Sim" : "Simulasi ARA/ARB"}
       </ActionBtn>
-      <ActionBtn variant="secondary" icon={<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-app-accent1' : ''}`} />} onClick={handleRefresh} disabled={isRefreshing} title="Refresh Data">
-        Refresh
+      <ActionBtn variant="secondary" icon={<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-app-accent1' : ''}`} />} onClick={handleRefresh} disabled={isRefreshing} title={language === "en" ? "Refresh Data" : "Refresh Data"}>
+        {language === "en" ? "Refresh" : "Refresh"}
       </ActionBtn>
-      <ActionBtn variant="primary" icon={<Plus className="w-4 h-4" />} onClick={openPortfolioModal} title="Tambah Portofolio">
-        Tambah Portofolio
+      <ActionBtn variant="primary" icon={<Plus className="w-4 h-4" />} onClick={openPortfolioModal} title={language === "en" ? "Add Portfolio" : "Tambah Portofolio"}>
+        {language === "en" ? "Add Portfolio" : "Tambah Portofolio"}
       </ActionBtn>
     </div>
   );
 
   const mobileActionsInvestments = (
     <div className="flex items-center gap-1.5">
-      <ActionBtn variant="secondary" icon={<TrendingUp className="w-4 h-4 text-app-accent1" />} onClick={() => setIsSimulatorOpen(true)} title="Simulasi ARA/ARB" />
-      <ActionBtn variant="secondary" icon={<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-app-accent1' : ''}`} />} onClick={handleRefresh} disabled={isRefreshing} title="Refresh Data" />
-      <ActionBtn variant="primary" icon={<Plus className="w-4 h-4" />} onClick={openPortfolioModal} title="Tambah Portofolio" />
+      <ActionBtn variant="secondary" icon={<TrendingUp className="w-4 h-4 text-app-accent1" />} onClick={() => setIsSimulatorOpen(true)} title={language === "en" ? "ARA/ARB Simulation" : "Simulasi ARA/ARB"} />
+      <ActionBtn variant="secondary" icon={<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-app-accent1' : ''}`} />} onClick={handleRefresh} disabled={isRefreshing} title={language === "en" ? "Refresh Data" : "Refresh Data"} />
+      <ActionBtn variant="primary" icon={<Plus className="w-4 h-4" />} onClick={openPortfolioModal} title={language === "en" ? "Add Portfolio" : "Tambah Portofolio"} />
     </div>
   );
 
   return (
     <PageShell
-      title="Investasi Anda"
-      subtitle="Berikut ringkasan performa investasi Anda."
+      title={language === "en" ? "Your Investments" : "Investasi Anda"}
+      subtitle={language === "en" ? "Here is the summary of your investment performance." : "Berikut ringkasan performa investasi Anda."}
       actions={actionsInvestments}
       mobileActions={mobileActionsInvestments}
     >
@@ -1638,7 +1641,7 @@ export default function Investments() {
               : "text-app-text/60 hover:text-app-text-bright"
           }`}
         >
-          Ringkasan
+          {language === "en" ? "Summary" : "Ringkasan"}
         </button>
         <button
           type="button"
@@ -1649,7 +1652,7 @@ export default function Investments() {
               : "text-app-text/60 hover:text-app-text-bright"
           }`}
         >
-          Kepemilikan Aktif
+          {language === "en" ? "Active Holdings" : "Kepemilikan Aktif"}
         </button>
         <button
           type="button"
@@ -1660,7 +1663,7 @@ export default function Investments() {
               : "text-app-text/60 hover:text-app-text-bright"
           }`}
         >
-          Audit Riwayat
+          {language === "en" ? "Audit History" : "Audit Riwayat"}
           {auditedHoldings.length > 0 && (
             <span className="bg-app-accent1 text-app-bg text-[9px] px-1.5 py-0.5 rounded-full font-bold">
               {auditedHoldings.length}
