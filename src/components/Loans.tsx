@@ -187,7 +187,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
             <CheckCircle className="w-5 h-5 text-app-success" />
           </div>
           <div>
-            <h2 className="font-bold text-app-text-bright text-base">
+            <h2 className="font-semibold text-app-text-bright text-base">
               {loan.name} <span className="text-xs font-normal opacity-50">({isLend ? 'Piutang' : 'Pinjaman'})</span>
             </h2>
             <p className="text-xs text-app-text/60">Rp{details.totalPrincipal.toLocaleString("id-ID")} • Lunas</p>
@@ -225,7 +225,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
   const payManualAmountLabel = isLend ? "Nominal Penerimaan Manual" : "Nominal Pembayaran Manual";
 
   return (
-    <HoverCard className={`bg-app-card rounded-[24px] border ${isLend ? 'border-app-success/20 hover:border-app-success/40' : 'border-app-accent1/20 hover:border-app-accent1/40'} p-5 shadow-sm flex flex-col relative overflow-hidden group transition-colors w-full`}>
+    <HoverCard className={`bg-app-card rounded-[18px] border ${isLend ? 'border-app-success/20 hover:border-app-success/40' : 'border-app-accent1/20 hover:border-app-accent1/40'} p-5 shadow-sm flex flex-col relative overflow-hidden group transition-colors w-full`}>
 
       <div className="flex justify-between items-center mb-4 relative z-10">
         <div className="flex items-center gap-3">
@@ -234,7 +234,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
           ) : (
             <CreditCard className="w-5 h-5 text-app-accent1" />
           )}
-          <h2 className="font-bold text-app-text-bright text-lg">
+          <h2 className="font-semibold text-app-text-bright text-lg">
             {loan.name} <span className="text-xs font-normal opacity-50">({isLend ? 'Piutang' : 'Pinjaman'})</span>
           </h2>
         </div>
@@ -265,7 +265,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
         </div>
       </div>
 
-      <div className="bg-app-bg/50 rounded-xl p-4 space-y-3 border border-app-border/50">
+      <div className="bg-app-bg/50 rounded-xl p-4 space-y-3 border border-app-border">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-xs text-app-text/70 mb-1">{totalPrincipalLabel}</p>
@@ -277,7 +277,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
           </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-4 pt-3 border-t border-app-border/50">
+        <div className="grid grid-cols-2 gap-4 pt-3 border-t border-app-border">
           <div>
             <p className="text-xs text-app-text/70 mb-1">{totalPaymentLabel}</p>
             <p className="font-semibold text-app-success">Rp{details.totalPayment.toLocaleString("id-ID")}</p>
@@ -292,7 +292,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4 pt-3 border-t border-app-border/50">
+        <div className="grid grid-cols-2 gap-4 pt-3 border-t border-app-border">
           <div>
             <p className="text-xs text-app-text/70 mb-1">{paidAmountLabel}</p>
             <p className="font-semibold text-app-success">Rp{paidAmount.toLocaleString("id-ID")}</p>
@@ -304,7 +304,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
         </div>
 
         {loan.hasTenor !== false && (
-          <div className="flex justify-between items-center pt-3 border-t border-app-border/50">
+          <div className="flex justify-between items-center pt-3 border-t border-app-border">
             <div className="flex flex-col">
               <p className="text-xs text-app-text/70">Tenor: {loan.tenorDuration} {loan.tenorUnit}</p>
               {loan.paymentMethod === 'mingguan' && loan.paymentDay && (
@@ -323,7 +323,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
         <span className="text-xs text-app-text/70">Progress</span>
         <span className="text-xs font-medium text-app-text-bright">{Math.round(progress)}%</span>
       </div>
-      <div className="w-full bg-app-bg rounded-full h-1.5 mb-5 overflow-hidden border border-app-border/50">
+      <div className="w-full bg-app-bg rounded-full h-1.5 mb-5 overflow-hidden border border-app-border">
         <div 
           className={`${isLend ? 'bg-app-success' : 'bg-app-accent1'} h-1.5 rounded-full transition-all duration-500`} 
           style={{ width: `${Math.min(100, Math.max(0, progress))}%` }} 
@@ -331,7 +331,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       </div>
 
       {nextPaymentDate && (
-        <div className="bg-app-bg/50 rounded-xl p-3 border border-app-border/50 flex justify-between items-center mb-4">
+        <div className="bg-app-bg/50 rounded-xl p-3 border border-app-border flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-app-text/70" />
             <span className="text-sm text-app-text-bright">
@@ -403,7 +403,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
             <button 
               onClick={() => handlePay(Number(manualAmount))}
               disabled={!manualAmount || Number(manualAmount) <= 0}
-              className={`${isLend ? 'bg-app-success' : 'bg-app-accent1'} text-app-bg px-4 py-2 rounded-lg text-sm font-bold disabled:opacity-50`}
+              className={`${isLend ? 'bg-app-success' : 'bg-app-accent1'} text-app-bg px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50`}
             >
               {isLend ? "Terima" : "Bayar"}
             </button>
@@ -413,7 +413,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       )}
 
       {isPaidOff ? (
-        <div className="bg-app-success/10 text-app-success p-3 rounded-xl border border-app-success/20 flex items-center justify-center gap-2 font-bold text-sm">
+        <div className="bg-app-success/10 text-app-success p-3 rounded-xl border border-app-success/20 flex items-center justify-center gap-2 font-semibold text-sm">
           <CheckCircle className="w-5 h-5" />
           {labelPrefix} Lunas
         </div>
@@ -452,9 +452,9 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
 
       {isScheduleOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1C1C1E] border border-app-border/40 rounded-[24px] w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
+          <div className="bg-[#1C1C1E] border border-app-border rounded-[18px] w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
             <div className="p-4 border-b border-app-border flex justify-between items-center">
-              <h3 className="font-bold text-app-text-bright">Jadwal Pembayaran</h3>
+              <h3 className="font-semibold text-app-text-bright">Jadwal Pembayaran</h3>
               <button onClick={() => setIsScheduleOpen(false)} className="text-app-text/50 hover:text-app-text-bright">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
               </button>
@@ -464,7 +464,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
                 <div key={item.id} className={`flex items-center justify-between p-3 rounded-xl border ${item.isPaid ? 'bg-app-success/10 border-app-success/20' : 'bg-app-bg border-app-border'}`}>
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${item.isPaid ? 'bg-app-success text-app-bg' : 'bg-app-card text-app-text/50'}`}>
-                      {item.isPaid ? <CheckCircle className="w-4 h-4" /> : <span className="text-xs font-bold">{item.id}</span>}
+                      {item.isPaid ? <CheckCircle className="w-4 h-4" /> : <span className="text-xs font-semibold">{item.id}</span>}
                     </div>
                     <div>
                       <p className={`text-sm font-semibold ${item.isPaid ? 'text-app-success' : 'text-app-text-bright'}`}>
@@ -476,7 +476,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
                     </div>
                   </div>
                   {item.isPaid && (
-                    <span className="text-xs font-bold text-app-success uppercase tracking-wider">Lunas</span>
+                    <span className="text-xs font-semibold text-app-success uppercase tracking-wider">Lunas</span>
                   )}
                 </div>
               ))}
@@ -543,8 +543,8 @@ export default function Loans() {
       snap.forEach((d) => accts.push({ id: d.id, ...d.data() } as Account));
       setAccounts(accts);
       if (accts.length > 0) {
-        if (!accountId) setAccountId(accts[0].id);
-        if (!autoDebitAccountId) setAutoDebitAccountId(accts[0].id);
+        if (!accountId) setAccountId(localStorage.getItem('lastAccountId_loans') || accts[0].id);
+        if (!autoDebitAccountId) setAutoDebitAccountId(localStorage.getItem('lastAccountId_loans_autodebit') || accts[0].id);
       }
     });
 
@@ -604,10 +604,10 @@ export default function Loans() {
     
     setDepositToAccount(loan.depositToAccount || false);
     setDeductFromAccount(loan.deductFromAccount || false);
-    setAccountId(loan.accountId || (accounts[0]?.id || ""));
+    setAccountId(loan.accountId || (localStorage.getItem('lastAccountId_loans') || accounts[0]?.id || ""));
     
     setAutoDebit(loan.autoDebit || false);
-    setAutoDebitAccountId(loan.autoDebitAccountId || (accounts[0]?.id || ""));
+    setAutoDebitAccountId(loan.autoDebitAccountId || (localStorage.getItem('lastAccountId_loans_autodebit') || accounts[0]?.id || ""));
     
     setDueDateEnabled(!!loan.dueDate);
     setDueDateVal(loan.dueDate ? new Date(loan.dueDate).toISOString().split('T')[0] : "");
@@ -938,7 +938,7 @@ export default function Loans() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto pt-20">
-          <div className="bg-app-card text-app-text w-full max-w-md rounded-[24px] shadow-2xl border border-app-border/40 overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
+          <div className="bg-app-card text-app-text w-full max-w-md rounded-[18px] shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
                 {editingLoan ? (type === 'lend' ? "Edit Piutang" : "Edit Pinjaman") : (type === 'lend' ? "Tambah Piutang" : "Tambah Pinjaman")}
@@ -963,7 +963,7 @@ export default function Loans() {
                       setDepositToAccount(false);
                       setDeductFromAccount(false);
                     }}
-                    className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all ${type === "borrow" ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text hover:text-app-text-bright"}`}
+                    className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all ${type === "borrow" ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text hover:text-app-text-bright"}`}
                   >
                     Saya Pinjam (Hutang)
                   </button>
@@ -975,7 +975,7 @@ export default function Loans() {
                       setDepositToAccount(false);
                       setDeductFromAccount(false);
                     }}
-                    className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all ${type === "lend" ? "bg-app-success text-app-bg shadow-sm" : "text-app-text hover:text-app-text-bright"}`}
+                    className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all ${type === "lend" ? "bg-app-success text-app-bg shadow-sm" : "text-app-text hover:text-app-text-bright"}`}
                   >
                     Saya Pinjamkan (Piutang)
                   </button>
@@ -998,7 +998,7 @@ export default function Loans() {
 
               {/* Jumlah Pinjaman/Piutang */}
               <div>
-                <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-app-text/70 mb-2 uppercase tracking-wider">
                   {type === 'lend' ? "Jumlah yang Dipinjamkan (Rp)" : "Jumlah Pinjaman (Rp)"}
                 </label>
                 <input
@@ -1006,14 +1006,14 @@ export default function Loans() {
                   value={amount}
                   onChange={(e) => setAmount(formatNumberInput(e.target.value))}
                   placeholder="0"
-                  className="w-full bg-app-bg border border-app-border text-app-text-bright text-lg font-bold rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
+                  className="w-full bg-app-bg border border-app-border text-app-text-bright text-lg font-semibold rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                 />
               </div>
 
               {/* Bunga */}
               <div className="bg-app-bg p-4 rounded-xl border border-app-border">
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-bold text-app-text-bright">Ada Bunga?</label>
+                  <label className="text-sm font-semibold text-app-text-bright">Ada Bunga?</label>
                   <button
                     type="button"
                     onClick={() => setHasInterest(!hasInterest)}
@@ -1024,19 +1024,19 @@ export default function Loans() {
                 </div>
                 
                 {hasInterest && (
-                  <div className="space-y-3 pt-3 border-t border-app-border/50">
+                  <div className="space-y-3 pt-3 border-t border-app-border">
                     <div className="flex gap-2">
                       <button
                         type="button"
                         onClick={() => setInterestType("percentage")}
-                        className={`flex-1 py-1.5 text-xs font-bold rounded-lg ${interestType === "percentage" ? "bg-app-accent1 text-app-bg" : "bg-app-card text-app-text"}`}
+                        className={`flex-1 py-1.5 text-xs font-semibold rounded-lg ${interestType === "percentage" ? "bg-app-accent1 text-app-bg" : "bg-app-card text-app-text"}`}
                       >
                         Persentase (%)
                       </button>
                       <button
                         type="button"
                         onClick={() => setInterestType("nominal")}
-                        className={`flex-1 py-1.5 text-xs font-bold rounded-lg ${interestType === "nominal" ? "bg-app-accent1 text-app-bg" : "bg-app-card text-app-text"}`}
+                        className={`flex-1 py-1.5 text-xs font-semibold rounded-lg ${interestType === "nominal" ? "bg-app-accent1 text-app-bg" : "bg-app-card text-app-text"}`}
                       >
                         Nominal (Rp)
                       </button>
@@ -1056,7 +1056,7 @@ export default function Loans() {
               <div className="bg-app-bg p-4 rounded-xl border border-app-border mb-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-bold text-app-text-bright block">Ada Tenor & Jadwal?</label>
+                    <label className="text-sm font-semibold text-app-text-bright block">Ada Tenor & Jadwal?</label>
                     <span className="text-xs text-app-text/60">Tentukan batas waktu dan jadwal cicilan</span>
                   </div>
                   <button
@@ -1079,7 +1079,7 @@ export default function Loans() {
                 <>
                   {/* Tenor */}
                   <div className="mb-5">
-                    <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-app-text/70 mb-2 uppercase tracking-wider">
                       Tenor {type === 'lend' ? "Piutang" : "Pinjaman"}
                     </label>
                     <div className="flex gap-2 mb-3">
@@ -1088,7 +1088,7 @@ export default function Loans() {
                           key={t}
                           type="button"
                           onClick={() => setTenorUnit(t as any)}
-                          className={`flex-1 py-2 text-xs font-bold rounded-xl capitalize ${tenorUnit === t ? "bg-app-accent1 text-app-bg" : "bg-app-bg border border-app-border text-app-text"}`}
+                          className={`flex-1 py-2 text-xs font-semibold rounded-xl capitalize ${tenorUnit === t ? "bg-app-accent1 text-app-bg" : "bg-app-bg border border-app-border text-app-text"}`}
                         >
                           {t}
                         </button>
@@ -1106,7 +1106,7 @@ export default function Loans() {
 
                   {/* Metode Pembayaran */}
                   <div className="mb-5">
-                    <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-app-text/70 mb-2 uppercase tracking-wider">
                       Metode {type === 'lend' ? "Terima" : "Bayar"}
                     </label>
                     <div className="flex gap-2 mb-3">
@@ -1115,7 +1115,7 @@ export default function Loans() {
                           key={t}
                           type="button"
                           onClick={() => setPaymentMethod(t as any)}
-                          className={`flex-1 py-2 text-xs font-bold rounded-xl capitalize ${paymentMethod === t ? "bg-app-accent1 text-app-bg" : "bg-app-bg border border-app-border text-app-text"}`}
+                          className={`flex-1 py-2 text-xs font-semibold rounded-xl capitalize ${paymentMethod === t ? "bg-app-accent1 text-app-bg" : "bg-app-bg border border-app-border text-app-text"}`}
                         >
                           {t}
                         </button>
@@ -1155,7 +1155,7 @@ export default function Loans() {
               {!hasTenor && (
                 <div className="bg-app-bg p-4 rounded-xl border border-app-border space-y-2">
                   <div>
-                    <label className="text-sm font-bold text-app-text-bright block">Tanggal Pembayaran (Jatuh Tempo)</label>
+                    <label className="text-sm font-semibold text-app-text-bright block">Tanggal Pembayaran (Jatuh Tempo)</label>
                     <span className="text-xs text-app-text/60">Bisa diisi atau dikosongkan jika tidak ada jatuh tempo</span>
                   </div>
                   
@@ -1173,7 +1173,7 @@ export default function Loans() {
                 <div className="bg-app-bg p-4 rounded-xl border border-app-border">
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <label className="text-sm font-bold text-app-text-bright block">Saldo Masuk?</label>
+                      <label className="text-sm font-semibold text-app-text-bright block">Saldo Masuk?</label>
                       <span className="text-xs text-app-text/60">Tambahkan langsung ke saldo rekening</span>
                     </div>
                     <button
@@ -1188,7 +1188,10 @@ export default function Loans() {
                   {depositToAccount && (
                     <select
                       value={accountId}
-                      onChange={(e) => setAccountId(e.target.value)}
+                      onChange={(e) => {
+                      setAccountId(e.target.value);
+                      localStorage.setItem('lastAccountId_loans', e.target.value);
+                    }}
                       className="w-full mt-2 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                     >
                       <option value="" disabled className="bg-[#1C1C1E] text-white">Pilih Rekening Tujuan</option>
@@ -1205,7 +1208,7 @@ export default function Loans() {
                 <div className="bg-app-bg p-4 rounded-xl border border-app-border">
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <label className="text-sm font-bold text-app-text-bright block">Potong dari Rekening?</label>
+                      <label className="text-sm font-semibold text-app-text-bright block">Potong dari Rekening?</label>
                       <span className="text-xs text-app-text/60">Kurangi saldo dari rekening sumber dana</span>
                     </div>
                     <button
@@ -1220,7 +1223,10 @@ export default function Loans() {
                   {deductFromAccount && (
                     <select
                       value={accountId}
-                      onChange={(e) => setAccountId(e.target.value)}
+                      onChange={(e) => {
+                      setAccountId(e.target.value);
+                      localStorage.setItem('lastAccountId_loans', e.target.value);
+                    }}
                       className="w-full mt-2 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                     >
                       <option value="" disabled className="bg-[#1C1C1E] text-white">Pilih Rekening Sumber</option>
@@ -1237,7 +1243,7 @@ export default function Loans() {
                 <div className="bg-app-bg p-4 rounded-xl border border-app-border">
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <label className="text-sm font-bold text-app-text-bright block">Auto Debit?</label>
+                      <label className="text-sm font-semibold text-app-text-bright block">Auto Debit?</label>
                       <span className="text-xs text-app-text/60">Potong saldo otomatis saat jatuh tempo</span>
                     </div>
                     <button
@@ -1252,12 +1258,15 @@ export default function Loans() {
                   {autoDebit && (
                     <select
                       value={autoDebitAccountId}
-                      onChange={(e) => setAutoDebitAccountId(e.target.value)}
+                      onChange={(e) => {
+                      setAutoDebitAccountId(e.target.value);
+                      localStorage.setItem('lastAccountId_loans_autodebit', e.target.value);
+                    }}
                       className="w-full mt-2 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                     >
                       <option value="" disabled className="bg-[#1C1C1E] text-white">Pilih Rekening Potongan</option>
                       {accounts.map(acc => (
-                        <option key={acc.id} value={acc.id} className="bg-[#1C1C1E] text-white">{acc.name}</option>
+                        <option key={acc.id} value={acc.id} className="bg-[#1C1C1E] text-white">{acc.name} (Rp {acc.balance.toLocaleString("id-ID")})</option>
                       ))}
                     </select>
                   )}
@@ -1267,7 +1276,7 @@ export default function Loans() {
               {/* Hasil Perhitungan */}
               {calculationResult && (
                 <div className="bg-app-card p-4 rounded-xl border border-app-border space-y-4">
-                  <h3 className="font-bold text-app-text-bright">
+                  <h3 className="font-semibold text-app-text-bright">
                     {type === 'lend' ? "Hasil Penerimaan" : "Hasil Perhitungan"}
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
@@ -1275,26 +1284,26 @@ export default function Loans() {
                       <p className="text-xs text-app-text/70 mb-1">
                         {type === 'lend' ? "Total Dipinjamkan" : "Total Pinjaman"}
                       </p>
-                      <p className="font-bold text-app-text-bright">Rp {calculationResult.totalPrincipal.toLocaleString("id-ID")}</p>
+                      <p className="font-semibold text-app-text-bright">Rp {calculationResult.totalPrincipal.toLocaleString("id-ID")}</p>
                     </div>
                     <div>
                       <p className="text-xs text-app-text/70 mb-1">Bunga</p>
-                      <p className="font-bold text-app-text-bright">Rp {calculationResult.totalInterest.toLocaleString("id-ID")}</p>
+                      <p className="font-semibold text-app-text-bright">Rp {calculationResult.totalInterest.toLocaleString("id-ID")}</p>
                     </div>
                     <div>
                       <p className="text-xs text-app-text/70 mb-1">
                         {type === 'lend' ? "Total Penerimaan" : "Total Bayar"}
                       </p>
-                      <p className="font-bold text-app-success">Rp {calculationResult.totalPayment.toLocaleString("id-ID")}</p>
+                      <p className="font-semibold text-app-success">Rp {calculationResult.totalPayment.toLocaleString("id-ID")}</p>
                     </div>
                     <div>
                       <p className="text-xs text-app-text/70 mb-1">
                         {type === 'lend' ? "Penerimaan Cicilan" : "Cicilan"}
                       </p>
-                      <p className="font-bold text-app-warning">Rp {calculationResult.installment.toLocaleString("id-ID", { maximumFractionDigits: 0 })} / {paymentMethod === "harian" ? "hari" : paymentMethod === "mingguan" ? "minggu" : "bulan"}</p>
+                      <p className="font-semibold text-app-warning">Rp {calculationResult.installment.toLocaleString("id-ID", { maximumFractionDigits: 0 })} / {paymentMethod === "harian" ? "hari" : paymentMethod === "mingguan" ? "minggu" : "bulan"}</p>
                     </div>
                   </div>
-                  <div className="pt-2 border-t border-app-border/50">
+                  <div className="pt-2 border-t border-app-border">
                     <p className="text-xs text-app-text/70">Tenor: {tenorDuration} {tenorUnit} ({calculationResult.paymentsCount}x pembayaran)</p>
                   </div>
                 </div>
@@ -1304,20 +1313,20 @@ export default function Loans() {
                 <button
                   type="button"
                   onClick={closeAddModal}
-                  className="px-4 py-3.5 rounded-xl font-bold text-sm bg-app-card hover:bg-app-hover border border-app-border text-app-text transition-colors"
+                  className="px-4 py-3.5 rounded-xl font-semibold text-sm bg-app-card hover:bg-app-hover border border-app-border text-app-text transition-colors"
                 >
                   Batal
                 </button>
                 <button
                   type="button"
                   onClick={handleCalculate}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-sm bg-app-accent1 text-app-bg hover:opacity-90 transition-opacity"
+                  className="flex-1 py-3.5 rounded-xl font-semibold text-sm bg-app-accent1 text-app-bg hover:opacity-90 transition-opacity"
                 >
                   {type === 'lend' ? "Hitung Penerimaan" : "Hitung Cicilan"}
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3.5 rounded-xl font-bold text-sm bg-app-success text-app-bg hover:opacity-90 transition-opacity"
+                  className="flex-1 py-3.5 rounded-xl font-semibold text-sm bg-app-success text-app-bg hover:opacity-90 transition-opacity"
                 >
                   {editingLoan ? "Simpan Perubahan" : (type === 'lend' ? "Simpan Piutang" : "Simpan Pinjaman")}
                 </button>

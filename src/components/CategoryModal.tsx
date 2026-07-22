@@ -62,7 +62,7 @@ export function CategoryModal({ isOpen, onClose, category, type }: CategoryModal
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-      <div className="bg-app-card w-full max-w-md rounded-[24px] p-6 relative border border-app-border/40 shadow-xl">
+      <div className="bg-app-card w-full max-w-md rounded-[18px] p-6 relative border border-app-border shadow-xl">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-app-text hover:text-app-text-bright transition-colors"
@@ -70,7 +70,7 @@ export function CategoryModal({ isOpen, onClose, category, type }: CategoryModal
           <X className="w-6 h-6" />
         </button>
 
-        <h2 className="text-xl font-bold text-app-text-bright mb-6">
+        <h2 className="text-xl font-semibold text-app-text-bright mb-6">
           {category ? 'Edit Kategori' : `Tambah Kategori ${type === 'income' ? 'Pemasukan' : 'Pengeluaran'}`}
         </h2>
 
@@ -102,7 +102,7 @@ export function CategoryModal({ isOpen, onClose, category, type }: CategoryModal
                   title={iconItem.name}
                   className={`aspect-square rounded-xl flex items-center justify-center transition-all ${
                     icon === iconItem.id
-                      ? 'bg-app-accent1 text-white shadow-md'
+                      ? 'bg-app-accent1 text-app-bg shadow-md'
                       : 'bg-app-bg text-app-text hover:bg-app-hover border border-app-border'
                   }`}
                 >
@@ -116,7 +116,7 @@ export function CategoryModal({ isOpen, onClose, category, type }: CategoryModal
             <button
               type="submit"
               disabled={isSubmitting || !name.trim()}
-              className="w-full bg-app-accent1 hover:bg-app-accent1/90 text-white font-bold py-3.5 rounded-xl transition-all disabled:opacity-50"
+              className="w-full bg-app-accent1 hover:bg-app-accent1/90 text-app-bg font-semibold py-3.5 rounded-xl transition-all disabled:opacity-50"
             >
               {isSubmitting ? 'Menyimpan...' : 'Simpan'}
             </button>

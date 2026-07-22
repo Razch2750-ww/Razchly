@@ -71,7 +71,7 @@ export default function ThemeApplicator() {
           src: url('${customFontBase64}');
         }
         :root {
-          --font-sans: 'UploadedCustomFont', 'Canva Sans', 'Inter', ui-sans-serif, system-ui, sans-serif !important;
+          --font-sans: 'UploadedCustomFont', "SF Pro Text", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
         }
       `;
     } else {

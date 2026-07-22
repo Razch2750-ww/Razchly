@@ -33,12 +33,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-app-bg text-app-text flex flex-col items-center justify-center p-6">
+    <div className="min-h-[100dvh] bg-app-bg text-app-text flex flex-col items-center justify-center p-6">
       <div className="max-w-md w-full flex flex-col items-center text-center">
-        <div className="w-20 h-20 mb-8 rounded-3xl overflow-hidden shadow-2xl shadow-app-accent1/20 border border-app-border">
+        <div className="w-20 h-20 mb-8 rounded-[18px] overflow-hidden shadow-2xl shadow-app-accent1/20 border border-app-border">
           <img src="/icon.svg" alt="Razchly Logo" className="w-full h-full object-cover" />
         </div>
-        <h1 className="text-3xl font-bold mb-2">Razchly</h1>
+        <h1 className="text-3xl font-semibold mb-2">Razchly</h1>
         <p className="text-app-text/60 mb-10">{t('login.subtitle')}</p>
 
         <div className="w-full space-y-4">

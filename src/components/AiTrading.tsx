@@ -644,7 +644,7 @@ void OnTradeTransaction(const MqlTradeTransaction& trans,
     ];
     constants.forEach(constant => {
       const regex = new RegExp(`\\b(${constant})\\b`, "g");
-      escaped = escaped.replace(regex, '<span class="text-cyan-400 font-bold">$1</span>');
+      escaped = escaped.replace(regex, '<span class="text-cyan-400 font-semibold">$1</span>');
     });
 
     return escaped;
@@ -1195,7 +1195,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
       {/* Visual Title Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-app-border pb-5 mb-6" id="ai-trading-header">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-app-text-bright flex items-center gap-2">
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-app-text-bright flex items-center gap-2">
             <Cpu className="w-7 h-7 text-app-accent1 shrink-0" />
             <TextReveal text="OpenAlice Neural Trading Suite" />
           </h1>
@@ -1207,8 +1207,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
         {/* Selected Asset Indicator */}
         <div className="flex flex-wrap items-center gap-3 bg-app-card px-4 py-2 rounded-xl border border-app-border" id="selected-asset-indicator">
           <div>
-            <div className="text-[10px] text-app-text/50 font-bold uppercase tracking-wider">ASET AKTIF</div>
-            <div className="font-bold text-app-text-bright flex items-center gap-1.5">
+            <div className="text-[10px] text-app-text/50 font-semibold uppercase tracking-wider">ASET AKTIF</div>
+            <div className="font-semibold text-app-text-bright flex items-center gap-1.5">
               {selectedSymbol}
               {quote.change >= 0 ? (
                 <span className="text-xs font-semibold text-app-success flex items-center bg-app-success/10 px-1.5 py-0.5 rounded">
@@ -1222,11 +1222,11 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             </div>
           </div>
           <div className="text-right pl-3 border-l border-app-border">
-            <div className="text-[10px] text-app-text/50 font-bold uppercase tracking-wider">HARGA SEKARANG</div>
-            <div className="font-mono font-bold text-app-text-bright text-sm sm:text-base">
+            <div className="text-[10px] text-app-text/50 font-semibold uppercase tracking-wider">HARGA SEKARANG</div>
+            <div className="font-mono font-semibold text-app-text-bright text-sm sm:text-base">
               {formatCurrencyVal(quote.price, quote.currency)}
             </div>
-            <div className="text-[9px] text-app-text/40 font-mono mt-0.5">
+            <div className="text-[9px] text-app-text/50 font-mono mt-0.5">
               {quote.currency === "IDR" ? (
                 `≈ $${(quote.price / usdToIdrRate).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
               ) : (
@@ -1236,11 +1236,11 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
           </div>
 
           <div className="pl-3 border-l border-app-border flex flex-col items-start">
-            <div className="text-[10px] text-app-text/50 font-bold uppercase tracking-wider">MATA UANG</div>
+            <div className="text-[10px] text-app-text/50 font-semibold uppercase tracking-wider">MATA UANG</div>
             <div className="flex items-center gap-1 mt-0.5 bg-app-bg p-0.5 rounded-lg border border-app-border">
               <button
                 onClick={() => setDisplayCurrency("USD")}
-                className={`px-2 py-0.5 rounded-md text-[10px] font-bold cursor-pointer transition-all ${
+                className={`px-2 py-0.5 rounded-md text-[10px] font-semibold cursor-pointer transition-all ${
                   displayCurrency === "USD"
                     ? "bg-app-accent1 text-app-bg"
                     : "text-app-text/60 hover:text-app-text-bright"
@@ -1250,7 +1250,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               </button>
               <button
                 onClick={() => setDisplayCurrency("IDR")}
-                className={`px-2 py-0.5 rounded-md text-[10px] font-bold cursor-pointer transition-all ${
+                className={`px-2 py-0.5 rounded-md text-[10px] font-semibold cursor-pointer transition-all ${
                   displayCurrency === "IDR"
                     ? "bg-app-accent1 text-app-bg"
                     : "text-app-text/60 hover:text-app-text-bright"
@@ -1272,10 +1272,10 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
       </div>
 
       {/* Asset Search & Selector panel */}
-      <div className="bg-app-card border border-app-border/40 rounded-[24px] p-4 shadow-sm" id="asset-selector-panel">
+      <div className="bg-app-card border border-app-border rounded-[18px] p-4 shadow-sm" id="asset-selector-panel">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-app-text/40" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-app-text/50" />
             <input
               type="text"
               placeholder="Cari Saham IDX, Crypto (BTCUSDT, ETHUSDT)..."
@@ -1288,7 +1288,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
           <button
             onClick={handleSearchAssets}
             disabled={loadingSearch}
-            className="px-5 py-2 bg-app-accent1 hover:opacity-90 text-app-bg rounded-xl font-bold text-sm cursor-pointer transition-all flex items-center justify-center gap-2"
+            className="px-5 py-2 bg-app-accent1 hover:opacity-90 text-app-bg rounded-xl font-semibold text-sm cursor-pointer transition-all flex items-center justify-center gap-2"
           >
             {loadingSearch ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             Cari
@@ -1307,7 +1307,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 }}
                 className="p-2 text-left bg-app-bg border border-app-border rounded-xl hover:bg-app-hover transition-colors cursor-pointer"
               >
-                <div className="font-bold text-app-text-bright text-sm">{item.symbol}</div>
+                <div className="font-semibold text-app-text-bright text-sm">{item.symbol}</div>
                 <div className="text-xs text-app-text/60 truncate">{item.description}</div>
               </button>
             ))}
@@ -1390,8 +1390,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
         {activeTab === "signals" && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" id="tab-signals">
             {/* Left Control Panel */}
-            <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4 w-full">
-              <h3 className="font-bold text-app-text-bright flex items-center gap-2">
+            <HoverCard className="bg-app-card border border-app-border rounded-[18px] p-5 shadow-sm space-y-4 w-full">
+              <h3 className="font-semibold text-app-text-bright flex items-center gap-2">
                 <Cpu className="w-5 h-5 text-app-accent1" />
                 OpenAlice Engine Matrix
               </h3>
@@ -1400,13 +1400,13 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               </p>
 
               {/* Strategy Engine Selectors */}
-              <div className="space-y-3 border-t border-b border-app-border/55 py-3">
+              <div className="space-y-3 border-t border-b border-app-border py-3">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">MODUL OTAK ANALISIS</label>
+                  <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">MODUL OTAK ANALISIS</label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setAutoTradeStrategy("AI_GEMINI")}
-                      className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer text-center ${
+                      className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all border cursor-pointer text-center ${
                         autoTradeStrategy === "AI_GEMINI"
                           ? "bg-app-accent1/10 border-app-accent1 text-app-accent1"
                           : "bg-app-bg border-app-border text-app-text/60 hover:text-app-text-bright hover:bg-app-hover"
@@ -1416,7 +1416,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     </button>
                     <button
                       onClick={() => setAutoTradeStrategy("QUANTUM_6L")}
-                      className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer text-center ${
+                      className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all border cursor-pointer text-center ${
                         autoTradeStrategy === "QUANTUM_6L"
                           ? "bg-app-accent1/10 border-app-accent1 text-app-accent1"
                           : "bg-app-bg border-app-border text-app-text/60 hover:text-app-text-bright hover:bg-app-hover"
@@ -1429,24 +1429,24 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
 
                 {autoTradeStrategy === "AI_GEMINI" && (
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">MESIN AI UTAMA</label>
+                    <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">MESIN AI UTAMA</label>
                     <div className="grid grid-cols-2 gap-1.5">
                       <button
                         onClick={() => setAiEngine("ALICE")}
-                        className={`px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all border cursor-pointer text-center ${
+                        className={`px-2 py-1.5 rounded-lg text-[10px] font-semibold transition-all border cursor-pointer text-center ${
                           aiEngine === "ALICE"
                             ? "bg-app-accent1/20 border-app-accent1 text-app-accent1 animate-pulse-slow"
-                            : "bg-app-bg border-app-border/50 text-app-text/60 hover:text-app-text-bright"
+                            : "bg-app-bg border-app-border text-app-text/60 hover:text-app-text-bright"
                         }`}
                       >
                         Alice Neural Matrix
                       </button>
                       <button
                         onClick={() => setAiEngine("GEMINI")}
-                        className={`px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all border cursor-pointer text-center ${
+                        className={`px-2 py-1.5 rounded-lg text-[10px] font-semibold transition-all border cursor-pointer text-center ${
                           aiEngine === "GEMINI"
                             ? "bg-app-accent1/20 border-app-accent1 text-app-accent1"
-                            : "bg-app-bg border-app-border/50 text-app-text/60 hover:text-app-text-bright"
+                            : "bg-app-bg border-app-border text-app-text/60 hover:text-app-text-bright"
                         }`}
                       >
                         Gemini-3.5-Flash
@@ -1460,7 +1460,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 <button
                   onClick={autoTradeStrategy === "AI_GEMINI" ? generateAiSignal : generateQuantum6LSignal}
                   disabled={generatingSignal}
-                  className="w-full py-2.5 bg-app-accent1 hover:opacity-90 text-app-bg font-bold rounded-xl cursor-pointer transition-opacity flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm animate-pulse-slow"
+                  className="w-full py-2.5 bg-app-accent1 hover:opacity-90 text-app-bg font-semibold rounded-xl cursor-pointer transition-opacity flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm animate-pulse-slow"
                 >
                   {generatingSignal ? (
                     <>
@@ -1478,44 +1478,44 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
 
               {/* Indicator Quick Status Cards */}
               <div className="border-t border-app-border pt-4 space-y-3">
-                <h4 className="text-[10px] font-bold text-app-text/50 tracking-wider">
+                <h4 className="text-[10px] font-semibold text-app-text/50 tracking-wider">
                   {autoTradeStrategy === "AI_GEMINI" ? "TEKNIKAL MATRIKS AKTIF" : "PARAMETER EA 6-LAPIS"}
                 </h4>
                 
                 {autoTradeStrategy === "AI_GEMINI" ? (
                   <>
-                    <div className="flex justify-between items-center text-sm border-b border-app-border/40 pb-2">
+                    <div className="flex justify-between items-center text-sm border-b border-app-border pb-2">
                       <span className="text-app-text/70">RSI (14)</span>
-                      <span className="font-mono font-bold text-app-text-bright">48.34 (Netral)</span>
+                      <span className="font-mono font-semibold text-app-text-bright">48.34 (Netral)</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm border-b border-app-border/40 pb-2">
+                    <div className="flex justify-between items-center text-sm border-b border-app-border pb-2">
                       <span className="text-app-text/70">SMA (20/50)</span>
-                      <span className="font-bold text-app-success flex items-center gap-1 text-xs">
+                      <span className="font-semibold text-app-success flex items-center gap-1 text-xs">
                         <TrendingUp className="w-3.5 h-3.5" /> Bullish Golden Cross
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-app-text/70">Bollinger Bands</span>
-                      <span className="font-mono font-bold text-app-text-bright">Middle Band</span>
+                      <span className="font-mono font-semibold text-app-text-bright">Middle Band</span>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="flex justify-between items-center text-sm border-b border-app-border/40 pb-2">
+                    <div className="flex justify-between items-center text-sm border-b border-app-border pb-2">
                       <span className="text-app-text/70">Trend Makro (EMA)</span>
-                      <span className="font-mono font-bold text-app-accent1">Periode {mqlEmaPeriod}</span>
+                      <span className="font-mono font-semibold text-app-accent1">Periode {mqlEmaPeriod}</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm border-b border-app-border/40 pb-2">
+                    <div className="flex justify-between items-center text-sm border-b border-app-border pb-2">
                       <span className="text-app-text/70">Bollinger Bands S&R</span>
-                      <span className="font-mono font-bold text-app-accent1">Periode {mqlBbPeriod} (Dev {mqlBbDev.toFixed(1)})</span>
+                      <span className="font-mono font-semibold text-app-accent1">Periode {mqlBbPeriod} (Dev {mqlBbDev.toFixed(1)})</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm border-b border-app-border/40 pb-2">
+                    <div className="flex justify-between items-center text-sm border-b border-app-border pb-2">
                       <span className="text-app-text/70">Momentum Osilator</span>
-                      <span className="font-mono font-bold text-app-accent1">RSI {mqlRsiPeriod} | MFI {mqlMfiPeriod}</span>
+                      <span className="font-mono font-semibold text-app-accent1">RSI {mqlRsiPeriod} | MFI {mqlMfiPeriod}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-app-text/70">Magic Number</span>
-                      <span className="font-mono font-bold text-app-text-bright">#{mqlMagic}</span>
+                      <span className="font-mono font-semibold text-app-text-bright">#{mqlMagic}</span>
                     </div>
                   </>
                 )}
@@ -1523,14 +1523,14 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             </HoverCard>
 
             {/* Middle/Right: AI Analysis Results Card */}
-            <div className="lg:col-span-2 bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm flex flex-col justify-between">
+            <div className="lg:col-span-2 bg-app-card border border-app-border rounded-[18px] p-6 shadow-sm flex flex-col justify-between">
               {aiSignal ? (
                 <div className="space-y-6" id="ai-signal-result">
                   <div className="flex items-start justify-between border-b border-app-border pb-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-lg text-app-text-bright">Keputusan Trading Rekomendasi</h3>
-                        <span className="text-xs bg-app-hover text-app-text/80 font-bold px-2.5 py-0.5 rounded-full">
+                        <h3 className="font-semibold text-lg text-app-text-bright">Keputusan Trading Rekomendasi</h3>
+                        <span className="text-xs bg-app-hover text-app-text/80 font-semibold px-2.5 py-0.5 rounded-full">
                           Model: {aiSignal.fallback ? "OpenAlice (Fallback)" : aiEngine === "ALICE" ? "OpenAlice Neural Engine" : "Gemini-3.5-Flash"}
                         </span>
                       </div>
@@ -1543,15 +1543,15 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                           {aiSignal.decision}
                         </span>
                         <div className="text-sm">
-                          <div className="text-app-text/50 font-bold text-xs uppercase tracking-wider">CONFIDENCE LEVEL</div>
-                          <div className="font-mono font-bold text-app-text-bright">{aiSignal.confidence}%</div>
+                          <div className="text-app-text/50 font-semibold text-xs uppercase tracking-wider">CONFIDENCE LEVEL</div>
+                          <div className="font-mono font-semibold text-app-text-bright">{aiSignal.confidence}%</div>
                         </div>
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <div className="text-[10px] text-app-text/50 font-bold uppercase tracking-wider">TANGGAL ANALISIS</div>
-                      <div className="text-sm font-mono font-bold text-app-text-bright mt-1">
+                      <div className="text-[10px] text-app-text/50 font-semibold uppercase tracking-wider">TANGGAL ANALISIS</div>
+                      <div className="text-sm font-mono font-semibold text-app-text-bright mt-1">
                         {new Date().toLocaleDateString("id-ID")}
                       </div>
                     </div>
@@ -1560,11 +1560,11 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   {/* Quantitative Signals recommendations */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-app-bg p-4 rounded-xl border border-app-border font-mono text-sm">
                     <div>
-                      <div className="text-[10px] text-app-text/50 font-bold uppercase tracking-wider">ESTIMASI TAKE PROFIT</div>
-                      <div className="font-bold text-app-success mt-1">
+                      <div className="text-[10px] text-app-text/50 font-semibold uppercase tracking-wider">ESTIMASI TAKE PROFIT</div>
+                      <div className="font-semibold text-app-success mt-1">
                         {formatCurrencyVal(aiSignal.takeProfit, quote.currency)}
                       </div>
-                      <div className="text-[10px] text-app-text/40 mt-0.5">
+                      <div className="text-[10px] text-app-text/50 mt-0.5">
                         {quote.currency === "IDR" ? (
                           `≈ $${(aiSignal.takeProfit / usdToIdrRate).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                         ) : (
@@ -1573,11 +1573,11 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                       </div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-app-text/50 font-bold uppercase tracking-wider">ESTIMASI STOP LOSS</div>
-                      <div className="font-bold text-app-danger mt-1">
+                      <div className="text-[10px] text-app-text/50 font-semibold uppercase tracking-wider">ESTIMASI STOP LOSS</div>
+                      <div className="font-semibold text-app-danger mt-1">
                         {formatCurrencyVal(aiSignal.stopLoss, quote.currency)}
                       </div>
-                      <div className="text-[10px] text-app-text/40 mt-0.5">
+                      <div className="text-[10px] text-app-text/50 mt-0.5">
                         {quote.currency === "IDR" ? (
                           `≈ $${(aiSignal.stopLoss / usdToIdrRate).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                         ) : (
@@ -1586,8 +1586,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                       </div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-app-text/50 font-bold uppercase tracking-wider">RISK / REWARD RATIO</div>
-                      <div className="font-bold text-app-text-bright mt-1">
+                      <div className="text-[10px] text-app-text/50 font-semibold uppercase tracking-wider">RISK / REWARD RATIO</div>
+                      <div className="font-semibold text-app-text-bright mt-1">
                         {aiSignal.riskRewardRatio}
                       </div>
                     </div>
@@ -1595,7 +1595,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
 
                   {/* AI Analysis Narrative in Indonesian */}
                   <div className="space-y-2">
-                    <h4 className="font-bold text-app-text-bright flex items-center gap-2 text-sm">
+                    <h4 className="font-semibold text-app-text-bright flex items-center gap-2 text-sm">
                       <CheckCircle2 className="w-4.5 h-4.5 text-app-success" />
                       Laporan Analisis Teknikal Mendalam
                     </h4>
@@ -1610,7 +1610,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     <Cpu className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-app-text-bright text-sm">Menunggu Pemicu Analisis AI</h4>
+                    <h4 className="font-semibold text-app-text-bright text-sm">Menunggu Pemicu Analisis AI</h4>
                     <p className="text-xs text-app-text/60 max-w-sm mt-1 mx-auto">
                       Klik tombol "Buat Analisis AI Real-Time" di panel sebelah kiri untuk memproses rekomendasi teknikal mendalam.
                     </p>
@@ -1628,19 +1628,19 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             {/* Left controls column */}
             <div className="lg:col-span-1 space-y-6">
               {/* Broker connection box */}
-              <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4 w-full">
+              <HoverCard className="bg-app-card border border-app-border rounded-[18px] p-5 shadow-sm space-y-4 w-full">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-app-text-bright flex items-center gap-2">
+                <h3 className="font-semibold text-app-text-bright flex items-center gap-2">
                   <Lock className="w-5 h-5 text-app-accent1" />
                   API Broker MT5
                 </h3>
                 {brokerConnected ? (
-                  <span className="text-xs bg-app-success/15 text-app-success border border-app-success/30 px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1">
+                  <span className="text-xs bg-app-success/15 text-app-success border border-app-success/30 px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 bg-app-success rounded-full animate-ping" />
                     Terhubung
                   </span>
                 ) : (
-                  <span className="text-xs bg-app-bg text-app-text/40 border border-app-border px-2 py-0.5 rounded-full">
+                  <span className="text-xs bg-app-bg text-app-text/50 border border-app-border px-2 py-0.5 rounded-full">
                     Terputus
                   </span>
                 )}
@@ -1657,7 +1657,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     setAccountMode("SIMULASI");
                     addLog("System: Beralih ke Akun Virtual / Mode Simulasi ($10,000).");
                   }}
-                  className={`py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
+                  className={`py-1.5 text-xs font-semibold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
                     accountMode === "SIMULASI"
                       ? "bg-app-accent1 text-app-bg shadow-sm"
                       : "text-app-text/60 hover:text-app-text-bright"
@@ -1672,7 +1672,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     setAccountMode("RIIL");
                     addLog("System: Beralih ke Mode Live / Real Trading (Gunakan Kunci API/Webhook untuk eksekusi nyata).");
                   }}
-                  className={`py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
+                  className={`py-1.5 text-xs font-semibold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
                     accountMode === "RIIL"
                       ? "bg-amber-500 text-app-bg shadow-sm"
                       : "text-app-text/60 hover:text-app-text-bright"
@@ -1686,7 +1686,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               {/* Informative banner for Real Trading Mode */}
               {accountMode === "RIIL" && (
                 <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl space-y-1.5">
-                  <div className="flex items-center gap-1 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+                  <div className="flex items-center gap-1 text-[10px] font-semibold text-amber-400 uppercase tracking-wider">
                     <ShieldAlert className="w-3.5 h-3.5 shrink-0" /> Peringatan Akun Real / Live
                   </div>
                   <p className="text-[10px] text-app-text/75 leading-relaxed">
@@ -1699,7 +1699,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 <form onSubmit={handleSaveApiConnection} className="space-y-3 pt-2">
                   {accountMode === "RIIL" && selectedBroker === "Bybit MT5" && (
                     <div className="flex items-center justify-between p-2 bg-app-bg border border-app-border rounded-xl">
-                      <span className="text-[10px] font-bold text-app-text/70 uppercase">Gunakan Bybit Testnet</span>
+                      <span className="text-[10px] font-semibold text-app-text/70 uppercase">Gunakan Bybit Testnet</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -1721,7 +1721,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
 
                   {accountMode === "RIIL" && (
                     <div>
-                      <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">WEBHOOK URL BRIDGE (OPSIONAL)</label>
+                      <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">WEBHOOK URL BRIDGE (OPSIONAL)</label>
                       <input
                         type="url"
                         placeholder="https://your-mt5-bridge.com/api/webhook"
@@ -1735,7 +1735,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     </div>
                   )}
                   <div>
-                    <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">PILIH BROKER MT5</label>
+                    <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">PILIH BROKER MT5</label>
                     <select
                       value={selectedBroker}
                       onChange={(e) => setSelectedBroker(e.target.value)}
@@ -1753,7 +1753,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
 
                   {selectedBroker === "Custom MT5" && (
                     <div>
-                      <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">NAMA BROKER KUSTOM</label>
+                      <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">NAMA BROKER KUSTOM</label>
                       <input
                         type="text"
                         placeholder="Masukkan nama broker kustom..."
@@ -1766,7 +1766,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   )}
 
                   <div>
-                    <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">SERVER MT5 BROKER</label>
+                    <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">SERVER MT5 BROKER</label>
                     <input
                       type="text"
                       placeholder={selectedBroker === "Bybit MT5" ? "Contoh: Bybit-Live" : selectedBroker === "Exness MT5" ? "Contoh: Exness-MT5-Real" : "Nama Server (e.g. XM-Real 1)..."}
@@ -1778,7 +1778,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">
+                    <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">
                       {selectedBroker === "Bybit MT5" ? "BYBIT API KEY / MT5 LOGIN ID" : "MT5 ACCOUNT LOGIN ID"}
                     </label>
                     <input
@@ -1790,7 +1790,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">
+                    <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">
                       {selectedBroker === "Bybit MT5" ? "BYBIT API SECRET / PASSWORD" : "MT5 ACCOUNT PASSWORD"}
                     </label>
                     <input
@@ -1802,7 +1802,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">KATA SANDI ENKRIPSI (E2EE)</label>
+                    <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">KATA SANDI ENKRIPSI (E2EE)</label>
                     <input
                       type="password"
                       placeholder="Gunakan passphrase privat Anda..."
@@ -1816,7 +1816,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   </div>
                   <button
                     type="submit"
-                    className="w-full mt-2 py-2 bg-app-accent1 hover:opacity-90 text-app-bg font-bold text-xs rounded-xl cursor-pointer transition-opacity"
+                    className="w-full mt-2 py-2 bg-app-accent1 hover:opacity-90 text-app-bg font-semibold text-xs rounded-xl cursor-pointer transition-opacity"
                   >
                     Hubungkan & Amankan Kredensial
                   </button>
@@ -1825,14 +1825,14 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 <div className="space-y-4 pt-2">
                   <div className="bg-app-success/10 border border-app-success/20 p-4 rounded-xl text-center">
                     <CheckCircle2 className="w-8 h-8 text-app-success mx-auto" />
-                    <div className="text-sm font-bold text-app-text-bright mt-2">Kredensial Aman Terenkripsi</div>
+                    <div className="text-sm font-semibold text-app-text-bright mt-2">Kredensial Aman Terenkripsi</div>
                     <p className="text-xs text-app-text/70 mt-1">
                       Koneksi MT5 terverifikasi. Sinyal trading siap ditransmisikan secara real-time tanpa delay.
                     </p>
                   </div>
 
                   <div className="flex items-center justify-between p-3 bg-app-bg rounded-xl border border-app-border">
-                    <span className="text-xs font-bold text-app-text/70">AUTO-TRADE EKSEKUSI</span>
+                    <span className="text-xs font-semibold text-app-text/70">AUTO-TRADE EKSEKUSI</span>
                     <button
                       onClick={() => {
                         setAutoTradeEnabled(!autoTradeEnabled);
@@ -1857,7 +1857,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-app-accent1"></span>
                       </span>
                       <div className="flex-1">
-                        <div className="font-bold text-app-text-bright text-[11px]">SISTEM PEMINDAIAN AKTIF</div>
+                        <div className="font-semibold text-app-text-bright text-[11px]">SISTEM PEMINDAIAN AKTIF</div>
                         <p className="text-[10px] text-app-text/60 mt-0.5">Menyelaraskan data real-time {selectedSymbol} dengan setup {autoTradeStrategy === "AI_GEMINI" ? (aiEngine === "ALICE" ? "Alice Neural" : "Gemini AI") : "6-Layer"}. Pemindaian ulang otomatis setiap 15 detik.</p>
                       </div>
                     </div>
@@ -1865,7 +1865,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
 
                   <button
                     onClick={handleDisconnect}
-                    className="w-full py-2 border border-app-danger text-app-danger hover:bg-app-danger/10 font-bold text-xs rounded-xl cursor-pointer transition-all"
+                    className="w-full py-2 border border-app-danger text-app-danger hover:bg-app-danger/10 font-semibold text-xs rounded-xl cursor-pointer transition-all"
                   >
                     Putuskan Hubungan Broker
                   </button>
@@ -1874,8 +1874,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             </HoverCard>
 
             {/* Active Strategy Panel for Auto-trading */}
-            <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4 w-full">
-              <h3 className="font-bold text-app-text-bright flex items-center gap-2 text-sm">
+            <HoverCard className="bg-app-card border border-app-border rounded-[18px] p-5 shadow-sm space-y-4 w-full">
+              <h3 className="font-semibold text-app-text-bright flex items-center gap-2 text-sm">
                 <Activity className="w-5 h-5 text-app-accent1" />
                 Konfigurasi Strategi Autotrade
               </h3>
@@ -1885,7 +1885,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
 
               <div className="space-y-3">
                 <div>
-                  <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">STRATEGI AKTIF</label>
+                  <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">STRATEGI AKTIF</label>
                   <select
                     value={autoTradeStrategy}
                     onChange={(e) => setAutoTradeStrategy(e.target.value as "AI_GEMINI" | "QUANTUM_6L")}
@@ -1897,35 +1897,35 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 </div>
 
                 {autoTradeStrategy === "QUANTUM_6L" && (
-                  <div className="bg-app-bg p-3.5 rounded-xl border border-app-border/60 space-y-2.5 text-xs">
-                    <div className="font-bold text-[10px] text-app-text/50 tracking-wider uppercase">PARAMETER TERHUBUNG EA</div>
+                  <div className="bg-app-bg p-3.5 rounded-xl border border-app-border space-y-2.5 text-xs">
+                    <div className="font-semibold text-[10px] text-app-text/50 tracking-wider uppercase">PARAMETER TERHUBUNG EA</div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <span className="text-app-text/60 text-[10px]">Macro Trend:</span>
-                        <span className="font-mono font-bold text-app-text-bright block text-xs">EMA {mqlEmaPeriod}</span>
+                        <span className="font-mono font-semibold text-app-text-bright block text-xs">EMA {mqlEmaPeriod}</span>
                       </div>
                       <div>
                         <span className="text-app-text/60 text-[10px]">Bands S&R:</span>
-                        <span className="font-mono font-bold text-app-text-bright block text-xs">{mqlBbPeriod} (Dev {mqlBbDev.toFixed(1)})</span>
+                        <span className="font-mono font-semibold text-app-text-bright block text-xs">{mqlBbPeriod} (Dev {mqlBbDev.toFixed(1)})</span>
                       </div>
                       <div>
                         <span className="text-app-text/60 text-[10px]">RSI / MFI:</span>
-                        <span className="font-mono font-bold text-app-text-bright block text-xs">P: {mqlRsiPeriod} / {mqlMfiPeriod}</span>
+                        <span className="font-mono font-semibold text-app-text-bright block text-xs">P: {mqlRsiPeriod} / {mqlMfiPeriod}</span>
                       </div>
                       <div>
                         <span className="text-app-text/60 text-[10px]">Risiko Lot:</span>
-                        <span className="font-mono font-bold text-app-text-bright block text-xs">{mqlRisk.toFixed(1)}% Dinamis</span>
+                        <span className="font-mono font-semibold text-app-text-bright block text-xs">{mqlRisk.toFixed(1)}% Dinamis</span>
                       </div>
                     </div>
-                    <div className="text-[10px] text-app-accent1 hover:underline border-t border-app-border/40 pt-2 flex items-center gap-1 cursor-pointer" onClick={() => setActiveTab("mql5")}>
+                    <div className="text-[10px] text-app-accent1 hover:underline border-t border-app-border pt-2 flex items-center gap-1 cursor-pointer" onClick={() => setActiveTab("mql5")}>
                       <Code className="w-3 h-3" /> Edit parameter di MQL5 tab &rarr;
                     </div>
                   </div>
                 )}
 
                 {autoTradeStrategy === "AI_GEMINI" && (
-                  <div className="bg-app-bg p-3.5 rounded-xl border border-app-border/60 space-y-2 text-xs">
-                    <div className="font-bold text-[10px] text-app-text/50 tracking-wider uppercase mb-1">PILIHAN ENGINE AKTIF</div>
+                  <div className="bg-app-bg p-3.5 rounded-xl border border-app-border space-y-2 text-xs">
+                    <div className="font-semibold text-[10px] text-app-text/50 tracking-wider uppercase mb-1">PILIHAN ENGINE AKTIF</div>
                     <select
                       value={aiEngine}
                       onChange={(e) => setAiEngine(e.target.value as "ALICE" | "GEMINI")}
@@ -1945,18 +1945,18 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               </div>
 
               {/* Visual diagram showing how Risk Settings, Backtesting, and MQL5 EA settings are connected directly to auto-trade behavior */}
-              <div className="border-t border-app-border/40 pt-4 mt-2 space-y-3">
-                <div className="text-[10px] font-bold text-app-text/50 uppercase tracking-wider flex items-center gap-1.5">
+              <div className="border-t border-app-border pt-4 mt-2 space-y-3">
+                <div className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider flex items-center gap-1.5">
                   <Zap className="w-3.5 h-3.5 text-app-accent1 animate-pulse" />
                   VISUAL INTEGRASI SISTEM KE AUTO-TRADE
                 </div>
                 
-                <div className="bg-app-bg p-3 rounded-xl border border-app-border/60 space-y-3">
+                <div className="bg-app-bg p-3 rounded-xl border border-app-border space-y-3">
                   {/* Component 1: Risk Settings Connect */}
                   <div className="flex items-start gap-2">
                     <div className="w-4 h-4 rounded bg-app-accent2/10 flex items-center justify-center border border-app-accent2/20 text-app-accent2 text-[9px] shrink-0 font-mono mt-0.5">1</div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[10px] font-bold text-app-text-bright flex items-center justify-between">
+                      <div className="text-[10px] font-semibold text-app-text-bright flex items-center justify-between">
                         <span>Manajemen Risiko</span>
                         <span className="text-[8px] text-emerald-400 font-mono flex items-center gap-0.5">● TERINTEGRASI</span>
                       </div>
@@ -1975,7 +1975,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   <div className="flex items-start gap-2">
                     <div className="w-4 h-4 rounded bg-app-accent1/10 flex items-center justify-center border border-app-accent1/20 text-app-accent1 text-[9px] shrink-0 font-mono mt-0.5">2</div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[10px] font-bold text-app-text-bright flex items-center justify-between">
+                      <div className="text-[10px] font-semibold text-app-text-bright flex items-center justify-between">
                         <span>Parameter MQL5 EA</span>
                         <span className="text-[8px] text-emerald-400 font-mono flex items-center gap-0.5">● TERHUBUNG</span>
                       </div>
@@ -1994,7 +1994,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   <div className="flex items-start gap-2">
                     <div className="w-4 h-4 rounded bg-purple-500/10 flex items-center justify-center border border-purple-500/20 text-purple-400 text-[9px] shrink-0 font-mono mt-0.5">3</div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[10px] font-bold text-app-text-bright flex items-center justify-between">
+                      <div className="text-[10px] font-semibold text-app-text-bright flex items-center justify-between">
                         <span>Hasil Backtesting</span>
                         <span className="text-[8px] text-purple-400 font-mono">
                           {backtestResult ? `${backtestResult.roi}% ROI` : "BELUM DIUJI"}
@@ -2004,18 +2004,18 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                         Strategi <span className="text-purple-300 font-semibold">{backtestStrategy}</span> ({backtestDays} hari) disinkronkan langsung ke mesin penentu sinyal.
                       </p>
                       {backtestResult && (
-                        <div className="mt-2 grid grid-cols-3 gap-2 bg-app-bg/80 p-2 rounded-xl border border-app-border/40 text-[9px] font-mono leading-none">
+                        <div className="mt-2 grid grid-cols-3 gap-2 bg-app-bg/80 p-2 rounded-xl border border-app-border text-[9px] font-mono leading-none">
                           <div>
-                            <span className="text-app-text/40 block mb-0.5">Win Rate:</span>
-                            <span className="font-bold text-app-success">{backtestResult.winRate}%</span>
+                            <span className="text-app-text/50 block mb-0.5">Win Rate:</span>
+                            <span className="font-semibold text-app-success">{backtestResult.winRate}%</span>
                           </div>
                           <div>
-                            <span className="text-app-text/40 block mb-0.5">Max DD:</span>
-                            <span className="font-bold text-app-danger">-{backtestResult.maxDrawdown}%</span>
+                            <span className="text-app-text/50 block mb-0.5">Max DD:</span>
+                            <span className="font-semibold text-app-danger">-{backtestResult.maxDrawdown}%</span>
                           </div>
                           <div>
-                            <span className="text-app-text/40 block mb-0.5">Sharpe:</span>
-                            <span className="font-bold text-purple-300">{backtestResult.sharpeRatio}</span>
+                            <span className="text-app-text/50 block mb-0.5">Sharpe:</span>
+                            <span className="font-semibold text-purple-300">{backtestResult.sharpeRatio}</span>
                           </div>
                         </div>
                       )}
@@ -2023,7 +2023,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   </div>
 
                   {/* Unified Destination: Bot Exec */}
-                  <div className="border-t border-app-border/30 pt-2.5 mt-1 text-center bg-app-bg/50 rounded-lg p-1.5 border border-app-border/30">
+                  <div className="border-t border-app-border pt-2.5 mt-1 text-center bg-app-bg/50 rounded-lg p-1.5 border border-app-border">
                     <div className="text-[8px] text-app-text/50 font-black uppercase tracking-wider">EKSEKUTOR AKTIF</div>
                     <div className="text-[11px] font-black text-app-accent1 mt-0.5 flex items-center justify-center gap-1">
                       <Activity className="w-3 h-3 animate-pulse text-app-accent1" />
@@ -2045,7 +2045,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
                     <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                    <span className="ml-1 text-[10px] font-bold">TRADING TERMINAL CONSOLE</span>
+                    <span className="ml-1 text-[10px] font-semibold">TRADING TERMINAL CONSOLE</span>
                   </div>
                   <span className="text-[10px]">E2EE SECURED</span>
                 </div>
@@ -2060,15 +2060,15 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               </div>
 
               {/* Active Session Performance Dashboard (Matches Backtest metrics exactly) */}
-              <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4 w-full">
-                <h3 className="font-bold text-app-text-bright text-sm flex items-center gap-2">
+              <HoverCard className="bg-app-card border border-app-border rounded-[18px] p-5 shadow-sm space-y-4 w-full">
+                <h3 className="font-semibold text-app-text-bright text-sm flex items-center gap-2">
                   <Activity className="w-5 h-5 text-app-accent1" />
                   Kinerja Real-Time Auto-Trade (Sesi Aktif)
                 </h3>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div className="bg-app-bg p-3.5 rounded-xl border border-app-border">
-                    <div className="text-[9px] text-app-text/50 font-bold tracking-wider uppercase">ROI / KEUNTUNGAN</div>
+                    <div className="text-[9px] text-app-text/50 font-semibold tracking-wider uppercase">ROI / KEUNTUNGAN</div>
                     <div className={`text-lg font-black font-mono mt-1 ${
                       roiLive >= 0 ? "text-app-success" : "text-app-danger"
                     }`}>
@@ -2081,7 +2081,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   </div>
 
                   <div className="bg-app-bg p-3.5 rounded-xl border border-app-border">
-                    <div className="text-[9px] text-app-text/50 font-bold tracking-wider uppercase">MAX DRAWDOWN</div>
+                    <div className="text-[9px] text-app-text/50 font-semibold tracking-wider uppercase">MAX DRAWDOWN</div>
                     <div className="text-lg font-black font-mono mt-1 text-app-danger">
                       -{maxDrawdownLive}%
                     </div>
@@ -2091,17 +2091,17 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   </div>
 
                   <div className="bg-app-bg p-3.5 rounded-xl border border-app-border">
-                    <div className="text-[9px] text-app-text/50 font-bold tracking-wider uppercase">WIN RATE (W / L)</div>
+                    <div className="text-[9px] text-app-text/50 font-semibold tracking-wider uppercase">WIN RATE (W / L)</div>
                     <div className="text-lg font-black font-mono mt-1 text-app-text-bright">
                       {winRateLive}%
                     </div>
                     <div className="text-[9px] font-mono mt-0.5 text-app-text/60">
-                      <span className="text-app-success font-bold">{winsCountLive} Win</span> / <span className="text-app-danger font-bold">{lossesCountLive} Loss</span>
+                      <span className="text-app-success font-semibold">{winsCountLive} Win</span> / <span className="text-app-danger font-semibold">{lossesCountLive} Loss</span>
                     </div>
                   </div>
 
                   <div className="bg-app-bg p-3.5 rounded-xl border border-app-border">
-                    <div className="text-[9px] text-app-text/50 font-bold tracking-wider uppercase">SHARPE RATIO</div>
+                    <div className="text-[9px] text-app-text/50 font-semibold tracking-wider uppercase">SHARPE RATIO</div>
                     <div className="text-lg font-black font-mono mt-1 text-app-success">
                       {sharpeRatioLive}
                     </div>
@@ -2116,12 +2116,12 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     <span className="text-app-text/60">Saldo Awal:</span>
                     <span className="font-semibold text-app-text-bright flex flex-col sm:flex-row sm:gap-1.5 items-end sm:items-center">
                       <span>$10,000.00</span>
-                      <span className="text-[10px] text-app-text/40">(Rp {(10000 * usdToIdrRate).toLocaleString("id-ID", {maximumFractionDigits: 0})})</span>
+                      <span className="text-[10px] text-app-text/50">(Rp {(10000 * usdToIdrRate).toLocaleString("id-ID", {maximumFractionDigits: 0})})</span>
                     </span>
                   </div>
                   <div className="flex justify-between sm:justify-start sm:gap-2">
                     <span className="text-app-text/60">Saldo Sesi:</span>
-                    <span className="font-bold text-app-accent1 flex flex-col sm:flex-row sm:gap-1.5 items-end sm:items-center">
+                    <span className="font-semibold text-app-accent1 flex flex-col sm:flex-row sm:gap-1.5 items-end sm:items-center">
                       <span>${currentBalanceLive.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                       <span className="text-[10px] text-app-text/50 font-normal">(Rp {(currentBalanceLive * usdToIdrRate).toLocaleString("id-ID", {maximumFractionDigits: 0})})</span>
                     </span>
@@ -2134,14 +2134,14 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               </HoverCard>
 
               {/* Simulated Live Trades Table */}
-              <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4 w-full">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-app-border/60 pb-3">
-                  <h3 className="font-bold text-app-text-bright text-sm flex items-center gap-2">
+              <HoverCard className="bg-app-card border border-app-border rounded-[18px] p-5 shadow-sm space-y-4 w-full">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-app-border pb-3">
+                  <h3 className="font-semibold text-app-text-bright text-sm flex items-center gap-2">
                     <Check className="w-5 h-5 text-app-accent1" />
                     Transaksi Berjalan & Riwayat
                   </h3>
                   {accountMode === "SIMULASI" ? (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold uppercase tracking-wider self-start sm:self-auto">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-semibold uppercase tracking-wider self-start sm:self-auto">
                       <span className="relative flex h-1.5 w-1.5">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400"></span>
@@ -2149,7 +2149,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                       Mode Simulasi / Akun Virtual ($10,000)
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/15 border border-red-500/30 text-red-500 text-[10px] font-bold uppercase tracking-wider self-start sm:self-auto">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/15 border border-red-500/30 text-red-500 text-[10px] font-semibold uppercase tracking-wider self-start sm:self-auto">
                       <span className="relative flex h-1.5 w-1.5">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
@@ -2162,11 +2162,11 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 {/* Penjelasan mengenai Saldo Riil vs Virtual untuk menjawab kebingungan user */}
                 {accountMode === "SIMULASI" ? (
                   <div className="bg-amber-500/5 border border-amber-500/10 p-3.5 rounded-xl text-xs space-y-2">
-                    <div className="font-bold text-amber-400 flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+                    <div className="font-semibold text-amber-400 flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
                       <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" /> Mengapa Transaksi Berhasil Meskipun Saldo MT5 Anda $0?
                     </div>
                     <p className="text-app-text/70 text-[11px] leading-relaxed">
-                      Sistem otomatisasi di halaman web ini berjalan sepenuhnya dalam <strong className="text-app-text-bright font-semibold">Mode Simulasi (Paper Trading / Sandbox)</strong> menggunakan saldo virtual bawaan sebesar <strong className="text-app-accent1 font-bold">$10,000 USD</strong>. Hal ini dirancang agar Anda bisa menguji strategi OpenAlice Brain & Quantum 6-Layer secara aman tanpa merisikokan dana riil Anda.
+                      Sistem otomatisasi di halaman web ini berjalan sepenuhnya dalam <strong className="text-app-text-bright font-semibold">Mode Simulasi (Paper Trading / Sandbox)</strong> menggunakan saldo virtual bawaan sebesar <strong className="text-app-accent1 font-semibold">$10,000 USD</strong>. Hal ini dirancang agar Anda bisa menguji strategi OpenAlice Brain & Quantum 6-Layer secara aman tanpa merisikokan dana riil Anda.
                     </p>
                     <p className="text-app-text/70 text-[11px] leading-relaxed">
                       Kredensial API MT5 Anda digunakan oleh bot untuk membaca data market dan sinkronisasi status akun, tetapi <strong>tidak akan memotong sepeser pun saldo nyata Anda</strong>. Untuk melakukan trading riil dengan dana asli di bursa MT5 Anda, Anda dapat mengunduh robot otomatis hasil kustomisasi di tab <strong className="text-app-accent1 hover:underline cursor-pointer font-semibold" onClick={() => setActiveTab("mql5")}>MQL5 EA Generator</strong> lalu memasangnya pada aplikasi MetaTrader 5 desktop Anda.
@@ -2174,7 +2174,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   </div>
                 ) : (
                   <div className="bg-red-500/5 border border-red-500/10 p-3.5 rounded-xl text-xs space-y-2">
-                    <div className="font-bold text-red-400 flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+                    <div className="font-semibold text-red-400 flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
                       <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" /> Eksekusi Live Trading Akun Riil Aktif
                     </div>
                     <p className="text-app-text/70 text-[11px] leading-relaxed">
@@ -2191,7 +2191,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse text-xs">
                       <thead>
-                        <tr className="border-b border-app-border text-app-text/50 font-bold uppercase">
+                        <tr className="border-b border-app-border text-app-text/50 font-semibold uppercase">
                           <th className="py-2.5">ID TRANSAKSI</th>
                           <th className="py-2.5">ASET</th>
                           <th className="py-2.5">TIPE</th>
@@ -2210,37 +2210,37 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                           const isPositive = pnl >= 0;
 
                           return (
-                            <tr key={t.id} className="border-b border-app-border/40 font-mono text-app-text hover:bg-app-hover/50">
-                              <td className="py-3 text-app-text-bright font-bold">{t.id}</td>
+                            <tr key={t.id} className="border-b border-app-border font-mono text-app-text hover:bg-app-hover/50">
+                              <td className="py-3 text-app-text-bright font-semibold">{t.id}</td>
                               <td className="py-3">{t.symbol}</td>
                               <td className="py-3">
-                                <span className={`px-2 py-0.5 rounded font-bold ${
+                                <span className={`px-2 py-0.5 rounded font-semibold ${
                                   t.type === "BUY" ? "bg-app-success/15 text-app-success" : "bg-app-danger/15 text-app-danger"
                                 }`}>{t.type}</span>
                               </td>
                               <td className="py-3 font-semibold">${t.entryPrice.toLocaleString()}</td>
                               <td className="py-3">{t.quantity}</td>
                               <td className="py-3">
-                                <span className={`font-bold ${isPositive ? "text-app-success" : "text-app-danger"}`}>
+                                <span className={`font-semibold ${isPositive ? "text-app-success" : "text-app-danger"}`}>
                                   {isPositive ? `+$${pnl.toFixed(2)}` : `-$${Math.abs(pnl).toFixed(2)}`}
                                 </span>
                               </td>
                               <td className="py-3">
                                 {t.status === "OPEN" ? (
-                                  <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-0.5 rounded-full font-bold inline-flex items-center gap-1">
+                                  <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-0.5 rounded-full font-semibold inline-flex items-center gap-1">
                                     <span className="w-1 h-1 bg-blue-400 rounded-full animate-ping" />
                                     OPEN
                                   </span>
                                 ) : t.status === "CLOSED_WIN" ? (
-                                  <span className="text-[10px] bg-app-success/15 text-app-success border border-app-success/30 px-2.5 py-0.5 rounded-full font-bold">
+                                  <span className="text-[10px] bg-app-success/15 text-app-success border border-app-success/30 px-2.5 py-0.5 rounded-full font-semibold">
                                     TP HIT
                                   </span>
                                 ) : t.status === "CLOSED_LOSS" ? (
-                                  <span className="text-[10px] bg-app-danger/15 text-app-danger border border-app-danger/30 px-2.5 py-0.5 rounded-full font-bold">
+                                  <span className="text-[10px] bg-app-danger/15 text-app-danger border border-app-danger/30 px-2.5 py-0.5 rounded-full font-semibold">
                                     SL HIT
                                   </span>
                                 ) : (
-                                  <span className="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-bold">
+                                  <span className="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-semibold">
                                     {t.status}
                                   </span>
                                 )}
@@ -2252,7 +2252,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     </table>
                   </div>
                 ) : (
-                  <div className="text-center py-10 text-app-text/40 text-xs">
+                  <div className="text-center py-10 text-app-text/50 text-xs">
                     Belum ada aktivitas transaksi terpicu. Aktifkan auto-trade dan hasilkan sinyal AI untuk menguji.
                   </div>
                 )}
@@ -2265,9 +2265,9 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
 
         {/* TAB 3: RISK MANAGEMENT */}
         {activeTab === "risk" && (
-          <div className="bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm max-w-3xl mx-auto space-y-6" id="tab-risk">
+          <div className="bg-app-card border border-app-border rounded-[18px] p-6 shadow-sm max-w-3xl mx-auto space-y-6" id="tab-risk">
             <div>
-              <h3 className="font-bold text-app-text-bright text-lg flex items-center gap-2">
+              <h3 className="font-semibold text-app-text-bright text-lg flex items-center gap-2">
                 <ShieldAlert className="w-5.5 h-5.5 text-app-accent1" />
                 OpenAlice Risk & Drawdown Engine
               </h3>
@@ -2278,7 +2278,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">BATAS PROTEKSI DRAWDOWN BASKET (%)</label>
+                <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">BATAS PROTEKSI DRAWDOWN BASKET (%)</label>
                 <div className="relative">
                   <input
                     type="number"
@@ -2286,13 +2286,13 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     onChange={(e) => setRiskSettings({ ...riskSettings, stopLossPercent: parseFloat(e.target.value) || 0 })}
                     className="w-full px-3 py-2 bg-app-bg border border-app-border text-app-text-bright rounded-xl font-mono text-sm outline-none focus:border-app-accent1"
                   />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-app-text/40 font-bold">%</span>
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-app-text/50 font-semibold">%</span>
                 </div>
                 <p className="text-[10px] text-app-text/50">Batas toleransi penyesuaian kerugian maksimal total seluruh basket grid sebelum dilikuidasi otomatis demi melindungi ekuitas.</p>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">TARGET TAKE PROFIT BASKET (%)</label>
+                <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">TARGET TAKE PROFIT BASKET (%)</label>
                 <div className="relative">
                   <input
                     type="number"
@@ -2300,13 +2300,13 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     onChange={(e) => setRiskSettings({ ...riskSettings, takeProfitPercent: parseFloat(e.target.value) || 0 })}
                     className="w-full px-3 py-2 bg-app-bg border border-app-border text-app-text-bright rounded-xl font-mono text-sm outline-none focus:border-app-accent1"
                   />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-app-text/40 font-bold">%</span>
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-app-text/50 font-semibold">%</span>
                 </div>
                 <p className="text-[10px] text-app-text/50">Target keuntungan rata-rata dari seluruh level posisi grid gabungan untuk mengunci keuntungan secara aman.</p>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">RISIKO PER INTRADAY TRADE (%)</label>
+                <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">RISIKO PER INTRADAY TRADE (%)</label>
                 <div className="relative">
                   <input
                     type="number"
@@ -2314,13 +2314,13 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     onChange={(e) => setRiskSettings({ ...riskSettings, maxRiskPerTrade: parseFloat(e.target.value) || 0 })}
                     className="w-full px-3 py-2 bg-app-bg border border-app-border text-app-text-bright rounded-xl font-mono text-sm outline-none focus:border-app-accent1"
                   />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-app-text/40 font-bold">%</span>
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-app-text/50 font-semibold">%</span>
                 </div>
                 <p className="text-[10px] text-app-text/50">Persentase maksimum alokasi modal portofolio yang dapat digunakan untuk entry awal pada grid level 1.</p>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">TOLERANSI SLIPPAGE (%)</label>
+                <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">TOLERANSI SLIPPAGE (%)</label>
                 <div className="relative">
                   <input
                     type="number"
@@ -2329,7 +2329,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     onChange={(e) => setRiskSettings({ ...riskSettings, slippage: parseFloat(e.target.value) || 0 })}
                     className="w-full px-3 py-2 bg-app-bg border border-app-border text-app-text-bright rounded-xl font-mono text-sm outline-none focus:border-app-accent1"
                   />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-app-text/40 font-bold">%</span>
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-app-text/50 font-semibold">%</span>
                 </div>
                 <p className="text-[10px] text-app-text/50">Batas selisih harga eksekusi terhadap harga order yang diperbolehkan di bursa MT5.</p>
               </div>
@@ -2338,7 +2338,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             <div className="bg-app-accent1/5 border border-app-accent1/10 p-4 rounded-xl flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-app-accent1 shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-xs font-bold text-app-text-bright">Proteksi Ekuitas Real-Time OpenAlice</h4>
+                <h4 className="text-xs font-semibold text-app-text-bright">Proteksi Ekuitas Real-Time OpenAlice</h4>
                 <p className="text-xs text-app-text/80 leading-relaxed mt-1">
                   Sistem monitoring server-side OpenAlice memantau status floating loss secara real-time. Jika batas drawdown dilampaui, seluruh posisi grid dinonaktifkan dalam 5ms untuk menjamin keamanan portofolio modal utama.
                 </p>
@@ -2352,15 +2352,15 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
           <div className="space-y-6" id="tab-backtest">
             
             {/* Strategy Configuration */}
-            <div className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm">
-              <h3 className="font-bold text-app-text-bright text-sm flex items-center gap-2 mb-4">
+            <div className="bg-app-card border border-app-border rounded-[18px] p-5 shadow-sm">
+              <h3 className="font-semibold text-app-text-bright text-sm flex items-center gap-2 mb-4">
                 <Database className="w-5 h-5 text-app-accent1" />
                 Konfigurasi Strategi Backtest
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">STRATEGI ALGORITMA</label>
+                  <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">STRATEGI ALGORITMA</label>
                   <select
                     value={backtestStrategy}
                     onChange={(e: any) => setBacktestStrategy(e.target.value)}
@@ -2374,7 +2374,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">DURASI HISTORIS</label>
+                  <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">DURASI HISTORIS</label>
                   <select
                     value={backtestDays}
                     onChange={(e: any) => setBacktestDays(parseInt(e.target.value))}
@@ -2394,7 +2394,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-app-text/60 uppercase tracking-wider">BIAYA KOMISI PER TRANSAKSI</label>
+                  <label className="text-[10px] font-semibold text-app-text/60 uppercase tracking-wider">BIAYA KOMISI PER TRANSAKSI</label>
                   <div className="relative">
                     <input
                       type="number"
@@ -2403,7 +2403,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                       onChange={(e) => setRiskSettings({ ...riskSettings, commission: parseFloat(e.target.value) || 0 })}
                       className="w-full px-3 py-2 bg-app-bg border border-app-border text-app-text-bright rounded-xl font-mono text-xs outline-none focus:border-app-accent1"
                     />
-                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] text-app-text/40 font-bold">%</span>
+                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] text-app-text/50 font-semibold">%</span>
                   </div>
                 </div>
 
@@ -2411,7 +2411,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   <button
                     onClick={handleRunBacktest}
                     disabled={runningBacktestState}
-                    className="w-full py-2.5 bg-app-accent1 hover:opacity-90 text-app-bg font-bold text-xs rounded-xl cursor-pointer transition-opacity flex items-center justify-center gap-2"
+                    className="w-full py-2.5 bg-app-accent1 hover:opacity-90 text-app-bg font-semibold text-xs rounded-xl cursor-pointer transition-opacity flex items-center justify-center gap-2"
                   >
                     {runningBacktestState ? (
                       <>
@@ -2434,14 +2434,14 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" id="backtest-results-container">
                 
                 {/* Metrics Stats Summary Cards */}
-                <div className="lg:col-span-1 bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4">
-                  <h3 className="font-bold text-app-text-bright text-sm border-b border-app-border/40 pb-3">
+                <div className="lg:col-span-1 bg-app-card border border-app-border rounded-[18px] p-5 shadow-sm space-y-4">
+                  <h3 className="font-semibold text-app-text-bright text-sm border-b border-app-border pb-3">
                     Metrik Kinerja Backtest
                   </h3>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-app-bg p-3.5 rounded-xl border border-app-border">
-                      <div className="text-[9px] text-app-text/50 font-bold tracking-wider uppercase">ROI / KEUNTUNGAN</div>
+                      <div className="text-[9px] text-app-text/50 font-semibold tracking-wider uppercase">ROI / KEUNTUNGAN</div>
                       <div className={`text-lg font-black font-mono mt-1 ${
                         backtestResult.roi >= 0 ? "text-app-success" : "text-app-danger"
                       }`}>
@@ -2450,24 +2450,24 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                     </div>
 
                     <div className="bg-app-bg p-3.5 rounded-xl border border-app-border">
-                      <div className="text-[9px] text-app-text/50 font-bold tracking-wider uppercase">MAX DRAWDOWN</div>
+                      <div className="text-[9px] text-app-text/50 font-semibold tracking-wider uppercase">MAX DRAWDOWN</div>
                       <div className="text-lg font-black font-mono mt-1 text-app-danger">
                         -{backtestResult.maxDrawdown}%
                       </div>
                     </div>
 
                     <div className="bg-app-bg p-3.5 rounded-xl border border-app-border">
-                      <div className="text-[9px] text-app-text/50 font-bold tracking-wider uppercase">WIN RATE (W / L)</div>
+                      <div className="text-[9px] text-app-text/50 font-semibold tracking-wider uppercase">WIN RATE (W / L)</div>
                       <div className="text-lg font-black font-mono mt-1 text-app-text-bright">
                         {backtestResult.winRate}%
                       </div>
                       <div className="text-[9px] font-mono mt-0.5 text-app-text/60">
-                        <span className="text-app-success font-bold">{backtestResult.wins || 0} Win</span> / <span className="text-app-danger font-bold">{backtestResult.losses || 0} Loss</span>
+                        <span className="text-app-success font-semibold">{backtestResult.wins || 0} Win</span> / <span className="text-app-danger font-semibold">{backtestResult.losses || 0} Loss</span>
                       </div>
                     </div>
 
                     <div className="bg-app-bg p-3.5 rounded-xl border border-app-border">
-                      <div className="text-[9px] text-app-text/50 font-bold tracking-wider uppercase">SHARPE RATIO</div>
+                      <div className="text-[9px] text-app-text/50 font-semibold tracking-wider uppercase">SHARPE RATIO</div>
                       <div className="text-lg font-black font-mono mt-1 text-app-success">
                         {backtestResult.sharpeRatio}
                       </div>
@@ -2479,12 +2479,12 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                       <span className="text-app-text/60">Saldo Awal:</span>
                       <span className="font-semibold text-app-text-bright flex items-center gap-1.5">
                         <span>${backtestResult.initialBalance.toLocaleString()}</span>
-                        <span className="text-[10px] text-app-text/40">(Rp {(backtestResult.initialBalance * usdToIdrRate).toLocaleString("id-ID", {maximumFractionDigits: 0})})</span>
+                        <span className="text-[10px] text-app-text/50">(Rp {(backtestResult.initialBalance * usdToIdrRate).toLocaleString("id-ID", {maximumFractionDigits: 0})})</span>
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-app-text/60">Saldo Akhir:</span>
-                      <span className="font-bold text-app-accent1 flex items-center gap-1.5">
+                      <span className="font-semibold text-app-accent1 flex items-center gap-1.5">
                         <span>${backtestResult.finalBalance.toLocaleString()}</span>
                         <span className="text-[10px] text-app-text/50 font-normal">(Rp {(backtestResult.finalBalance * usdToIdrRate).toLocaleString("id-ID", {maximumFractionDigits: 0})})</span>
                       </span>
@@ -2493,7 +2493,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                       <span className="text-app-text/60">Total Transaksi:</span>
                       <span className="font-semibold text-app-text-bright">{backtestResult.trades.length} Trades</span>
                     </div>
-                    <div className="flex justify-between border-b border-app-border/20 pb-2 mb-2">
+                    <div className="flex justify-between border-b border-app-border pb-2 mb-2">
                       <span className="text-app-text/60">Detail Eksekusi:</span>
                       <span className="font-semibold text-app-text-bright text-[11px]">
                         <span className="text-app-success">{backtestResult.wins || 0} Menang</span> / <span className="text-app-danger">{backtestResult.losses || 0} Kalah</span>
@@ -2507,7 +2507,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                       addLog(`System: Berhasil menerapkan parameter dari hasil backtest terbaik! Strategi Aktif: ${backtestStrategy === "QUANTUM_6L" ? "QUANTUM_6L (MQL5 EA)" : "AI Gemini"}, SL: ${riskSettings.stopLossPercent}%, TP: ${riskSettings.takeProfitPercent}%, Resiko Per Trade: ${riskSettings.maxRiskPerTrade}%.`);
                       setActiveTab("autotrade");
                     }}
-                    className="w-full mt-3 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[11px] uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
+                    className="w-full mt-3 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-[11px] uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-[0.98] cursor-pointer"
                   >
                     <ArrowLeftRight className="w-3.5 h-3.5" />
                     Terapkan Hasil Backtest ke Auto Trade
@@ -2515,8 +2515,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 </div>
 
                 {/* Equity Curve Line Chart */}
-                <div className="lg:col-span-2 bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-3">
-                  <h3 className="font-bold text-app-text-bright text-sm">
+                <div className="lg:col-span-2 bg-app-card border border-app-border rounded-[18px] p-5 shadow-sm space-y-3">
+                  <h3 className="font-semibold text-app-text-bright text-sm">
                     Kurva Ekuitas (Simulasi Kinerja Portofolio)
                   </h3>
                   
@@ -2549,15 +2549,15 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 </div>
 
                 {/* Full History of Simulated Trades executed */}
-                <div className="lg:col-span-3 bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-4">
-                  <h3 className="font-bold text-app-text-bright text-sm">
+                <div className="lg:col-span-3 bg-app-card border border-app-border rounded-[18px] p-5 shadow-sm space-y-4">
+                  <h3 className="font-semibold text-app-text-bright text-sm">
                     Riwayat Transaksi Backtest Lengkap (Simulasi Slippage & Komisi Terpenuhi)
                   </h3>
 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse text-xs">
                       <thead>
-                        <tr className="border-b border-app-border text-app-text/50 font-bold uppercase">
+                        <tr className="border-b border-app-border text-app-text/50 font-semibold uppercase">
                           <th className="py-2">TANGGAL MASUK</th>
                           <th className="py-2">TANGGAL KELUAR</th>
                           <th className="py-2">HARGA MASUK</th>
@@ -2569,17 +2569,17 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                       </thead>
                       <tbody>
                         {backtestResult.trades.map((trade, i) => (
-                          <tr key={i} className="border-b border-app-border/40 font-mono text-app-text hover:bg-app-hover/40">
+                          <tr key={i} className="border-b border-app-border font-mono text-app-text hover:bg-app-hover/40">
                             <td className="py-2.5">{trade.entryTime}</td>
                             <td className="py-2.5">{trade.exitTime || "HOLD"}</td>
                             <td className="py-2.5">${trade.entryPrice.toLocaleString()}</td>
                             <td className="py-2.5">${trade.exitPrice?.toLocaleString() || "-"}</td>
-                            <td className={`py-2.5 font-bold ${
+                            <td className={`py-2.5 font-semibold ${
                               (trade.profit || 0) >= 0 ? "text-app-success" : "text-app-danger"
                             }`}>
                               {(trade.profit || 0) >= 0 ? `+$${trade.profit?.toLocaleString()}` : `-$${Math.abs(trade.profit || 0).toLocaleString()}`}
                             </td>
-                            <td className={`py-2.5 font-bold ${
+                            <td className={`py-2.5 font-semibold ${
                               (trade.profitPercent || 0) >= 0 ? "text-app-success" : "text-app-danger"
                             }`}>
                               {(trade.profitPercent || 0) >= 0 ? `+${trade.profitPercent}%` : `${trade.profitPercent}%`}
@@ -2604,15 +2604,15 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             {/* Left Controls Column (lg:col-span-5) */}
             <div className="lg:col-span-5 space-y-6">
               {/* Core Philosophy Header Card */}
-              <div className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-3">
+              <div className="bg-app-card border border-app-border rounded-[18px] p-5 shadow-sm space-y-3">
                 <div className="flex items-center gap-2">
                   <ShieldAlert className="w-5 h-5 text-amber-500 animate-pulse" />
-                  <h3 className="font-bold text-app-text-bright text-base">EA MetaTrader 5 (MQL5) Pro</h3>
+                  <h3 className="font-semibold text-app-text-bright text-base">EA MetaTrader 5 (MQL5) Pro</h3>
                 </div>
                 <p className="text-xs text-app-text/80 leading-relaxed">
                   Expert Advisor kuantitatif dengan pendekatan <strong className="text-app-accent1">High Probability Setup</strong>. EA ini mengombinasikan <strong>6 Lapis Filter</strong> secara sinkronus untuk akurasi maksimal dan keamanan dana tingkat tinggi.
                 </p>
-                <div className="pt-2 text-xs text-app-text/60 space-y-1 bg-app-bg/50 p-3 rounded-xl border border-app-border/40">
+                <div className="pt-2 text-xs text-app-text/60 space-y-1 bg-app-bg/50 p-3 rounded-xl border border-app-border">
                   <div>1. <strong>Filter Fundamental</strong>: Calendar News pause jeda 30 menit.</div>
                   <div>2. <strong>Filter Tren Makro</strong>: Filter H1/H4 EMA 200.</div>
                   <div>3. <strong>Area Nilai</strong>: Bollinger Bands Rejection.</div>
@@ -2623,10 +2623,10 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               </div>
 
               {/* Dynamic Parameter Customizer */}
-              <div className="bg-app-card border border-app-border/40 rounded-[24px] p-5 shadow-sm space-y-5">
+              <div className="bg-app-card border border-app-border rounded-[18px] p-5 shadow-sm space-y-5">
                 <div className="flex items-center gap-2 border-b border-app-border pb-3">
                   <Settings className="w-4.5 h-4.5 text-app-accent1" />
-                  <h4 className="font-bold text-app-text-bright text-sm">Sesuaikan Parameter EA</h4>
+                  <h4 className="font-semibold text-app-text-bright text-sm">Sesuaikan Parameter EA</h4>
                 </div>
 
                 <div className="space-y-4">
@@ -2656,9 +2656,9 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   </div>
 
                   {/* News Filter Settings */}
-                  <div className="bg-app-bg/30 p-3 rounded-xl border border-app-border/40 space-y-3">
+                  <div className="bg-app-bg/30 p-3 rounded-xl border border-app-border space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-app-text-bright flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-app-text-bright flex items-center gap-1.5">
                         <Info className="w-3.5 h-3.5 text-amber-500" /> Fundamental News Filter
                       </span>
                       <label className="relative inline-flex items-center cursor-pointer">
@@ -2808,7 +2808,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
               {/* Header actions */}
               <div className="bg-app-card border border-app-border rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                 <div className="text-left">
-                  <h4 className="font-bold text-app-text-bright text-sm flex items-center gap-1.5">
+                  <h4 className="font-semibold text-app-text-bright text-sm flex items-center gap-1.5">
                     <Terminal className="w-4 h-4 text-app-accent1" />
                     Source Code: Quantum_6Layers.mq5
                   </h4>
@@ -2820,7 +2820,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
                     onClick={handleCopyCode}
-                    className="flex-1 sm:flex-initial px-4 py-2 bg-app-bg hover:bg-app-hover border border-app-border rounded-xl text-app-text-bright text-xs font-bold cursor-pointer transition-colors flex items-center justify-center gap-1.5"
+                    className="flex-1 sm:flex-initial px-4 py-2 bg-app-bg hover:bg-app-hover border border-app-border rounded-xl text-app-text-bright text-xs font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1.5"
                   >
                     {mqlCopied ? (
                       <>
@@ -2836,7 +2836,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                   </button>
                   <button
                     onClick={handleDownloadEA}
-                    className="flex-1 sm:flex-initial px-4 py-2 bg-app-accent1 hover:opacity-90 text-app-bg rounded-xl text-xs font-bold cursor-pointer transition-opacity flex items-center justify-center gap-1.5"
+                    className="flex-1 sm:flex-initial px-4 py-2 bg-app-accent1 hover:opacity-90 text-app-bg rounded-xl text-xs font-semibold cursor-pointer transition-opacity flex items-center justify-center gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5" />
                     Unduh .MQ5
@@ -2846,14 +2846,14 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
 
               {/* Code Viewer */}
               <div className="bg-[#0b0f17] border border-app-border rounded-2xl p-4 flex-1 font-mono text-[11px] overflow-hidden flex flex-col shadow-inner">
-                <div className="flex items-center justify-between border-b border-app-border/40 pb-2 mb-3">
+                <div className="flex items-center justify-between border-b border-app-border pb-2 mb-3">
                   <div className="flex items-center gap-1">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
                     <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-                    <span className="text-[10px] text-app-text/40 ml-2">MetaEditor 5 Terminal</span>
+                    <span className="text-[10px] text-app-text/50 ml-2">MetaEditor 5 Terminal</span>
                   </div>
-                  <span className="text-[10px] text-app-text/40">MQL5 Code</span>
+                  <span className="text-[10px] text-app-text/50">MQL5 Code</span>
                 </div>
 
                 <div className="overflow-y-auto max-h-[580px] text-left pr-2 space-y-0.5 select-text scrollbar-thin">

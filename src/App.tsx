@@ -22,14 +22,17 @@ import ImageAnalysis from './components/ImageAnalysis';
 import AiTrading from './components/AiTrading';
 
 const LoadingFallback = () => (
-  <div className="flex items-center justify-center w-full h-full min-h-[60vh] animate-in fade-in duration-300">
-    <div className="flex flex-col items-center gap-4">
-      <div className="relative w-10 h-10 flex items-center justify-center">
-        <div className="absolute inset-0 rounded-full border-2 border-app-accent1/10" />
-        <div className="absolute inset-0 rounded-full border-2 border-t-app-accent1 border-r-app-accent1/30 border-b-transparent border-l-transparent animate-spin" />
-      </div>
-      <span className="text-[10px] uppercase font-bold tracking-widest text-app-text/50">Memuat Halaman</span>
+  <div className="flex flex-col w-full h-full p-4 md:p-8 animate-pulse">
+    <div className="w-full flex items-center justify-between mb-8">
+      <div className="w-32 h-8 bg-app-card rounded-lg" />
+      <div className="w-10 h-10 bg-app-card rounded-full" />
     </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div className="col-span-1 h-32 bg-app-card rounded-[18px]" />
+      <div className="col-span-1 h-32 bg-app-card rounded-[18px]" />
+      <div className="col-span-1 h-32 bg-app-card rounded-[18px]" />
+    </div>
+    <div className="w-full h-64 bg-app-card rounded-[18px]" />
   </div>
 );
 
@@ -209,15 +212,15 @@ export default function App() {
     return (
       <div className="flex h-screen w-full bg-app-bg text-app-text overflow-hidden select-none font-sans">
         {/* Sidebar Skeleton (Default collapsed style: w-[72px] on desktop, hidden on mobile) */}
-        <aside className="hidden md:flex flex-col w-[72px] border-r border-app-border/60 bg-app-bg h-full shrink-0">
-          <div className="h-16 flex items-center justify-center border-b border-app-border/40 px-3">
-            <div className="w-8 h-8 rounded-xl bg-app-card relative overflow-hidden border border-app-border/40">
+        <aside className="hidden md:flex flex-col w-[72px] border-r border-app-border bg-app-bg h-full shrink-0">
+          <div className="h-16 flex items-center justify-center border-b border-app-border px-3">
+            <div className="w-8 h-8 rounded-xl bg-app-card relative overflow-hidden border border-app-border">
               <div className="absolute inset-0 shimmer-bg" />
             </div>
           </div>
           <div className="flex-1 px-3 py-4 flex flex-col gap-3 items-center mt-3">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="w-8 h-8 rounded-lg bg-app-card relative overflow-hidden border border-app-border/40">
+              <div key={i} className="w-8 h-8 rounded-lg bg-app-card relative overflow-hidden border border-app-border">
                 <div className="absolute inset-0 shimmer-bg" />
               </div>
             ))}
@@ -229,18 +232,18 @@ export default function App() {
           {/* Header Skeleton */}
           <div className="flex items-center justify-between mb-6 w-full shrink-0">
             <div className="flex flex-col gap-2">
-              <div className="w-40 h-6 bg-app-card rounded-lg relative overflow-hidden border border-app-border/40">
+              <div className="w-40 h-6 bg-app-card rounded-lg relative overflow-hidden border border-app-border">
                 <div className="absolute inset-0 shimmer-bg" />
               </div>
-              <div className="w-24 h-3 bg-app-card rounded-md relative overflow-hidden border border-app-border/40">
+              <div className="w-24 h-3 bg-app-card rounded-md relative overflow-hidden border border-app-border">
                 <div className="absolute inset-0 shimmer-bg" />
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-app-card relative overflow-hidden border border-app-border/40">
+              <div className="w-9 h-9 rounded-full bg-app-card relative overflow-hidden border border-app-border">
                 <div className="absolute inset-0 shimmer-bg" />
               </div>
-              <div className="w-9 h-9 rounded-full bg-app-card relative overflow-hidden border border-app-border/40">
+              <div className="w-9 h-9 rounded-full bg-app-card relative overflow-hidden border border-app-border">
                 <div className="absolute inset-0 shimmer-bg" />
               </div>
             </div>
@@ -249,7 +252,7 @@ export default function App() {
           {/* Desktop/Mobile Bento Top Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 shrink-0 w-full">
             {/* Hero Card Skeleton (spans 2) */}
-            <div className="col-span-1 md:col-span-2 h-[160px] bg-app-card rounded-[24px] border border-app-border/40 relative overflow-hidden p-6 flex flex-col justify-between">
+            <div className="col-span-1 md:col-span-2 h-[160px] bg-app-card rounded-[18px] border border-app-border relative overflow-hidden p-6 flex flex-col justify-between">
               <div className="absolute inset-0 shimmer-bg" />
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-app-bg" />
@@ -261,7 +264,7 @@ export default function App() {
             {/* Side 2x2 grid / Mobile widgets (spans 1) */}
             <div className="grid grid-cols-2 gap-4 h-[160px]">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-app-card rounded-[24px] border border-app-border/40 relative overflow-hidden p-4 flex flex-col justify-between">
+                <div key={i} className="bg-app-card rounded-[18px] border border-app-border relative overflow-hidden p-4 flex flex-col justify-between">
                   <div className="absolute inset-0 shimmer-bg" />
                   <div className="w-12 h-3 bg-app-bg rounded" />
                   <div className="w-20 h-5 bg-app-bg rounded mt-2" />
@@ -273,7 +276,7 @@ export default function App() {
           {/* Middle Section: Dompet Saya (1/3) & Alur Kas Chart (2/3) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 w-full">
             {/* Dompet Saya Skeleton */}
-            <div className="md:col-span-1 h-[340px] bg-app-card rounded-[24px] border border-app-border/40 relative overflow-hidden p-6 flex flex-col gap-4">
+            <div className="md:col-span-1 h-[340px] bg-app-card rounded-[18px] border border-app-border relative overflow-hidden p-6 flex flex-col gap-4">
               <div className="absolute inset-0 shimmer-bg" />
               <div className="w-28 h-5 bg-app-bg rounded mb-2" />
               {[...Array(3)].map((_, i) => (
@@ -288,13 +291,13 @@ export default function App() {
             </div>
 
             {/* Chart Skeleton */}
-            <div className="md:col-span-2 h-[340px] bg-app-card rounded-[24px] border border-app-border/40 relative overflow-hidden p-6 flex flex-col justify-between">
+            <div className="md:col-span-2 h-[340px] bg-app-card rounded-[18px] border border-app-border relative overflow-hidden p-6 flex flex-col justify-between">
               <div className="absolute inset-0 shimmer-bg" />
               <div className="flex justify-between items-center">
                 <div className="w-24 h-5 bg-app-bg rounded" />
                 <div className="w-32 h-6 bg-app-bg rounded-lg" />
               </div>
-              <div className="flex-1 w-full border-b border-app-border/20 my-6 relative flex items-end gap-3 justify-around px-4">
+              <div className="flex-1 w-full border-b border-app-border my-6 relative flex items-end gap-3 justify-around px-4">
                 {[...Array(6)].map((_, i) => (
                   <div 
                     key={i} 
@@ -311,11 +314,11 @@ export default function App() {
           </div>
 
           {/* Bottom Section: Transaksi Terakhir Skeleton */}
-          <div className="h-[280px] bg-app-card rounded-[24px] border border-app-border/40 relative overflow-hidden p-6 flex flex-col gap-4 w-full">
+          <div className="h-[280px] bg-app-card rounded-[18px] border border-app-border relative overflow-hidden p-6 flex flex-col gap-4 w-full">
             <div className="absolute inset-0 shimmer-bg" />
             <div className="w-36 h-5 bg-app-bg rounded mb-2" />
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center justify-between w-full h-12 border-b border-app-border/20 pb-2">
+              <div key={i} className="flex items-center justify-between w-full h-12 border-b border-app-border pb-2">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-app-bg" />
                   <div className="flex flex-col gap-1.5">

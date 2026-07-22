@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Outfit", "Canva Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "SF Pro Text", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   --color-app-bg: var(--bg-color);
@@ -20,28 +20,26 @@
   --color-app-accent8: var(--accent8-color, var(--accent1-color));
   --color-app-accent9: var(--accent9-color, var(--accent1-color));
   --color-app-accent10: var(--accent10-color, var(--accent1-color));
-  --color-app-success: #98c379;
-  --color-app-danger: #e06c75;
+  --color-app-success: #34c759;
+  --color-app-danger: #ff3b30;
 }
 
 /* Custom premium styles */
 .bg-app-card {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03), inset 0 1px 0 var(--inner-border);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: none;
 }
 
-.bg-accent-gradient {
-  background: var(--accent-gradient);
+.bg-app-glass {
+  background-color: color-mix(in srgb, var(--card-bg) 70%, transparent);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid var(--border-color);
 }
 
 .text-gradient {
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--accent1-color);
 }
 
 .shimmer-element {

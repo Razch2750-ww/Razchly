@@ -320,13 +320,13 @@ export default function TradingViewChart({
   return (
     <div className="bg-app-card border border-app-border rounded-2xl p-5 shadow-sm space-y-4" id="tradingview-simulator-container">
       {/* Chart Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-app-border/60 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-app-border pb-3">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-app-accent1/10 rounded-xl flex items-center justify-center text-app-accent1">
             <TrendingUp className="w-4 h-4 animate-pulse-slow" />
           </div>
           <div>
-            <h3 className="font-bold text-app-text-bright text-xs sm:text-sm flex items-center gap-1.5">
+            <h3 className="font-semibold text-app-text-bright text-xs sm:text-sm flex items-center gap-1.5">
               <span>Simulator Market Live & Chart Kustom</span>
               <span className="text-[10px] bg-indigo-500/10 text-indigo-300 font-mono border border-indigo-500/15 px-1.5 py-0.5 rounded">
                 TradingView v2.1
@@ -344,7 +344,7 @@ export default function TradingViewChart({
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
-                className={`px-2 py-1 rounded-md font-mono text-[10px] font-bold cursor-pointer transition-colors ${
+                className={`px-2 py-1 rounded-md font-mono text-[10px] font-semibold cursor-pointer transition-colors ${
                   timeframe === tf 
                     ? "bg-app-accent1 text-app-bg shadow" 
                     : "text-app-text/60 hover:text-app-text-bright"
@@ -361,7 +361,7 @@ export default function TradingViewChart({
               onClick={() => setChartType("candlestick")}
               className={`px-2 py-1 rounded-md text-[10px] font-semibold cursor-pointer transition-colors ${
                 chartType === "candlestick"
-                  ? "bg-app-accent2 text-app-bg font-bold shadow"
+                  ? "bg-app-accent2 text-app-bg font-semibold shadow"
                   : "text-app-text/60 hover:text-app-text-bright"
               }`}
             >
@@ -371,7 +371,7 @@ export default function TradingViewChart({
               onClick={() => setChartType("line")}
               className={`px-2 py-1 rounded-md text-[10px] font-semibold cursor-pointer transition-colors ${
                 chartType === "line"
-                  ? "bg-app-accent2 text-app-bg font-bold shadow"
+                  ? "bg-app-accent2 text-app-bg font-semibold shadow"
                   : "text-app-text/60 hover:text-app-text-bright"
               }`}
             >
@@ -381,7 +381,7 @@ export default function TradingViewChart({
               onClick={() => setChartType("area")}
               className={`px-2 py-1 rounded-md text-[10px] font-semibold cursor-pointer transition-colors ${
                 chartType === "area"
-                  ? "bg-app-accent2 text-app-bg font-bold shadow"
+                  ? "bg-app-accent2 text-app-bg font-semibold shadow"
                   : "text-app-text/60 hover:text-app-text-bright"
               }`}
             >
@@ -392,7 +392,7 @@ export default function TradingViewChart({
           {/* Draw support line */}
           <button
             onClick={() => setIsDrawingMode(!isDrawingMode)}
-            className={`p-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 text-[10px] font-bold ${
+            className={`p-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 text-[10px] font-semibold ${
               isDrawingMode
                 ? "bg-amber-500/10 border-amber-500/50 text-amber-300 animate-pulse"
                 : "bg-app-bg border-app-border text-app-text/60 hover:text-amber-400"
@@ -419,12 +419,12 @@ export default function TradingViewChart({
       </div>
 
       {/* Indicator Toggles */}
-      <div className="flex flex-wrap items-center gap-2 bg-app-bg/50 p-2 rounded-xl border border-app-border/40 text-[10px]">
-        <span className="text-app-text/40 font-bold uppercase tracking-wider mr-1.5">IND_OVERLAYS:</span>
+      <div className="flex flex-wrap items-center gap-2 bg-app-bg/50 p-2 rounded-xl border border-app-border text-[10px]">
+        <span className="text-app-text/50 font-semibold uppercase tracking-wider mr-1.5">IND_OVERLAYS:</span>
         <button
           onClick={() => setShowSma(!showSma)}
           className={`px-2.5 py-1 rounded-md border flex items-center gap-1 cursor-pointer font-medium transition-all ${
-            showSma ? "bg-purple-500/15 border-purple-500/30 text-purple-300" : "bg-transparent border-app-border text-app-text/40"
+            showSma ? "bg-purple-500/15 border-purple-500/30 text-purple-300" : "bg-transparent border-app-border text-app-text/50"
           }`}
         >
           <Sliders className="w-3 h-3" />
@@ -433,7 +433,7 @@ export default function TradingViewChart({
         <button
           onClick={() => setShowBb(!showBb)}
           className={`px-2.5 py-1 rounded-md border flex items-center gap-1 cursor-pointer font-medium transition-all ${
-            showBb ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300" : "bg-transparent border-app-border text-app-text/40"
+            showBb ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300" : "bg-transparent border-app-border text-app-text/50"
           }`}
         >
           <Sliders className="w-3 h-3" />
@@ -442,7 +442,7 @@ export default function TradingViewChart({
         <button
           onClick={() => setShowRsi(!showRsi)}
           className={`px-2.5 py-1 rounded-md border flex items-center gap-1 cursor-pointer font-medium transition-all ${
-            showRsi ? "bg-pink-500/15 border-pink-500/30 text-pink-300" : "bg-transparent border-app-border text-app-text/40"
+            showRsi ? "bg-pink-500/15 border-pink-500/30 text-pink-300" : "bg-transparent border-app-border text-app-text/50"
           }`}
         >
           <Eye className="w-3 h-3" />
@@ -451,7 +451,7 @@ export default function TradingViewChart({
         <button
           onClick={() => setShowVolume(!showVolume)}
           className={`px-2.5 py-1 rounded-md border flex items-center gap-1 cursor-pointer font-medium transition-all ${
-            showVolume ? "bg-teal-500/15 border-teal-500/30 text-teal-300" : "bg-transparent border-app-border text-app-text/40"
+            showVolume ? "bg-teal-500/15 border-teal-500/30 text-teal-300" : "bg-transparent border-app-border text-app-text/50"
           }`}
         >
           <Eye className="w-3 h-3" />
@@ -460,7 +460,7 @@ export default function TradingViewChart({
         <button
           onClick={() => setShowSignals(!showSignals)}
           className={`px-2.5 py-1 rounded-md border flex items-center gap-1 cursor-pointer font-medium transition-all ${
-            showSignals ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-300" : "bg-transparent border-app-border text-app-text/40"
+            showSignals ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-300" : "bg-transparent border-app-border text-app-text/50"
           }`}
         >
           <Sparkles className="w-3 h-3 animate-pulse-slow" />
@@ -469,7 +469,7 @@ export default function TradingViewChart({
         <button
           onClick={() => setShowGrid(!showGrid)}
           className={`px-2 py-1 rounded-md border text-[9px] cursor-pointer font-mono transition-all ml-auto ${
-            showGrid ? "border-app-border text-app-text/60" : "border-app-border/30 text-app-text/30"
+            showGrid ? "border-app-border text-app-text/60" : "border-app-border text-app-text/30"
           }`}
         >
           GRID: {showGrid ? "ON" : "OFF"}
@@ -477,11 +477,11 @@ export default function TradingViewChart({
       </div>
 
       {/* Floating Status Display */}
-      <div className="flex flex-wrap items-center justify-between text-[11px] bg-app-bg/30 px-3 py-2 rounded-xl border border-app-border/40 font-mono gap-y-1.5">
+      <div className="flex flex-wrap items-center justify-between text-[11px] bg-app-bg/30 px-3 py-2 rounded-xl border border-app-border font-mono gap-y-1.5">
         <div className="flex flex-wrap gap-x-3 gap-y-0.5">
           {hoveredCandle ? (
             <>
-              <span className="text-app-text/40">T: <span className="text-app-text-bright font-bold">{hoveredCandle.time.split(" ")[1] || hoveredCandle.time}</span></span>
+              <span className="text-app-text/50">T: <span className="text-app-text-bright font-semibold">{hoveredCandle.time.split(" ")[1] || hoveredCandle.time}</span></span>
               <span>O: <span className={hoveredCandle.close >= hoveredCandle.open ? "text-app-success" : "text-app-danger"}>{formatCurrencyVal(hoveredCandle.open, selectedSymbol.includes("IDX") || selectedSymbol.includes("BBCA") || selectedSymbol.includes("BBRI") ? "IDR" : "USD")}</span></span>
               <span>H: <span className={hoveredCandle.close >= hoveredCandle.open ? "text-app-success" : "text-app-danger"}>{formatCurrencyVal(hoveredCandle.high, selectedSymbol.includes("IDX") || selectedSymbol.includes("BBCA") || selectedSymbol.includes("BBRI") ? "IDR" : "USD")}</span></span>
               <span>L: <span className={hoveredCandle.close >= hoveredCandle.open ? "text-app-success" : "text-app-danger"}>{formatCurrencyVal(hoveredCandle.low, selectedSymbol.includes("IDX") || selectedSymbol.includes("BBCA") || selectedSymbol.includes("BBRI") ? "IDR" : "USD")}</span></span>
@@ -490,7 +490,7 @@ export default function TradingViewChart({
             </>
           ) : (
             <>
-              <span className="text-app-text/40 flex items-center gap-1"><Info className="w-3.5 h-3.5 text-app-accent1" /> Geser kursor di atas grafik untuk memantau data candle OHLCV secara presisi</span>
+              <span className="text-app-text/50 flex items-center gap-1"><Info className="w-3.5 h-3.5 text-app-accent1" /> Geser kursor di atas grafik untuk memantau data candle OHLCV secara presisi</span>
             </>
           )}
         </div>
@@ -983,9 +983,9 @@ export default function TradingViewChart({
         </svg>
 
         {/* Drag/S&R Instruction Overlay */}
-        <div className="absolute bottom-2 left-3 bg-app-bg/80 border border-app-border/40 px-2 py-1 rounded text-[9px] font-mono text-app-text/60 pointer-events-none">
+        <div className="absolute bottom-2 left-3 bg-app-bg/80 border border-app-border px-2 py-1 rounded text-[9px] font-mono text-app-text/60 pointer-events-none">
           {isDrawingMode ? (
-            <span className="text-amber-300 font-bold">MODE GAMBAR AKTIF: Klik di chart untuk menggambar garis horizontal</span>
+            <span className="text-amber-300 font-semibold">MODE GAMBAR AKTIF: Klik di chart untuk menggambar garis horizontal</span>
           ) : (
             <span>Klik & seret grafik ke kiri/kanan untuk menggeser history pasar</span>
           )}

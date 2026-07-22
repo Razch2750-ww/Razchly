@@ -239,7 +239,7 @@ export default function GrabDetails() {
       {/* HEADER */}
       <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6 shrink-0">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-semibold text-app-text-bright mb-1 tracking-tight">
             <TextReveal text="Analisis Grab" />
           </h1>
           <p className="text-app-text/70 text-sm">
@@ -256,7 +256,7 @@ export default function GrabDetails() {
           </button>
           <Link to="/settings" className="px-4 h-10 rounded-full bg-app-card flex items-center justify-center text-sm font-semibold text-app-text-bright border border-app-border gap-2 hover:bg-app-hover cursor-pointer transition-colors">
             <span className="opacity-800">{user?.displayName?.toUpperCase() || "USER"}</span>
-            <div className="w-6 h-6 rounded-full bg-app-accent1 text-xs font-bold flex items-center justify-center text-app-bg overflow-hidden flex-shrink-0">
+            <div className="w-6 h-6 rounded-full bg-app-accent1 text-xs font-semibold flex items-center justify-center text-app-bg overflow-hidden flex-shrink-0">
                {user?.photoURL ? (
                  <img src={user?.photoURL} alt="Profile" className="w-full h-full object-cover" />
                ) : (
@@ -305,7 +305,7 @@ export default function GrabDetails() {
           <button onClick={handlePrev} className="p-1 hover:bg-app-hover rounded-full transition-colors cursor-pointer">
             <ChevronLeft className="w-5 h-5 text-app-accent1" />
           </button>
-          <span className="font-bold text-sm text-app-text-bright">
+          <span className="font-semibold text-sm text-app-text-bright">
             {getPeriodText()}
           </span>
           <button onClick={handleNext} className="p-1 hover:bg-app-hover rounded-full transition-colors cursor-pointer">
@@ -317,7 +317,7 @@ export default function GrabDetails() {
       {/* STATS OVERVIEW */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
         {/* TOTAL PENDAPATAN */}
-        <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
+        <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
              
              <div className="absolute top-0 right-0 p-4 opacity-10">
                <TrendingUp className="w-16 h-16 text-app-success" />
@@ -325,13 +325,13 @@ export default function GrabDetails() {
              <p className="text-app-text/70 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
                 Total Pendapatan
              </p>
-             <h3 className="text-xl md:text-3xl font-bold text-app-text-bright relative z-10 font-mono">
+             <h3 className="text-xl md:text-3xl font-semibold text-app-text-bright relative z-10 font-mono">
                Rp {totalNominal.toLocaleString("id-ID")}
              </h3>
         </HoverCard>
 
         {/* TOTAL ORDERAN */}
-        <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
+        <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
              
              <div className="absolute top-0 right-0 p-4 opacity-10">
                <Receipt className="w-16 h-16 text-blue-500" />
@@ -339,13 +339,13 @@ export default function GrabDetails() {
              <p className="text-app-text/70 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
                 Total Orderan
              </p>
-             <h3 className="text-xl md:text-3xl font-bold text-app-text-bright relative z-10 font-mono">
+             <h3 className="text-xl md:text-3xl font-semibold text-app-text-bright relative z-10 font-mono">
                {totalOrders}
              </h3>
         </HoverCard>
 
         {/* TOTAL HEMAT */}
-        <HoverCard className="bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
+        <HoverCard className="bg-app-card border border-app-border rounded-[18px] p-6 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
              
             <div className="absolute top-0 right-0 p-4 opacity-10">
                <Tags className="w-16 h-16 text-app-accent1" />
@@ -353,13 +353,13 @@ export default function GrabDetails() {
             <p className="text-app-text/70 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
               Total Order Hemat
             </p>
-            <h3 className="text-xl md:text-3xl font-bold text-app-text-bright relative z-10 font-mono">
+            <h3 className="text-xl md:text-3xl font-semibold text-app-text-bright relative z-10 font-mono">
               {hematOrdersFound}
             </h3>
         </HoverCard>
 
         {/* NOMINAL POTONGAN HEMAT */}
-        <HoverCard className="bg-app-card border border-app-danger/30 rounded-[24px] p-6 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
+        <HoverCard className="bg-app-card border border-app-danger/30 rounded-[18px] p-6 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
              
              <div className="absolute top-0 right-0 p-4 opacity-5">
                <PiggyBank className="w-16 h-16 text-app-danger" />
@@ -367,14 +367,14 @@ export default function GrabDetails() {
              <p className="text-app-danger/80 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
                 Nominal Potongan Hemat
              </p>
-             <h3 className="text-xl md:text-3xl font-bold text-app-danger relative z-10 font-mono">
+             <h3 className="text-xl md:text-3xl font-semibold text-app-danger relative z-10 font-mono">
                -Rp {simulatedHematDeduction.toLocaleString("id-ID")}
              </h3>
         </HoverCard>
       </div>
 
       {/* TOTAL PER KATEGORI */}
-      <h3 className="text-xl font-bold text-app-text-bright mb-4 flex items-center gap-2">
+      <h3 className="text-xl font-semibold text-app-text-bright mb-4 flex items-center gap-2">
         <Car className="w-5 h-5 text-app-accent1" /> Total per Kategori
       </h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -382,8 +382,8 @@ export default function GrabDetails() {
           <div key={cat.label} className="bg-app-card border border-app-border rounded-2xl p-4 shadow-sm flex flex-col items-center text-center hover:border-app-accent1/50 transition-colors relative overflow-hidden">
             
             <div className="relative z-10 w-full">
-              <p className="text-app-text/70 text-xs font-bold uppercase tracking-wider mb-2">{cat.label}</p>
-              <h4 className="text-app-success font-bold mb-1">Rp {cat.total.toLocaleString("id-ID")}</h4>
+              <p className="text-app-text/70 text-xs font-semibold uppercase tracking-wider mb-2">{cat.label}</p>
+              <h4 className="text-app-success font-semibold mb-1">Rp {cat.total.toLocaleString("id-ID")}</h4>
               <p className="text-[10px] text-app-text/50">{cat.count} Orderan</p>
             </div>
           </div>
@@ -396,9 +396,9 @@ export default function GrabDetails() {
       </div>
 
       {/* GRAFIK PENDAPATAN */}
-      <div className="bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm mb-8 relative overflow-hidden">
+      <div className="bg-app-card border border-app-border rounded-[18px] p-6 shadow-sm mb-8 relative overflow-hidden">
         
-        <h3 className="text-lg font-bold text-app-text-bright mb-6 flex items-center gap-2 relative z-10">
+        <h3 className="text-lg font-semibold text-app-text-bright mb-6 flex items-center gap-2 relative z-10">
           <LineChartIcon className="w-5 h-5 text-app-accent1" /> Grafik Pendapatan
         </h3>
         <div className="h-[300px] w-full relative z-10">

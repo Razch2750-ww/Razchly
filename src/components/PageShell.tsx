@@ -1,5 +1,5 @@
 /**
- * PageShell — shared layout wrapper per Impeccable Product Register.
+ * PageShell - shared layout wrapper per Impeccable Product Register.
  *
  * Eliminates:
  * - Copy-paste header anti-pattern across 8 pages
@@ -42,7 +42,7 @@ export function PageHeader({ title, subtitle, actions, mobileActions }: PageHead
   return (
     <header className="flex items-start justify-between mb-6 md:mb-8 gap-4">
       <div className="min-w-0 flex-1">
-        <h1 className="text-2xl md:text-[1.75rem] font-bold text-app-text-bright tracking-tight leading-tight">
+        <h1 className="text-2xl md:text-[1.75rem] font-semibold text-app-text-bright tracking-tight leading-tight">
           {title}
         </h1>
         {subtitle && <p className="text-app-text/60 text-sm mt-1">{subtitle}</p>}
@@ -101,7 +101,7 @@ export function FieldLabel({ htmlFor, children, required }: {
 export type BtnVariant = "primary" | "secondary" | "ghost" | "danger" | "success";
 
 const variantCls: Record<BtnVariant, string> = {
-  primary:   "bg-app-accent1 text-white hover:opacity-90",
+  primary:   "bg-app-accent1 text-app-bg hover:opacity-90",
   secondary: "bg-app-card border border-app-border text-app-text-bright hover:bg-app-hover",
   ghost:     "text-app-text/70 hover:text-app-text-bright hover:bg-app-hover",
   danger:    "bg-app-danger/10 text-app-danger hover:bg-app-danger/20 border border-app-danger/20",
@@ -149,7 +149,7 @@ export function EmptyState({ icon, title, description, action }: {
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 rounded-2xl border border-dashed border-app-border text-center">
-      <div className="w-12 h-12 rounded-2xl bg-app-card border border-app-border flex items-center justify-center text-app-text/40 mb-4">
+      <div className="w-12 h-12 rounded-2xl bg-app-card border border-app-border flex items-center justify-center text-app-text/50 mb-4">
         {icon}
       </div>
       <p className="font-semibold text-app-text-bright mb-1">{title}</p>
@@ -196,7 +196,7 @@ export function KpiCard({ label, value, sub, icon, onClick, color = "accent" }: 
       <div className="relative z-10 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-app-text/60 text-xs font-medium mb-2">{label}</p>
-          <p className="text-xl font-bold text-app-text-bright leading-none">{value}</p>
+          <p className="text-xl font-semibold text-app-text-bright leading-none">{value}</p>
           {sub && <div className="mt-1.5 text-xs">{sub}</div>}
         </div>
         {icon && (

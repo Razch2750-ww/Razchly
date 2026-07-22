@@ -164,7 +164,7 @@ function AssetLogo({ logoid, code, description }: { logoid?: string; code: strin
 
   // Fallback to text initials badge
   return (
-    <div className="w-full h-full flex items-center justify-center bg-app-accent1/15 text-app-accent1 font-bold text-xs tracking-wider uppercase">
+    <div className="w-full h-full flex items-center justify-center bg-app-accent1/15 text-app-accent1 font-semibold text-xs tracking-wider uppercase">
       {code.slice(0, 2)}
     </div>
   );
@@ -258,12 +258,12 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
   };
 
   return (
-    <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
+    <div className="bg-app-card rounded-[18px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
       
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 relative z-10">
         <div>
-          <h2 className="text-app-text-bright font-bold flex items-center gap-2 text-lg">
+          <h2 className="text-app-text-bright font-semibold flex items-center gap-2 text-lg">
             Simulasi ARA & ARB Saham (BEI)
           </h2>
           <p className="text-xs text-app-text/60 mt-1">
@@ -276,9 +276,9 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
           <button
             type="button"
             onClick={() => setDirection("ara")}
-            className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-1.5 rounded-lg text-xs font-semibold uppercase transition-all flex items-center gap-1.5 ${
               direction === "ara"
-                ? "bg-app-success text-white shadow-sm font-bold"
+                ? "bg-app-success text-white shadow-sm font-semibold"
                 : "text-app-text/60 hover:text-app-text-bright font-semibold"
             }`}
           >
@@ -287,9 +287,9 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
           <button
             type="button"
             onClick={() => setDirection("arb")}
-            className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-1.5 rounded-lg text-xs font-semibold uppercase transition-all flex items-center gap-1.5 ${
               direction === "arb"
-                ? "bg-app-danger text-white shadow-sm font-bold"
+                ? "bg-app-danger text-white shadow-sm font-semibold"
                 : "text-app-text/60 hover:text-app-text-bright font-semibold"
             }`}
           >
@@ -300,10 +300,10 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
 
       <div className="flex flex-col gap-6 relative z-10">
         {/* INPUTS CONTAINER (Full Width, beautifully aligned) */}
-        <div className="bg-app-bg/40 p-5 rounded-2xl border border-app-border/60 space-y-5">
+        <div className="bg-app-bg/40 p-5 rounded-2xl border border-app-border space-y-5">
           {/* Section 1: Quick Select */}
           <div>
-            <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+            <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
               Pilih Contoh / Portofolio
             </label>
             <div className="flex flex-wrap gap-2">
@@ -329,7 +329,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
                   onClick={() => handleQuickSelect(stock.code, stock.price, stock.qty)}
                   className="px-2.5 py-1.5 rounded-lg bg-app-bg border border-app-border text-xs text-app-text hover:text-app-text-bright hover:border-app-accent1 transition-all flex items-center gap-1.5"
                 >
-                  <span className="font-bold text-app-accent1">{stock.code}</span>
+                  <span className="font-semibold text-app-accent1">{stock.code}</span>
                   <span className="text-app-text/60">Rp {stock.price.toLocaleString("id-ID")}</span>
                   {stock.qty && <span className="px-1 py-0.5 rounded bg-app-bg text-[9px] text-app-accent2">{stock.qty} Lot</span>}
                 </button>
@@ -340,7 +340,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
           {/* Section 2: Main inputs in a clean responsive grid */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
-              <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+              <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                 Nama / Kode Saham
               </label>
               <input
@@ -353,7 +353,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+              <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                 Harga Sebelumnya (Rp)
               </label>
               <input
@@ -362,12 +362,12 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
                 value={priceInput}
                 onChange={(e) => setPriceInput(formatNumberInput(e.target.value))}
                 placeholder="Harga acuan..."
-                className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-2.5 text-sm focus:border-app-accent1 outline-none text-app-text-bright font-bold"
+                className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-2.5 text-sm focus:border-app-accent1 outline-none text-app-text-bright font-semibold"
               />
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+              <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                 Jumlah Lot
               </label>
               <input
@@ -376,12 +376,12 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
                 value={lotInput}
                 onChange={(e) => setLotInput(formatNumberInput(e.target.value))}
                 placeholder="Jumlah lot..."
-                className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-2.5 text-sm focus:border-app-accent1 outline-none text-app-text-bright font-bold"
+                className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-2.5 text-sm focus:border-app-accent1 outline-none text-app-text-bright font-semibold"
               />
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70 flex justify-between">
+              <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70 flex justify-between">
                 <span>Berapa Kali ARA/ARB ({days}x)</span>
               </label>
               <div className="flex items-center gap-2">
@@ -399,7 +399,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
                   max="100"
                   value={days}
                   onChange={(e) => setDays(Math.min(100, Math.max(1, parseInt(e.target.value) || 1)))}
-                  className="w-16 text-center bg-app-bg border border-app-border rounded-lg py-1.5 text-xs text-app-text-bright font-bold focus:border-app-accent1 outline-none"
+                  className="w-16 text-center bg-app-bg border border-app-border rounded-lg py-1.5 text-xs text-app-text-bright font-semibold focus:border-app-accent1 outline-none"
                 />
               </div>
             </div>
@@ -407,15 +407,15 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
 
           {/* Section 3: Summary details */}
           {parsedPrice > 0 && parsedLots > 0 && (
-            <div className="bg-app-bg/50 p-4 rounded-xl border border-app-border/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+            <div className="bg-app-bg/50 p-4 rounded-xl border border-app-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
               <div>
                 <span className="text-app-text/50">Total Uang Awal:</span>
-                <span className="font-bold text-app-text-bright ml-2 text-sm">
+                <span className="font-semibold text-app-text-bright ml-2 text-sm">
                   Rp {(parsedPrice * parsedLots * 100).toLocaleString("id-ID")}
                 </span>
               </div>
               <div className="text-app-text/50">
-                Konversi Shares: <span className="font-bold text-app-text-bright">{parsedLots} lot</span> ({ (parsedLots * 100).toLocaleString("id-ID") } lembar saham)
+                Konversi Shares: <span className="font-semibold text-app-text-bright">{parsedLots} lot</span> ({ (parsedLots * 100).toLocaleString("id-ID") } lembar saham)
               </div>
             </div>
           )}
@@ -424,9 +424,9 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
         {/* PROJECTION RESULTS & ATURAN BEI (Stack below) */}
         <div className="space-y-6">
           <div className="bg-app-bg/50 rounded-2xl border border-app-border p-5">
-            <h3 className="text-xs font-bold text-app-text-bright uppercase tracking-wider mb-4 flex items-center justify-between">
+            <h3 className="text-xs font-semibold text-app-text-bright uppercase tracking-wider mb-4 flex items-center justify-between">
               <span>Hasil Proyeksi Hari-ke-Hari {stockName ? `Saham ${stockName}` : ""}</span>
-              <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold ${direction === "ara" ? "bg-app-success/10 text-app-success border border-app-success/20" : "bg-app-danger/10 text-app-danger border border-app-danger/20"}`}>
+              <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${direction === "ara" ? "bg-app-success/10 text-app-success border border-app-success/20" : "bg-app-danger/10 text-app-danger border border-app-danger/20"}`}>
                 {direction.toUpperCase()} MODE
               </span>
             </h3>
@@ -440,18 +440,18 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
                 <table className="w-full text-left text-xs min-w-[650px]">
                   <thead>
                     <tr className="border-b border-app-border text-app-text/50">
-                      <th className="pb-3 font-bold">HARI</th>
-                      <th className="pb-3 font-bold text-right">HARGA ACUAN</th>
-                      <th className="pb-3 font-bold text-right">HARGA TARGET</th>
+                      <th className="pb-3 font-semibold">HARI</th>
+                      <th className="pb-3 font-semibold text-right">HARGA ACUAN</th>
+                      <th className="pb-3 font-semibold text-right">HARGA TARGET</th>
                       {parsedLots > 0 && (
                         <>
-                          <th className="pb-3 font-bold text-right">LOT</th>
-                          <th className="pb-3 font-bold text-right">TOTAL UANG TARGET</th>
-                          <th className="pb-3 font-bold text-right">KUMULATIF +/-</th>
+                          <th className="pb-3 font-semibold text-right">LOT</th>
+                          <th className="pb-3 font-semibold text-right">TOTAL UANG TARGET</th>
+                          <th className="pb-3 font-semibold text-right">KUMULATIF +/-</th>
                         </>
                       )}
-                      <th className="pb-3 font-bold text-right">FRAKSI</th>
-                      <th className="pb-3 font-bold text-right">B.PERSEN</th>
+                      <th className="pb-3 font-semibold text-right">FRAKSI</th>
+                      <th className="pb-3 font-semibold text-right">B.PERSEN</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-app-border/30">
@@ -461,15 +461,15 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
                       const pctTotal = initialTotal > 0 ? (diffTotal / initialTotal) * 100 : 0;
                       return (
                         <tr key={step.day} className="hover:bg-app-hover/35 transition-colors">
-                          <td className="py-3 font-bold text-app-text-bright">Hari {step.day}</td>
+                          <td className="py-3 font-semibold text-app-text-bright">Hari {step.day}</td>
                           <td className="py-3 text-right font-medium text-app-text/80">Rp {step.prevPrice.toLocaleString("id-ID")}</td>
-                          <td className={`py-3 text-right font-bold text-sm ${direction === "ara" ? "text-app-success" : "text-app-danger"}`}>
+                          <td className={`py-3 text-right font-semibold text-sm ${direction === "ara" ? "text-app-success" : "text-app-danger"}`}>
                             Rp {step.price.toLocaleString("id-ID")}
                           </td>
                           {parsedLots > 0 && (
                             <>
                               <td className="py-3 text-right text-app-text/70">{parsedLots} lot</td>
-                              <td className="py-3 text-right font-bold text-app-text-bright">
+                              <td className="py-3 text-right font-semibold text-app-text-bright">
                                 Rp {step.totalValue.toLocaleString("id-ID")}
                               </td>
                               <td className={`py-3 text-right font-semibold text-xs ${diffTotal >= 0 ? "text-app-success" : "text-app-danger"}`}>
@@ -492,21 +492,21 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
           </div>
 
           {/* Rules Explanation */}
-          <div className="bg-app-card rounded-2xl border border-app-border/40 p-4 text-[11px] text-app-text/60 space-y-3">
-            <h4 className="font-bold text-app-text-bright">
+          <div className="bg-app-card rounded-2xl border border-app-border p-4 text-[11px] text-app-text/60 space-y-3">
+            <h4 className="font-semibold text-app-text-bright">
               Aturan ARA & ARB Bursa Efek Indonesia (BEI):
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <p className="font-bold text-app-success">Batas Kenaikan (ARA):</p>
+                <p className="font-semibold text-app-success">Batas Kenaikan (ARA):</p>
                 <ul className="list-disc pl-4 space-y-0.5">
-                  <li>Harga Rp50 – Rp200: <span className="font-semibold text-app-text-bright">+35%</span></li>
-                  <li>Harga &gt;Rp200 – Rp5.000: <span className="font-semibold text-app-text-bright">+25%</span></li>
+                  <li>Harga Rp50 - Rp200: <span className="font-semibold text-app-text-bright">+35%</span></li>
+                  <li>Harga &gt;Rp200 - Rp5.000: <span className="font-semibold text-app-text-bright">+25%</span></li>
                   <li>Harga &gt;Rp5.000: <span className="font-semibold text-app-text-bright">+20%</span></li>
                 </ul>
               </div>
               <div className="space-y-1.5">
-                <p className="font-bold text-app-danger">Batas Penurunan (ARB):</p>
+                <p className="font-semibold text-app-danger">Batas Penurunan (ARB):</p>
                 <p className="leading-normal">
                   Seragam <span className="font-semibold text-app-text-bright">-15%</span> untuk seluruh rentang harga saham.
                 </p>
@@ -516,28 +516,28 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
               </div>
             </div>
             
-            <div className="pt-2 border-t border-app-border/30">
-              <span className="font-bold text-app-text-bright">Tabel Fraksi Harga:</span>
+            <div className="pt-2 border-t border-app-border">
+              <span className="font-semibold text-app-text-bright">Tabel Fraksi Harga:</span>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-1.5">
-                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border/20 text-center">
-                  <p className="text-app-text/40 text-[9px] uppercase font-bold">Selalu &lt; 200</p>
-                  <p className="font-bold text-app-text-bright">Rp 1</p>
+                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border text-center">
+                  <p className="text-app-text/50 text-[9px] uppercase font-semibold">Selalu &lt; 200</p>
+                  <p className="font-semibold text-app-text-bright">Rp 1</p>
                 </div>
-                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border/20 text-center">
-                  <p className="text-app-text/40 text-[9px] uppercase font-bold">200 - &lt; 500</p>
-                  <p className="font-bold text-app-text-bright">Rp 2</p>
+                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border text-center">
+                  <p className="text-app-text/50 text-[9px] uppercase font-semibold">200 - &lt; 500</p>
+                  <p className="font-semibold text-app-text-bright">Rp 2</p>
                 </div>
-                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border/20 text-center">
-                  <p className="text-app-text/40 text-[9px] uppercase font-bold">500 - &lt; 2.000</p>
-                  <p className="font-bold text-app-text-bright">Rp 5</p>
+                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border text-center">
+                  <p className="text-app-text/50 text-[9px] uppercase font-semibold">500 - &lt; 2.000</p>
+                  <p className="font-semibold text-app-text-bright">Rp 5</p>
                 </div>
-                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border/20 text-center">
-                  <p className="text-app-text/40 text-[9px] uppercase font-bold">2.000 - &lt; 5.000</p>
-                  <p className="font-bold text-app-text-bright">Rp 10</p>
+                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border text-center">
+                  <p className="text-app-text/50 text-[9px] uppercase font-semibold">2.000 - &lt; 5.000</p>
+                  <p className="font-semibold text-app-text-bright">Rp 10</p>
                 </div>
-                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border/20 text-center col-span-2 sm:col-span-1">
-                  <p className="text-app-text/40 text-[9px] uppercase font-bold">&ge; 5.000</p>
-                  <p className="font-bold text-app-text-bright">Rp 25</p>
+                <div className="bg-app-bg/40 p-1.5 rounded border border-app-border text-center col-span-2 sm:col-span-1">
+                  <p className="text-app-text/50 text-[9px] uppercase font-semibold">&ge; 5.000</p>
+                  <p className="font-semibold text-app-text-bright">Rp 25</p>
                 </div>
               </div>
             </div>
@@ -786,7 +786,7 @@ export default function Investments() {
     setPortoQty("");
     setPortoPrice("");
     setPortoDate(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
-    setPortoAccountId(accounts[0]?.id || "");
+    setPortoAccountId(localStorage.getItem('lastAccountId_investasi') || accounts[0]?.id || "");
     setHasFee(false);
     setPortoFee("");
     setPortoSelectedId("");
@@ -801,7 +801,7 @@ export default function Investments() {
     setPortoQty(inv.qty.toString());
     setPortoPrice(inv.price.toString());
     setPortoDate(format(inv.createdAt, "yyyy-MM-dd'T'HH:mm"));
-    setPortoAccountId(accounts[0]?.id || "");
+    setPortoAccountId(localStorage.getItem('lastAccountId_investasi') || accounts[0]?.id || "");
     setHasFee(false);
     setPortoFee("");
     setPortoSelectedId(inv.id);
@@ -1631,13 +1631,13 @@ export default function Investments() {
       mobileActions={mobileActionsInvestments}
     >
       {/* Sub-tab Navigation */}
-      <div className="flex bg-app-bg p-1 rounded-xl border border-app-border/40 self-start mb-6 gap-1 relative z-10 shrink-0">
+      <div className="flex bg-app-bg p-1 rounded-xl border border-app-border self-start mb-6 gap-1 relative z-10 shrink-0">
         <button
           type="button"
           onClick={() => setActiveTab("dashboard")}
-          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
             activeTab === "dashboard"
-              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
               : "text-app-text/60 hover:text-app-text-bright"
           }`}
         >
@@ -1646,9 +1646,9 @@ export default function Investments() {
         <button
           type="button"
           onClick={() => setActiveTab("holding")}
-          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
             activeTab === "holding"
-              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
               : "text-app-text/60 hover:text-app-text-bright"
           }`}
         >
@@ -1657,15 +1657,15 @@ export default function Investments() {
         <button
           type="button"
           onClick={() => setActiveTab("audit")}
-          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
             activeTab === "audit"
-              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
               : "text-app-text/60 hover:text-app-text-bright"
           }`}
         >
           {language === "en" ? "Audit History" : "Audit Riwayat"}
           {auditedHoldings.length > 0 && (
-            <span className="bg-app-accent1 text-app-bg text-[9px] px-1.5 py-0.5 rounded-full font-bold">
+            <span className="bg-app-accent1 text-app-bg text-[9px] px-1.5 py-0.5 rounded-full font-semibold">
               {auditedHoldings.length}
             </span>
           )}
@@ -1679,13 +1679,13 @@ export default function Investments() {
           <div className="lg:col-span-5 flex flex-col gap-6 w-full">
             
             {/* CARD 1: TOTAL EQUITY */}
-            <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full">
+            <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden w-full">
               
               <div className="relative z-10 flex flex-col mb-4">
-                <span className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider mb-1">
+                <span className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider mb-1">
                   Total Equity
                 </span>
-                <span className="text-2xl font-bold text-app-text-bright break-words leading-tight font-mono">
+                <span className="text-2xl font-semibold text-app-text-bright break-words leading-tight font-mono">
                   Rp {totalBalance.toLocaleString("id-ID")}
                 </span>
               </div>
@@ -1747,13 +1747,13 @@ export default function Investments() {
               </div>
 
               {/* Period Selectors */}
-              <div className="flex gap-2 justify-center mt-4 border-t border-app-border/20 pt-3 relative z-10">
+              <div className="flex gap-2 justify-center mt-4 border-t border-app-border pt-3 relative z-10">
                 {(["1W", "1M", "3M", "YTD", "1Y", "All"] as const).map((p) => (
                   <button
                     key={p}
                     type="button"
                     onClick={() => setChartPeriod(p)}
-                    className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
                       chartPeriod === p
                         ? "bg-app-accent1 text-app-bg shadow-sm"
                         : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
@@ -1766,16 +1766,16 @@ export default function Investments() {
             </HoverCard>
 
             {/* CARD 2: CUMULATIVE PORTFOLIO RETURN */}
-            <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full">
+            <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden w-full">
               
               
               <div className="relative z-10 flex flex-col mb-4">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">
+                  <span className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider">
                     Cumulative Portfolio Return
                   </span>
                   <div className="relative group">
-                    <Info className="w-3.5 h-3.5 text-app-text/40 hover:text-app-text cursor-pointer" />
+                    <Info className="w-3.5 h-3.5 text-app-text/50 hover:text-app-text cursor-pointer" />
                     <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-app-card border border-app-border p-2 rounded-lg shadow-xl text-[10px] text-app-text/80 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 leading-relaxed">
                       Imbal hasil kumulatif portofolio Anda dibandingkan indeks IHSG (COMPOSITE).
                     </div>
@@ -1786,14 +1786,14 @@ export default function Investments() {
                   <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-3.5 bg-app-success rounded-full" />
                     <span className="text-xs text-app-text/60 font-semibold">Portfolio:</span>
-                    <span className={`text-xs font-bold font-mono ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                    <span className={`text-xs font-semibold font-mono ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
                       {incomeToday >= 0 ? "+" : ""}{(expenseToday > 0 ? ((incomeToday / expenseToday) * 100).toFixed(2) : 0)}%
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-3.5 bg-purple-500 rounded-full" />
                     <span className="text-xs text-app-text/60 font-semibold">IHSG:</span>
-                    <span className={`text-xs font-bold font-mono ${marketData.COMPOSITE?.change >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                    <span className={`text-xs font-semibold font-mono ${marketData.COMPOSITE?.change >= 0 ? "text-app-success" : "text-app-danger"}`}>
                       {marketData.COMPOSITE?.change >= 0 ? "+" : ""}{marketData.COMPOSITE?.change?.toFixed(2)}%
                     </span>
                   </div>
@@ -1864,13 +1864,13 @@ export default function Investments() {
               </div>
 
               {/* Period Selectors */}
-              <div className="flex gap-2 justify-center mt-4 border-t border-app-border/20 pt-3 relative z-10">
+              <div className="flex gap-2 justify-center mt-4 border-t border-app-border pt-3 relative z-10">
                 {(["1W", "1M", "3M", "YTD", "1Y", "All"] as const).map((p) => (
                   <button
                     key={p}
                     type="button"
                     onClick={() => setChartPeriod(p)}
-                    className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
                       chartPeriod === p
                         ? "bg-app-accent1 text-app-bg shadow-sm"
                         : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
@@ -1886,16 +1886,16 @@ export default function Investments() {
 
           {/* COLUMN 2: MIDDLE PANEL - TOTAL EQUITY RETURN (lg:col-span-3) */}
           <div className="lg:col-span-3 w-full">
-            <HoverCard className="bg-app-card rounded-[24px] p-5 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full h-[620px]">
+            <HoverCard className="bg-app-card rounded-[18px] p-5 border border-app-border flex flex-col shadow-sm relative overflow-hidden w-full h-[620px]">
               
               
               <div className="relative z-10 flex flex-col gap-3 shrink-0 mb-4">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">
+                  <span className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider">
                     Total Equity Return
                   </span>
                   <div className="relative group">
-                    <Info className="w-3.5 h-3.5 text-app-text/40 hover:text-app-text cursor-pointer" />
+                    <Info className="w-3.5 h-3.5 text-app-text/50 hover:text-app-text cursor-pointer" />
                     <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-app-card border border-app-border p-2 rounded-lg shadow-xl text-[10px] text-app-text/80 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 leading-relaxed">
                       Catatan performa harian/bulanan nilai investasi dan P&L Anda.
                     </div>
@@ -1904,11 +1904,11 @@ export default function Investments() {
 
                 {/* View Mode Toggle */}
                 <div className="flex justify-between items-center">
-                  <div className="flex bg-app-bg p-0.5 rounded-lg border border-app-border/60">
+                  <div className="flex bg-app-bg p-0.5 rounded-lg border border-app-border">
                     <button
                       type="button"
                       onClick={() => setEquityReturnViewMode("daily")}
-                      className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                      className={`px-3 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
                         equityReturnViewMode === "daily"
                           ? "bg-app-card text-app-accent1 shadow-sm"
                           : "text-app-text/60 hover:text-app-text-bright"
@@ -1919,7 +1919,7 @@ export default function Investments() {
                     <button
                       type="button"
                       onClick={() => setEquityReturnViewMode("monthly")}
-                      className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                      className={`px-3 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
                         equityReturnViewMode === "monthly"
                           ? "bg-app-card text-app-accent1 shadow-sm"
                           : "text-app-text/60 hover:text-app-text-bright"
@@ -1928,17 +1928,17 @@ export default function Investments() {
                       Monthly
                     </button>
                   </div>
-                  <span className="text-[10px] font-bold text-app-text/50 capitalize font-sans">
+                  <span className="text-[10px] font-semibold text-app-text/50 capitalize font-sans">
                     {chartPeriod === "YTD" ? "Year to Date" : chartPeriod === "All" ? "All Time" : `Last ${chartPeriod}`}
                   </span>
                 </div>
               </div>
 
               {/* Scrollable Table */}
-              <div className="flex-1 overflow-y-auto pr-1 relative z-10 border border-app-border/40 rounded-xl bg-app-bg/15">
+              <div className="flex-1 overflow-y-auto pr-1 relative z-10 border border-app-border rounded-xl bg-app-bg/15">
                 <table className="w-full text-left text-xs font-mono">
                   <thead>
-                    <tr className="bg-app-bg border-b border-app-border/50 text-app-text/60 font-bold font-sans uppercase tracking-wider text-[9px] sticky top-0 z-10">
+                    <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-semibold font-sans uppercase tracking-wider text-[9px] sticky top-0 z-10">
                       <th className="py-2.5 px-3">Date</th>
                       <th className="py-2.5 px-3 text-right">Equity</th>
                       <th className="py-2.5 px-3 text-right">P&L</th>
@@ -1948,20 +1948,20 @@ export default function Investments() {
                     {equityReturnViewMode === "daily" ? (
                       dailyRows.length === 0 ? (
                         <tr>
-                          <td colSpan={3} className="py-8 text-center text-app-text/40 font-sans">
+                          <td colSpan={3} className="py-8 text-center text-app-text/50 font-sans">
                             Belum ada data
                           </td>
                         </tr>
                       ) : (
                         dailyRows.map((row, i) => (
                           <tr key={i} className="hover:bg-app-hover/30 transition-colors">
-                            <td className="py-2.5 px-3 text-app-text/75 font-sans font-bold">
+                            <td className="py-2.5 px-3 text-app-text/75 font-sans font-semibold">
                               {format(row.rawDate, "dd MMM yy", { locale: localeId })}
                             </td>
                             <td className="py-2.5 px-3 text-right text-app-text-bright">
                               {row.equity.toLocaleString("id-ID")}
                             </td>
-                            <td className={`py-2.5 px-3 text-right font-bold ${row.pnl >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                            <td className={`py-2.5 px-3 text-right font-semibold ${row.pnl >= 0 ? "text-app-success" : "text-app-danger"}`}>
                               <div>{row.pnl >= 0 ? "+" : ""}{row.pnl.toLocaleString("id-ID")}</div>
                               <div className="text-[9px] font-normal opacity-85">({row.pnl >= 0 ? "+" : ""}{row.pnlPercent.toFixed(2)}%)</div>
                             </td>
@@ -1971,20 +1971,20 @@ export default function Investments() {
                     ) : (
                       monthlyRows.length === 0 ? (
                         <tr>
-                          <td colSpan={3} className="py-8 text-center text-app-text/40 font-sans">
+                          <td colSpan={3} className="py-8 text-center text-app-text/50 font-sans">
                             Belum ada data
                           </td>
                         </tr>
                       ) : (
                         monthlyRows.map((row, i) => (
                           <tr key={i} className="hover:bg-app-hover/30 transition-colors">
-                            <td className="py-3 px-3 text-app-text/75 font-sans font-bold">
+                            <td className="py-3 px-3 text-app-text/75 font-sans font-semibold">
                               {row.dateLabel}
                             </td>
-                            <td className="py-3 px-3 text-right text-app-text-bright font-bold">
+                            <td className="py-3 px-3 text-right text-app-text-bright font-semibold">
                               {row.equity.toLocaleString("id-ID")}
                             </td>
-                            <td className={`py-3 px-3 text-right font-bold ${row.pnl >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                            <td className={`py-3 px-3 text-right font-semibold ${row.pnl >= 0 ? "text-app-success" : "text-app-danger"}`}>
                               <div>{row.pnl >= 0 ? "+" : ""}{row.pnl.toLocaleString("id-ID")}</div>
                               <div className="text-[9px] font-normal opacity-85">({row.pnl >= 0 ? "+" : ""}{row.pnlPercent.toFixed(2)}%)</div>
                             </td>
@@ -2000,20 +2000,20 @@ export default function Investments() {
 
           {/* COLUMN 3: RIGHT PANEL - PORTFOLIO ALLOCATION (lg:col-span-4) */}
           <div className="lg:col-span-4 w-full">
-            <HoverCard className="bg-app-card rounded-[24px] p-5 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden w-full min-h-[620px]">
+            <HoverCard className="bg-app-card rounded-[18px] p-5 border border-app-border flex flex-col shadow-sm relative overflow-hidden w-full min-h-[620px]">
               
               
               <div className="relative z-10 flex justify-between items-center shrink-0 mb-4">
-                <span className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">
+                <span className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider">
                   Portfolio Allocation
                 </span>
 
                 {/* Category Toggle */}
-                <div className="flex bg-app-bg p-0.5 rounded-lg border border-app-border/60">
+                <div className="flex bg-app-bg p-0.5 rounded-lg border border-app-border">
                   <button
                     type="button"
                     onClick={() => setAllocationViewBy("aset")}
-                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                    className={`px-3 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
                       allocationViewBy === "aset"
                         ? "bg-app-card text-app-accent1 shadow-sm"
                         : "text-app-text/60 hover:text-app-text-bright"
@@ -2024,7 +2024,7 @@ export default function Investments() {
                   <button
                     type="button"
                     onClick={() => setAllocationViewBy("kategori")}
-                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                    className={`px-3 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
                       allocationViewBy === "kategori"
                         ? "bg-app-card text-app-accent1 shadow-sm"
                         : "text-app-text/60 hover:text-app-text-bright"
@@ -2041,7 +2041,7 @@ export default function Investments() {
 
                 if (totalAllocValue === 0) {
                   return (
-                    <div className="flex-1 flex flex-col items-center justify-center text-app-text/50 text-xs py-8 border border-dashed border-app-border/50 rounded-xl relative z-10 bg-app-bg/10 min-h-[300px]">
+                    <div className="flex-1 flex flex-col items-center justify-center text-app-text/50 text-xs py-8 border border-dashed border-app-border rounded-xl relative z-10 bg-app-bg/10 min-h-[300px]">
                       <TrendingUp className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
                       Belum ada instrumen investasi
                     </div>
@@ -2083,7 +2083,7 @@ export default function Investments() {
                         </PieChart>
                       </ResponsiveContainer>
                       <div className="absolute flex flex-col items-center justify-center pointer-events-none text-center px-4 max-w-[140px]">
-                        <span className="text-[15px] font-bold text-app-text-bright break-words leading-tight font-mono">
+                        <span className="text-[15px] font-semibold text-app-text-bright break-words leading-tight font-mono">
                           Rp {totalAllocValue.toLocaleString("id-ID")}
                         </span>
                         <span className="text-[10px] text-app-text/50 mt-1 font-semibold">
@@ -2102,15 +2102,15 @@ export default function Investments() {
                           <div key={item.id} className="flex flex-col gap-1.5 group">
                             <div className="flex justify-between items-center text-xs">
                               <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-full bg-app-card border border-app-border/60 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                                <div className="w-7 h-7 rounded-full bg-app-card border border-app-border flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
                                   <AssetLogo logoid={item.logoid} code={item.name} description={item.description} />
                                 </div>
                                 <div className="flex flex-col">
-                                  <span className="font-bold text-app-text-bright">{item.name}</span>
+                                  <span className="font-semibold text-app-text-bright">{item.name}</span>
                                   <span className="text-[9px] text-app-text/50 font-mono">Rp {item.value.toLocaleString("id-ID")}</span>
                                 </div>
                               </div>
-                              <span className="font-bold text-app-text-bright font-mono">{percentage.toFixed(2)}%</span>
+                              <span className="font-semibold text-app-text-bright font-mono">{percentage.toFixed(2)}%</span>
                             </div>
                             <div className="w-full h-1.5 bg-app-border/20 rounded-full overflow-hidden relative">
                               <div 
@@ -2136,7 +2136,7 @@ export default function Investments() {
           {/* WIDGETS (STACK ON MOBILE, GRID ON DESKTOP) */}
       <div className="flex flex-col gap-4 mb-6 md:grid md:grid-cols-3 md:gap-6 md:mb-8">
         {/* TOTAL INVESTASI */}
-        <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex items-center justify-between shadow-sm relative overflow-hidden cursor-pointer w-full">
+        <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border flex items-center justify-between shadow-sm relative overflow-hidden cursor-pointer w-full">
           
           <div className="flex items-center gap-4 relative z-10 w-full">
             <div className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center ${incomeToday >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
@@ -2146,7 +2146,7 @@ export default function Investments() {
               <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1">
                 Total Investasi
               </p>
-              <p className="text-xl font-bold text-app-text-bright break-words leading-tight font-mono">
+              <p className="text-xl font-semibold text-app-text-bright break-words leading-tight font-mono">
                 Rp {totalBalance.toLocaleString("id-ID")}
               </p>
               <div className={`flex items-center gap-1 mt-1 text-xs font-medium ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
@@ -2162,19 +2162,19 @@ export default function Investments() {
               </div>
             </div>
           </div>
-          <ChevronRight className="w-5 h-5 shrink-0 text-app-text/40 relative z-10 ml-2" />
+          <ChevronRight className="w-5 h-5 shrink-0 text-app-text/50 relative z-10 ml-2" />
         </HoverCard>
 
         {/* RETURN */}
-        <HoverCard className="bg-app-card rounded-[24px] border border-app-border/40 flex shadow-sm overflow-hidden relative cursor-pointer w-full">
+        <HoverCard className="bg-app-card rounded-[18px] border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer w-full">
           
           <div className="flex-1 p-4 border-r border-app-border flex flex-col justify-center relative z-10 min-w-0">
-             <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider mb-1">Modal Awal</p>
-             <p className="text-lg font-bold text-app-text-bright break-words leading-tight font-mono">Rp {expenseToday.toLocaleString("id-ID")}</p>
+             <p className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider mb-1">Modal Awal</p>
+             <p className="text-lg font-semibold text-app-text-bright break-words leading-tight font-mono">Rp {expenseToday.toLocaleString("id-ID")}</p>
           </div>
           <div className="flex-1 p-4 flex flex-col justify-center relative z-10 min-w-0">
-             <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider mb-1">Sekarang</p>
-             <p className={`text-lg font-bold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} break-words leading-tight font-mono`}>
+             <p className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider mb-1">Sekarang</p>
+             <p className={`text-lg font-semibold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} break-words leading-tight font-mono`}>
                Rp {totalBalance.toLocaleString("id-ID")}
              </p>
              <div className={`text-[10px] font-medium mt-1 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} leading-tight font-mono`}>
@@ -2184,18 +2184,18 @@ export default function Investments() {
         </HoverCard>
 
         {/* PASAR: IHSG & KURS RUPIAH */}
-        <HoverCard className="bg-app-card rounded-[24px] border border-app-border/40 flex shadow-sm overflow-hidden relative cursor-pointer w-full">
+        <HoverCard className="bg-app-card rounded-[18px] border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer w-full">
           
           <div className="flex-1 p-4 border-r border-app-border hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0">
              <div className="flex justify-between items-start mb-1">
-               <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">IHSG</p>
+               <p className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider">IHSG</p>
                {marketData.COMPOSITE?.change >= 0 ? (
                  <TrendingUp className="w-4 h-4 shrink-0 text-app-success" />
                ) : (
                  <TrendingDown className="w-4 h-4 shrink-0 text-app-danger" />
                )}
              </div>
-             <p className="text-lg font-bold text-app-text-bright break-words leading-tight font-mono">
+             <p className="text-lg font-semibold text-app-text-bright break-words leading-tight font-mono">
                {marketData.COMPOSITE?.price?.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "7.245,12"}
              </p>
              <div className={`flex items-center gap-1 mt-1 text-[10px] font-medium ${marketData.COMPOSITE?.change >= 0 ? "text-app-success" : "text-app-danger"} font-mono`}>
@@ -2209,14 +2209,14 @@ export default function Investments() {
             className="flex-1 p-4 hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0"
           >
              <div className="flex justify-between items-start mb-1">
-               <p className="text-app-text/70 text-[10px] font-bold uppercase tracking-wider">USD/IDR</p>
+               <p className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider">USD/IDR</p>
                {marketData.USDIDR?.change >= 0 ? (
                  <TrendingUp className="w-4 h-4 shrink-0 text-app-danger" />
                ) : (
                  <TrendingDown className="w-4 h-4 shrink-0 text-app-success" />
                )}
              </div>
-             <p className="text-lg font-bold text-app-text-bright break-words leading-tight font-mono">
+             <p className="text-lg font-semibold text-app-text-bright break-words leading-tight font-mono">
                {marketData.USDIDR?.price?.toLocaleString("id-ID") || "16.250"}
              </p>
              <div className={`flex items-center gap-1 mt-1 text-[10px] font-medium ${marketData.USDIDR?.change >= 0 ? "text-app-danger" : "text-app-success"} font-mono`}>
@@ -2229,23 +2229,23 @@ export default function Investments() {
       {/* MAIN SECTIONS */}
       <div className="flex flex-col gap-6 mb-6">
         {/* PERFORMA INVESTASI */}
-        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-[18px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
           
           <div className="flex items-center justify-between mb-6 relative z-10">
-            <h2 className="text-app-text-bright font-bold">
+            <h2 className="text-app-text-bright font-semibold">
               Performa Investasi
             </h2>
             <div className="flex items-center gap-2">
               <div className="bg-app-bg rounded-full p-1 border border-app-border flex">
                 <button
                   onClick={() => setChartPeriod("1W")}
-                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === "1W" ? "bg-app-accent1 text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
+                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === "1W" ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
                 >
                   7 Hari
                 </button>
                 <button
                   onClick={() => setChartPeriod("1M")}
-                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === "1M" ? "bg-app-accent1 text-white shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
+                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === "1M" ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
                 >
                   30 Hari
                 </button>
@@ -2371,21 +2371,21 @@ export default function Investments() {
         </div>
 
         {/* PORTOFOLIO */}
-        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-[18px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
           
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 relative z-10">
             <div className="flex flex-col gap-1.5 w-full md:w-auto">
-              <h2 className="text-app-text-bright font-bold text-lg">
+              <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">
                 Portofolio Investasi
               </h2>
               <div className="flex bg-app-bg p-0.5 rounded-xl border border-app-border self-start">
                 <button
                   type="button"
                   onClick={() => setActiveTab("holding")}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === "holding"
-                      ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+                      ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
                       : "text-app-text/60 hover:text-app-text-bright border border-transparent"
                   }`}
                 >
@@ -2394,15 +2394,15 @@ export default function Investments() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("audit")}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                     activeTab === "audit"
-                      ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+                      ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
                       : "text-app-text/60 hover:text-app-text-bright border border-transparent"
                   }`}
                 >
                   Audit Riwayat Transaksi
                   {auditedHoldings.length > 0 && (
-                    <span className="bg-app-accent1 text-app-bg text-[9px] px-1.5 py-0.5 rounded-full font-bold">
+                    <span className="bg-app-accent1 text-app-bg text-[9px] px-1.5 py-0.5 rounded-full font-semibold">
                       {auditedHoldings.length}
                     </span>
                   )}
@@ -2417,7 +2417,7 @@ export default function Investments() {
                     onClick={() => setPortfolioViewMode("daftar")}
                     className={`p-1.5 rounded-lg transition-all ${
                       portfolioViewMode === "daftar"
-                        ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+                        ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
                         : "text-app-text/60 hover:text-app-text-bright border border-transparent"
                     }`}
                     title="Tampilan Daftar"
@@ -2428,7 +2428,7 @@ export default function Investments() {
                     onClick={() => setPortfolioViewMode("alokasi")}
                     className={`p-1.5 rounded-lg transition-all ${
                       portfolioViewMode === "alokasi"
-                        ? "bg-app-card text-app-accent1 shadow-sm border border-app-border/50"
+                        ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
                         : "text-app-text/60 hover:text-app-text-bright border border-transparent"
                     }`}
                     title="Tampilan Alokasi"
@@ -2447,9 +2447,9 @@ export default function Investments() {
                     <button
                       key={f.id}
                       onClick={() => setFilterCategory(f.id as any)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all whitespace-nowrap ${
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase transition-all whitespace-nowrap ${
                         filterCategory === f.id
-                          ? "bg-app-card text-app-text-bright shadow-sm border border-app-border/50"
+                          ? "bg-app-card text-app-text-bright shadow-sm border border-app-border"
                           : "text-app-text/60 hover:text-app-text-bright border border-transparent"
                       }`}
                     >
@@ -2459,7 +2459,7 @@ export default function Investments() {
                 </div>
                 
                 <div className="relative group">
-                  <button className="flex items-center gap-2 bg-app-bg px-3 py-2 rounded-xl border border-app-border text-[10px] font-bold uppercase hover:bg-app-card transition-colors">
+                  <button className="flex items-center gap-2 bg-app-bg px-3 py-2 rounded-xl border border-app-border text-[10px] font-semibold uppercase hover:bg-app-card transition-colors">
                     <ArrowDownUp className="w-3 h-3" /> Urutkan
                   </button>
                   <div className="absolute right-0 top-full mt-2 w-32 bg-app-card border border-app-border rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 flex flex-col p-1">
@@ -2491,7 +2491,7 @@ export default function Investments() {
                 <div className="flex bg-app-card border border-app-border rounded-lg p-1 mb-2 shrink-0 mx-1">
                   <button
                     onClick={() => setAllocationViewBy("aset")}
-                    className={`flex-1 py-1.5 text-[11px] font-bold rounded-md transition-colors ${
+                    className={`flex-1 py-1.5 text-[11px] font-semibold rounded-md transition-colors ${
                       allocationViewBy === "aset"
                         ? "bg-app-bg text-app-text-bright shadow-sm"
                         : "text-app-text/50 hover:text-app-text"
@@ -2501,7 +2501,7 @@ export default function Investments() {
                   </button>
                   <button
                     onClick={() => setAllocationViewBy("kategori")}
-                    className={`flex-1 py-1.5 text-[11px] font-bold rounded-md transition-colors ${
+                    className={`flex-1 py-1.5 text-[11px] font-semibold rounded-md transition-colors ${
                       allocationViewBy === "kategori"
                         ? "bg-app-bg text-app-text-bright shadow-sm"
                         : "text-app-text/50 hover:text-app-text"
@@ -2604,7 +2604,7 @@ export default function Investments() {
                           </PieChart>
                         </ResponsiveContainer>
                         <div className="absolute flex flex-col items-center justify-center pointer-events-none">
-                          <span className="text-xl font-bold text-app-text-bright">Rp {totalAllocValue.toLocaleString("id-ID")}</span>
+                          <span className="text-xl font-semibold text-app-text-bright">Rp {totalAllocValue.toLocaleString("id-ID")}</span>
                           <span className="text-xs text-app-text/60 mt-1">{allocationData.length} {allocationViewBy === "aset" ? "Aset" : "Kategori"}</span>
                         </div>
                       </div>
@@ -2623,12 +2623,12 @@ export default function Investments() {
                                   </div>
                                   <div className="flex flex-col">
                                     <div className="flex items-baseline gap-2">
-                                      <span className="font-bold text-sm text-app-text-bright">{item.name}</span>
+                                      <span className="font-semibold text-sm text-app-text-bright">{item.name}</span>
                                       <span className="text-xs text-app-text/60 font-medium">Rp {item.value.toLocaleString("id-ID")}</span>
                                     </div>
                                   </div>
                                 </div>
-                                <span className="font-bold text-[15px] text-app-text-bright">{percentage.toFixed(2)}%</span>
+                                <span className="font-semibold text-[15px] text-app-text-bright">{percentage.toFixed(2)}%</span>
                               </div>
                               <div className="w-full h-1.5 bg-app-border/30 rounded-full overflow-hidden relative">
                                 <div 
@@ -2681,7 +2681,7 @@ export default function Investments() {
                               <AssetLogo logoid={liveData?.logoid} code={inv.code} description={liveData?.description} />
                             </div>
                             <div className="flex flex-col">
-                              <h3 className="font-bold text-app-text-bright leading-tight">
+                              <h3 className="font-semibold text-app-text-bright leading-tight">
                                 {inv.code}
                               </h3>
                               <span className="text-[10px] text-app-text/50 line-clamp-1">
@@ -2723,21 +2723,21 @@ export default function Investments() {
                            {liveData?.price && (
                              <div className="flex justify-between items-center">
                                <span className="text-xs text-app-text/60">Return</span>
-                               <span className={`text-xs font-bold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                               <span className={`text-xs font-semibold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>
                                  {pl >= 0 ? "+" : ""}Rp {(inv.qty * pl * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")} ({pl >= 0 ? "+" : ""}{plPercent.toFixed(2)}%)
                                </span>
                              </div>
                            )}
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-app-border/30 flex justify-between items-center">
+                        <div className="mt-4 pt-4 border-t border-app-border flex justify-between items-center">
                           <div>
-                            <div className="text-[10px] text-app-text/60 font-bold uppercase tracking-wider mb-1">Modal Awal</div>
-                            <div className="text-sm font-bold text-app-text-bright">Rp {(inv.price * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
+                            <div className="text-[10px] text-app-text/60 font-semibold uppercase tracking-wider mb-1">Modal Awal</div>
+                            <div className="text-sm font-semibold text-app-text-bright">Rp {(inv.price * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-[10px] text-app-text/60 font-bold uppercase tracking-wider mb-1">Nilai Sekarang</div>
-                            <div className={`text-sm font-bold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>Rp {(livePrice * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
+                            <div className="text-[10px] text-app-text/60 font-semibold uppercase tracking-wider mb-1">Nilai Sekarang</div>
+                            <div className={`text-sm font-semibold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>Rp {(livePrice * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
                           </div>
                         </div>
                         </div>
@@ -2754,7 +2754,7 @@ export default function Investments() {
               <div className="bg-app-accent1/10 border border-app-accent1/20 p-4 rounded-2xl flex items-start gap-3">
                 <Info className="w-5 h-5 text-app-accent1 shrink-0 mt-0.5" />
                 <div className="text-xs text-app-text/90 leading-relaxed">
-                  <p className="font-bold text-app-text-bright mb-1">Analisis Transaksi & Evaluasi Pasar</p>
+                  <p className="font-semibold text-app-text-bright mb-1">Analisis Transaksi & Evaluasi Pasar</p>
                   Bagian ini secara otomatis memindai seluruh riwayat transaksi keuangan Anda yang menyangkut investasi (Kategori Beli/Jual atau catatan yang sesuai) dan mencocokkannya dengan harga terkini di pasar untuk mengaudit modal riil dan nilai kepemilikan Anda.
                 </div>
               </div>
@@ -2797,23 +2797,23 @@ export default function Investments() {
                   <div className="flex flex-col gap-4">
                     {/* First Row: Holdings Capital Basis */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="bg-app-bg/40 border border-app-border/60 p-4 rounded-2xl">
-                        <p className="text-[10px] font-bold text-app-text/50 uppercase tracking-wider mb-1">
+                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
+                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
                           Modal Kepemilikan (Cost Basis)
                         </p>
-                        <p className="text-lg font-bold text-app-text-bright">
+                        <p className="text-lg font-semibold text-app-text-bright">
                           Rp {Math.round(totalTxModal).toLocaleString("id-ID")}
                         </p>
-                        <p className="text-[10px] text-app-text/40 mt-1">
+                        <p className="text-[10px] text-app-text/50 mt-1">
                           Berdasarkan sisa unit & harga beli rata-rata
                         </p>
                       </div>
 
-                      <div className="bg-app-bg/40 border border-app-border/60 p-4 rounded-2xl">
-                        <p className="text-[10px] font-bold text-app-text/50 uppercase tracking-wider mb-1">
+                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
+                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
                           Nilai Pasar Saat Ini
                         </p>
-                        <p className="text-lg font-bold text-app-text-bright">
+                        <p className="text-lg font-semibold text-app-text-bright">
                           Rp {Math.round(totalTxCurrentValue).toLocaleString("id-ID")}
                         </p>
                         <p className={`text-[10px] font-semibold mt-1 ${totalTxProfit >= 0 ? "text-app-success" : "text-app-danger"}`}>
@@ -2821,14 +2821,14 @@ export default function Investments() {
                         </p>
                       </div>
 
-                      <div className="bg-app-bg/40 border border-app-border/60 p-4 rounded-2xl">
-                        <p className="text-[10px] font-bold text-app-text/50 uppercase tracking-wider mb-1">
+                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
+                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
                           Arus Kas Bersih Keluar
                         </p>
-                        <p className="text-lg font-bold text-app-text-bright">
+                        <p className="text-lg font-semibold text-app-text-bright">
                           Rp {Math.round(totalActualSpent).toLocaleString("id-ID")}
                         </p>
-                        <p className="text-[10px] text-app-text/40 mt-1">
+                        <p className="text-[10px] text-app-text/50 mt-1">
                           Total pembelian dikurangi total penjualan
                         </p>
                       </div>
@@ -2836,27 +2836,27 @@ export default function Investments() {
 
                     {/* Second Row: Realized Sales Performance & Accuracy */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="bg-app-bg/40 border border-app-border/60 p-4 rounded-2xl flex flex-col justify-between">
+                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl flex flex-col justify-between">
                         <div>
-                          <p className="text-[10px] font-bold text-app-text/50 uppercase tracking-wider mb-1">
+                          <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
                             Keuntungan Realisasi (Realized Profit/Loss)
                           </p>
-                          <p className={`text-lg font-bold ${totalRealizedPL >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                          <p className={`text-lg font-semibold ${totalRealizedPL >= 0 ? "text-app-success" : "text-app-danger"}`}>
                             {totalRealizedPL >= 0 ? "+" : ""}Rp {Math.round(totalRealizedPL).toLocaleString("id-ID")}
                           </p>
                         </div>
-                        <p className="text-[10px] text-app-text/40 mt-2">
+                        <p className="text-[10px] text-app-text/50 mt-2">
                           Total keuntungan/kerugian riil dari transaksi penjualan yang telah direalisasikan
                         </p>
                       </div>
 
-                      <div className="bg-app-bg/40 border border-app-border/60 p-4 rounded-2xl flex flex-col justify-between">
+                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl flex flex-col justify-between">
                         <div>
-                          <p className="text-[10px] font-bold text-app-text/50 uppercase tracking-wider mb-1">
+                          <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
                             Akurasi Transaksi Jual (Win/Loss Rate)
                           </p>
                           <div className="flex items-baseline gap-2 mt-1">
-                            <span className="text-lg font-bold text-app-text-bright">
+                            <span className="text-lg font-semibold text-app-text-bright">
                               {winRate.toFixed(1)}% Win Rate
                             </span>
                             <span className="text-xs text-app-text/60">
@@ -2881,7 +2881,7 @@ export default function Investments() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs min-w-[850px]">
                     <thead>
-                      <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-bold uppercase tracking-wider text-[10px]">
+                      <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-semibold uppercase tracking-wider text-[10px]">
                         <th className="py-4 px-4">Instrumen</th>
                         <th className="py-4 px-4 text-right">Kuantitas</th>
                         <th className="py-4 px-4 text-right">Avg Beli</th>
@@ -2895,7 +2895,7 @@ export default function Investments() {
                     <tbody className="divide-y divide-app-border/40 text-app-text/80">
                       {auditedHoldings.length === 0 ? (
                         <tr>
-                          <td colSpan={8} className="py-8 text-center text-app-text/40">
+                          <td colSpan={8} className="py-8 text-center text-app-text/50">
                             Tidak ditemukan transaksi investasi di riwayat Anda.
                           </td>
                         </tr>
@@ -2920,7 +2920,7 @@ export default function Investments() {
                               statusClass = "bg-yellow-500/15 text-yellow-500 border-yellow-500/30";
                             } else {
                               statusLabel = "Lunas (Sudah Jual)";
-                              statusClass = "bg-app-text/10 text-app-text/60 border-app-border/40";
+                              statusClass = "bg-app-text/10 text-app-text/60 border-app-border";
                             }
                           } else if (Math.abs(currentMatch.qty - h.qty) > 0.0001) {
                             statusLabel = "Selisih Qty";
@@ -2932,13 +2932,13 @@ export default function Investments() {
 
                           return (
                             <tr key={`${h.category}-${h.code}`} className="hover:bg-app-hover/30 transition-colors">
-                              <td className="py-3.5 px-4 font-bold text-app-text-bright flex items-center gap-3">
+                              <td className="py-3.5 px-4 font-semibold text-app-text-bright flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-app-card border border-app-border flex items-center justify-center overflow-hidden shrink-0">
                                   <AssetLogo code={h.code} logoid={quotes[h.category === "emas" ? "EMAS" : h.code]?.logoid} />
                                 </div>
                                 <div className="flex flex-col">
-                                  <span className="font-bold">{h.code}</span>
-                                  <span className="text-[10px] text-app-text/40 font-semibold uppercase">{h.category}</span>
+                                  <span className="font-semibold">{h.code}</span>
+                                  <span className="text-[10px] text-app-text/50 font-semibold uppercase">{h.category}</span>
                                 </div>
                               </td>
                               <td className="py-3.5 px-4 text-right font-medium text-app-text-bright">
@@ -2953,30 +2953,30 @@ export default function Investments() {
                               <td className="py-3.5 px-4 text-right font-medium">
                                 {h.wins > 0 || h.losses > 0 ? (
                                   <div className="flex flex-col items-end">
-                                    <span className={`font-bold ${h.realizedPL >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                                    <span className={`font-semibold ${h.realizedPL >= 0 ? "text-app-success" : "text-app-danger"}`}>
                                       {h.realizedPL >= 0 ? "+" : ""}Rp {Math.round(h.realizedPL).toLocaleString("id-ID")}
                                     </span>
-                                    <span className="text-[9px] font-bold">
+                                    <span className="text-[9px] font-semibold">
                                       <span className="text-app-success">{h.wins}W</span>
-                                      <span className="text-app-text/40 mx-1">/</span>
+                                      <span className="text-app-text/50 mx-1">/</span>
                                       <span className="text-app-danger">{h.losses}L</span>
                                     </span>
                                   </div>
                                 ) : (
-                                  <span className="text-app-text/40 font-medium">-</span>
+                                  <span className="text-app-text/50 font-medium">-</span>
                                 )}
                               </td>
-                              <td className="py-3.5 px-4 text-right font-bold text-app-text-bright">
+                              <td className="py-3.5 px-4 text-right font-semibold text-app-text-bright">
                                 Rp {Math.round(activeValue).toLocaleString("id-ID")}
                               </td>
-                              <td className={`py-3.5 px-4 text-right font-bold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                              <td className={`py-3.5 px-4 text-right font-semibold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>
                                 {pl >= 0 ? "+" : ""}Rp {Math.round(pl).toLocaleString("id-ID")}
                                 <span className="block text-[10px] font-normal opacity-80">
                                   ({pl >= 0 ? "+" : ""}{plPct.toFixed(2)}%)
                                 </span>
                               </td>
                               <td className="py-3.5 px-4 text-center">
-                                <span className={`text-[10px] px-2.5 py-1 rounded-full border font-bold ${statusClass}`}>
+                                <span className={`text-[10px] px-2.5 py-1 rounded-full border font-semibold ${statusClass}`}>
                                   {statusLabel}
                                 </span>
                               </td>
@@ -2993,12 +2993,12 @@ export default function Investments() {
               {auditedHoldings.length > 0 && (
                 <div className="flex flex-col sm:flex-row justify-between items-center bg-app-bg/50 border border-app-border p-5 rounded-2xl gap-4">
                   <div className="text-xs text-app-text/70 text-center sm:text-left">
-                    <span className="font-bold text-app-text-bright block mb-1">Mendeteksi Selisih Antara Riwayat & Portofolio?</span>
+                    <span className="font-semibold text-app-text-bright block mb-1">Mendeteksi Selisih Antara Riwayat & Portofolio?</span>
                     Tombol sinkronisasi akan menyelaraskan daftar instrumen portofolio Anda agar sesuai dengan total transaksi pembelian dan penjualan yang tercatat di atas.
                   </div>
                   <button
                     onClick={syncInvestmentsWithTransactions}
-                    className="flex items-center gap-2 bg-app-accent1 hover:bg-app-accent1-hover text-app-bg font-bold px-5 py-3 rounded-xl transition-all shadow-md shrink-0 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs"
+                    className="flex items-center gap-2 bg-app-accent1 hover:bg-app-accent1-hover text-app-bg font-semibold px-5 py-3 rounded-xl transition-all shadow-md shrink-0 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs"
                   >
                     <RefreshCw className="w-4 h-4" /> SINKRONKAN PORTOFOLIO SEKARANG
                   </button>
@@ -3007,13 +3007,13 @@ export default function Investments() {
 
               {/* Detailed Transaction Trail Log */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-app-text-bright uppercase tracking-wider flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold text-app-text-bright uppercase tracking-wider flex items-center gap-1.5">
                   <FileText className="w-4 h-4 text-app-accent1" /> Audit Trail Transaksi Investasi
                 </h3>
                 <div className="border border-app-border rounded-2xl overflow-hidden bg-app-bg/15 max-h-[300px] overflow-y-auto">
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-bold uppercase tracking-wider text-[9px] sticky top-0 z-10">
+                      <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-semibold uppercase tracking-wider text-[9px] sticky top-0 z-10">
                         <th className="py-3 px-4">Tanggal</th>
                         <th className="py-3 px-4">Jenis</th>
                         <th className="py-3 px-4">Aset</th>
@@ -3034,7 +3034,7 @@ export default function Investments() {
                         if (logs.length === 0) {
                           return (
                             <tr>
-                              <td colSpan={6} className="py-6 text-center text-app-text/40">
+                              <td colSpan={6} className="py-6 text-center text-app-text/50">
                                 Tidak ada log transaksi investasi.
                               </td>
                             </tr>
@@ -3057,7 +3057,7 @@ export default function Investments() {
                                 {formattedDate}
                               </td>
                               <td className="py-2.5 px-4">
-                                <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold border ${
+                                <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold border ${
                                   parsed.type === "buy" 
                                     ? "bg-app-success/10 text-app-success border-app-success/20" 
                                     : "bg-app-danger/10 text-app-danger border-app-danger/20"
@@ -3065,13 +3065,13 @@ export default function Investments() {
                                   {parsed.type === "buy" ? "BELI" : "JUAL"}
                                 </span>
                               </td>
-                              <td className="py-2.5 px-4 font-bold text-app-text-bright">
+                              <td className="py-2.5 px-4 font-semibold text-app-text-bright">
                                 {parsed.code}
                               </td>
                               <td className="py-2.5 px-4 text-right font-medium">
                                 {parsed.qty} {parsed.category === "emas" ? "g" : parsed.category === "crypto" ? "koin" : "lot"}
                               </td>
-                              <td className="py-2.5 px-4 text-right font-bold text-app-text-bright">
+                              <td className="py-2.5 px-4 text-right font-semibold text-app-text-bright">
                                 Rp {tx.amount.toLocaleString("id-ID")}
                               </td>
                               <td className="py-2.5 px-4 text-app-text/70 truncate max-w-[200px]" title={tx.note}>
@@ -3105,9 +3105,9 @@ export default function Investments() {
       {/* Modal Simulasi ARA/ARB */}
       {isSimulatorOpen && (
         <div className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-app-card text-app-text w-full max-w-5xl rounded-[24px] shadow-2xl border border-app-border/40 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+          <div className="bg-app-card text-app-text w-full max-w-5xl rounded-[18px] shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg shrink-0">
-              <h2 className="text-lg font-bold text-app-text-bright flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-app-text-bright flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-app-accent1" />
                 Simulasi ARA & ARB Saham (BEI)
               </h2>
@@ -3128,7 +3128,7 @@ export default function Investments() {
       {/* Modal Tambah Portofolio */}
       {isPortfolioModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full max-w-md rounded-[24px] shadow-2xl border border-app-border/40 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-app-card text-app-text w-full max-w-md rounded-[18px] shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
                 {portoEditId ? "Sesuaikan Portofolio" : portoTxType === "beli" ? "Beli Investasi" : "Jual Investasi"}
@@ -3157,7 +3157,7 @@ export default function Investments() {
                       setPortoFee("");
                       setPortoSelectedId("");
                     }}
-                    className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                    className={`flex-1 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
                       portoTxType === "beli"
                         ? "bg-app-accent1 text-app-bg shadow-sm"
                         : "text-app-text hover:bg-app-hover"
@@ -3182,7 +3182,7 @@ export default function Investments() {
                       setHasFee(false);
                       setPortoFee("");
                     }}
-                    className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                    className={`flex-1 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
                       portoTxType === "jual"
                         ? "bg-app-accent1 text-app-bg shadow-sm"
                         : "text-app-text hover:bg-app-hover"
@@ -3208,7 +3208,7 @@ export default function Investments() {
                         type="button"
                         disabled={!!portoEditId}
                         onClick={() => setPortoCategory(type.id as any)}
-                        className={`flex-1 py-2 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 ${
+                        className={`flex-1 py-2 rounded-lg text-[10px] sm:text-xs font-semibold uppercase tracking-wider transition-all disabled:opacity-50 ${
                           portoCategory === type.id
                             ? "bg-app-accent1 text-app-bg shadow-sm"
                             : "text-app-text hover:bg-app-hover"
@@ -3222,7 +3222,7 @@ export default function Investments() {
                   {portoCategory === "saham" && (
                     <>
                       <div className="relative">
-                        <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                        <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                           Kode atau Nama Saham
                         </label>
                         <input
@@ -3259,9 +3259,9 @@ export default function Investments() {
                                   <div
                                     key={i}
                                     onClick={() => selectSymbol(res)}
-                                    className="p-3 hover:bg-app-hover cursor-pointer border-b border-app-border/50 last:border-0 flex flex-col"
+                                    className="p-3 hover:bg-app-hover cursor-pointer border-b border-app-border last:border-0 flex flex-col"
                                   >
-                                    <span className="font-bold text-app-text-bright text-sm">
+                                    <span className="font-semibold text-app-text-bright text-sm">
                                       {res.symbol}{" "}
                                       <span className="text-[10px] text-app-text/50 uppercase ml-1 px-1.5 py-0.5 bg-app-bg rounded-md">
                                         {res.exchange}
@@ -3282,7 +3282,7 @@ export default function Investments() {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                             Jumlah Lot
                           </label>
                           <input
@@ -3295,7 +3295,7 @@ export default function Investments() {
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                             {portoEditId ? "Harga Beli Rata-Rata" : "Harga per Lembar (Rp)"}
                           </label>
                           <input
@@ -3315,7 +3315,7 @@ export default function Investments() {
                   {portoCategory === "crypto" && (
                     <>
                       <div className="relative">
-                        <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                        <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                           Kode Koin
                         </label>
                         <input
@@ -3358,9 +3358,9 @@ export default function Investments() {
                                   <div
                                     key={i}
                                     onClick={() => selectSymbol(res)}
-                                    className="p-3 hover:bg-app-hover cursor-pointer border-b border-app-border/50 last:border-0 flex flex-col"
+                                    className="p-3 hover:bg-app-hover cursor-pointer border-b border-app-border last:border-0 flex flex-col"
                                   >
-                                    <span className="font-bold text-app-text-bright text-sm">
+                                    <span className="font-semibold text-app-text-bright text-sm">
                                       {res.symbol}{" "}
                                       <span className="text-[10px] text-app-text/50 uppercase ml-1 px-1.5 py-0.5 bg-app-bg rounded-md">
                                         {res.exchange}
@@ -3381,7 +3381,7 @@ export default function Investments() {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                             Jumlah Koin
                           </label>
                           <input
@@ -3395,7 +3395,7 @@ export default function Investments() {
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                             Harga Beli per Koin (Rp)
                           </label>
                           <input
@@ -3416,7 +3416,7 @@ export default function Investments() {
                     <>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                             Berat (Gram)
                           </label>
                           <input
@@ -3430,7 +3430,7 @@ export default function Investments() {
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                             Harga per Gram (Rp)
                           </label>
                           <input
@@ -3453,7 +3453,7 @@ export default function Investments() {
               {portoTxType === "jual" && !portoEditId && (
                 <>
                   <div>
-                    <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                    <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                       Pilih Portofolio
                     </label>
                     <select
@@ -3481,8 +3481,8 @@ export default function Investments() {
                       const found = investments.find(inv => inv.id === portoSelectedId);
                       if (!found) return null;
                       return (
-                        <div className="mt-2 text-xs text-app-text/60 bg-app-bg p-3 rounded-xl border border-app-border/40">
-                          Kepemilikan: <span className="font-bold text-app-text-bright">{found.qty} {found.category === "saham" ? "Lot" : found.category === "crypto" ? "Koin" : "Gram"}</span> dengan rata-rata beli <span className="font-bold text-app-text-bright">Rp {found.price.toLocaleString("id-ID")}</span>
+                        <div className="mt-2 text-xs text-app-text/60 bg-app-bg p-3 rounded-xl border border-app-border">
+                          Kepemilikan: <span className="font-semibold text-app-text-bright">{found.qty} {found.category === "saham" ? "Lot" : found.category === "crypto" ? "Koin" : "Gram"}</span> dengan rata-rata beli <span className="font-semibold text-app-text-bright">Rp {found.price.toLocaleString("id-ID")}</span>
                         </div>
                       );
                     })()}
@@ -3490,7 +3490,7 @@ export default function Investments() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                      <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                         Jumlah Dijual
                       </label>
                       <input
@@ -3504,7 +3504,7 @@ export default function Investments() {
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                      <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                         Harga Jual per {portoCategory === "saham" ? "Lembar" : portoCategory === "crypto" ? "Koin" : "Gram"} (Rp)
                       </label>
                       <input
@@ -3525,12 +3525,15 @@ export default function Investments() {
               {!portoEditId && (
                 <>
                   <div>
-                    <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                    <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                       {portoTxType === "beli" ? "Bayar dari Rekening" : "Terima di Rekening"}
                     </label>
                     <select
                       value={portoAccountId}
-                      onChange={(e) => setPortoAccountId(e.target.value)}
+                      onChange={(e) => {
+                      setPortoAccountId(e.target.value);
+                      localStorage.setItem('lastAccountId_investasi', e.target.value);
+                    }}
                       className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright font-medium"
                       required
                     >
@@ -3545,7 +3548,7 @@ export default function Investments() {
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold uppercase tracking-wider text-app-text/70">Ada Biaya Transaksi (Fee)?</span>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-app-text/70">Ada Biaya Transaksi (Fee)?</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -3565,7 +3568,7 @@ export default function Investments() {
                     </div>
                     {hasFee && (
                       <div>
-                        <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                        <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                           Nominal Fee (Rp)
                         </label>
                         <input
@@ -3584,7 +3587,7 @@ export default function Investments() {
               )}
 
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block">
+                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
                   Waktu Transaksi
                 </label>
                 <input
@@ -3605,13 +3608,13 @@ export default function Investments() {
                 <button
                   type="button"
                   onClick={() => setIsPortfolioModalOpen(false)}
-                  className="flex-1 py-4 rounded-2xl font-bold text-sm bg-app-hover hover:bg-app-border/50 text-app-text transition-colors"
+                  className="flex-1 py-4 rounded-2xl font-semibold text-sm bg-app-hover hover:bg-app-border/50 text-app-text transition-colors"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-4 rounded-2xl font-bold text-sm bg-app-accent1 text-app-bg hover:opacity-90 transition-opacity shadow-lg"
+                  className="flex-1 py-4 rounded-2xl font-semibold text-sm bg-app-accent1 text-app-bg hover:opacity-90 transition-opacity shadow-lg"
                 >
                   {portoEditId ? "Simpan Perubahan" : portoTxType === "beli" ? "Simpan Pembelian" : "Simpan Penjualan"}
                 </button>

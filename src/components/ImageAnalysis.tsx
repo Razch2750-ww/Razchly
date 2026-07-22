@@ -221,11 +221,11 @@ export default function ImageAnalysis() {
   return (
     <div className="flex-1 flex flex-col w-full h-full max-w-4xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
       <ScrollReveal className="w-full flex flex-col">
-        <h1 className="text-2xl font-bold text-app-text-bright mb-6">
+        <h1 className="text-2xl font-semibold text-app-text-bright mb-6">
           <TextReveal text="Analisis Mutasi Rekening / Struk (AI)" />
         </h1>
         
-        <div className="bg-app-card rounded-3xl p-6 border border-app-border shadow-xl">
+        <div className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-xl">
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-1 w-full flex flex-col items-center justify-center p-8 border-2 border-dashed border-app-border rounded-2xl bg-app-bg transition-colors hover:border-app-accent1/50 relative overflow-hidden min-h-[300px]">
                     {selectedImages.length > 0 ? (
@@ -248,7 +248,7 @@ export default function ImageAnalysis() {
                                                 setSelectedImages(newImages);
                                                 if (newImages.length === 0) setExtractedData([]);
                                             }}
-                                            className="absolute -top-2 -right-2 bg-app-danger text-white p-1.5 rounded-full hover:bg-app-danger/80 transition shadow-lg"
+                                            className="absolute -top-2 -right-2 bg-app-danger text-app-bg p-1.5 rounded-full hover:bg-app-danger/80 transition shadow-lg"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                                         </button>
@@ -270,7 +270,7 @@ export default function ImageAnalysis() {
                             <p className="text-xs text-app-text/60 mb-4">PNG, JPG, PDF, up to 5MB. Bisa unggah beberapa file sekaligus.</p>
                             <button 
                                 onClick={() => fileInputRef.current?.click()}
-                                className="bg-app-accent1 hover:bg-app-accent1/90 text-white px-6 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-app-accent1/20 flex items-center gap-2 mx-auto"
+                                className="bg-app-accent1 hover:bg-app-accent1/90 text-app-bg px-6 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-app-accent1/20 flex items-center gap-2 mx-auto"
                             >
                                 <Upload className="w-4 h-4" />
                                 Pilih File
@@ -293,7 +293,7 @@ export default function ImageAnalysis() {
                     <button 
                         onClick={handleAnalyze} 
                         disabled={isAnalyzing}
-                        className="bg-app-accent1 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-app-accent1/90 transition disabled:opacity-50 shadow-lg shadow-app-accent1/20"
+                        className="bg-app-accent1 text-app-bg px-6 py-3 rounded-xl font-semibold flex items-center gap-2 hover:bg-app-accent1/90 transition disabled:opacity-50 shadow-lg shadow-app-accent1/20"
                     >
                         {isAnalyzing ? (
                             <>
@@ -313,7 +313,7 @@ export default function ImageAnalysis() {
             {extractedData.length > 0 && (
                 <div className="mt-8 animate-in slide-in-from-bottom-4 duration-300">
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
-                        <h3 className="text-lg font-bold text-app-text-bright flex items-center gap-2">
+                        <h3 className="text-lg font-semibold text-app-text-bright flex items-center gap-2">
                            <Check className="w-5 h-5 text-app-success" />
                            Berhasil Mengekstrak {extractedData.length} Transaksi
                         </h3>
@@ -323,7 +323,7 @@ export default function ImageAnalysis() {
                            <select 
                               value={selectedAccountId}
                               onChange={(e) => setSelectedAccountId(e.target.value)}
-                              className="bg-transparent text-sm font-bold text-app-text-bright focus:outline-none"
+                              className="bg-transparent text-sm font-semibold text-app-text-bright focus:outline-none"
                            >
                               {accounts.map(acc => (
                                  <option key={acc.id} value={acc.id}>{acc.name}</option>
@@ -351,14 +351,14 @@ export default function ImageAnalysis() {
                                           className="w-4 h-4 rounded border-app-border text-app-accent1 focus:ring-app-accent1 cursor-pointer"
                                        />
                                     </th>
-                                    <th className="p-4 font-bold">Catatan</th>
-                                    <th className="p-4 font-bold">Kategori</th>
-                                    <th className="p-4 font-bold text-right">Nominal</th>
+                                    <th className="p-4 font-semibold">Catatan</th>
+                                    <th className="p-4 font-semibold">Kategori</th>
+                                    <th className="p-4 font-semibold text-right">Nominal</th>
                                  </tr>
                               </thead>
                               <tbody>
                                  {extractedData.map((trx, idx) => (
-                                    <tr key={idx} className="border-b border-app-border/50 last:border-0 hover:bg-app-card/50 transition">
+                                    <tr key={idx} className="border-b border-app-border last:border-0 hover:bg-app-card/50 transition">
                                        <td className="p-4 text-center">
                                           <input 
                                              type="checkbox" 
@@ -373,7 +373,7 @@ export default function ImageAnalysis() {
                                           />
                                        </td>
                                        <td className="p-4">
-                                          <div className="text-sm font-bold text-app-text-bright">{trx.note || "Tanpa Keterangan"}</div>
+                                          <div className="text-sm font-semibold text-app-text-bright">{trx.note || "Tanpa Keterangan"}</div>
                                           <div className="text-xs text-app-text/60 mt-0.5">{new Date(trx.date).toLocaleDateString('id-ID')}</div>
                                        </td>
                                        <td className="p-4">
@@ -390,7 +390,7 @@ export default function ImageAnalysis() {
                                           )}
                                        </td>
                                        <td className="p-4 text-right">
-                                          <span className={`text-sm font-bold whitespace-nowrap ${trx.type === 'income' ? 'text-app-success' : trx.type === 'expense' ? 'text-app-danger' : 'text-app-text'}`}>
+                                          <span className={`text-sm font-semibold whitespace-nowrap ${trx.type === 'income' ? 'text-app-success' : trx.type === 'expense' ? 'text-app-danger' : 'text-app-text'}`}>
                                              {trx.type === 'income' ? '+' : trx.type === 'expense' ? '-' : ''} Rp {trx.amount.toLocaleString('id-ID')}
                                           </span>
                                        </td>
@@ -405,7 +405,7 @@ export default function ImageAnalysis() {
                        <button 
                           onClick={handleSaveTransactions}
                           disabled={isSaving || !selectedAccountId || selectedRows.size === 0}
-                          className="bg-app-success text-white px-8 py-3.5 rounded-xl font-bold flex items-center gap-2 hover:bg-app-success/90 transition disabled:opacity-50 shadow-xl shadow-app-success/20"
+                          className="bg-app-success text-app-bg px-8 py-3.5 rounded-xl font-semibold flex items-center gap-2 hover:bg-app-success/90 transition disabled:opacity-50 shadow-xl shadow-app-success/20"
                        >
                           {isSaving ? (
                              <>

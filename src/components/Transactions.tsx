@@ -292,13 +292,28 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
   const [categoryId, setCategoryId] = useState("");
 
+  
+  const handleTypeChange = (newType: TransactionType) => {
+    setType(newType);
+    if (!editingTransaction) {
+      if (newType === "expense") {
+        setAccountId(localStorage.getItem('lastAccountId_expense') || accounts[0]?.id || "");
+      } else if (newType === "income") {
+        setAccountId(localStorage.getItem('lastAccountId_income') || accounts[0]?.id || "");
+      } else if (newType === "transfer") {
+        setFromAccountId(localStorage.getItem('lastAccountId_transfer_from') || accounts[0]?.id || "");
+        setToAccountId(localStorage.getItem('lastAccountId_transfer_to') || accounts[1]?.id || accounts[0]?.id || "");
+      }
+    }
+  };
+
   const openAddModal = () => {
     setEditingTransaction(null);
     setType("expense");
     setAmount("");
-    setAccountId(accounts[0]?.id || "");
-    setFromAccountId(accounts[0]?.id || "");
-    setToAccountId(accounts[1]?.id || accounts[0]?.id || "");
+    setAccountId(localStorage.getItem('lastAccountId_expense') || accounts[0]?.id || "");
+    setFromAccountId(localStorage.getItem('lastAccountId_transfer_from') || accounts[0]?.id || "");
+    setToAccountId(localStorage.getItem('lastAccountId_transfer_to') || accounts[1]?.id || accounts[0]?.id || "");
     setNote("");
     setCategoryId("");
     setHasAdminFee(false);
@@ -989,13 +1004,13 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       {!modalOnly && (
         <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-0 md:p-8 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
           {/* MOBILE LAYOUT */}
-          <div className="md:hidden flex flex-col w-full min-h-screen px-4 pt-4 pb-32">
+          <div className="md:hidden flex flex-col w-full min-h-[100dvh] px-4 pt-4 pb-32">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => navigate(-1)}>
             <ArrowLeft className="w-6 h-6 text-app-text" />
           </button>
-          <h1 className="text-xl font-bold text-app-text-bright">
+          <h1 className="text-xl font-semibold text-app-text-bright">
             <TextReveal text="Laporan Keuangan" />
           </h1>
           <button>
@@ -1041,7 +1056,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             <button onClick={handleMobilePrev}>
               <ChevronLeft className="w-5 h-5 text-app-accent1" />
             </button>
-            <span className="font-bold text-sm text-app-text-bright">
+            <span className="font-semibold text-sm text-app-text-bright">
               {getMobilePeriodText()}
             </span>
             <button onClick={handleMobileNext}>
@@ -1127,7 +1142,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         </div>
 
         {/* Chart Section */}
-        <h3 className="text-[13px] font-bold text-app-text-bright mb-3">
+        <h3 className="text-[13px] font-semibold text-app-text-bright mb-3">
           Tren Alur Kas (Pemasukan vs Pengeluaran)
         </h3>
         <div className="bg-app-card border border-app-border rounded-2xl p-4 mb-6 relative shadow-lg">
@@ -1197,22 +1212,22 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           <div className="flex-1 flex flex-col justify-center px-4 py-5 border-r border-app-border">
             <div className="flex items-center gap-2 mb-1.5">
               <TrendingUp className="w-3.5 h-3.5 text-app-text/50" />
-              <span className="text-[11px] text-app-text/50 uppercase tracking-widest font-bold">
+              <span className="text-[11px] text-app-text/50 uppercase tracking-widest font-semibold">
                 Pemasukan
               </span>
             </div>
-            <span className="text-app-success font-bold text-base">
+            <span className="text-app-success font-semibold text-base">
               Rp {mobileStats.income.toLocaleString("id-ID")}
             </span>
           </div>
           <div className="flex-1 flex flex-col justify-center px-4 py-5">
             <div className="flex items-center gap-2 mb-1.5">
               <TrendingDown className="w-3.5 h-3.5 text-app-text/50" />
-              <span className="text-[11px] text-app-text/50 uppercase tracking-widest font-bold">
+              <span className="text-[11px] text-app-text/50 uppercase tracking-widest font-semibold">
                 Pengeluaran
               </span>
             </div>
-            <span className="text-app-danger font-bold text-base">
+            <span className="text-app-danger font-semibold text-base">
               Rp {mobileStats.expense.toLocaleString("id-ID")}
             </span>
           </div>
@@ -1229,7 +1244,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               className={`w-2 h-2 rounded-full ${mobileStats.netProfit >= 0 ? "bg-app-success" : "bg-app-danger"}`}
             />
             <span
-              className={`${mobileStats.netProfit >= 0 ? "text-app-success" : "text-app-danger"} font-bold text-[13px]`}
+              className={`${mobileStats.netProfit >= 0 ? "text-app-success" : "text-app-danger"} font-semibold text-[13px]`}
             >
               Rp {mobileStats.netProfit.toLocaleString("id-ID")}
             </span>
@@ -1238,7 +1253,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
         {/* History Transaksi Section */}
         <div className="mt-6">
-          <h3 className="text-[13px] font-bold text-app-text-bright mb-3">
+          <h3 className="text-[13px] font-semibold text-app-text-bright mb-3">
             Daftar Transaksi
           </h3>
           <div className="bg-app-card border border-app-border rounded-2xl p-4 shadow-lg space-y-3 relative overflow-hidden">
@@ -1253,7 +1268,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 {mobileFilteredTransactions.map((t) => (
                   <StaggerItem key={t.id}>
                     <div
-                      className="flex items-center justify-between p-3.5 bg-app-bg hover:bg-app-hover rounded-xl transition-colors border border-app-border/40 hover:border-app-border relative overflow-hidden"
+                      className="flex items-center justify-between p-3.5 bg-app-bg hover:bg-app-hover rounded-xl transition-colors border border-app-border hover:border-app-border relative overflow-hidden"
                     >
                     
                     <div className="flex items-center gap-3 relative z-10 min-w-0 flex-1">
@@ -1278,7 +1293,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <p className="text-xs text-app-text-bright font-bold truncate">
+                          <p className="text-xs text-app-text-bright font-semibold truncate">
                             {t.note ||
                               (t.type === "income"
                                 ? "Pemasukan"
@@ -1292,7 +1307,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                             </span>
                           )}
                           {t.categoryId && (
-                            <span className="px-1.5 py-0.5 bg-app-card border border-app-border text-app-text text-[8px] font-bold rounded-full flex items-center gap-1">
+                            <span className="px-1.5 py-0.5 bg-app-card border border-app-border text-app-text text-[8px] font-semibold rounded-full flex items-center gap-1">
                               <CategoryIcon
                                 iconId={t.categoryIcon || "dollar-sign"}
                                 className="w-2.5 h-2.5 text-app-text/70"
@@ -1315,7 +1330,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                     <div className="flex items-center gap-2 relative z-10 shrink-0 pl-2">
                       <div className="flex flex-col items-end gap-1">
                         <p
-                          className={`text-xs font-bold whitespace-nowrap
+                          className={`text-xs font-semibold whitespace-nowrap
                           ${
                             t.type === "income"
                               ? "text-app-success"
@@ -1374,7 +1389,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         {/* HEADER SECTION */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
           <div>
-            <h1 className="text-2xl md:text-[1.75rem] font-bold text-app-text-bright tracking-tight leading-tight">
+            <h1 className="text-2xl md:text-[1.75rem] font-semibold text-app-text-bright tracking-tight leading-tight">
               <TextReveal text={language === "en" ? "Financial Report" : "Laporan Keuangan"} />
             </h1>
             <p className="text-app-text/60 text-sm mt-1">
@@ -1402,7 +1417,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               state={{ expandSection: 'profile' }}
               className="flex items-center gap-2.5 h-9 px-3 rounded-xl bg-app-card border border-app-border text-sm font-medium text-app-text-bright hover:bg-app-hover transition-colors cursor-pointer"
             >
-              <div className="w-6 h-6 rounded-full bg-app-accent1 text-[11px] font-bold flex items-center justify-center text-white overflow-hidden shrink-0">
+              <div className="w-6 h-6 rounded-full bg-app-accent1 text-[11px] font-semibold flex items-center justify-center text-app-bg overflow-hidden shrink-0">
                 {user?.photoURL ? (
                   <img
                     src={user?.photoURL}
@@ -1423,7 +1438,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           <div className="bg-app-card border border-app-border rounded-2xl p-4 md:p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm shrink-0 relative overflow-hidden">
           
           <div className="relative z-10">
-            <h2 className="text-app-text-bright font-bold text-lg">
+            <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">
               {language === "en" ? "Financial Report" : "Laporan Keuangan"}
             </h2>
             <p className="text-app-text/60 text-xs mt-1">
@@ -1439,9 +1454,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               >
                 <option value="all">{language === "en" ? "All Wallets" : "Semua Dompet"}</option>
                 {accounts.map((acc) => (
-                  <option key={acc.id} value={acc.id}>
-                    {acc.name}
-                  </option>
+                  <option key={acc.id} value={acc.id}>{acc.name} (Rp {acc.balance.toLocaleString("id-ID")})</option>
                 ))}
               </select>
               <ChevronDown className="w-4 h-4 text-app-text/50 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -1488,7 +1501,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </button>
             <button
               onClick={exportToPDF}
-              className="flex items-center gap-2 px-4 py-2.5 bg-[#d32f2f] hover:bg-[#b71c1c] text-white transition-colors rounded-xl font-medium text-sm"
+              className="flex items-center gap-2 px-4 py-2.5 bg-[#d32f2f] hover:bg-[#b71c1c] text-app-bg transition-colors rounded-xl font-medium text-sm"
             >
               <FileText className="w-4 h-4" /> PDF
             </button>
@@ -1500,15 +1513,15 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         <ScrollReveal>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 shrink-0">
           {/* TOTAL KEUNTUNGAN BERSIH */}
-          <div className="lg:col-span-2 bg-app-card rounded-[24px] p-6 md:p-8 border border-app-border/40 shadow-sm flex flex-col justify-between relative overflow-hidden">
+          <div className="lg:col-span-2 bg-app-card rounded-[18px] p-6 md:p-8 border border-app-border shadow-sm flex flex-col justify-between relative overflow-hidden">
             {/* DECORATIVE LIGHTING - optional aesthetic */}
             
 
             <div className="relative z-10 mb-8">
-              <div className="inline-block px-3 py-1 bg-app-success/10 text-app-success text-[10px] font-bold tracking-wider rounded-full mb-4 uppercase">
+              <div className="inline-block px-3 py-1 bg-app-success/10 text-app-success text-[10px] font-semibold tracking-wider rounded-full mb-4 uppercase">
                 {language === "en" ? "Total Net Profit" : "Total Keuntungan Bersih"}
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-app-text-bright mb-2">
+              <h2 className="text-4xl md:text-5xl font-semibold text-app-text-bright mb-2">
                 Rp {stats.netProfit.toLocaleString("id-ID")}
               </h2>
               <div className="flex items-center gap-2 text-app-text/60 text-xs">
@@ -1517,27 +1530,27 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-10 mt-auto">
-              <div className="bg-app-bg border border-app-border/50 rounded-2xl p-5 flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-bold text-app-text-bright mb-1">
+              <div className="bg-app-bg border border-app-border rounded-2xl p-5 flex flex-col items-center justify-center text-center">
+                <span className="text-xl font-semibold text-app-text-bright mb-1">
                   {stats.count}
                 </span>
-                <span className="text-[10px] text-app-text/50 font-bold tracking-wider uppercase">
+                <span className="text-[10px] text-app-text/50 font-semibold tracking-wider uppercase">
                   {language === "en" ? "Total Transactions" : "Total Transaksi"}
                 </span>
               </div>
-              <div className="bg-app-bg border border-app-border/50 rounded-2xl p-5 flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-bold text-app-success mb-1">
+              <div className="bg-app-bg border border-app-border rounded-2xl p-5 flex flex-col items-center justify-center text-center">
+                <span className="text-xl font-semibold text-app-success mb-1">
                   Rp {Math.round(stats.avgIncome).toLocaleString("id-ID")}
                 </span>
-                <span className="text-[10px] text-app-text/50 font-bold tracking-wider uppercase">
+                <span className="text-[10px] text-app-text/50 font-semibold tracking-wider uppercase">
                   {language === "en" ? "Average / Day" : "Rata-rata / Hari"}
                 </span>
               </div>
-              <div className="bg-app-bg border border-app-border/50 rounded-2xl p-5 flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-bold text-app-danger mb-1">
+              <div className="bg-app-bg border border-app-border rounded-2xl p-5 flex flex-col items-center justify-center text-center">
+                <span className="text-xl font-semibold text-app-danger mb-1">
                   Rp {Math.round(stats.avgExpense).toLocaleString("id-ID")}
                 </span>
-                <span className="text-[10px] text-app-text/50 font-bold tracking-wider uppercase">
+                <span className="text-[10px] text-app-text/50 font-semibold tracking-wider uppercase">
                   {language === "en" ? "Expenses / Day" : "Pengeluaran / Hari"}
                 </span>
               </div>
@@ -1545,15 +1558,15 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           </div>
 
           {/* AI INSIGHT */}
-          <div className="bg-app-card rounded-[24px] p-6 md:p-8 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
+          <div className="bg-app-card rounded-[18px] p-6 md:p-8 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
             
             <div className="flex items-center gap-2 mb-6 relative z-10">
               <Sparkles className="w-5 h-5 text-app-accent1" />
-              <span className="text-app-accent1 text-[10px] font-bold tracking-widest uppercase">
+              <span className="text-app-accent1 text-[10px] font-semibold tracking-widest uppercase">
                 AI Insight
               </span>
             </div>
-            <h3 className="text-app-text-bright font-bold text-lg mb-3 relative z-10">
+            <h3 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em] mb-3 relative z-10">
               {stats.count === 0
                 ? `Belum Ada Transaksi ${selectedReportPeriod === "today" ? "Hari Ini" : selectedReportPeriod === "this_week" ? "Minggu Ini" : "Bulan Ini"}`
                 : stats.netProfit > 0
@@ -1573,7 +1586,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </p>
             <button
               onClick={fetchFinancialStrategy}
-              className="flex items-center gap-2 text-app-accent1 text-xs font-bold tracking-widest uppercase hover:opacity-80 transition-opacity relative z-10 cursor-pointer"
+              className="flex items-center gap-2 text-app-accent1 text-xs font-semibold tracking-widest uppercase hover:opacity-80 transition-opacity relative z-10 cursor-pointer"
             >
               Pelajari Strategi <ArrowRight className="w-4 h-4" />
             </button>
@@ -1586,7 +1599,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 shrink-0">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-app-text-bright">
+              <h3 className="text-lg font-semibold text-app-text-bright">
                 Sumber Pendapatan
               </h3>
               <button
@@ -1604,7 +1617,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 setTab("Pemasukan");
                 detailRef.current?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="bg-app-card border border-app-border/40 rounded-[24px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
+              className="bg-app-card border border-app-border rounded-[18px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
             >
               
               <div className="flex items-center gap-4 relative z-10">
@@ -1612,7 +1625,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   <TrendingUp className="w-6 h-6 text-app-success" />
                 </div>
                 <div>
-                  <p className="text-app-text-bright font-bold text-base">
+                  <p className="text-app-text-bright font-semibold text-base">
                     Total Pemasukan
                   </p>
                   <p className="text-app-text/50 text-xs mt-0.5">
@@ -1625,14 +1638,14 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   </p>
                 </div>
               </div>
-              <p className="text-xl font-bold text-app-success relative z-10">
+              <p className="text-xl font-semibold text-app-success relative z-10">
                 Rp {stats.income.toLocaleString("id-ID")}
               </p>
             </HoverCard>
           </div>
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-app-text-bright">
+              <h3 className="text-lg font-semibold text-app-text-bright">
                 Alokasi Pengeluaran
               </h3>
               <button
@@ -1650,7 +1663,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 setTab("Pengeluaran");
                 detailRef.current?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="bg-app-card border border-app-border/40 rounded-[24px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
+              className="bg-app-card border border-app-border rounded-[18px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
             >
               
               <div className="flex items-center gap-4 relative z-10">
@@ -1658,7 +1671,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   <TrendingDown className="w-6 h-6 text-app-danger" />
                 </div>
                 <div>
-                  <p className="text-app-text-bright font-bold text-base">
+                  <p className="text-app-text-bright font-semibold text-base">
                     Total Pengeluaran
                   </p>
                   <p className="text-app-text/50 text-xs mt-0.5">
@@ -1671,7 +1684,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   </p>
                 </div>
               </div>
-              <p className="text-xl font-bold text-app-danger relative z-10">
+              <p className="text-xl font-semibold text-app-danger relative z-10">
                 Rp {stats.expense.toLocaleString("id-ID")}
               </p>
             </HoverCard>
@@ -1685,7 +1698,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           className="flex-1 flex flex-col shrink-0 min-h-[400px]"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
-            <h3 className="text-xl font-bold text-app-text-bright">
+            <h3 className="text-xl font-semibold text-app-text-bright">
               Detail Transaksi
             </h3>
             <div className="flex items-center gap-1 bg-app-card p-1 rounded-full border border-app-border relative">
@@ -1696,7 +1709,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   <button
                     key={t}
                     onClick={() => setTab(t as any)}
-                    className="px-5 py-2 rounded-full text-xs font-bold transition-colors relative"
+                    className="px-5 py-2 rounded-full text-xs font-semibold transition-colors relative"
                   >
                     {isActive && (
                       <motion.div
@@ -1705,7 +1718,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
-                    <span className={`relative z-10 ${isActive ? "text-white" : "text-app-text/60 hover:text-app-text-bright"}`}>
+                    <span className={`relative z-10 ${isActive ? "text-app-bg" : "text-app-text/60 hover:text-app-text-bright"}`}>
                       {t}
                     </span>
                   </button>
@@ -1714,7 +1727,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </div>
           </div>
 
-          <div className="bg-app-card border border-app-border/40 rounded-[24px] p-6 shadow-sm mb-6 flex-1 overflow-hidden relative flex flex-col">
+          <div className="bg-app-card border border-app-border rounded-[18px] p-6 shadow-sm mb-6 flex-1 overflow-hidden relative flex flex-col">
             
             {filteredTransactions.length === 0 ? (
               <div className="p-8 text-center text-app-text/50 rounded-2xl border border-dashed border-app-border mt-4 relative z-10 flex flex-col items-center justify-center gap-3">
@@ -1728,7 +1741,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 {filteredTransactions.map((t) => (
                   <StaggerItem key={t.id}>
                     <div
-                      className="flex items-center justify-between p-4 bg-app-bg hover:bg-app-hover rounded-2xl transition-colors border border-app-border/50 hover:border-app-border cursor-pointer group relative overflow-hidden"
+                      className="flex items-center justify-between p-4 bg-app-bg hover:bg-app-hover rounded-2xl transition-colors border border-app-border hover:border-app-border cursor-pointer group relative overflow-hidden"
                     >
                     
                     <div className="flex items-center gap-4 relative z-10">
@@ -1753,7 +1766,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-sm text-app-text-bright font-bold">
+                          <p className="text-sm text-app-text-bright font-semibold">
                             {t.note ||
                               (t.type === "income"
                                 ? "Pemasukan"
@@ -1762,12 +1775,12 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                                   : "Transfer")}
                           </p>
                           {t.type === "transfer" && (
-                            <span className="px-2 py-0.5 bg-app-accent1/10 text-app-accent1 text-[10px] font-bold rounded-full border border-app-accent1/20 hidden sm:inline-block">
+                            <span className="px-2 py-0.5 bg-app-accent1/10 text-app-accent1 text-[10px] font-semibold rounded-full border border-app-accent1/20 hidden sm:inline-block">
                               Transfer
                             </span>
                           )}
                           {t.categoryId && (
-                            <span className="px-2 py-0.5 bg-app-card border border-app-border text-app-text text-[10px] font-bold rounded-full hidden sm:flex items-center gap-1">
+                            <span className="px-2 py-0.5 bg-app-card border border-app-border text-app-text text-[10px] font-semibold rounded-full hidden sm:flex items-center gap-1">
                               <CategoryIcon
                                 iconId={t.categoryIcon || "dollar-sign"}
                                 className="w-3 h-3 text-app-text/70"
@@ -1790,7 +1803,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                     <div className="flex items-center gap-4 relative z-10">
                       <div className="flex flex-col items-end">
                         <p
-                          className={`text-base font-bold whitespace-nowrap
+                          className={`text-base font-semibold whitespace-nowrap
                           ${
                             t.type === "income"
                               ? "text-app-success"
@@ -1847,7 +1860,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       {/* Modal Add */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-[60] flex flex-col justify-end md:items-center md:justify-center backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full md:max-w-xl md:rounded-[24px] rounded-t-[24px] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-app-border/40 animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
+          <div className="bg-app-card text-app-text w-full md:max-w-xl md:rounded-[18px] rounded-t-[18px] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-app-border animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
                 {editingTransaction ? "Edit Transaksi" : "Catat Transaksi"}
@@ -1862,20 +1875,20 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
             <div className="flex p-4 gap-2 border-b border-app-border overflow-x-auto no-scrollbar bg-app-card">
               <button
-                onClick={() => setType("expense")}
-                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-colors whitespace-nowrap ${type === "expense" ? "bg-app-danger text-app-bg shadow-md" : "bg-app-bg border border-app-border hover:bg-app-hover hover:text-app-text-bright"}`}
+                onClick={() => handleTypeChange("expense")}
+                className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap ${type === "expense" ? "bg-app-danger text-app-bg shadow-md" : "bg-app-bg border border-app-border hover:bg-app-hover hover:text-app-text-bright"}`}
               >
                 Pengeluaran
               </button>
               <button
-                onClick={() => setType("income")}
-                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-colors whitespace-nowrap ${type === "income" ? "bg-app-success text-app-bg shadow-md" : "bg-app-bg border border-app-border hover:bg-app-hover hover:text-app-text-bright"}`}
+                onClick={() => handleTypeChange("income")}
+                className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap ${type === "income" ? "bg-app-success text-app-bg shadow-md" : "bg-app-bg border border-app-border hover:bg-app-hover hover:text-app-text-bright"}`}
               >
                 Pemasukan
               </button>
               <button
-                onClick={() => setType("transfer")}
-                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-colors whitespace-nowrap ${type === "transfer" ? "bg-app-accent1 text-app-bg shadow-md" : "bg-app-bg border border-app-border hover:bg-app-hover hover:text-app-text-bright"}`}
+                onClick={() => handleTypeChange("transfer")}
+                className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap ${type === "transfer" ? "bg-app-accent1 text-app-bg shadow-md" : "bg-app-bg border border-app-border hover:bg-app-hover hover:text-app-text-bright"}`}
               >
                 Transfer
               </button>
@@ -1888,12 +1901,15 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               {/* Type specific fields */}
               {(type === "income" || type === "expense") && (
                 <div>
-                  <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                  <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                     Rekening
                   </label>
                   <select
                     value={accountId}
-                    onChange={(e) => setAccountId(e.target.value)}
+                    onChange={(e) => {
+                      setAccountId(e.target.value);
+                      localStorage.setItem(`lastAccountId_${type}`, e.target.value);
+                    }}
                     className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm text-app-text-bright focus:border-app-accent1 outline-none transition-colors appearance-none"
                     required
                   >
@@ -1912,12 +1928,15 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               {type === "transfer" && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                    <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                       Dari Rekening
                     </label>
                     <select
                       value={fromAccountId}
-                      onChange={(e) => setFromAccountId(e.target.value)}
+                      onChange={(e) => {
+                        setFromAccountId(e.target.value);
+                        localStorage.setItem('lastAccountId_transfer_from', e.target.value);
+                      }}
                       className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm text-app-text-bright focus:border-app-accent1 outline-none transition-colors appearance-none"
                       required
                     >
@@ -1925,19 +1944,20 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                         Pilih Rekening Asal
                       </option>
                       {accounts.map((acc) => (
-                        <option key={acc.id} value={acc.id}>
-                          {acc.name}
-                        </option>
+                        <option key={acc.id} value={acc.id}>{acc.name} (Rp {acc.balance.toLocaleString("id-ID")})</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                    <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                       Ke Rekening
                     </label>
                     <select
                       value={toAccountId}
-                      onChange={(e) => setToAccountId(e.target.value)}
+                      onChange={(e) => {
+                        setToAccountId(e.target.value);
+                        localStorage.setItem('lastAccountId_transfer_to', e.target.value);
+                      }}
                       className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm text-app-text-bright focus:border-app-accent1 outline-none transition-colors appearance-none"
                       required
                     >
@@ -1945,9 +1965,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                         Pilih Rekening Tujuan
                       </option>
                       {accounts.map((acc) => (
-                        <option key={acc.id} value={acc.id}>
-                          {acc.name}
-                        </option>
+                        <option key={acc.id} value={acc.id}>{acc.name} (Rp {acc.balance.toLocaleString("id-ID")})</option>
                       ))}
                     </select>
                   </div>
@@ -1955,7 +1973,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               )}
 
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                   Nominal (Rp)
                 </label>
                 <input
@@ -1963,7 +1981,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   inputMode="numeric"
                   value={amount}
                   onChange={(e) => setAmount(formatNumberInput(e.target.value))}
-                  className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-4 text-2xl font-bold text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
+                  className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-4 text-2xl font-semibold text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
                   placeholder="0"
                   required
                 />
@@ -1988,9 +2006,9 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   </div>
 
                   {hasAdminFee && (
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2 border-t border-app-border/50">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2 border-t border-app-border">
                       <div className="flex-1">
-                        <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                        <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                           Biaya / Admin Fee (Rp)
                         </label>
                         <input
@@ -2000,18 +2018,18 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                           onChange={(e) =>
                             setAdminFee(formatNumberInput(e.target.value))
                           }
-                          className="w-full bg-transparent border-b border-app-border text-app-text-bright placeholder:text-app-text/30 px-1 py-2 font-mono text-lg focus:border-app-accent1 outline-none"
+                          className="w-full bg-transparent border-b border-app-border text-app-text-bright placeholder:text-app-text/50 px-1 py-2 font-mono text-lg focus:border-app-accent1 outline-none"
                           placeholder="0"
                           required
                         />
                       </div>
                       {type === "transfer" && (
                         <div className="flex-1">
-                          <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                             Potong Saldo Dari
                           </label>
                           <select
-                            className="w-full bg-transparent text-[10px] text-app-accent1 font-bold uppercase py-3 border-b border-transparent hover:border-app-border outline-none appearance-none"
+                            className="w-full bg-transparent text-[10px] text-app-accent1 font-semibold uppercase py-3 border-b border-transparent hover:border-app-border outline-none appearance-none"
                             value={adminFeeChargeTo}
                             onChange={(e) =>
                               setAdminFeeChargeTo(e.target.value as any)
@@ -2031,7 +2049,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
               {type !== "transfer" && (
                 <div>
-                  <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                  <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                     Kategori (Opsional)
                   </label>
                   <select
@@ -2052,7 +2070,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               )}
 
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                   Catatan
                 </label>
                 <input
@@ -2065,7 +2083,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                   Waktu Transaksi
                 </label>
                 <input
@@ -2089,7 +2107,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-app-accent1 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 text-app-bg font-bold py-4 rounded-xl transition-all shadow-lg text-sm flex items-center justify-center gap-2"
+                  className="w-full bg-app-accent1 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] text-app-bg font-semibold py-4 rounded-xl transition-all shadow-lg text-sm flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? "Menyimpan..." : editingTransaction ? "Perbarui Transaksi" : "Simpan Transaksi"}
                 </button>
@@ -2101,7 +2119,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       {/* Modal Add Grab */}
       {isGrabModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-[60] flex flex-col justify-end md:items-center md:justify-center backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full md:max-w-xl md:rounded-[24px] rounded-t-[24px] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-app-border/40 animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
+          <div className="bg-app-card text-app-text w-full md:max-w-xl md:rounded-[18px] rounded-t-[18px] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-app-border animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright flex items-center gap-2">
                 <Car className="w-5 h-5 text-app-success" /> Transaksi Grab
@@ -2117,13 +2135,13 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             <div className="flex p-4 gap-2 border-b border-app-border bg-app-card">
               <button
                 onClick={() => setGrabType("tunai")}
-                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-colors ${grabType === "tunai" ? "bg-app-success text-white shadow-md" : "bg-app-bg border border-app-border hover:bg-app-hover hover:text-app-text-bright"}`}
+                className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-colors ${grabType === "tunai" ? "bg-app-success text-app-bg shadow-md" : "bg-app-bg border border-app-border hover:bg-app-hover hover:text-app-text-bright"}`}
               >
                 Tunai
               </button>
               <button
                 onClick={() => setGrabType("nontunai")}
-                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-colors ${grabType === "nontunai" ? "bg-app-success text-white shadow-md" : "bg-app-bg border border-app-border hover:bg-app-hover hover:text-app-text-bright"}`}
+                className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-colors ${grabType === "nontunai" ? "bg-app-success text-app-bg shadow-md" : "bg-app-bg border border-app-border hover:bg-app-hover hover:text-app-text-bright"}`}
               >
                 Non-Tunai
               </button>
@@ -2135,7 +2153,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             >
               {/* Pilihan Label Layanan */}
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                   Layanan Grab
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -2151,7 +2169,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                       key={label}
                       type="button"
                       onClick={() => setGrabLabel(label)}
-                      className={`px-4 py-2 rounded-full text-xs font-bold border transition-colors ${grabLabel === label ? "bg-app-accent1 border-app-accent1 text-white shadow-sm" : "border-app-border bg-app-bg text-app-text/70 hover:text-app-text-bright"}`}
+                      className={`px-4 py-2 rounded-full text-xs font-semibold border transition-colors ${grabLabel === label ? "bg-app-accent1 border-app-accent1 text-app-bg shadow-sm" : "border-app-border bg-app-bg text-app-text/70 hover:text-app-text-bright"}`}
                     >
                       {label}
                     </button>
@@ -2161,7 +2179,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
               {grabType === "nontunai" ? (
                 <div>
-                  <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                  <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                     Nominal Pendapatan (Rp)
                   </label>
                   <input
@@ -2171,7 +2189,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                     onChange={(e) =>
                       setGrabNominal(formatNumberInput(e.target.value))
                     }
-                    className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-4 text-xl font-bold text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
+                    className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-4 text-xl font-semibold text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
                     placeholder="0"
                     required
                   />
@@ -2179,7 +2197,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                    <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                       1. Cash Diterima di Tangan (Rp)
                     </label>
                     <input
@@ -2189,14 +2207,14 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                       onChange={(e) =>
                         setGrabCashReceived(formatNumberInput(e.target.value))
                       }
-                      className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-lg font-bold text-app-success focus:border-app-accent1 outline-none transition-colors"
+                      className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-lg font-semibold text-app-success focus:border-app-accent1 outline-none transition-colors"
                       placeholder="0"
                       required
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                      <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                         2. Nominal di Aplikasi Driver
                       </label>
                       <input
@@ -2206,13 +2224,13 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                         onChange={(e) =>
                           setGrabAppDriver(formatNumberInput(e.target.value))
                         }
-                        className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-base font-bold text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
+                        className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-base font-semibold text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
                         placeholder="0"
                         required
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                      <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                         3. Nominal di Aplikasi Customer
                       </label>
                       <input
@@ -2222,7 +2240,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                         onChange={(e) =>
                           setGrabAppCust(formatNumberInput(e.target.value))
                         }
-                        className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-base font-bold text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
+                        className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-base font-semibold text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
                         placeholder="0"
                         required
                       />
@@ -2232,7 +2250,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                     grabAppCust &&
                     parseNumberInput(grabCashReceived) <
                       parseNumberInput(grabAppCust) && (
-                      <p className="text-xs text-app-danger font-bold mt-1">
+                      <p className="text-xs text-app-danger font-semibold mt-1">
                         Error: Cash diterima tidak boleh kurang dari App
                         Customer!
                       </p>
@@ -2244,7 +2262,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                     parseNumberInput(grabCashReceived) >=
                       parseNumberInput(grabAppCust) && (
                       <div className="p-4 bg-app-success/10 rounded-xl mt-4 border border-app-success/20">
-                        <p className="text-xs text-app-success font-bold mb-2">
+                        <p className="text-xs text-app-success font-semibold mb-2">
                           Simulasi Hitungan:
                         </p>
                         <ul className="text-xs text-app-text-bright space-y-1">
@@ -2268,7 +2286,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                               parseNumberInput(grabAppCust)
                             ).toLocaleString("id-ID")}
                           </li>
-                          <li className="pt-1 mt-1 border-t border-app-success/20 font-bold">
+                          <li className="pt-1 mt-1 border-t border-app-success/20 font-semibold">
                             Total Pendapatan: Rp{" "}
                             {(
                               parseNumberInput(grabAppDriver) +
@@ -2286,7 +2304,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               )}
 
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">
+                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                   Waktu Transaksi
                 </label>
                 <input
@@ -2315,7 +2333,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                       parseNumberInput(grabCashReceived) <
                         parseNumberInput(grabAppCust))
                   }
-                  className="w-full bg-app-success disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 text-white font-bold py-4 rounded-xl transition-all shadow-lg text-sm flex items-center justify-center gap-2"
+                  className="w-full bg-app-success disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] text-app-bg font-semibold py-4 rounded-xl transition-all shadow-lg text-sm flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? "Menyimpan..." : "Simpan Transaksi Grab"}
                 </button>
@@ -2327,8 +2345,8 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       {/* Confirm Delete Modal */}
       {tsxToDelete && (
         <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full max-w-sm rounded-[24px] shadow-2xl border border-app-border/40 p-6 animate-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold text-app-text-bright mb-2">
+          <div className="bg-app-card text-app-text w-full max-w-sm rounded-[18px] shadow-2xl border border-app-border p-6 animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-semibold text-app-text-bright mb-2">
               Hapus Transaksi?
             </h3>
             <p className="text-sm text-app-text/70 mb-6">
@@ -2344,7 +2362,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               </button>
               <button
                 onClick={confirmDeleteTransaction}
-                className="flex-1 py-3 bg-app-danger text-white rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-app-danger/20"
+                className="flex-1 py-3 bg-app-danger text-app-bg rounded-xl font-semibold hover:opacity-90 active:scale-[0.98] transition-opacity shadow-lg shadow-app-danger/20"
               >
                 Hapus
               </button>
@@ -2371,7 +2389,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-app-card border border-app-border w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl relative z-10 flex flex-col max-h-[85vh]"
+              className="bg-app-card border border-app-border w-full max-w-3xl rounded-[18px] overflow-hidden shadow-2xl relative z-10 flex flex-col max-h-[85vh]"
             >
               {/* Decorative solid accent line */}
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-app-accent1" />
@@ -2383,10 +2401,10 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                     <Sparkles className="w-5 h-5 animate-pulse" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-app-text-bright flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-app-text-bright flex items-center gap-2">
                       Strategi Keuangan AI
                       {strategyRecommendation?.isOffline && (
-                        <span className="text-[10px] font-bold bg-app-border px-2 py-0.5 rounded-full text-app-text/60">
+                        <span className="text-[10px] font-semibold bg-app-border px-2 py-0.5 rounded-full text-app-text/60">
                           Mode Lokal
                         </span>
                       )}
@@ -2433,7 +2451,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
                     {/* DIAGNOSTIC FINDINGS */}
                     <div className="space-y-3">
-                      <h3 className="text-sm font-bold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
                         <AlertTriangle className="w-4 h-4 text-app-danger" />
                         Temuan Diagnostik
                       </h3>
@@ -2441,7 +2459,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                         {strategyRecommendation.diagnostic.map((diag, index) => (
                           <div
                             key={index}
-                            className="flex items-start gap-3 p-3.5 bg-app-bg border border-app-border/40 rounded-xl text-xs text-app-text/80 leading-relaxed"
+                            className="flex items-start gap-3 p-3.5 bg-app-bg border border-app-border rounded-xl text-xs text-app-text/80 leading-relaxed"
                           >
                             <span className="w-1.5 h-1.5 rounded-full bg-app-danger shrink-0 mt-1.5" />
                             <span>{diag}</span>
@@ -2452,7 +2470,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
                     {/* SAVINGS RECOMMENDATIONS */}
                     <div className="space-y-3">
-                      <h3 className="text-sm font-bold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
                         <Coins className="w-4 h-4 text-app-success" />
                         Rekomendasi Penghematan Taktis
                       </h3>
@@ -2465,7 +2483,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                             <div>
                               <div className="flex items-center justify-between mb-2">
                                 <span
-                                  className={`text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full ${
+                                  className={`text-[9px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full ${
                                     rec.priority === "tinggi"
                                       ? "bg-app-danger/15 text-app-danger"
                                       : rec.priority === "sedang"
@@ -2475,11 +2493,11 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                                 >
                                   {rec.priority}
                                 </span>
-                                <span className="text-[10px] font-bold text-app-success bg-app-success/10 px-2 py-0.5 rounded-full">
+                                <span className="text-[10px] font-semibold text-app-success bg-app-success/10 px-2 py-0.5 rounded-full">
                                   {rec.potentialSavings}
                                 </span>
                               </div>
-                              <h4 className="font-bold text-app-text-bright text-xs mb-1.5 group-hover:text-app-accent1 transition-colors">
+                              <h4 className="font-semibold text-app-text-bright text-xs mb-1.5 group-hover:text-app-accent1 transition-colors">
                                 {rec.title}
                               </h4>
                               <p className="text-[11px] text-app-text/60 leading-relaxed">
@@ -2493,7 +2511,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
                     {/* BUDGET ALLOCATION PLAN */}
                     <div className="space-y-3">
-                      <h3 className="text-sm font-bold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
                         <Target className="w-4 h-4 text-app-accent2" />
                         Rencana Alokasi Anggaran Ideal (50/20/20/10)
                       </h3>
@@ -2526,7 +2544,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                             </div>
                             <div className="flex justify-between text-[10px] text-app-text/50">
                               <span>Alokasi saat ini: ~{plan.currentPct}%</span>
-                              <span className="font-bold text-app-text/80">Rekomendasi: {plan.recommendedPct}%</span>
+                              <span className="font-semibold text-app-text/80">Rekomendasi: {plan.recommendedPct}%</span>
                             </div>
                           </div>
                         ))}
@@ -2535,7 +2553,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
                     {/* INCOME STRATEGIES */}
                     <div className="space-y-3">
-                      <h3 className="text-sm font-bold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-app-text-bright uppercase tracking-wider flex items-center gap-2">
                         <Compass className="w-4 h-4 text-app-accent1" />
                         Strategi Peningkatan Pemasukan
                       </h3>
@@ -2545,7 +2563,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                             key={index}
                             className="flex items-start gap-3 text-xs leading-relaxed text-app-text/80"
                           >
-                            <div className="w-5 h-5 rounded-full bg-app-accent1/10 flex items-center justify-center shrink-0 text-app-accent1 text-[10px] font-bold mt-0.5">
+                            <div className="w-5 h-5 rounded-full bg-app-accent1/10 flex items-center justify-center shrink-0 text-app-accent1 text-[10px] font-semibold mt-0.5">
                               {index + 1}
                             </div>
                             <span>{strat}</span>
@@ -2565,7 +2583,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               <div className="p-4 border-t border-app-border flex justify-end shrink-0 bg-app-bg/30">
                 <button
                   onClick={() => setIsStrategyModalOpen(false)}
-                  className="px-6 py-2.5 rounded-xl bg-app-accent1 hover:opacity-90 text-app-bg font-bold text-xs transition-opacity cursor-pointer shadow-md"
+                  className="px-6 py-2.5 rounded-xl bg-app-accent1 hover:opacity-90 active:scale-[0.98] text-app-bg font-semibold text-xs transition-opacity cursor-pointer shadow-md"
                 >
                   Selesai & Terapkan
                 </button>

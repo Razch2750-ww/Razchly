@@ -138,7 +138,7 @@ export default function SavingsTarget() {
       {/* HEADER */}
       <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6 shrink-0">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-app-text-bright mb-1 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-semibold text-app-text-bright mb-1 tracking-tight">
             <TextReveal text="Target Tabungan" />
           </h1>
           <p className="text-app-text/70 text-sm">Kelola dan pantau target keuangan berlapis Anda.</p>
@@ -153,7 +153,7 @@ export default function SavingsTarget() {
           </button>
           <Link to="/settings" className="px-4 h-10 rounded-full bg-app-card flex items-center justify-center text-sm font-semibold text-app-text-bright border border-app-border gap-2 hover:bg-app-hover cursor-pointer transition-colors">
             <span className="opacity-800">{user?.displayName?.toUpperCase() || "USER"}</span>
-            <div className="w-6 h-6 rounded-full bg-app-accent1 text-xs font-bold flex items-center justify-center text-app-bg overflow-hidden flex-shrink-0">
+            <div className="w-6 h-6 rounded-full bg-app-accent1 text-xs font-semibold flex items-center justify-center text-app-bg overflow-hidden flex-shrink-0">
                {user?.photoURL ? (
                  <img src={user?.photoURL} alt="Profile" className="w-full h-full object-cover" />
                ) : (
@@ -166,24 +166,24 @@ export default function SavingsTarget() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <ScrollReveal className="lg:col-span-2">
-          <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden h-full">
+          <div className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden h-full">
 
-          <h2 className="text-app-text-bright font-bold mb-6 flex items-center gap-2 relative z-10">
+          <h2 className="text-app-text-bright font-semibold mb-6 flex items-center gap-2 relative z-10">
             <Target className="w-5 h-5 text-app-accent1" /> Atur Target Finansial
           </h2>
           <form onSubmit={handleTabunganChange} className="relative z-10 flex flex-col gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div className="w-full">
                 <div className="flex items-center justify-between mb-2">
-                    <label className="text-[10px] uppercase font-bold tracking-wider text-app-text/70 flex items-center gap-1"><ArrowUp className="w-3 h-3 text-app-success"/> Penghasilan Harian (Berlapis)</label>
-                    <button type="button" onClick={() => setIncomeTargetInputs([...incomeTargetInputs, ''])} className="text-[10px] uppercase font-bold text-app-success hover:underline bg-app-success/10 px-2 py-1 rounded">
+                    <label className="text-[10px] uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1"><ArrowUp className="w-3 h-3 text-app-success"/> Penghasilan Harian (Berlapis)</label>
+                    <button type="button" onClick={() => setIncomeTargetInputs([...incomeTargetInputs, ''])} className="text-[10px] uppercase font-semibold text-app-success hover:underline bg-app-success/10 px-2 py-1 rounded">
                         + Tambah Layer
                     </button>
                 </div>
                 <div className="flex flex-col gap-3 border border-app-border rounded-xl p-4 bg-app-bg/50">
                     {incomeTargetInputs.map((val, idx) => (
                       <div key={idx} className="flex items-center gap-3">
-                        <div className="bg-app-success/20 text-app-success px-3 py-1 rounded-lg font-bold text-sm">L{idx + 1}</div>
+                        <div className="bg-app-success/20 text-app-success px-3 py-1 rounded-lg font-semibold text-sm">L{idx + 1}</div>
                         <input
                           type="text"
                           value={val}
@@ -207,15 +207,15 @@ export default function SavingsTarget() {
               
               <div className="w-full">
                 <div className="flex items-center justify-between mb-2">
-                    <label className="text-[10px] uppercase font-bold tracking-wider text-app-text/70 flex items-center gap-1"><ArrowDown className="w-3 h-3 text-app-danger"/> Pengeluaran Harian (Berlapis)</label>
-                    <button type="button" onClick={() => setExpenseLimitInputs([...expenseLimitInputs, ''])} className="text-[10px] uppercase font-bold text-app-danger hover:underline bg-app-danger/10 px-2 py-1 rounded">
+                    <label className="text-[10px] uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1"><ArrowDown className="w-3 h-3 text-app-danger"/> Pengeluaran Harian (Berlapis)</label>
+                    <button type="button" onClick={() => setExpenseLimitInputs([...expenseLimitInputs, ''])} className="text-[10px] uppercase font-semibold text-app-danger hover:underline bg-app-danger/10 px-2 py-1 rounded">
                         + Tambah Layer
                     </button>
                 </div>
                 <div className="flex flex-col gap-3 border border-app-border rounded-xl p-4 bg-app-bg/50">
                     {expenseLimitInputs.map((val, idx) => (
                       <div key={idx} className="flex items-center gap-3">
-                        <div className="bg-app-danger/20 text-app-danger px-3 py-1 rounded-lg font-bold text-sm">L{idx + 1}</div>
+                        <div className="bg-app-danger/20 text-app-danger px-3 py-1 rounded-lg font-semibold text-sm">L{idx + 1}</div>
                         <input
                           type="text"
                           value={val}
@@ -242,15 +242,15 @@ export default function SavingsTarget() {
               {/* Tabungan Bulanan (Berlapis) */}
               <div className="w-full">
                 <div className="flex items-center justify-between mb-2">
-                    <label className="text-[10px] uppercase font-bold tracking-wider text-app-text/70 flex items-center gap-1"><Star className="w-3 h-3 text-app-accent1"/> Tabungan Bulanan (Berlapis)</label>
-                    <button type="button" onClick={() => setTargetInputs([...targetInputs, ''])} className="text-[10px] uppercase font-bold text-app-accent1 hover:underline bg-app-accent1/10 px-2 py-1 rounded">
+                    <label className="text-[10px] uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1"><Star className="w-3 h-3 text-app-accent1"/> Tabungan Bulanan (Berlapis)</label>
+                    <button type="button" onClick={() => setTargetInputs([...targetInputs, ''])} className="text-[10px] uppercase font-semibold text-app-accent1 hover:underline bg-app-accent1/10 px-2 py-1 rounded">
                         + Tambah Layer Target
                     </button>
                 </div>
                 <div className="flex flex-col gap-3 border border-app-border rounded-xl p-4 bg-app-bg/50">
                     {targetInputs.map((val, idx) => (
                       <div key={idx} className="flex items-center gap-3">
-                        <div className="bg-app-accent1/20 text-app-accent1 px-3 py-1 rounded-lg font-bold text-sm">L{idx + 1}</div>
+                        <div className="bg-app-accent1/20 text-app-accent1 px-3 py-1 rounded-lg font-semibold text-sm">L{idx + 1}</div>
                         <input
                           type="text"
                           value={val}
@@ -276,13 +276,13 @@ export default function SavingsTarget() {
               <div className="w-full flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                      <label className="text-[10px] uppercase font-bold tracking-wider text-app-text/70 flex items-center gap-1">
+                      <label className="text-[10px] uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1">
                         <TrendingDown className="w-3 h-3 text-app-danger"/> Anggaran Pengeluaran Bulanan (PWA Prediktif)
                       </label>
                   </div>
                   <div className="border border-app-border rounded-xl p-4 bg-app-bg/50">
                     <div className="flex items-center gap-3">
-                      <div className="bg-app-danger/20 text-app-danger px-3 py-3 rounded-lg font-bold text-sm">TOTAL</div>
+                      <div className="bg-app-danger/20 text-app-danger px-3 py-3 rounded-lg font-semibold text-sm">TOTAL</div>
                       <input
                         type="text"
                         value={monthlyBudgetInput}
@@ -300,7 +300,7 @@ export default function SavingsTarget() {
             </div>
 
             <div className="flex justify-end mt-2">
-              <button type="submit" className="w-full sm:w-auto px-8 py-3 bg-app-accent1 text-app-bg font-bold rounded-xl hover:opacity-90 transition-opacity whitespace-nowrap">
+              <button type="submit" className="w-full sm:w-auto px-8 py-3 bg-app-accent1 text-app-bg font-semibold rounded-xl hover:opacity-90 transition-opacity whitespace-nowrap">
                 Simpan Target
               </button>
             </div>
@@ -314,20 +314,20 @@ export default function SavingsTarget() {
         <StaggerContainer className="lg:col-span-1 flex flex-col gap-6">
           {/* Laba Bersih Card */}
           <StaggerItem className="flex-1">
-            <HoverCard className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col justify-center relative overflow-hidden h-full min-h-[140px] w-full">
+            <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden h-full min-h-[140px] w-full">
 
             <div className="absolute top-0 right-0 p-4 opacity-10">
                <TrendingUp className="w-16 h-16 text-app-success" />
             </div>
             <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-2 relative z-10">Laba Bersih Bulan Ini</p>
-            <h3 className="text-3xl font-bold text-app-text-bright relative z-10 font-mono">Rp {Math.max(savingsThisMonth, 0).toLocaleString("id-ID")}</h3>
+            <h3 className="text-3xl font-semibold text-app-text-bright relative z-10 font-mono">Rp {Math.max(savingsThisMonth, 0).toLocaleString("id-ID")}</h3>
             <p className="text-xs text-app-text/50 mt-2 relative z-10">Masuk akal untuk ditabung</p>
             </HoverCard>
           </StaggerItem>
 
           {/* Predictive analysis card */}
           <StaggerItem className="flex-1">
-            <HoverCard className={`rounded-[24px] p-6 border shadow-sm flex flex-col relative overflow-hidden h-full w-full ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
+            <HoverCard className={`rounded-[18px] p-6 border shadow-sm flex flex-col relative overflow-hidden h-full w-full ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
 
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-3">
@@ -338,9 +338,9 @@ export default function SavingsTarget() {
                     <Sparkles className="w-5 h-5 text-app-success shrink-0" />
                   )
                 ) : (
-                  <TrendingDown className="w-5 h-5 text-app-text/40 shrink-0" />
+                  <TrendingDown className="w-5 h-5 text-app-text/50 shrink-0" />
                 )}
-                <h4 className="text-app-text-bright font-bold text-sm">
+                <h4 className="text-app-text-bright font-semibold text-sm">
                   {monthlyExpenseBudget > 0 ? (
                     isOverBudget ? "Prediksi: Peringatan Anggaran! ⚠️" : "Prediksi: Anggaran Aman! ✨"
                   ) : (
@@ -355,11 +355,11 @@ export default function SavingsTarget() {
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
                         <p className="text-app-text/50">Anggaran</p>
-                        <p className="font-bold text-app-text-bright">Rp {monthlyExpenseBudget.toLocaleString('id-ID')}</p>
+                        <p className="font-semibold text-app-text-bright">Rp {monthlyExpenseBudget.toLocaleString('id-ID')}</p>
                       </div>
                       <div>
                         <p className="text-app-text/50">Proyeksi Bulan Ini</p>
-                        <p className={`font-bold ${isOverBudget ? 'text-app-danger' : 'text-app-success'}`}>
+                        <p className={`font-semibold ${isOverBudget ? 'text-app-danger' : 'text-app-success'}`}>
                           Rp {Math.round(projectedMonthlyExpense).toLocaleString('id-ID')}
                         </p>
                       </div>
@@ -375,11 +375,11 @@ export default function SavingsTarget() {
                     <p className="text-[11px] text-app-text/80 leading-relaxed">
                       {isOverBudget ? (
                         <>
-                          Pengeluaran harian Anda rata-rata <span className="font-bold text-app-danger">Rp {Math.round(dailySpendingRate).toLocaleString('id-ID')}</span>. Anda diproyeksikan melebihi anggaran sebesar <span className="font-bold text-app-danger">Rp {Math.round(projectedMonthlyExpense - monthlyExpenseBudget).toLocaleString('id-ID')}</span> dan kehabisan anggaran dalam <span className="font-bold text-app-danger">{daysUntilRunOut} hari</span> ({runOutDateStr || 'akhir bulan'}).
+                          Pengeluaran harian Anda rata-rata <span className="font-semibold text-app-danger">Rp {Math.round(dailySpendingRate).toLocaleString('id-ID')}</span>. Anda diproyeksikan melebihi anggaran sebesar <span className="font-semibold text-app-danger">Rp {Math.round(projectedMonthlyExpense - monthlyExpenseBudget).toLocaleString('id-ID')}</span> dan kehabisan anggaran dalam <span className="font-semibold text-app-danger">{daysUntilRunOut} hari</span> ({runOutDateStr || 'akhir bulan'}).
                         </>
                       ) : (
                         <>
-                          Pengeluaran harian rata-rata Anda <span className="font-bold text-app-success">Rp {Math.round(dailySpendingRate).toLocaleString('id-ID')}</span> sangat baik! Jika dipertahankan, Anda diproyeksikan memiliki sisa anggaran <span className="font-bold text-app-success">Rp {Math.round(monthlyExpenseBudget - projectedMonthlyExpense).toLocaleString('id-ID')}</span> di akhir bulan.
+                          Pengeluaran harian rata-rata Anda <span className="font-semibold text-app-success">Rp {Math.round(dailySpendingRate).toLocaleString('id-ID')}</span> sangat baik! Jika dipertahankan, Anda diproyeksikan memiliki sisa anggaran <span className="font-semibold text-app-success">Rp {Math.round(monthlyExpenseBudget - projectedMonthlyExpense).toLocaleString('id-ID')}</span> di akhir bulan.
                         </>
                       )}
                     </p>
@@ -399,9 +399,9 @@ export default function SavingsTarget() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Tabungan Bulanan Berlayer */}
-        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
 
-          <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
+          <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <Star className="w-5 h-5 text-app-accent1" /> Tabungan Layered
           </h2>
           
@@ -410,10 +410,10 @@ export default function SavingsTarget() {
               monthlySavingsTargets.map((target, idx) => {
                 const savingsProgress = target > 0 ? Math.min(Math.max((savingsThisMonth / target) * 100, 0), 100) : 0;
                 return (
-                  <div key={idx} className="border-b border-app-border/30 last:border-0 pb-4 last:pb-0">
+                  <div key={idx} className="border-b border-app-border last:border-0 pb-4 last:pb-0">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs font-bold text-app-text-bright">Layer {idx + 1}</span>
-                      <span className="text-[10px] font-bold text-app-accent1">
+                      <span className="text-xs font-semibold text-app-text-bright">Layer {idx + 1}</span>
+                      <span className="text-[10px] font-semibold text-app-accent1">
                         {savingsProgress.toFixed(0)}% Tercapai
                       </span>
                     </div>
@@ -421,11 +421,11 @@ export default function SavingsTarget() {
                     <div className="flex justify-between items-end mb-2">
                       <div>
                         <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Tercapai</p>
-                        <p className="text-sm font-bold text-app-accent1">Rp {Math.max(savingsThisMonth, 0).toLocaleString('id-ID')}</p>
+                        <p className="text-sm font-semibold text-app-accent1">Rp {Math.max(savingsThisMonth, 0).toLocaleString('id-ID')}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Target L{idx + 1}</p>
-                        <p className="text-xs font-bold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
+                        <p className="text-xs font-semibold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
                       </div>
                     </div>
      
@@ -442,7 +442,7 @@ export default function SavingsTarget() {
                       <span className="text-app-text/50">Status</span>
                       <span className="font-medium text-app-text/70">
                         {savingsThisMonth >= target ? (
-                          <span className="text-app-success font-bold">Tercapai! 🎉</span>
+                          <span className="text-app-success font-semibold">Tercapai! 🎉</span>
                         ) : (
                           `Sisa Rp ${Math.max(target - savingsThisMonth, 0).toLocaleString('id-ID')}`
                         )}
@@ -460,9 +460,9 @@ export default function SavingsTarget() {
         </div>
 
         {/* Penghasilan Harian Berlayer */}
-        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
 
-          <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
+          <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowUp className="w-5 h-5 text-app-success" /> Penghasilan Layered
           </h2>
           
@@ -471,10 +471,10 @@ export default function SavingsTarget() {
               dailyIncomeTargets.map((target, idx) => {
                 const incomeProgress = target > 0 ? Math.min((incomeToday / target) * 100, 100) : 0;
                 return (
-                  <div key={idx} className="border-b border-app-border/30 last:border-0 pb-4 last:pb-0">
+                  <div key={idx} className="border-b border-app-border last:border-0 pb-4 last:pb-0">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs font-bold text-app-text-bright">Layer {idx + 1}</span>
-                      <span className="text-[10px] font-bold text-app-success">
+                      <span className="text-xs font-semibold text-app-text-bright">Layer {idx + 1}</span>
+                      <span className="text-[10px] font-semibold text-app-success">
                         {incomeProgress.toFixed(0)}% Tercapai
                       </span>
                     </div>
@@ -482,11 +482,11 @@ export default function SavingsTarget() {
                     <div className="flex justify-between items-end mb-2">
                       <div>
                         <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Tercapai</p>
-                        <p className="text-sm font-bold text-app-success">Rp {Math.max(incomeToday, 0).toLocaleString('id-ID')}</p>
+                        <p className="text-sm font-semibold text-app-success">Rp {Math.max(incomeToday, 0).toLocaleString('id-ID')}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Target L{idx + 1}</p>
-                        <p className="text-xs font-bold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
+                        <p className="text-xs font-semibold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
                       </div>
                     </div>
      
@@ -503,7 +503,7 @@ export default function SavingsTarget() {
                       <span className="text-app-text/50">Status</span>
                       <span className="font-medium text-app-text/70">
                         {incomeToday >= target ? (
-                          <span className="text-app-success font-bold">Tercapai! 🎉</span>
+                          <span className="text-app-success font-semibold">Tercapai! 🎉</span>
                         ) : (
                           `Kurang Rp ${Math.max(target - incomeToday, 0).toLocaleString('id-ID')}`
                         )}
@@ -521,9 +521,9 @@ export default function SavingsTarget() {
         </div>
 
         {/* Pengeluaran Harian Berlayer */}
-        <div className="bg-app-card rounded-[24px] p-6 border border-app-border/40 shadow-sm flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
 
-          <h2 className="text-app-text-bright font-bold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
+          <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowDown className="w-5 h-5 text-app-danger" /> Pengeluaran Layered
           </h2>
           
@@ -532,10 +532,10 @@ export default function SavingsTarget() {
               dailyExpenseLimits.map((target, idx) => {
                 const expenseProgress = target > 0 ? Math.min((expenseToday / target) * 100, 100) : 0;
                 return (
-                  <div key={idx} className="border-b border-app-border/30 last:border-0 pb-4 last:pb-0">
+                  <div key={idx} className="border-b border-app-border last:border-0 pb-4 last:pb-0">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs font-bold text-app-text-bright">Layer {idx + 1}</span>
-                      <span className="text-[10px] font-bold text-app-danger">
+                      <span className="text-xs font-semibold text-app-text-bright">Layer {idx + 1}</span>
+                      <span className="text-[10px] font-semibold text-app-danger">
                         {expenseProgress.toFixed(0)}% Terpakai
                       </span>
                     </div>
@@ -543,11 +543,11 @@ export default function SavingsTarget() {
                     <div className="flex justify-between items-end mb-2">
                       <div>
                         <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Terpakai</p>
-                        <p className="text-sm font-bold text-app-danger">Rp {Math.max(expenseToday, 0).toLocaleString('id-ID')}</p>
+                        <p className="text-sm font-semibold text-app-danger">Rp {Math.max(expenseToday, 0).toLocaleString('id-ID')}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Batas L{idx + 1}</p>
-                        <p className="text-xs font-bold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
+                        <p className="text-xs font-semibold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
                       </div>
                     </div>
      
@@ -564,7 +564,7 @@ export default function SavingsTarget() {
                       <span className="text-app-text/50">Status</span>
                       <span className="font-medium text-app-text/70">
                         {expenseToday > target ? (
-                          <span className="text-app-danger font-bold">Overbudget! 🚫</span>
+                          <span className="text-app-danger font-semibold">Overbudget! 🚫</span>
                         ) : (
                           `Sisa Rp ${Math.max(target - expenseToday, 0).toLocaleString('id-ID')}`
                         )}

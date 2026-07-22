@@ -358,7 +358,7 @@ export function WaggleIcon({ children, className = '' }: WaggleIconProps) {
 
 export function Skeleton({ className = '' }: { className?: string }) {
   return (
-    <div className={`relative overflow-hidden bg-app-card/40 rounded-xl border border-app-border/40 ${className}`}>
+    <div className={`relative overflow-hidden bg-app-card/40 rounded-xl border border-app-border ${className}`}>
       <div className="absolute inset-0 shimmer-bg" />
     </div>
   );

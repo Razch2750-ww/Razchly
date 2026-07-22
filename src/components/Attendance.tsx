@@ -1,61 +1,120 @@
 import React, { useState, useEffect, useRef } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, differenceInMinutes, startOfWeek, endOfWeek, isWithinInterval, parseISO, getDay } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { collection, onSnapshot, doc, setDoc, deleteDoc, query, orderBy, getDocs, where, updateDoc } from "firebase/firestore";
+import { collection, onSnapshot, doc, setDoc, deleteDoc, query, orderBy, getDocs, where, updateDoc, writeBatch, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useStore } from "../store/useStore";
 import { sendDeviceNotification } from "../utils/notification";
-import { AttendanceRecord } from "../types";
-import { Calendar, Clock, CheckCircle, XCircle, FileText, Activity, Plus, Edit2, Trash2, X, MapPin, ChevronLeft, ChevronRight, BarChart3, Timer, Award, Target } from "lucide-react";
+import { AttendanceRecord, Account } from "../types";
+import { Calendar, Clock, CheckCircle, XCircle, FileText, Activity, Plus, Edit2, Trash2, X, MapPin, ChevronLeft, ChevronRight, BarChart3, Timer, Award, Target, Calculator } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { motion } from "motion/react";
 import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
 import { PageShell, ActionBtn, EmptyState } from "./PageShell";
 
 const CurrencyInput = ({ value, onChange }: { value: number, onChange: (val: number) => void }) => {
-  const displayValue = value ? `Rp${value.toLocaleString('id-ID')}` : '';
-
-  return (
-    <input
-      type="text"
-      value={displayValue}
-      placeholder="Rp0"
-      onChange={(e) => {
-        const val = e.target.value.replace(/\D/g, '');
-        onChange(parseInt(val) || 0);
-      }}
-      className="w-full bg-app-bg border border-app-border rounded px-2 py-1.5 outline-none focus:border-app-accent1 text-xs text-app-text-bright"
-    />
-  );
-};
-
-const FloatInput = ({ value, onChange }: { value: number, onChange: (val: number) => void }) => {
-  const [localValue, setLocalValue] = useState(value === 0 ? "" : value.toString());
+  const [localValue, setLocalValue] = useState(value === 0 ? "" : value.toLocaleString('id-ID', { maximumFractionDigits: 2 }));
   const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     if (!isFocused) {
-      setLocalValue(value === 0 ? "" : value.toString());
+      setLocalValue(value === 0 ? "" : value.toLocaleString('id-ID', { maximumFractionDigits: 2 }));
+    }
+  }, [value, isFocused]);
+
+  return (
+    <div className="relative w-full min-w-[90px]">
+       <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] sm:text-xs text-app-text/50">Rp</span>
+       <input
+          type="text"
+          inputMode="decimal"
+          placeholder="0"
+          value={isFocused ? localValue : (value ? value.toLocaleString('id-ID', { maximumFractionDigits: 2 }) : "")}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => {
+            setIsFocused(false);
+            const val = localValue.replace(/\./g, '').replace(',', '.');
+            let num = parseFloat(val);
+            if (isNaN(num)) num = 0;
+            onChange(num);
+          }}
+          onChange={(e) => {
+            let val = e.target.value;
+            val = val.replace(/[^0-9,.]/g, '');
+            val = val.replace(/\./g, ',');
+            
+            const parts = val.split(',');
+            if (parts.length > 2) {
+              val = parts[0] + ',' + parts.slice(1).join('');
+            }
+            
+            let [intPart, decPart] = val.split(',');
+            if (intPart) {
+               intPart = parseInt(intPart.replace(/\D/g, ''), 10).toLocaleString('id-ID');
+            } else if (val === ',') {
+               intPart = "0";
+            }
+            
+            const formatted = val.includes(',') ? `${intPart},${decPart}` : (intPart || "");
+            setLocalValue(formatted);
+            
+            const parseVal = formatted.replace(/\./g, '').replace(',', '.');
+            let num = parseFloat(parseVal);
+            if (isNaN(num)) num = 0;
+            onChange(num);
+          }}
+          className="w-full bg-app-bg border border-app-border rounded pl-6 pr-2 py-1.5 outline-none focus:border-app-accent1 text-xs text-app-text-bright"
+       />
+    </div>
+  );
+};
+
+const FloatInput = ({ value, onChange }: { value: number, onChange: (val: number) => void }) => {
+  const [localValue, setLocalValue] = useState(value === 0 ? "" : value.toLocaleString('id-ID', { maximumFractionDigits: 4 }));
+  const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+    if (!isFocused) {
+      setLocalValue(value === 0 ? "" : value.toLocaleString('id-ID', { maximumFractionDigits: 4 }));
     }
   }, [value, isFocused]);
 
   return (
     <input
-      type="number"
-      step="0.01"
+      type="text"
+      inputMode="decimal"
       placeholder="0"
-      value={isFocused ? localValue : (value || '')}
+      value={isFocused ? localValue : (value ? value.toLocaleString('id-ID', { maximumFractionDigits: 4 }) : "")}
       onFocus={() => setIsFocused(true)}
       onBlur={() => {
         setIsFocused(false);
-        // Force sync on blur if needed
-        let num = parseFloat(localValue);
+        const val = localValue.replace(/\./g, '').replace(',', '.');
+        let num = parseFloat(val);
         if (isNaN(num)) num = 0;
         onChange(num);
       }}
       onChange={(e) => {
-        setLocalValue(e.target.value);
-        let num = parseFloat(e.target.value);
+        let val = e.target.value;
+        val = val.replace(/[^0-9,.]/g, '');
+        val = val.replace(/\./g, ',');
+        
+        const parts = val.split(',');
+        if (parts.length > 2) {
+          val = parts[0] + ',' + parts.slice(1).join('');
+        }
+        
+        let [intPart, decPart] = val.split(',');
+        if (intPart) {
+           intPart = parseInt(intPart.replace(/\D/g, ''), 10).toLocaleString('id-ID');
+        } else if (val === ',') {
+           intPart = "0";
+        }
+        
+        const formatted = val.includes(',') ? `${intPart},${decPart}` : (intPart || "");
+        setLocalValue(formatted);
+        
+        const parseVal = formatted.replace(/\./g, '').replace(',', '.');
+        let num = parseFloat(parseVal);
         if (isNaN(num)) num = 0;
         onChange(num);
       }}
@@ -67,6 +126,7 @@ const FloatInput = ({ value, onChange }: { value: number, onChange: (val: number
 export default function Attendance() {
   const { user, workSchedule, setWorkSchedule, attendancePeriodStart, attendancePeriodEnd, setAttendancePeriodStart, setAttendancePeriodEnd, salarySettings } = useStore();
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedPeriodStart, setSelectedPeriodStart] = useState<Date>(() => {
      const now = new Date();
      if (now.getDate() >= attendancePeriodStart) {
@@ -108,6 +168,11 @@ export default function Attendance() {
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [isSalaryModalOpen, setIsSalaryModalOpen] = useState(false);
+  const [isSaveSalaryModalOpen, setIsSaveSalaryModalOpen] = useState(false);
+  const [saveSalaryAmount, setSaveSalaryAmount] = useState<string>("");
+  const [saveSalaryAccountId, setSaveSalaryAccountId] = useState(localStorage.getItem('lastAccountId_gaji') || "");
+  const [saveSalaryDate, setSaveSalaryDate] = useState("");
   const [selectedDateForHours, setSelectedDateForHours] = useState<Date | null>(null);
   const [editingRecord, setEditingRecord] = useState<AttendanceRecord | null>(null);
   const [modalDate, setModalDate] = useState("");
@@ -156,6 +221,16 @@ export default function Attendance() {
 
     return () => unsubscribe();
   }, [user, selectedPeriodStart, attendancePeriodStart]);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsub = onSnapshot(collection(db, "users", user.uid, "accounts"), (snap) => {
+      const accts: Account[] = [];
+      snap.forEach(doc => accts.push({ id: doc.id, ...doc.data() } as Account));
+      setAccounts(accts);
+    });
+    return () => unsub();
+  }, [user]);
 
   const todayRecord = records.find(r => {
     const today = new Date();
@@ -380,9 +455,14 @@ export default function Attendance() {
   const todaySchedule = workSchedule?.days[todayDay];
 
   const attendanceActions = (
-    <ActionBtn variant="secondary" icon={<Calendar className="w-4 h-4" />} onClick={() => setIsScheduleModalOpen(true)}>
-      Pengaturan Jadwal
-    </ActionBtn>
+    <div className="flex gap-2">
+      <ActionBtn variant="secondary" icon={<Calendar className="w-4 h-4" />} onClick={() => setIsScheduleModalOpen(true)} className="!w-9 !px-0 sm:!w-auto sm:!px-4">
+        <span className="hidden sm:inline">Pengaturan Jadwal</span>
+      </ActionBtn>
+      <ActionBtn variant="secondary" icon={<Calculator className="w-4 h-4" />} onClick={() => setIsSalaryModalOpen(true)} className="!w-9 !px-0 sm:!w-auto sm:!px-4">
+        <span className="hidden sm:inline">Perhitungan Gaji</span>
+      </ActionBtn>
+    </div>
   );
 
   return (
@@ -395,11 +475,11 @@ export default function Attendance() {
       <div className="space-y-6 md:space-y-8">
 
         {/* Today's Actions */}
-        <HoverCard className="bg-app-card rounded-[24px] border border-app-border/40 p-5 shadow-sm relative overflow-hidden group transition-colors w-full">
+        <HoverCard className="bg-app-card rounded-[18px] border border-app-border p-5 shadow-sm relative overflow-hidden group transition-colors w-full">
           
           <div className="relative z-10">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-              <h2 className="font-bold text-app-text-bright flex items-center gap-2">
+              <h2 className="font-semibold text-app-text-bright flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-app-accent1" />
                 Absen Hari Ini - {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </h2>
@@ -416,7 +496,7 @@ export default function Attendance() {
                     <div className="text-center bg-app-card border border-app-border rounded-xl p-4 min-w-[120px] shadow-sm flex flex-col items-center">
                       <p className="text-xs text-app-text/60 mb-1 font-medium">Check In</p>
                       <div className="flex items-center gap-1.5 justify-center">
-                        <p className="font-bold text-app-text-bright text-xl">{todayRecord.checkIn ? new Date(todayRecord.checkIn).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) : '-'}</p>
+                        <p className="font-semibold text-app-text-bright text-xl">{todayRecord.checkIn ? new Date(todayRecord.checkIn).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) : '-'}</p>
                         {todayRecord.checkInLocation && (
                           <a href={`https://maps.google.com/?q=${todayRecord.checkInLocation.lat},${todayRecord.checkInLocation.lng}`} target="_blank" rel="noreferrer" className="text-app-accent1 hover:opacity-80">
                             <MapPin className="w-4 h-4" />
@@ -427,7 +507,7 @@ export default function Attendance() {
                     <div className="text-center bg-app-card border border-app-border rounded-xl p-4 min-w-[120px] shadow-sm flex flex-col items-center">
                       <p className="text-xs text-app-text/60 mb-1 font-medium">Check Out</p>
                       <div className="flex items-center gap-1.5 justify-center">
-                        <p className="font-bold text-app-text-bright text-xl">{todayRecord.checkOut ? new Date(todayRecord.checkOut).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) : '-'}</p>
+                        <p className="font-semibold text-app-text-bright text-xl">{todayRecord.checkOut ? new Date(todayRecord.checkOut).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) : '-'}</p>
                         {todayRecord.checkOutLocation && (
                           <a href={`https://maps.google.com/?q=${todayRecord.checkOutLocation.lat},${todayRecord.checkOutLocation.lng}`} target="_blank" rel="noreferrer" className="text-app-accent1 hover:opacity-80">
                             <MapPin className="w-4 h-4" />
@@ -452,7 +532,7 @@ export default function Attendance() {
                             </div>
                             <button
                               onClick={() => handleAction('checkOut')}
-                              className="w-full py-4 bg-app-danger text-app-bg rounded-xl font-bold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                              className="w-full py-4 bg-app-danger text-app-bg rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                             >
                               <Clock className="w-5 h-5" />
                               Absen Keluar
@@ -467,7 +547,7 @@ export default function Attendance() {
                  )}
                  
                  {todayRecord.notes && (
-                   <p className="text-sm text-app-text/70 mt-2 bg-app-card px-4 py-2 rounded-lg border border-app-border/50">Catatan: {todayRecord.notes}</p>
+                   <p className="text-sm text-app-text/70 mt-2 bg-app-card px-4 py-2 rounded-lg border border-app-border">Catatan: {todayRecord.notes}</p>
                  )}
               </div>
             ) : (
@@ -486,7 +566,7 @@ export default function Attendance() {
                         }`}
                       >
                         {getStatusIcon(s)}
-                        <span className="text-xs font-bold">{getStatusLabel(s)}</span>
+                        <span className="text-xs font-semibold">{getStatusLabel(s)}</span>
                       </button>
                     ))}
                   </div>
@@ -507,7 +587,7 @@ export default function Attendance() {
 
                 <button
                   onClick={() => handleAction('checkIn')}
-                  className="w-full py-4 bg-app-accent1 text-app-bg rounded-xl font-bold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-app-accent1 text-app-bg rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                 >
                   <Clock className="w-5 h-5" />
                   {status === 'present' ? 'Absen Masuk Sekarang' : `Simpan Status ${getStatusLabel(status)}`}
@@ -521,8 +601,8 @@ export default function Attendance() {
         <div>
            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
              <div className="flex items-center gap-4">
-               <h2 className="font-bold text-app-text-bright">Riwayat Kehadiran</h2>
-               <button onClick={openAddModal} className="flex items-center gap-1.5 px-3 py-1.5 bg-app-accent1/10 text-app-accent1 rounded-lg hover:bg-app-accent1/20 transition-colors text-xs font-bold">
+               <h2 className="font-semibold text-app-text-bright">Riwayat Kehadiran</h2>
+               <button onClick={openAddModal} className="flex items-center gap-1.5 px-3 py-1.5 bg-app-accent1/10 text-app-accent1 rounded-lg hover:bg-app-accent1/20 transition-colors text-xs font-semibold">
                   <Plus className="w-3.5 h-3.5" />
                   Manual
                </button>
@@ -559,10 +639,10 @@ export default function Attendance() {
              </div>
            </div>
 
-           <div className="bg-app-card p-4 rounded-xl border border-app-border/40">
+           <div className="bg-app-card p-4 rounded-xl border border-app-border">
              <div className="grid grid-cols-7 gap-1 text-center mb-2">
                {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(d => (
-                 <div key={d} className="text-[10px] font-bold text-app-text/50 uppercase py-1">{d}</div>
+                 <div key={d} className="text-[10px] font-semibold text-app-text/50 uppercase py-1">{d}</div>
                ))}
              </div>
              <div className="grid grid-cols-7 gap-1">
@@ -617,13 +697,13 @@ export default function Attendance() {
                         className={`p-1.5 min-h-[4.2rem] flex flex-col justify-between rounded-lg relative cursor-pointer hover:bg-app-card transition-colors border ${isToday ? 'bg-app-accent1/10 border-app-accent1 text-app-accent1' : 'bg-app-bg border-app-border text-app-text-bright'}`}
                       >
                          <div className="flex items-center justify-between w-full">
-                           <span className="text-xs font-bold pl-0.5">{d.getDate()}</span>
+                           <span className="text-xs font-semibold pl-0.5">{d.getDate()}</span>
                            {isToday && <span className="w-1.5 h-1.5 rounded-full bg-app-accent1 mr-0.5" />}
                          </div>
                          <div className="flex flex-col items-end text-right pr-0.5 mt-0.5 w-full overflow-hidden">
                            {hasRecord ? (
                              hasRecord.status === 'present' ? (
-                               <div className="text-[10px] text-app-success leading-tight flex flex-col font-bold gap-0 w-full">
+                               <div className="text-[10px] text-app-success leading-tight flex flex-col font-semibold gap-0 w-full">
                                  <span className="truncate block">{hasRecord.checkIn ? new Date(hasRecord.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
                                  <span className="truncate block">{hasRecord.checkOut ? new Date(hasRecord.checkOut).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
                                  {(() => {
@@ -647,12 +727,12 @@ export default function Attendance() {
                                </div>
                              )
                            ) : currentSchedule.isActive ? (
-                             <div className="text-[10px] text-app-text/40 leading-tight flex flex-col font-medium w-full">
+                             <div className="text-[10px] text-app-text/50 leading-tight flex flex-col font-medium w-full">
                                <span className="truncate block">{currentSchedule.start}</span>
                                <span className="truncate block">{currentSchedule.end}</span>
                              </div>
                            ) : (
-                             <div className="text-[10px] text-app-danger/50 leading-tight font-bold mt-0.5 truncate w-full">Libur</div>
+                             <div className="text-[10px] text-app-danger/50 leading-tight font-semibold mt-0.5 truncate w-full">Libur</div>
                            )}
                          </div>
                          {hasRecord && <div className={`w-1 h-1 rounded-full absolute bottom-1 left-1 ${hasRecord.status === 'present' ? 'bg-app-success' : hasRecord.status === 'absent' ? 'bg-app-danger' : hasRecord.status === 'leave' ? 'bg-app-warning' : 'bg-app-accent1'}`} />}
@@ -669,9 +749,9 @@ export default function Attendance() {
 
       {isScheduleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-3xl rounded-[24px] border border-app-border/40 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-app-bg w-full max-w-3xl rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
-              <h2 className="font-bold text-app-text-bright">Pengaturan Jadwal & Periode</h2>
+              <h2 className="font-semibold text-app-text-bright">Pengaturan Jadwal & Periode</h2>
               <button onClick={() => setIsScheduleModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
                 <X className="w-5 h-5" />
               </button>
@@ -679,14 +759,14 @@ export default function Attendance() {
             
             <div className="p-6 overflow-y-auto flex-1 space-y-6">
               
-              <div className="bg-app-card p-4 rounded-xl border border-app-border/40">
-                <h3 className="font-bold text-app-text-bright mb-4 text-sm flex items-center gap-2">
+              <div className="bg-app-card p-4 rounded-xl border border-app-border">
+                <h3 className="font-semibold text-app-text-bright mb-4 text-sm flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-app-accent1" />
                   Pengaturan Periode Absensi
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">Tgl Awal</label>
+                    <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">Tgl Awal</label>
                     <input 
                       type="number" min="1" max="31" 
                       value={attendancePeriodStart} 
@@ -702,7 +782,7 @@ export default function Attendance() {
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">Tgl Akhir</label>
+                    <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">Tgl Akhir</label>
                     <input 
                       type="number" min="1" max="31" 
                       value={attendancePeriodEnd} 
@@ -721,9 +801,9 @@ export default function Attendance() {
                 <p className="text-xs text-app-text/50 mt-3">Perubahan periode akan langsung tersimpan. Contoh: Awal 19, Akhir 18.</p>
               </div>
 
-              <div className="bg-app-card p-4 rounded-xl border border-app-border/40">
+              <div className="bg-app-card p-4 rounded-xl border border-app-border">
                  <div className="flex items-center justify-between mb-4">
-                   <h3 className="font-bold text-app-text-bright text-sm">Pratinjau Kalender Periode Ini</h3>
+                   <h3 className="font-semibold text-app-text-bright text-sm">Pratinjau Kalender Periode Ini</h3>
                    <div className="flex items-center gap-2">
                      <button 
                        onClick={() => setSelectedPeriodStart(new Date(selectedPeriodStart.getFullYear(), selectedPeriodStart.getMonth() - 1, attendancePeriodStart))}
@@ -757,7 +837,7 @@ export default function Attendance() {
                  </div>
                  <div className="grid grid-cols-7 gap-1 text-center mb-2">
                    {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(d => (
-                     <div key={d} className="text-[10px] font-bold text-app-text/50 uppercase py-1">{d}</div>
+                     <div key={d} className="text-[10px] font-semibold text-app-text/50 uppercase py-1">{d}</div>
                    ))}
                  </div>
                  <div className="grid grid-cols-7 gap-1">
@@ -813,13 +893,13 @@ export default function Attendance() {
                             className={`p-1.5 min-h-[4.2rem] flex flex-col justify-between rounded-lg relative cursor-pointer hover:bg-app-card transition-colors border ${isToday ? 'bg-app-accent1/10 border-app-accent1 text-app-accent1' : 'bg-app-bg border-app-border text-app-text-bright'}`}
                           >
                              <div className="flex items-center justify-between w-full">
-                               <span className="text-xs font-bold pl-0.5">{d.getDate()}</span>
+                               <span className="text-xs font-semibold pl-0.5">{d.getDate()}</span>
                                {isToday && <span className="w-1.5 h-1.5 rounded-full bg-app-accent1 mr-0.5" />}
                              </div>
                              <div className="flex flex-col items-end text-right pr-0.5 mt-0.5 w-full overflow-hidden">
                                {hasRecord ? (
                                  hasRecord.status === 'present' ? (
-                                   <div className="text-[10px] text-app-success leading-tight flex flex-col font-bold gap-0 w-full">
+                                   <div className="text-[10px] text-app-success leading-tight flex flex-col font-semibold gap-0 w-full">
                                      <span className="truncate block">{hasRecord.checkIn ? new Date(hasRecord.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
                                      <span className="truncate block">{hasRecord.checkOut ? new Date(hasRecord.checkOut).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
                                      {(() => {
@@ -843,12 +923,12 @@ export default function Attendance() {
                                    </div>
                                  )
                                ) : currentSchedule.isActive ? (
-                                 <div className="text-[10px] text-app-text/40 leading-tight flex flex-col font-medium w-full">
+                                 <div className="text-[10px] text-app-text/50 leading-tight flex flex-col font-medium w-full">
                                    <span className="truncate block">{currentSchedule.start}</span>
                                    <span className="truncate block">{currentSchedule.end}</span>
                                  </div>
                                ) : (
-                                 <div className="text-[10px] text-app-danger/50 leading-tight font-bold mt-0.5 truncate w-full">Libur</div>
+                                 <div className="text-[10px] text-app-danger/50 leading-tight font-semibold mt-0.5 truncate w-full">Libur</div>
                                )}
                              </div>
                              {hasRecord && <div className={`w-1 h-1 rounded-full absolute bottom-1 left-1 ${hasRecord.status === 'present' ? 'bg-app-success' : hasRecord.status === 'absent' ? 'bg-app-danger' : hasRecord.status === 'leave' ? 'bg-app-warning' : 'bg-app-accent1'}`} />}
@@ -859,12 +939,60 @@ export default function Attendance() {
                  </div>
               </div>
 
-               {/* Salary Calculation */}
-               <div className="bg-app-card p-4 rounded-[24px] border border-app-border/40 overflow-x-auto shadow-sm">
-                  <h3 className="font-bold text-app-text-bright mb-4 text-sm flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-app-accent1" />
-                    Perhitungan Gaji
-                  </h3>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isSalaryModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-app-bg w-full max-w-3xl rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between p-4 border-b border-app-border">
+              <h2 className="font-semibold text-app-text-bright">Perhitungan Gaji</h2>
+              <button onClick={() => setIsSalaryModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto flex-1 space-y-6">
+              {/* Salary Calculation */}
+               <div className="bg-app-card p-4 rounded-[18px] border border-app-border overflow-x-auto shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
+                    <h3 className="font-semibold text-app-text-bright text-sm flex items-center gap-2">
+                      <Calculator className="w-4 h-4 text-app-accent1" />
+                      Perhitungan Gaji
+                    </h3>
+                    <div className="flex items-center gap-2 self-start sm:self-auto">
+                      <button 
+                        onClick={() => setSelectedPeriodStart(new Date(selectedPeriodStart.getFullYear(), selectedPeriodStart.getMonth() - 1, attendancePeriodStart))}
+                        className="p-1 text-app-text/50 hover:text-app-text-bright transition-colors bg-app-bg rounded-md border border-app-border"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                      </button>
+                      <span className="text-xs font-medium text-app-text-bright bg-app-bg px-2 py-1 rounded border border-app-border">
+                        {(() => {
+                          const end = new Date(selectedPeriodStart);
+                          if (attendancePeriodEnd < attendancePeriodStart) {
+                              end.setMonth(end.getMonth() + 1);
+                          }
+                          const targetMonth = end.getMonth();
+                          end.setDate(attendancePeriodEnd);
+                          if (end.getMonth() !== targetMonth) {
+                             end.setDate(0);
+                          }
+                          const startStr = selectedPeriodStart.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+                          const endStr = end.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                          return `${startStr} - ${endStr}`;
+                        })()}
+                      </span>
+                      <button 
+                        onClick={() => setSelectedPeriodStart(new Date(selectedPeriodStart.getFullYear(), selectedPeriodStart.getMonth() + 1, attendancePeriodStart))}
+                        className="p-1 text-app-text/50 hover:text-app-text-bright transition-colors bg-app-bg rounded-md border border-app-border"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                      </button>
+                    </div>
+                  </div>
                   {(() => {
                     const hariMasuk = records.filter(r => r.status === 'present').length;
                     const tidakMasuk = records.filter(r => r.status !== 'present').length;
@@ -933,92 +1061,222 @@ export default function Attendance() {
                     const formatRp = (num: number) => `Rp${num.toLocaleString('id-ID')}`;
                     
                     return (
-                      <table className="w-full text-left border-collapse text-sm min-w-[500px]">
-                        <thead>
-                          <tr className="border-b border-app-border text-app-text/70 uppercase text-[10px] tracking-wider">
-                            <th className="py-2 font-bold w-1/3">Komponen</th>
-                            <th className="py-2 font-bold w-1/4">Nilai Dasar</th>
-                            <th className="py-2 font-bold w-1/6 text-center">Faktor</th>
-                            <th className="py-2 font-bold text-right">Total</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-app-border/50">
-                          <tr>
-                            <td className="py-3 font-medium text-app-text-bright">Gaji Pokok</td>
-                            <td className="py-2">
-                              <CurrencyInput value={s.gajiPokok || 0} onChange={(val) => handleUpdateSalarySettings('gajiPokok', val)} />
-                            </td>
-                            <td className="py-2 text-center text-app-text/50">-</td>
-                            <td className="py-2 text-right font-bold text-app-text-bright">{formatRp(totalGajiPokok)}</td>
-                          </tr>
-                          <tr>
-                            <td className="py-3 font-medium text-app-text-bright">Uang Harian</td>
-                            <td className="py-2">
-                              <CurrencyInput value={s.uangHarian || 0} onChange={(val) => handleUpdateSalarySettings('uangHarian', val)} />
-                            </td>
-                            <td className="py-2 text-center text-app-text-bright font-bold">{hariMasuk}</td>
-                            <td className="py-2 text-right font-bold text-app-text-bright">{formatRp(totalUangHarian)}</td>
-                          </tr>
-                          <tr>
-                            <td className="py-3 font-medium text-app-text-bright">Uang Kerajinan</td>
-                            <td className="py-2">
-                              <CurrencyInput value={s.uangKerajinan || 0} onChange={(val) => handleUpdateSalarySettings('uangKerajinan', val)} />
-                            </td>
-                            <td className="py-2 text-center text-app-text/50">-</td>
-                            <td className="py-2 text-right font-bold text-app-text-bright">{formatRp(totalUangKerajinan)}</td>
-                          </tr>
-                          <tr>
-                            <td className="py-3 font-medium text-app-text-bright">Uang Makan</td>
-                            <td className="py-2">
-                              <CurrencyInput value={s.uangMakan || 0} onChange={(val) => handleUpdateSalarySettings('uangMakan', val)} />
-                            </td>
-                            <td className="py-2 text-center text-app-text-bright font-bold">{hariMasuk}</td>
-                            <td className="py-2 text-right font-bold text-app-text-bright">{formatRp(totalUangMakan)}</td>
-                          </tr>
-                          <tr>
-                            <td className="py-3 font-medium text-app-text-bright">Uang Tunjangan</td>
-                            <td className="py-2">
-                              <CurrencyInput value={s.uangTunjangan || 0} onChange={(val) => handleUpdateSalarySettings('uangTunjangan', val)} />
-                            </td>
-                            <td className="py-2 text-center text-app-text/50">-</td>
-                            <td className="py-2 text-right font-bold text-app-text-bright">{formatRp(totalUangTunjangan)}</td>
-                          </tr>
-                          <tr className="bg-app-accent1/5">
-                            <td className="py-3 font-medium text-app-accent1 pl-2">Hari Masuk Reguler</td>
-                            <td className="py-2"></td>
-                            <td className="py-2 text-center text-app-accent1 font-bold">{hariKerjaSeharusnya}</td>
-                            <td className="py-2 text-right"></td>
-                          </tr>
-                          <tr className="bg-app-danger/5">
-                            <td className="py-3 font-medium text-app-danger pl-2">Tidak Masuk (Sakit, Izin, Alpha)</td>
-                            <td className="py-2"></td>
-                            <td className="py-2 text-center text-app-danger font-bold">{tidakMasuk}</td>
-                            <td className="py-2 text-right"></td>
-                          </tr>
-                          <tr>
-                            <td className="py-3 font-medium text-app-text-bright">Lembur</td>
-                            <td className="py-2">
-                              <CurrencyInput value={s.uangLemburPerJam || 0} onChange={(val) => handleUpdateSalarySettings('uangLemburPerJam', val)} />
-                            </td>
-                            <td className="py-2 text-center relative group">
-                              <FloatInput value={finalLemburHours} onChange={(val) => handleUpdateSalarySettings('lemburHours', val)} />
-                              <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-app-card border border-app-border text-[10px] p-2 rounded shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10 transition-opacity">
-                                <div>Otomatis: {autoLembur.toLocaleString('id-ID', {maximumFractionDigits:5})}j</div>
-                                <div className="text-app-text/50">Ketik manual untuk menimpa</div>
-                              </div>
-                            </td>
-                            <td className="py-2 text-right font-bold text-app-text-bright">{formatRp(totalLembur)}</td>
-                          </tr>
-                          <tr className="border-t-2 border-app-border">
-                            <td className="py-4 font-bold text-app-text-bright text-base" colSpan={3}>Total</td>
-                            <td className="py-4 text-right font-bold text-app-warning text-base"><span className="bg-app-warning/10 px-3 py-1.5 rounded-lg">{formatRp(total)}</span></td>
-                          </tr>
-                        </tbody>
-                      </table>
+                      <>
+                      <div className="w-full overflow-x-auto">
+                        <table className="w-full min-w-[450px] text-left border-collapse text-xs sm:text-sm">
+                          <thead>
+                            <tr className="border-b border-app-border text-app-text/70 uppercase text-[10px] tracking-wider">
+                              <th className="py-2 font-semibold">Komponen</th>
+                              <th className="py-2 font-semibold px-2 w-[120px]">Nilai Dasar</th>
+                              <th className="py-2 font-semibold px-2 text-center w-[70px]">Faktor</th>
+                              <th className="py-2 font-semibold text-right">Total</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-app-border/50">
+                            <tr>
+                              <td className="py-3 pr-2 font-medium text-app-text-bright">Gaji Pokok</td>
+                              <td className="py-2 px-2">
+                                <CurrencyInput value={s.gajiPokok || 0} onChange={(val) => handleUpdateSalarySettings('gajiPokok', val)} />
+                              </td>
+                              <td className="py-2 px-2 text-center text-app-text/50">-</td>
+                              <td className="py-2 pl-2 text-right font-semibold text-app-text-bright">{formatRp(totalGajiPokok)}</td>
+                            </tr>
+                            <tr>
+                              <td className="py-3 pr-2 font-medium text-app-text-bright">Uang Harian</td>
+                              <td className="py-2 px-2">
+                                <CurrencyInput value={s.uangHarian || 0} onChange={(val) => handleUpdateSalarySettings('uangHarian', val)} />
+                              </td>
+                              <td className="py-2 px-2 text-center text-app-text-bright font-semibold">{hariMasuk}</td>
+                              <td className="py-2 pl-2 text-right font-semibold text-app-text-bright">{formatRp(totalUangHarian)}</td>
+                            </tr>
+                            <tr>
+                              <td className="py-3 pr-2 font-medium text-app-text-bright">Uang Kerajinan</td>
+                              <td className="py-2 px-2">
+                                <CurrencyInput value={s.uangKerajinan || 0} onChange={(val) => handleUpdateSalarySettings('uangKerajinan', val)} />
+                              </td>
+                              <td className="py-2 px-2 text-center text-app-text/50">-</td>
+                              <td className="py-2 pl-2 text-right font-semibold text-app-text-bright">{formatRp(totalUangKerajinan)}</td>
+                            </tr>
+                            <tr>
+                              <td className="py-3 pr-2 font-medium text-app-text-bright">Uang Makan</td>
+                              <td className="py-2 px-2">
+                                <CurrencyInput value={s.uangMakan || 0} onChange={(val) => handleUpdateSalarySettings('uangMakan', val)} />
+                              </td>
+                              <td className="py-2 px-2 text-center text-app-text-bright font-semibold">{hariMasuk}</td>
+                              <td className="py-2 pl-2 text-right font-semibold text-app-text-bright">{formatRp(totalUangMakan)}</td>
+                            </tr>
+                            <tr>
+                              <td className="py-3 pr-2 font-medium text-app-text-bright">Uang Tunjangan</td>
+                              <td className="py-2 px-2">
+                                <CurrencyInput value={s.uangTunjangan || 0} onChange={(val) => handleUpdateSalarySettings('uangTunjangan', val)} />
+                              </td>
+                              <td className="py-2 px-2 text-center text-app-text/50">-</td>
+                              <td className="py-2 pl-2 text-right font-semibold text-app-text-bright">{formatRp(totalUangTunjangan)}</td>
+                            </tr>
+                            <tr className="bg-app-accent1/5">
+                              <td className="py-3 pr-2 font-medium text-app-accent1 pl-2">Hari Masuk Reguler</td>
+                              <td className="py-2 px-2"></td>
+                              <td className="py-2 px-2 text-center text-app-accent1 font-semibold">{hariKerjaSeharusnya}</td>
+                              <td className="py-2 pl-2 text-right"></td>
+                            </tr>
+                            <tr className="bg-app-danger/5">
+                              <td className="py-3 pr-2 font-medium text-app-danger pl-2">Tidak Masuk (Sakit, Izin, Alpha)</td>
+                              <td className="py-2 px-2"></td>
+                              <td className="py-2 px-2 text-center text-app-danger font-semibold">{tidakMasuk}</td>
+                              <td className="py-2 pl-2 text-right"></td>
+                            </tr>
+                            <tr>
+                              <td className="py-3 pr-2 font-medium text-app-text-bright">Lembur</td>
+                              <td className="py-2 px-2">
+                                <CurrencyInput value={s.uangLemburPerJam || 0} onChange={(val) => handleUpdateSalarySettings('uangLemburPerJam', val)} />
+                              </td>
+                              <td className="py-2 px-2 text-center relative group">
+                                <FloatInput value={finalLemburHours} onChange={(val) => handleUpdateSalarySettings('lemburHours', val)} />
+                                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-app-card border border-app-border text-[10px] p-2 rounded shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10 transition-opacity">
+                                  <div>Otomatis: {autoLembur.toLocaleString('id-ID', {maximumFractionDigits:5})}j</div>
+                                  <div className="text-app-text/50">Ketik manual untuk menimpa</div>
+                                </div>
+                              </td>
+                              <td className="py-2 pl-2 text-right font-semibold text-app-text-bright">{formatRp(totalLembur)}</td>
+                            </tr>
+                            <tr className="border-t-2 border-app-border">
+                              <td className="py-4 font-semibold text-app-text-bright text-sm sm:text-base" colSpan={3}>Total</td>
+                              <td className="py-4 text-right font-semibold text-app-warning text-sm sm:text-base"><span className="bg-app-warning/10 px-2 py-1 rounded-lg whitespace-nowrap">{formatRp(total)}</span></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="mt-6 flex justify-end">
+                        <button 
+                          onClick={() => {
+                            // format the total with id-ID locale, but convert it to string that uses dots and commas
+                            setSaveSalaryAmount(total.toLocaleString('id-ID', { maximumFractionDigits: 10 }));
+                            setSaveSalaryDate(new Date().toISOString().split('T')[0]);
+                            setIsSaveSalaryModalOpen(true);
+                          }}
+                          className="bg-app-accent1 hover:bg-app-accent2 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                        >
+                          Simpan sebagai Pemasukan
+                        </button>
+                      </div>
+                    </>
                     );
                   })()}
-               </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
+      {isSaveSalaryModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-app-bg w-full max-w-sm rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-app-border">
+              <h2 className="font-semibold text-app-text-bright">Simpan Pemasukan</h2>
+              <button onClick={() => setIsSaveSalaryModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-app-text/70 mb-1">Jumlah</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-app-text/50">Rp</span>
+                  <input
+                    type="text"
+                    value={saveSalaryAmount}
+                    onChange={(e) => {
+                      let val = e.target.value;
+                      // Remove anything that is not a digit or comma
+                      val = val.replace(/[^0-9,]/g, '');
+                      // Only allow one comma
+                      const parts = val.split(',');
+                      if (parts.length > 2) {
+                        val = parts[0] + ',' + parts.slice(1).join('');
+                      }
+                      
+                      // Format the integer part with dots
+                      if (val) {
+                         const hasComma = val.includes(',');
+                         let [intPart, decPart] = val.split(',');
+                         if (intPart) {
+                            intPart = parseInt(intPart, 10).toLocaleString('id-ID');
+                         }
+                         setSaveSalaryAmount(hasComma ? `${intPart},${decPart}` : intPart);
+                      } else {
+                         setSaveSalaryAmount("");
+                      }
+                    }}
+                    className="w-full bg-app-card border border-app-border rounded-lg pl-9 pr-3 py-2 outline-none focus:border-app-accent1 text-app-text-bright"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-app-text/70 mb-1">Rekening Tujuan</label>
+                <select
+                  value={saveSalaryAccountId}
+                  onChange={(e) => {
+                  setSaveSalaryAccountId(e.target.value);
+                  localStorage.setItem('lastAccountId_gaji', e.target.value);
+                }}
+                  className="w-full bg-app-card border border-app-border rounded-lg px-3 py-2 outline-none focus:border-app-accent1 text-app-text-bright"
+                >
+                  <option value="">Pilih Rekening</option>
+                  {accounts.map((a) => (
+                    <option key={a.id} value={a.id}>{a.name} (Rp{a.balance?.toLocaleString('id-ID') || 0})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="pt-4 flex gap-3">
+                <button
+                  onClick={() => setIsSaveSalaryModalOpen(false)}
+                  className="flex-1 bg-app-card hover:bg-app-border text-app-text-bright py-2 rounded-lg font-medium transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={async () => {
+                    const amountValue = parseFloat(saveSalaryAmount.replace(/\./g, '').replace(',', '.'));
+                    if (!user || isNaN(amountValue) || amountValue <= 0 || !saveSalaryAccountId) {
+                      toast.error("Harap isi jumlah dan rekening tujuan dengan benar");
+                      return;
+                    }
+                    try {
+                      const batch = writeBatch(db);
+                      
+                      const tsxRef = doc(collection(db, "users", user.uid, "transactions"));
+                      const startOfPeriod = new Date(selectedPeriodStart);
+                      
+                      batch.set(tsxRef, {
+                          type: "income",
+                          amount: amountValue,
+                          date: Date.now(),
+                          accountId: saveSalaryAccountId,
+                          note: `Gaji periode ${startOfPeriod.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`,
+                          categoryId: "", 
+                      });
+                      
+                      const accRef = doc(db, "users", user.uid, "accounts", saveSalaryAccountId);
+                      const accDoc = await getDoc(accRef);
+                      if (accDoc.exists()) {
+                         const currentBal = accDoc.data().balance || 0;
+                         batch.update(accRef, { balance: currentBal + amountValue });
+                      }
+                      
+                      await batch.commit();
+                      toast.success("Gaji berhasil disimpan sebagai pemasukan!");
+                      setIsSaveSalaryModalOpen(false);
+                      setIsSalaryModalOpen(false);
+                    } catch (e) {
+                      console.error("Error saving salary:", e);
+                      toast.error("Gagal menyimpan gaji");
+                    }
+                  }}
+                  className="flex-1 bg-app-accent1 hover:bg-app-accent2 text-white py-2 rounded-lg font-medium transition-colors"
+                >
+                  Simpan
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1026,9 +1284,9 @@ export default function Attendance() {
 
       {selectedDateForHours && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-sm rounded-[24px] border border-app-border/40 shadow-2xl overflow-hidden flex flex-col">
+          <div className="bg-app-bg w-full max-w-sm rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
-              <h2 className="font-bold text-app-text-bright">Jam Kerja ({selectedDateForHours.toLocaleDateString('id-ID')})</h2>
+              <h2 className="font-semibold text-app-text-bright">Jam Kerja ({selectedDateForHours.toLocaleDateString('id-ID')})</h2>
               <button onClick={() => setSelectedDateForHours(null)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
                 <X className="w-5 h-5" />
               </button>
@@ -1126,9 +1384,9 @@ export default function Attendance() {
 
       {selectedDateActionMenu && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-xs rounded-[24px] border border-app-border/40 shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
+          <div className="bg-app-bg w-full max-w-xs rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between p-4 border-b border-app-border bg-app-card/30">
-              <h2 className="font-bold text-app-text-bright text-sm">Pilih Tindakan</h2>
+              <h2 className="font-semibold text-app-text-bright text-sm">Pilih Tindakan</h2>
               <button 
                 onClick={() => setSelectedDateActionMenu(null)} 
                 className="p-1.5 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card"
@@ -1137,9 +1395,9 @@ export default function Attendance() {
               </button>
             </div>
             <div className="p-4 space-y-3.5">
-              <div className="text-center pb-2 border-b border-app-border/30">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-app-text/40 block mb-0.5">Tanggal</span>
-                <span className="text-sm font-bold text-app-text-bright">
+              <div className="text-center pb-2 border-b border-app-border">
+                <span className="text-[10px] uppercase font-semibold tracking-wider text-app-text/50 block mb-0.5">Tanggal</span>
+                <span className="text-sm font-semibold text-app-text-bright">
                   {selectedDateActionMenu.date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                 </span>
               </div>
@@ -1171,7 +1429,7 @@ export default function Attendance() {
                     <div className="bg-app-card rounded-xl p-3 border border-app-border space-y-2 mb-3">
                        <div className="flex justify-between items-center text-xs">
                          <span className="text-app-text/60">Status</span>
-                         <span className={`font-bold ${getStatusColor(record.status)} px-2 py-0.5 rounded border text-[10px] uppercase`}>{getStatusLabel(record.status)}</span>
+                         <span className={`font-semibold ${getStatusColor(record.status)} px-2 py-0.5 rounded border text-[10px] uppercase`}>{getStatusLabel(record.status)}</span>
                        </div>
                        {record.status === 'present' && (
                          <>
@@ -1186,15 +1444,15 @@ export default function Attendance() {
                            {diffStr && (
                              <div className="flex justify-between items-center text-xs">
                                <span className="text-app-text/60">Total Lembur</span>
-                               <span className="font-bold text-app-warning">{diffStr}</span>
+                               <span className="font-semibold text-app-warning">{diffStr}</span>
                              </div>
                            )}
                          </>
                        )}
                        {record.notes && (
-                         <div className="pt-2 border-t border-app-border/50 mt-2">
-                           <span className="block text-[10px] text-app-text/50 uppercase font-bold mb-1">Catatan</span>
-                           <p className="text-xs text-app-text-bright bg-app-bg p-2 rounded-lg border border-app-border/50">{record.notes}</p>
+                         <div className="pt-2 border-t border-app-border mt-2">
+                           <span className="block text-[10px] text-app-text/50 uppercase font-semibold mb-1">Catatan</span>
+                           <p className="text-xs text-app-text-bright bg-app-bg p-2 rounded-lg border border-app-border">{record.notes}</p>
                          </div>
                        )}
                     </div>
@@ -1214,7 +1472,7 @@ export default function Attendance() {
                       openAddModalForDate(date);
                     }
                   }}
-                  className="w-full py-3 px-4 bg-app-accent1 text-app-bg hover:opacity-90 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full py-3 px-4 bg-app-accent1 text-app-bg hover:opacity-90 rounded-2xl font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
                 >
                   <Calendar className="w-4 h-4" />
                   {selectedDateActionMenu.hasRecord ? 'Edit Absensi' : 'Tambah Absensi'}
@@ -1227,7 +1485,7 @@ export default function Attendance() {
                       setSelectedDateActionMenu(null);
                       handleDelete(hasRecord);
                     }}
-                    className="w-full py-3 px-4 bg-app-danger/10 text-app-danger hover:bg-app-danger/20 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
+                    className="w-full py-3 px-4 bg-app-danger/10 text-app-danger hover:bg-app-danger/20 rounded-2xl font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
                   >
                     <Trash2 className="w-4 h-4" />
                     Hapus
@@ -1241,7 +1499,7 @@ export default function Attendance() {
                   setSelectedDateActionMenu(null);
                   setSelectedDateForHours(date);
                 }}
-                className="w-full py-3 px-4 bg-app-card text-app-text-bright hover:bg-app-hover border border-app-border rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 bg-app-card text-app-text-bright hover:bg-app-hover border border-app-border rounded-2xl font-semibold text-xs transition-all flex items-center justify-center gap-2"
               >
                 <Clock className="w-4 h-4" />
                 Edit Jadwal Kerja
@@ -1253,9 +1511,9 @@ export default function Attendance() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-md rounded-[24px] border border-app-border/40 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-app-bg w-full max-w-md rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
-              <h2 className="font-bold text-app-text-bright">{editingRecord ? 'Edit Absensi' : 'Tambah Absensi Manual'}</h2>
+              <h2 className="font-semibold text-app-text-bright">{editingRecord ? 'Edit Absensi' : 'Tambah Absensi Manual'}</h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
                 <X className="w-5 h-5" />
               </button>
@@ -1263,7 +1521,7 @@ export default function Attendance() {
             
             <div className="p-4 overflow-y-auto flex-1 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">Tanggal</label>
+                <label className="block text-xs font-semibold text-app-text/70 mb-2 uppercase tracking-wider">Tanggal</label>
                 <input
                   type="date"
                   value={modalDate}
@@ -1273,7 +1531,7 @@ export default function Attendance() {
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">Status Kehadiran</label>
+                <label className="block text-xs font-semibold text-app-text/70 mb-2 uppercase tracking-wider">Status Kehadiran</label>
                 <div className="grid grid-cols-2 gap-2">
                   {(['present', 'absent', 'leave', 'sick'] as const).map((s) => (
                     <button
@@ -1285,7 +1543,7 @@ export default function Attendance() {
                       }`}
                     >
                       {getStatusIcon(s)}
-                      <span className="text-[10px] font-bold">{getStatusLabel(s)}</span>
+                      <span className="text-[10px] font-semibold">{getStatusLabel(s)}</span>
                     </button>
                   ))}
                 </div>
@@ -1294,7 +1552,7 @@ export default function Attendance() {
               {modalStatus === 'present' && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">Jam Masuk</label>
+                    <label className="block text-xs font-semibold text-app-text/70 mb-2 uppercase tracking-wider">Jam Masuk</label>
                     <input
                       type="time"
                       value={modalCheckIn}
@@ -1303,7 +1561,7 @@ export default function Attendance() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">Jam Keluar</label>
+                    <label className="block text-xs font-semibold text-app-text/70 mb-2 uppercase tracking-wider">Jam Keluar</label>
                     <input
                       type="time"
                       value={modalCheckOut}
@@ -1315,7 +1573,7 @@ export default function Attendance() {
               )}
               
               <div>
-                <label className="block text-xs font-bold text-app-text/70 mb-2 uppercase tracking-wider">Catatan (Opsional)</label>
+                <label className="block text-xs font-semibold text-app-text/70 mb-2 uppercase tracking-wider">Catatan (Opsional)</label>
                 <input
                   type="text"
                   value={modalNotes}
@@ -1329,7 +1587,7 @@ export default function Attendance() {
             <div className="p-4 border-t border-app-border bg-app-card">
               <button
                 onClick={handleSaveModal}
-                className="w-full py-3.5 bg-app-accent1 text-app-bg rounded-xl font-bold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                className="w-full py-3.5 bg-app-accent1 text-app-bg rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
               >
                 Simpan
               </button>

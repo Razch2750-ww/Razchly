@@ -89,10 +89,10 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.94, opacity: 0, y: 15 }}
             transition={{ type: "spring", damping: 20, stiffness: 200 }}
-            className="bg-app-card text-app-text w-full max-w-md rounded-[24px] shadow-2xl border border-app-border/40 overflow-hidden"
+            className="bg-app-card text-app-text w-full max-w-md rounded-[18px] shadow-2xl border border-app-border overflow-hidden"
           >
-            <div className="px-6 py-5 border-b border-app-border/40 flex justify-between items-center bg-app-bg/50">
-              <h2 className="text-lg font-bold text-app-text-bright">
+            <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg/50">
+              <h2 className="text-lg font-semibold text-app-text-bright">
                 {account ? "Edit Rekening" : "Tambah Rekening"}
               </h2>
               <button
@@ -105,7 +105,7 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
             </div>
             <form onSubmit={saveAccount} className="p-6 space-y-5">
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider mb-2.5 block text-app-text/70">
+                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2.5 block text-app-text/70">
                   Ikon Rekening
                 </label>
                 <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
@@ -119,7 +119,7 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
                       className={`flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl border transition-all cursor-pointer ${
                         icon === iconItem.id
                           ? "border-app-accent1 bg-app-accent1/15 shadow-sm text-app-accent1"
-                          : "border-app-border/40 bg-app-bg/30 text-app-text/60 hover:text-app-text-bright hover:bg-app-hover"
+                          : "border-app-border bg-app-bg/30 text-app-text/60 hover:text-app-text-bright hover:bg-app-hover"
                       }`}
                     >
                       <AccountIcon iconId={iconItem.id} className="w-7 h-7" />
@@ -149,7 +149,7 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
                   inputMode="numeric"
                   value={balance}
                   onChange={(e) => setBalance(formatNumberInput(e.target.value))}
-                  className="floating-label-input font-mono text-xl font-bold text-app-accent1 tracking-wide"
+                  className="floating-label-input font-mono text-xl font-semibold text-app-accent1 tracking-wide"
                   placeholder="0"
                   id="acc-balance"
                   required
@@ -166,7 +166,7 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
                   whileTap={{ scale: 0.98 }}
                   onClick={onClose}
                   disabled={isSaving}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-sm bg-app-hover hover:bg-app-border/50 text-app-text transition-colors disabled:opacity-50 cursor-pointer"
+                  className="flex-1 py-3.5 rounded-xl font-semibold text-sm bg-app-hover hover:bg-app-border/50 text-app-text transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   Batal
                 </motion.button>
@@ -175,7 +175,7 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   disabled={isSaving}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-sm bg-app-accent1 text-app-bg hover:opacity-95 transition-all shadow-lg shadow-app-accent1/10 disabled:opacity-50 cursor-pointer"
+                  className="flex-1 py-3.5 rounded-xl font-semibold text-sm bg-app-accent1 text-app-bg hover:opacity-95 transition-all shadow-lg shadow-app-accent1/10 disabled:opacity-50 cursor-pointer"
                 >
                   {isSaving ? "Menyimpan..." : "Simpan"}
                 </motion.button>

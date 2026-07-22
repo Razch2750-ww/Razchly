@@ -406,7 +406,7 @@ export default function Settings() {
 
       <ScrollReveal className="flex-1 space-y-6 pb-10">
         
-        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('profil')} className={`relative z-10 w-full flex items-center justify-between ${sections.profil ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
@@ -427,7 +427,7 @@ export default function Settings() {
               <input type="url" value={photoURL} onChange={e => setPhotoURL(e.target.value)} className="w-full bg-app-bg border border-app-border rounded-lg px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright placeholder-app-text/30" placeholder="https://..." />
             </div>
             <div className="pt-2">
-              <button type="submit" disabled={isUpdatingProfile} className="bg-app-accent1 disabled:opacity-800 disabled:cursor-not-allowed hover:bg-opacity-90 text-white px-6 py-3 rounded-lg text-sm font-bold transition-colors">
+              <button type="submit" disabled={isUpdatingProfile} className="bg-app-accent1 disabled:opacity-800 disabled:cursor-not-allowed hover:bg-opacity-90 text-app-bg px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
                 {isUpdatingProfile ? t('settings.profil.savingBtn') : t('settings.profil.saveBtn')}
               </button>
             </div>
@@ -435,7 +435,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
           <button type="button" onClick={() => toggleSection('rekening')} className={`relative z-10 w-full flex items-center justify-between ${sections.rekening ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
@@ -450,7 +450,7 @@ export default function Settings() {
             <div className="flex justify-end mb-4">
               <button 
                 onClick={openAddModal}
-                className="flex items-center gap-2 bg-app-accent1 text-app-bg px-4 py-2 rounded-xl font-bold hover:opacity-90 transition-opacity text-sm"
+                className="flex items-center gap-2 bg-app-accent1 text-app-bg px-4 py-2 rounded-xl font-semibold hover:opacity-90 transition-opacity text-sm"
               >
                 <Plus className="w-4 h-4" />
                 <span>{t('settings.rekening.addBtn')}</span>
@@ -506,8 +506,8 @@ export default function Settings() {
                       </div>
                     </div>
                     <div className="relative z-10">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-app-text mb-1 block">{t('settings.rekening.currentBalance')}</p>
-                      <p className="text-xl font-bold font-mono text-app-text-bright truncate">
+                      <p className="text-[10px] uppercase tracking-wider font-semibold text-app-text mb-1 block">{t('settings.rekening.currentBalance')}</p>
+                      <p className="text-xl font-semibold font-mono text-app-text-bright truncate">
                         Rp {acc.balance.toLocaleString('id-ID')}
                       </p>
                     </div>
@@ -521,12 +521,12 @@ export default function Settings() {
         </section>
 
         {/* SECTION: DAFTAR KATEGORI */}
-        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('kategori')} className={`relative z-10 w-full flex items-center justify-between ${sections.kategori ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <LayoutGrid className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-bold uppercase tracking-widest text-app-text-bright">{t('settings.kategori.title')}</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.kategori.title')}</h2>
             </div>
             {sections.kategori ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
           </button>
@@ -535,12 +535,12 @@ export default function Settings() {
           <div className="animate-in slide-in-from-top-2 duration-200">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-app-success uppercase tracking-wider">{t('settings.kategori.incomeTitle')}</h3>
+                <h3 className="text-sm font-semibold text-app-success uppercase tracking-wider">{t('settings.kategori.incomeTitle')}</h3>
                 <div className="flex gap-2">
                   {categories.length === 0 && (
                     <button 
                       onClick={generateDefaultCategories}
-                      className="flex items-center gap-2 px-3 py-1.5 bg-app-accent1/10 hover:bg-app-accent1/20 border border-app-accent1/30 text-app-accent1 rounded-full transition-colors text-xs font-bold"
+                      className="flex items-center gap-2 px-3 py-1.5 bg-app-accent1/10 hover:bg-app-accent1/20 border border-app-accent1/30 text-app-accent1 rounded-full transition-colors text-xs font-semibold"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>{t('settings.kategori.createDefault')}</span>
@@ -548,7 +548,7 @@ export default function Settings() {
                   )}
                   <button 
                     onClick={() => openCategoryAddModal('income')}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-app-bg hover:bg-app-hover border border-app-border text-app-text rounded-full transition-colors text-xs font-bold"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-app-bg hover:bg-app-hover border border-app-border text-app-text rounded-full transition-colors text-xs font-semibold"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>{t('common.add')}</span>
@@ -582,10 +582,10 @@ export default function Settings() {
             </div>
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-app-danger uppercase tracking-wider">{t('settings.kategori.expenseTitle')}</h3>
+                <h3 className="text-sm font-semibold text-app-danger uppercase tracking-wider">{t('settings.kategori.expenseTitle')}</h3>
                 <button 
                   onClick={() => openCategoryAddModal('expense')}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-app-bg hover:bg-app-hover border border-app-border text-app-text rounded-full transition-colors text-xs font-bold"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-app-bg hover:bg-app-hover border border-app-border text-app-text rounded-full transition-colors text-xs font-semibold"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>{t('common.add')}</span>
@@ -620,12 +620,12 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('grab')} className={`relative z-10 w-full flex items-center justify-between ${sections.grab ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <Car className="w-5 h-5 text-app-success" />
-              <h2 className="text-sm font-bold uppercase tracking-widest text-app-text-bright">{t('settings.grab.title')}</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.grab.title')}</h2>
             </div>
             {sections.grab ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
           </button>
@@ -633,26 +633,26 @@ export default function Settings() {
           {sections.grab && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 animate-in slide-in-from-top-2 duration-200">
             <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">{t('settings.grab.cashLabel')}</label>
+                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">{t('settings.grab.cashLabel')}</label>
                 <select value={grabCashAccount} onChange={e => handleGrabSettingChange('grabCashAccount', e.target.value)} className="w-full bg-app-bg border border-app-border rounded-lg px-3 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright">
                   <option value="" disabled>{t('settings.grab.cashPlaceholder') || "Pilih Rekening Cash"}</option>
-                  {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
+                  {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name} (Rp {acc.balance.toLocaleString("id-ID")})</option>)}
                 </select>
             </div>
             <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">{t('settings.grab.dompetLabel')}</label>
+                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">{t('settings.grab.dompetLabel')}</label>
                 <select value={grabDompetAccount} onChange={e => handleGrabSettingChange('grabDompetAccount', e.target.value)} className="w-full bg-app-bg border border-app-border rounded-lg px-3 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright">
                   <option value="" disabled>{t('settings.grab.dompetPlaceholder') || "Pilih Rekening Dompet"}</option>
-                  {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
+                  {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name} (Rp {acc.balance.toLocaleString("id-ID")})</option>)}
                 </select>
             </div>
-            <div className="md:col-span-2 pt-2 border-t border-app-border/50">
+            <div className="md:col-span-2 pt-2 border-t border-app-border">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                     <div className="flex-1">
-                        <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">{t('settings.grab.hematLabel')}</label>
+                        <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">{t('settings.grab.hematLabel')}</label>
                         <select value={grabHematAccount} onChange={e => handleGrabSettingChange('grabHematAccount', e.target.value)} className="w-full bg-app-bg border border-app-border rounded-lg px-3 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright">
                           <option value="" disabled>{t('settings.grab.hematPlaceholder') || "Pilih Rekening Hemat"}</option>
-                          {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
+                          {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name} (Rp {acc.balance.toLocaleString("id-ID")})</option>)}
                         </select>
                     </div>
                 </div>
@@ -661,12 +661,12 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('jadwal')} className={`relative z-10 w-full flex items-center justify-between ${sections.jadwal ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-app-warning" />
-              <h2 className="text-sm font-bold uppercase tracking-widest text-app-text-bright">{t('settings.jadwal.title')}</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.jadwal.title')}</h2>
             </div>
             {sections.jadwal ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
           </button>
@@ -675,11 +675,11 @@ export default function Settings() {
           <div className="flex flex-col gap-6 animate-in slide-in-from-top-2 duration-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">{t('settings.jadwal.startPeriodLabel')}</label>
+                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">{t('settings.jadwal.startPeriodLabel')}</label>
                 <input type="number" min="1" max="31" value={attendancePeriodStart} onChange={handleAttendancePeriodStartChange} className="w-full bg-app-bg border border-app-border rounded-lg px-3 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright" />
               </div>
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider mb-2 block text-app-text/70">{t('settings.jadwal.endPeriodLabel')}</label>
+                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">{t('settings.jadwal.endPeriodLabel')}</label>
                 <input type="number" min="1" max="31" value={attendancePeriodEnd} onChange={handleAttendancePeriodEndChange} className="w-full bg-app-bg border border-app-border rounded-lg px-3 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright" />
               </div>
             </div>
@@ -701,7 +701,7 @@ export default function Settings() {
                return (
                   <div key={day} className="bg-app-bg p-3 rounded-xl border border-app-border flex flex-col gap-3">
                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-app-text-bright">{dayNames[day as keyof typeof dayNames]}</span>
+                        <span className="font-semibold text-app-text-bright">{dayNames[day as keyof typeof dayNames]}</span>
                         <button
                           type="button"
                           onClick={() => handleWorkScheduleChange(day, 'isActive', !ds.isActive)}
@@ -713,11 +713,11 @@ export default function Settings() {
                      {ds.isActive && (
                         <div className="flex gap-2">
                            <div className="flex-1">
-                              <label className="text-[10px] uppercase font-bold tracking-wider mb-1 block text-app-text/70">{t('settings.jadwal.startLabel') || 'Mulai'}</label>
+                              <label className="text-[10px] uppercase font-semibold tracking-wider mb-1 block text-app-text/70">{t('settings.jadwal.startLabel') || 'Mulai'}</label>
                               <input type="time" value={ds.start} onChange={e => handleWorkScheduleChange(day, 'start', e.target.value)} className="w-full bg-app-card border border-app-border rounded-lg px-2 py-2 text-sm focus:border-app-accent1 outline-none text-app-text-bright" />
                            </div>
                            <div className="flex-1">
-                              <label className="text-[10px] uppercase font-bold tracking-wider mb-1 block text-app-text/70">{t('settings.jadwal.endLabel') || 'Selesai'}</label>
+                              <label className="text-[10px] uppercase font-semibold tracking-wider mb-1 block text-app-text/70">{t('settings.jadwal.endLabel') || 'Selesai'}</label>
                               <input type="time" value={ds.end} onChange={e => handleWorkScheduleChange(day, 'end', e.target.value)} className="w-full bg-app-card border border-app-border rounded-lg px-2 py-2 text-sm focus:border-app-accent1 outline-none text-app-text-bright" />
                            </div>
                         </div>
@@ -730,12 +730,12 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('bahasa')} className={`relative z-10 w-full flex items-center justify-between ${sections.bahasa ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-bold uppercase tracking-widest text-app-text-bright">{t('settings.bahasa.title')}</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.bahasa.title')}</h2>
             </div>
             {sections.bahasa ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
           </button>
@@ -758,12 +758,12 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('tema')} className={`relative z-10 w-full flex items-center justify-between ${sections.tema ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <Palette className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-bold uppercase tracking-widest text-app-text-bright">{t('settings.tema.title')}</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.tema.title')}</h2>
             </div>
             {sections.tema ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
           </button>
@@ -772,7 +772,7 @@ export default function Settings() {
           <div className="space-y-8 animate-in slide-in-from-top-2 duration-200">
             {(Object.entries(groupedThemes) as [string, typeof themes][]).map(([category, catThemes]) => (
               <div key={category}>
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-app-text mb-4">
+                <h3 className="text-[10px] font-semibold uppercase tracking-widest text-app-text mb-4">
                   {category === 'light' ? t('settings.tema.light') : category === 'dark' ? t('settings.tema.dark') : 'Amoled'}
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -786,7 +786,7 @@ export default function Settings() {
                         className="w-full h-24 rounded-xl flex flex-col p-3 relative overflow-hidden"
                         style={{ backgroundColor: theme.colors.bg, color: theme.colors.text }}
                       >
-                        <span className="text-sm font-bold truncate z-10 text-left">{theme.name}</span>
+                        <span className="text-sm font-semibold truncate z-10 text-left">{theme.name}</span>
                         <div className="flex-1"></div>
                         <div className="flex gap-2 z-10 w-full">
                           <div className="w-4 h-4 rounded-full shadow-sm" style={{ backgroundColor: theme.colors.accent1 }}></div>
@@ -804,12 +804,12 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('navigasi')} className={`relative z-10 w-full flex items-center justify-between ${sections.navigasi ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <LayoutGrid className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-bold uppercase tracking-widest text-app-text-bright">{t('settings.navigasi.title')}</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.navigasi.title')}</h2>
             </div>
             {sections.navigasi ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
           </button>
@@ -842,7 +842,7 @@ export default function Settings() {
                     <button
                       type="button"
                       onClick={() => handleToggleTab(tab.path)}
-                      className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
                         isHidden
                           ? 'border-app-danger/30 bg-app-danger/10 text-app-danger hover:bg-app-danger/20'
                           : 'border-app-success/30 bg-app-success/10 text-app-success hover:bg-app-success/20'
@@ -868,12 +868,12 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[24px] border border-app-border/40 shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('font')} className={`relative z-10 w-full flex items-center justify-between ${sections.font ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
             <div className="flex items-center gap-2">
               <Type className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-bold uppercase tracking-widest text-app-text-bright">{t('settings.font.title')}</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.font.title')}</h2>
             </div>
             {sections.font ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
           </button>
@@ -898,13 +898,13 @@ export default function Settings() {
                       <Check className="w-5 h-5 text-app-accent1 shrink-0" />
                     </div>
                     <div>
-                      <p className="text-xs text-app-text/70 font-bold uppercase tracking-wider mb-1">Siap Diterapkan</p>
-                      <p className="text-sm font-bold truncate text-app-text-bright">{pendingFontFile.name}</p>
+                      <p className="text-xs text-app-text/70 font-semibold uppercase tracking-wider mb-1">Siap Diterapkan</p>
+                      <p className="text-sm font-semibold truncate text-app-text-bright">{pendingFontFile.name}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <button onClick={() => setPendingFontFile(null)} className="px-4 py-2 text-xs font-bold text-app-text/70 hover:text-app-text-bright transition-colors">{t('common.cancel')}</button>
-                    <button onClick={handleApplyFont} className="px-4 py-2 bg-app-accent1 hover:opacity-90 text-app-bg text-xs font-bold rounded-xl transition-colors shadow-sm">
+                    <button onClick={() => setPendingFontFile(null)} className="px-4 py-2 text-xs font-semibold text-app-text/70 hover:text-app-text-bright transition-colors">{t('common.cancel')}</button>
+                    <button onClick={handleApplyFont} className="px-4 py-2 bg-app-accent1 hover:opacity-90 text-app-bg text-xs font-semibold rounded-xl transition-colors shadow-sm">
                       {t('settings.font.applyBtn')}
                     </button>
                   </div>
@@ -918,11 +918,11 @@ export default function Settings() {
                       <Check className="w-5 h-5 text-app-success shrink-0" />
                     </div>
                     <div>
-                      <p className="text-xs text-app-success font-bold uppercase tracking-wider mb-1">Font Aktif</p>
-                      <p className="text-sm font-bold truncate text-app-text-bright">{customFontName}</p>
+                      <p className="text-xs text-app-success font-semibold uppercase tracking-wider mb-1">Font Aktif</p>
+                      <p className="text-sm font-semibold truncate text-app-text-bright">{customFontName}</p>
                     </div>
                   </div>
-                  <button onClick={handleRemoveFont} className="px-4 py-2 hover:bg-app-danger/10 text-app-danger text-xs font-bold rounded-xl transition-colors shrink-0">
+                  <button onClick={handleRemoveFont} className="px-4 py-2 hover:bg-app-danger/10 text-app-danger text-xs font-semibold rounded-xl transition-colors shrink-0">
                     {t('settings.font.removeBtn')}
                   </button>
                 </div>
@@ -951,8 +951,8 @@ export default function Settings() {
       {/* Confirm Delete Category Modal */}
       {categoryToDelete && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full max-w-sm rounded-[24px] shadow-2xl border border-app-border/40 p-6 animate-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold text-app-text-bright mb-2">
+          <div className="bg-app-card text-app-text w-full max-w-sm rounded-[18px] shadow-2xl border border-app-border p-6 animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-semibold text-app-text-bright mb-2">
               {language === 'en' ? 'Delete Category?' : 'Hapus Kategori?'}
             </h3>
             <p className="text-sm text-app-text/70 mb-6">
@@ -967,7 +967,7 @@ export default function Settings() {
               </button>
               <button 
                 onClick={handleDeleteCategory}
-                className="flex-1 py-3 bg-app-danger text-white rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-app-danger/20"
+                className="flex-1 py-3 bg-app-danger text-app-bg rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-app-danger/20"
               >
                 {t('common.delete')}
               </button>
@@ -979,8 +979,8 @@ export default function Settings() {
       {/* Confirm Delete Account Modal */}
       {accountToDelete && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full max-w-sm rounded-[24px] shadow-2xl border border-app-border/40 p-6 animate-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold text-app-text-bright mb-2">
+          <div className="bg-app-card text-app-text w-full max-w-sm rounded-[18px] shadow-2xl border border-app-border p-6 animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-semibold text-app-text-bright mb-2">
               {language === 'en' ? 'Delete Account?' : 'Hapus Rekening?'}
             </h3>
             <p className="text-sm text-app-text/70 mb-6">
@@ -997,7 +997,7 @@ export default function Settings() {
               </button>
               <button 
                 onClick={confirmDeleteAccount}
-                className="flex-1 py-3 bg-app-danger text-white rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-app-danger/20"
+                className="flex-1 py-3 bg-app-danger text-app-bg rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-app-danger/20"
               >
                 {t('common.delete')}
               </button>
