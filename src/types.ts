@@ -6,6 +6,10 @@ export interface Account {
   createdAt: number;
   isPrimary?: boolean;
   excludeFromTotal?: boolean;
+  interestEnabled?: boolean;
+  interestRate?: number; // Annual rate in percentage (e.g. 2.5)
+  interestMethod?: 'daily_compound' | 'monthly' | 'yearly';
+  lastInterestCalculationDate?: number; // Timestamp of last calculated date
 }
 
 export interface Category {
@@ -86,4 +90,5 @@ export interface Transaction {
   categoryId?: string;
   categoryName?: string;
   categoryIcon?: string;
+  isInterest?: boolean;
 }

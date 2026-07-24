@@ -8,6 +8,7 @@ import ThemeApplicator from './components/ThemeApplicator';
 import { Toaster } from 'react-hot-toast';
 import Layout from './components/Layout';
 import GlobalGoalNotifier from './components/GlobalGoalNotifier';
+import { processAllAccountsInterest } from './utils/interestUtils';
 
 import Login from './components/Login';
 import Transactions from './components/Transactions';
@@ -46,6 +47,11 @@ export default function App() {
       
       if (currentUser) {
         try {
+          // Process daily background interest for all accounts with interest enabled
+          processAllAccountsInterest(currentUser.uid).catch((err) =>
+            console.error("Auto interest processing error:", err)
+          );
+
           const userDocRef = doc(db, 'users', currentUser.uid);
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {

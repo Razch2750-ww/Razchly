@@ -135,6 +135,16 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
   const [adminFeeChargeTo, setAdminFeeChargeTo] = useState<
     "origin" | "destination"
   >("origin");
+  const [isTransferAll, setIsTransferAll] = useState(false);
+
+  useEffect(() => {
+    if (type === "transfer" && isTransferAll && fromAccountId) {
+      const acc = accounts.find((a) => a.id === fromAccountId);
+      if (acc) {
+        setAmount(formatNumberInput(acc.balance.toString()));
+      }
+    }
+  }, [type, isTransferAll, fromAccountId, accounts]);
   const [tsxDate, setTsxDate] = useState(
     format(new Date(), "yyyy-MM-dd'T'HH:mm"),
   );
@@ -295,6 +305,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
   
   const handleTypeChange = (newType: TransactionType) => {
     setType(newType);
+    setIsTransferAll(false);
     if (!editingTransaction) {
       if (newType === "expense") {
         setAccountId(localStorage.getItem('lastAccountId_expense') || accounts[0]?.id || "");
@@ -319,6 +330,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
     setHasAdminFee(false);
     setAdminFee("");
     setAdminFeeChargeTo("origin");
+    setIsTransferAll(false);
     setTsxDate(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
     setIsModalOpen(true);
   };
@@ -340,6 +352,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
     setHasAdminFee(!!t.adminFee);
     setAdminFee(t.adminFee ? t.adminFee.toString() : "");
     setAdminFeeChargeTo(t.adminFeeChargeTo || "origin");
+    setIsTransferAll(false);
     setTsxDate(format(new Date(t.date), "yyyy-MM-dd'T'HH:mm"));
     setIsModalOpen(true);
   };
@@ -1006,20 +1019,20 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           {/* MOBILE LAYOUT */}
           <div className="md:hidden flex flex-col w-full min-h-[100dvh] px-4 pt-4 pb-32">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-6 h-6 text-app-text" />
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={() => navigate(-1)} className="p-2 rounded-xl bg-app-card/60 border border-app-border/40 text-app-text hover:text-app-text-bright active:scale-95 transition-all">
+            <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-semibold text-app-text-bright">
-            <TextReveal text="Laporan Keuangan" />
+          <h1 className="text-lg font-bold text-app-text-bright">
+            <TextReveal text={language === 'en' ? "Financial Report" : "Laporan Keuangan"} />
           </h1>
-          <button>
-            <Share2 className="w-5 h-5 text-app-text/80" />
+          <button onClick={exportToPDF} className="p-2 rounded-xl bg-app-card/60 border border-app-border/40 text-app-text/80 hover:text-app-text-bright active:scale-95 transition-all" title="Share/Export PDF">
+            <Share2 className="w-4.5 h-4.5" />
           </button>
         </div>
 
         {/* Period Tabs */}
-        <div className="bg-app-card rounded-xl p-1 flex items-center justify-between mb-6 border border-app-border">
+        <div className="bg-app-card/80 rounded-2xl p-1 flex items-center justify-between mb-3 border border-app-border/60 shadow-sm gap-1">
           {["Harian", "Mingguan", "Bulanan", "Custom"].map((p) => (
             <button
               key={p}
@@ -1027,7 +1040,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 setMobileTab(p as any);
                 setMobileCurrentDate(new Date());
               }}
-              className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-colors ${mobileTab === p ? "bg-app-accent1 text-app-bg shadow-md" : "text-app-text/60 hover:text-app-text-bright"}`}
+              className={`flex-1 py-1.5 rounded-xl text-xs font-semibold transition-all ${mobileTab === p ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
             >
               {p}
             </button>
@@ -1036,108 +1049,116 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
         {/* Date Navigator */}
         {mobileTab === "Custom" ? (
-          <div className="flex items-center gap-2 mb-6 px-2">
+          <div className="flex items-center gap-2 mb-4 p-2 rounded-xl bg-app-card/40 border border-app-border/30">
             <input 
               type="date" 
               value={mobileCustomStartDate}
               onChange={(e) => setMobileCustomStartDate(e.target.value)}
-              className="flex-1 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-3 py-2 outline-none focus:border-app-accent1"
+              className="flex-1 bg-app-card border border-app-border text-app-text-bright text-xs rounded-lg px-2.5 py-1.5 outline-none focus:border-app-accent1"
             />
-            <span className="text-app-text/50">-</span>
+            <span className="text-app-text/50 text-xs">-</span>
             <input 
               type="date" 
               value={mobileCustomEndDate}
               onChange={(e) => setMobileCustomEndDate(e.target.value)}
-              className="flex-1 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-3 py-2 outline-none focus:border-app-accent1"
+              className="flex-1 bg-app-card border border-app-border text-app-text-bright text-xs rounded-lg px-2.5 py-1.5 outline-none focus:border-app-accent1"
             />
           </div>
         ) : (
-          <div className="flex items-center justify-between mb-6 px-2">
-            <button onClick={handleMobilePrev}>
-              <ChevronLeft className="w-5 h-5 text-app-accent1" />
+          <div className="flex items-center justify-between mb-4 px-3 py-1.5 rounded-xl bg-app-card/40 border border-app-border/30">
+            <button onClick={handleMobilePrev} className="p-1 rounded-lg bg-app-card border border-app-border/50 text-app-accent1 active:scale-95 transition-all">
+              <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="font-semibold text-sm text-app-text-bright">
+            <span className="font-semibold text-xs text-app-text-bright">
               {getMobilePeriodText()}
             </span>
-            <button onClick={handleMobileNext}>
-              <ChevronRight className="w-5 h-5 text-app-accent1" />
+            <button onClick={handleMobileNext} className="p-1 rounded-lg bg-app-card border border-app-border/50 text-app-accent1 active:scale-95 transition-all">
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        {/* Filters */}
-        <div className="space-y-4 mb-8">
+        {/* Filters Group */}
+        <div className="p-3 rounded-2xl bg-app-card/40 border border-app-border/40 space-y-2.5 mb-5">
           {/* Account Filter */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-            <div className="w-8 h-8 flex items-center justify-center shrink-0">
-              <Wallet className="w-5 h-5 text-app-text/60" />
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-app-card border border-app-border/60 flex items-center justify-center shrink-0">
+              <Wallet className="w-3.5 h-3.5 text-app-text/70" />
             </div>
-            <button
-              onClick={() => setMobileAccountFilter("Semua")}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold shrink-0 transition-colors ${mobileAccountFilter === "Semua" ? "bg-app-accent1 text-app-bg" : "border border-app-border text-app-text"}`}
-            >
-              Semua
-            </button>
-            {accounts.map((acc) => (
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
               <button
-                key={acc.id}
-                onClick={() => setMobileAccountFilter(acc.id)}
-                className={`px-4 py-1.5 rounded-lg text-sm flex items-center gap-2 shrink-0 transition-colors ${mobileAccountFilter === acc.id ? "bg-app-accent1 text-app-bg" : "border border-app-border text-app-text"}`}
+                onClick={() => setMobileAccountFilter("Semua")}
+                className={`px-3 py-1 rounded-xl text-xs font-semibold shrink-0 transition-all ${mobileAccountFilter === "Semua" ? "bg-app-accent1 text-app-bg shadow-xs" : "bg-app-card border border-app-border/60 text-app-text/70 hover:border-app-text/30"}`}
               >
-                <div
-                  className={`w-2 h-2 rounded-full ${acc.id === "tunai" ? "bg-app-bg" : "bg-blue-400"}`}
-                />{" "}
-                {acc.name}
+                Semua
               </button>
-            ))}
+              {accounts.map((acc) => (
+                <button
+                  key={acc.id}
+                  onClick={() => setMobileAccountFilter(acc.id)}
+                  className={`px-3 py-1 rounded-xl text-xs flex items-center gap-1.5 shrink-0 transition-all ${mobileAccountFilter === acc.id ? "bg-app-accent1 text-app-bg font-semibold shadow-xs" : "bg-app-card border border-app-border/60 text-app-text/70 hover:border-app-text/30"}`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${acc.id === "tunai" ? "bg-app-accent1" : "bg-blue-400"}`}
+                  />
+                  {acc.name}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Income Category Filter */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-            <div className="w-8 h-8 flex items-center justify-center shrink-0">
-              <TrendingUp className="w-5 h-5 text-app-success" />
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-app-success/15 border border-app-success/20 flex items-center justify-center shrink-0">
+              <TrendingUp className="w-3.5 h-3.5 text-app-success" />
             </div>
-            <button
-              onClick={() => setMobileIncomeFilter("Semua")}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold shrink-0 transition-colors ${mobileIncomeFilter === "Semua" ? "bg-app-accent1 text-app-bg" : "border border-app-border text-app-text"}`}
-            >
-              Semua
-            </button>
-            {categories
-              .filter((c) => c.type === "income")
-              .map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setMobileIncomeFilter(cat.id)}
-                  className={`px-4 py-1.5 rounded-lg text-sm flex items-center gap-2 shrink-0 transition-colors ${mobileIncomeFilter === cat.id ? "bg-app-accent1 text-app-bg" : "border border-app-border text-app-text"}`}
-                >
-                  <Briefcase className="w-3 h-3 text-app-success" /> {cat.name}
-                </button>
-              ))}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              <button
+                onClick={() => setMobileIncomeFilter("Semua")}
+                className={`px-3 py-1 rounded-xl text-xs font-semibold shrink-0 transition-all ${mobileIncomeFilter === "Semua" ? "bg-app-accent1 text-app-bg shadow-xs" : "bg-app-card border border-app-border/60 text-app-text/70 hover:border-app-text/30"}`}
+              >
+                Semua
+              </button>
+              {categories
+                .filter((c) => c.type === "income")
+                .map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setMobileIncomeFilter(cat.id)}
+                    className={`px-3 py-1 rounded-xl text-xs flex items-center gap-1.5 shrink-0 transition-all ${mobileIncomeFilter === cat.id ? "bg-app-success/20 border border-app-success/40 text-app-success font-semibold shadow-xs" : "bg-app-card border border-app-border/60 text-app-text/70 hover:border-app-text/30"}`}
+                  >
+                    <Briefcase className="w-3 h-3 text-app-success" />
+                    {cat.name}
+                  </button>
+                ))}
+            </div>
           </div>
 
           {/* Expense Category Filter */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-            <div className="w-8 h-8 flex items-center justify-center shrink-0">
-              <TrendingDown className="w-5 h-5 text-app-danger" />
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-app-danger/15 border border-app-danger/20 flex items-center justify-center shrink-0">
+              <TrendingDown className="w-3.5 h-3.5 text-app-danger" />
             </div>
-            <button
-              onClick={() => setMobileExpenseFilter("Semua")}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold shrink-0 transition-colors ${mobileExpenseFilter === "Semua" ? "bg-app-accent1 text-app-bg" : "border border-app-border text-app-text"}`}
-            >
-              Semua
-            </button>
-            {categories
-              .filter((c) => c.type === "expense")
-              .map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setMobileExpenseFilter(cat.id)}
-                  className={`px-4 py-1.5 rounded-lg text-sm flex items-center gap-2 shrink-0 transition-colors ${mobileExpenseFilter === cat.id ? "bg-app-accent1 text-app-bg" : "border border-app-border text-app-text"}`}
-                >
-                  <ShoppingCart className="w-3 h-3 text-app-danger" /> {cat.name}
-                </button>
-              ))}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              <button
+                onClick={() => setMobileExpenseFilter("Semua")}
+                className={`px-3 py-1 rounded-xl text-xs font-semibold shrink-0 transition-all ${mobileExpenseFilter === "Semua" ? "bg-app-accent1 text-app-bg shadow-xs" : "bg-app-card border border-app-border/60 text-app-text/70 hover:border-app-text/30"}`}
+              >
+                Semua
+              </button>
+              {categories
+                .filter((c) => c.type === "expense")
+                .map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setMobileExpenseFilter(cat.id)}
+                    className={`px-3 py-1 rounded-xl text-xs flex items-center gap-1.5 shrink-0 transition-all ${mobileExpenseFilter === cat.id ? "bg-app-danger/20 border border-app-danger/40 text-app-danger font-semibold shadow-xs" : "bg-app-card border border-app-border/60 text-app-text/70 hover:border-app-text/30"}`}
+                  >
+                    <ShoppingCart className="w-3 h-3 text-app-danger" />
+                    {cat.name}
+                  </button>
+                ))}
+            </div>
           </div>
         </div>
 
@@ -1346,7 +1367,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                               : ""}{" "}
                           Rp {t.amount.toLocaleString("id-ID")}
                         </p>
-                        {t.adminFee && (
+                        {Boolean(t.adminFee) && (
                           <p className="text-[9px] text-app-danger font-semibold mt-0.5">
                             Fee: -Rp {t.adminFee.toLocaleString("id-ID")}
                           </p>
@@ -1819,7 +1840,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                               : ""}{" "}
                           Rp {t.amount.toLocaleString("id-ID")}
                         </p>
-                        {t.adminFee && (
+                        {Boolean(t.adminFee) && (
                           <p className="text-[10px] text-app-danger font-semibold mt-0.5">
                             Fee: -Rp {t.adminFee.toLocaleString("id-ID")}
                           </p>
@@ -1973,14 +1994,33 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               )}
 
               <div>
-                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
-                  Nominal (Rp)
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-[10px] uppercase font-semibold tracking-wider text-app-text/70 m-0">
+                    Nominal (Rp)
+                  </label>
+                  {type === "transfer" && (
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <span className="text-[10px] font-medium text-app-text/70">Transfer Semua Saldo</span>
+                      <div className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
+                          checked={isTransferAll}
+                          onChange={(e) => setIsTransferAll(e.target.checked)}
+                        />
+                        <div className="w-7 h-4 bg-app-card border border-app-border rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-app-text/50 peer-checked:after:bg-white after:border after:border-transparent after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-app-accent1"></div>
+                      </div>
+                    </label>
+                  )}
+                </div>
                 <input
                   type="text"
                   inputMode="numeric"
                   value={amount}
-                  onChange={(e) => setAmount(formatNumberInput(e.target.value))}
+                  onChange={(e) => {
+                    setAmount(formatNumberInput(e.target.value));
+                    setIsTransferAll(false);
+                  }}
                   className="w-full bg-app-bg border border-app-border rounded-xl px-4 py-4 text-2xl font-semibold text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
                   placeholder="0"
                   required

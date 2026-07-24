@@ -510,6 +510,12 @@ export default function Settings() {
                       <p className="text-xl font-semibold font-mono text-app-text-bright truncate">
                         Rp {acc.balance.toLocaleString('id-ID')}
                       </p>
+                      {acc.interestEnabled && (
+                        <div className="mt-2 pt-2 border-t border-app-border/50 flex items-center gap-1.5 text-[11px] font-medium text-app-accent1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-app-accent1 animate-pulse" />
+                          <span>Bunga {acc.interestRate}% p.a. ({acc.interestMethod === 'monthly' ? 'Bulanan' : acc.interestMethod === 'yearly' ? 'Tahunan' : 'Harian Compound'})</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   );

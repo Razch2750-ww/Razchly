@@ -213,7 +213,19 @@ async function startServer() {
 
                    if(data.lp || data.price || (data.ask && data.bid)) {
                       resultData.price = data.lp || data.price || (data.ask + data.bid)/2;
-                      resultData.change = data.ch || resultData.change || 0;
+                      const rawChp = data.chp ?? resultData.chp;
+                      const rawCh = data.ch ?? resultData.ch;
+                      if (data.chp !== undefined) resultData.chp = data.chp;
+                      if (data.ch !== undefined) resultData.ch = data.ch;
+
+                      if (rawChp !== undefined) {
+                         resultData.change = rawChp;
+                      } else if (rawCh !== undefined && resultData.price) {
+                         const prevPrice = resultData.price - rawCh;
+                         resultData.change = prevPrice > 0 ? (rawCh / prevPrice) * 100 : 0;
+                      } else {
+                         resultData.change = resultData.change || 0;
+                      }
                    }
 
                    if (resultData.price !== undefined) {

@@ -1327,18 +1327,21 @@ export default function Investments() {
       return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
     if (chartPeriod === "All") {
-      if (activeInvestments.length === 0) return 30;
-      const earliest = Math.min(...activeInvestments.map((inv) => inv.createdAt));
+      const allTxDates = allTransactions.filter((tx) => !!tx.date).map((tx) => tx.date!);
+      const activeDates = activeInvestments.map((inv) => inv.createdAt);
+      const combined = [...allTxDates, ...activeDates];
+      if (combined.length === 0) return 30;
+      const earliest = Math.min(...combined);
       const diffTime = Math.abs(new Date().getTime() - earliest);
       return Math.max(30, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
     }
     return 30;
-  }, [chartPeriod, activeInvestments]);
+  }, [chartPeriod, activeInvestments, allTransactions]);
 
   // Chart data generation
   const chartData = useMemo(() => {
     const data = [];
-    const targetIhsg = marketData.COMPOSITE?.change || -29.42;
+    const targetIhsg = marketData.COMPOSITE?.change || 0.45;
 
     const chronologicalTx = [...allTransactions]
       .filter((tx) => !!tx.date)
@@ -1352,7 +1355,7 @@ export default function Investments() {
 
       let modalForDay = 0;
       let valueForDay = 0;
-      let realizedPL = 0;
+      let netInflowForDay = 0;
       let historicalModal = 0;
 
       const holdingsForDay: Record<string, { qty: number; avgPrice: number; category: string; code: string; earliestTxDate: number }> = {};
@@ -1377,6 +1380,8 @@ export default function Investments() {
 
         const h = holdingsForDay[key];
 
+        const isTxOnThisDay = isSameDay(new Date(tx.date), date);
+
         if (parsed.type === "buy") {
           const buyQty = parsed.qty;
           const buyAmount = parsed.amount;
@@ -1389,18 +1394,16 @@ export default function Investments() {
           }
           h.qty = newTotalQty;
           historicalModal += buyAmount;
+          if (isTxOnThisDay) {
+            netInflowForDay += buyAmount;
+          }
         } else {
           const sellQty = parsed.qty;
           const sellAmount = parsed.amount;
-          const sellPricePerUnit = sellQty > 0 ? (sellAmount / (sellQty * mult)) : 0;
-          
-          if (h.qty > 0) {
-             const profitPerUnit = sellPricePerUnit - h.avgPrice;
-             realizedPL += profitPerUnit * sellQty * mult;
-          } else {
-             realizedPL += sellAmount;
-          }
           h.qty = Math.max(0, h.qty - sellQty);
+          if (isTxOnThisDay) {
+            netInflowForDay -= sellAmount;
+          }
         }
       });
 
@@ -1431,8 +1434,8 @@ export default function Investments() {
         valueForDay += h.qty * simulatedPrice * mult;
       });
 
-      const totalEquity = valueForDay + realizedPL;
-      const portfolioReturn = historicalModal > 0 ? ((totalEquity - modalForDay) / historicalModal) * 100 : 0;
+      const totalEquity = valueForDay;
+      const portfolioReturn = modalForDay > 0 ? ((valueForDay - modalForDay) / modalForDay) * 100 : 0;
       
       const progress = numDays > 0 ? (numDays - i) / numDays : 1;
       const wave = Math.sin(progress * Math.PI * 3) * 6 + Math.sin(progress * Math.PI * 7) * 2;
@@ -1442,6 +1445,7 @@ export default function Investments() {
         name: format(date, "dd MMM", { locale: localeId }),
         value: totalEquity,
         modal: modalForDay,
+        netInflow: netInflowForDay,
         portfolioReturn,
         ihsgReturn,
         rawDate: date,
@@ -1500,7 +1504,7 @@ export default function Investments() {
       let pnlPercent = 0;
       if (idx > 0) {
         const prev = chartData[idx - 1];
-        pnl = d.value - prev.value;
+        pnl = (d.value - prev.value) - (d.netInflow || 0);
         pnlPercent = prev.value > 0 ? (pnl / prev.value) * 100 : 0;
       } else {
         pnl = d.value - d.modal;
@@ -1518,7 +1522,7 @@ export default function Investments() {
   }, [chartData]);
 
   const monthlyRows = useMemo(() => {
-    const groups: Record<string, { monthKey: string; dateLabel: string; finalValue: number; initialValue: number; rawDate: Date }> = {};
+    const groups: Record<string, { monthKey: string; dateLabel: string; finalValue: number; initialValue: number; totalNetInflow: number; rawDate: Date }> = {};
     
     chartData.forEach((d) => {
       const date = d.rawDate;
@@ -1531,10 +1535,12 @@ export default function Investments() {
           dateLabel: label,
           finalValue: d.value,
           initialValue: d.value,
+          totalNetInflow: d.netInflow || 0,
           rawDate: date,
         };
       } else {
         groups[monthKey].finalValue = d.value;
+        groups[monthKey].totalNetInflow += (d.netInflow || 0);
       }
     });
     
@@ -1542,7 +1548,7 @@ export default function Investments() {
     
     return sortedMonths.map((m, idx) => {
       const prevMonthVal = idx > 0 ? sortedMonths[idx - 1].finalValue : m.initialValue;
-      const pnl = m.finalValue - prevMonthVal;
+      const pnl = (m.finalValue - prevMonthVal) - m.totalNetInflow;
       const pnlPercent = prevMonthVal > 0 ? (pnl / prevMonthVal) * 100 : 0;
       return {
         dateLabel: m.dateLabel,
@@ -2131,100 +2137,114 @@ export default function Investments() {
         </div>
       )}
 
-      {activeTab !== "dashboard" && (
-        <>
-          {/* WIDGETS (STACK ON MOBILE, GRID ON DESKTOP) */}
-      <div className="flex flex-col gap-4 mb-6 md:grid md:grid-cols-3 md:gap-6 md:mb-8">
-        {/* TOTAL INVESTASI */}
-        <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border flex items-center justify-between shadow-sm relative overflow-hidden cursor-pointer w-full">
-          
-          <div className="flex items-center gap-4 relative z-10 w-full">
-            <div className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center ${incomeToday >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
-              <BarChart3 className={`w-6 h-6 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-app-text/70 text-xs font-medium uppercase tracking-wider mb-1">
-                Total Investasi
-              </p>
-              <p className="text-xl font-semibold text-app-text-bright break-words leading-tight font-mono">
-                Rp {totalBalance.toLocaleString("id-ID")}
-              </p>
-              <div className={`flex items-center gap-1 mt-1 text-xs font-medium ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                {incomeToday >= 0 ? (
-                  <>
-                    <TrendingUp className="w-3 h-3 shrink-0" /> <span className="truncate">Berjalan baik</span>
-                  </>
-                ) : (
-                  <>
-                    <TrendingDown className="w-3 h-3 shrink-0" /> <span className="truncate">Sedang menurun</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-          <ChevronRight className="w-5 h-5 shrink-0 text-app-text/50 relative z-10 ml-2" />
-        </HoverCard>
+      {activeTab !== "dashboard" && (() => {
+        const getMarketChangeVal = (item: any) => {
+          if (!item || item.change === undefined) return 0;
+          let c = Number(item.change);
+          if (Math.abs(c) > 15 && item.price && item.price > 100) {
+            const prev = item.price - c;
+            c = prev > 0 ? (c / prev) * 100 : 0;
+          }
+          return c;
+        };
 
-        {/* RETURN */}
-        <HoverCard className="bg-app-card rounded-[18px] border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer w-full">
-          
-          <div className="flex-1 p-4 border-r border-app-border flex flex-col justify-center relative z-10 min-w-0">
-             <p className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider mb-1">Modal Awal</p>
-             <p className="text-lg font-semibold text-app-text-bright break-words leading-tight font-mono">Rp {expenseToday.toLocaleString("id-ID")}</p>
-          </div>
-          <div className="flex-1 p-4 flex flex-col justify-center relative z-10 min-w-0">
-             <p className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider mb-1">Sekarang</p>
-             <p className={`text-lg font-semibold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} break-words leading-tight font-mono`}>
-               Rp {totalBalance.toLocaleString("id-ID")}
-             </p>
-             <div className={`text-[10px] font-medium mt-1 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} leading-tight font-mono`}>
-                {incomeToday >= 0 ? "+" : ""}Rp {incomeToday.toLocaleString("id-ID")} <br className="md:hidden" />({incomeToday >= 0 ? "+" : ""}{expenseToday > 0 ? ((incomeToday / expenseToday) * 100).toFixed(2) : 0}%)
-             </div>
-          </div>
-        </HoverCard>
+        const ihsgChange = getMarketChangeVal(marketData.COMPOSITE);
+        const usdidrChange = getMarketChangeVal(marketData.USDIDR);
 
-        {/* PASAR: IHSG & KURS RUPIAH */}
-        <HoverCard className="bg-app-card rounded-[18px] border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer w-full">
-          
-          <div className="flex-1 p-4 border-r border-app-border hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0">
-             <div className="flex justify-between items-start mb-1">
-               <p className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider">IHSG</p>
-               {marketData.COMPOSITE?.change >= 0 ? (
-                 <TrendingUp className="w-4 h-4 shrink-0 text-app-success" />
-               ) : (
-                 <TrendingDown className="w-4 h-4 shrink-0 text-app-danger" />
-               )}
-             </div>
-             <p className="text-lg font-semibold text-app-text-bright break-words leading-tight font-mono">
-               {marketData.COMPOSITE?.price?.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "7.245,12"}
-             </p>
-             <div className={`flex items-center gap-1 mt-1 text-[10px] font-medium ${marketData.COMPOSITE?.change >= 0 ? "text-app-success" : "text-app-danger"} font-mono`}>
-               {marketData.COMPOSITE?.change >= 0 ? "+" : ""}{marketData.COMPOSITE?.change?.toFixed(2) || "0.00"}%
-             </div>
-          </div>
-          <a
-             href="https://www.google.com/search?q=1+dolar"
-             target="_blank"
-             rel="noopener noreferrer"
-            className="flex-1 p-4 hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0"
-          >
-             <div className="flex justify-between items-start mb-1">
-               <p className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider">USD/IDR</p>
-               {marketData.USDIDR?.change >= 0 ? (
-                 <TrendingUp className="w-4 h-4 shrink-0 text-app-danger" />
-               ) : (
-                 <TrendingDown className="w-4 h-4 shrink-0 text-app-success" />
-               )}
-             </div>
-             <p className="text-lg font-semibold text-app-text-bright break-words leading-tight font-mono">
-               {marketData.USDIDR?.price?.toLocaleString("id-ID") || "16.250"}
-             </p>
-             <div className={`flex items-center gap-1 mt-1 text-[10px] font-medium ${marketData.USDIDR?.change >= 0 ? "text-app-danger" : "text-app-success"} font-mono`}>
-               {marketData.USDIDR?.change >= 0 ? "+" : ""}{marketData.USDIDR?.change?.toFixed(2) || "0.00"}%
-             </div>
-          </a>
-        </HoverCard>
-      </div>
+        return (
+          <>
+            {/* WIDGETS (STACK ON MOBILE, GRID ON DESKTOP) */}
+            <div className="flex flex-col gap-3.5 mb-6 md:grid md:grid-cols-3 md:gap-5 md:mb-8">
+              {/* TOTAL INVESTASI */}
+              <HoverCard className="bg-app-card rounded-[18px] p-4 sm:p-5 border border-app-border flex items-center justify-between shadow-sm relative overflow-hidden cursor-pointer w-full min-h-[92px]">
+                <div className="flex items-center gap-3.5 relative z-10 w-full min-w-0">
+                  <div className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${incomeToday >= 0 ? "bg-app-success/15" : "bg-app-danger/15"}`}>
+                    <BarChart3 className={`w-5.5 h-5.5 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-app-text/60 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-0.5">
+                      Total Investasi
+                    </p>
+                    <p className="text-lg sm:text-xl font-bold text-app-text-bright font-mono leading-tight truncate">
+                      Rp {totalBalance.toLocaleString("id-ID")}
+                    </p>
+                    <div className={`flex items-center gap-1 mt-1 text-[11px] font-semibold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                      {incomeToday >= 0 ? (
+                        <>
+                          <TrendingUp className="w-3.5 h-3.5 shrink-0" /> <span className="whitespace-nowrap">Berjalan baik</span>
+                        </>
+                      ) : (
+                        <>
+                          <TrendingDown className="w-3.5 h-3.5 shrink-0" /> <span className="whitespace-nowrap">Sedang menurun</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 shrink-0 text-app-text/40 relative z-10 ml-1" />
+              </HoverCard>
+
+              {/* RETURN */}
+              <HoverCard className="bg-app-card rounded-[18px] border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer w-full min-h-[92px]">
+                <div className="flex-1 p-3.5 sm:p-4 border-r border-app-border flex flex-col justify-center relative z-10 min-w-0">
+                   <p className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider mb-0.5">Modal Awal</p>
+                   <p className="text-base sm:text-lg font-bold text-app-text-bright font-mono leading-tight truncate">Rp {expenseToday.toLocaleString("id-ID")}</p>
+                </div>
+                <div className="flex-1 p-3.5 sm:p-4 flex flex-col justify-center relative z-10 min-w-0">
+                   <p className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider mb-0.5">Sekarang</p>
+                   <p className={`text-base sm:text-lg font-bold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} font-mono leading-tight truncate`}>
+                     Rp {totalBalance.toLocaleString("id-ID")}
+                   </p>
+                   <div className={`text-[10px] sm:text-[11px] font-semibold mt-1 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} leading-tight font-mono whitespace-nowrap truncate`}>
+                      {incomeToday >= 0 ? "+" : ""}Rp {incomeToday.toLocaleString("id-ID")} ({incomeToday >= 0 ? "+" : ""}{expenseToday > 0 ? ((incomeToday / expenseToday) * 100).toFixed(2) : "0.00"}%)
+                   </div>
+                </div>
+              </HoverCard>
+
+              {/* PASAR: IHSG & KURS RUPIAH */}
+              <HoverCard className="bg-app-card rounded-[18px] border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer w-full min-h-[92px]">
+                <div className="flex-1 p-3.5 sm:p-4 border-r border-app-border hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0">
+                   <div className="flex justify-between items-center mb-0.5">
+                     <p className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider">IHSG</p>
+                     {ihsgChange >= 0 ? (
+                       <TrendingUp className="w-3.5 h-3.5 shrink-0 text-app-success" />
+                     ) : (
+                       <TrendingDown className="w-3.5 h-3.5 shrink-0 text-app-danger" />
+                     )}
+                   </div>
+                   <p className="text-base sm:text-lg font-bold text-app-text-bright font-mono leading-tight truncate">
+                     {marketData.COMPOSITE?.price?.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "7.245,12"}
+                   </p>
+                   <div className={`flex items-center gap-1 mt-1 text-[10px] sm:text-[11px] font-semibold ${ihsgChange >= 0 ? "text-app-success" : "text-app-danger"} font-mono`}>
+                     {ihsgChange >= 0 ? "+" : ""}{ihsgChange.toFixed(2)}%
+                   </div>
+                </div>
+                <a
+                   href="https://www.google.com/search?q=1+dolar"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="flex-1 p-3.5 sm:p-4 hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0"
+                >
+                   <div className="flex justify-between items-center mb-0.5">
+                     <p className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider">USD/IDR</p>
+                     {usdidrChange >= 0 ? (
+                       <TrendingUp className="w-3.5 h-3.5 shrink-0 text-app-danger" />
+                     ) : (
+                       <TrendingDown className="w-3.5 h-3.5 shrink-0 text-app-success" />
+                     )}
+                   </div>
+                   <p className="text-base sm:text-lg font-bold text-app-text-bright font-mono leading-tight truncate">
+                     {marketData.USDIDR?.price?.toLocaleString("id-ID") || "16.250"}
+                   </p>
+                   <div className={`flex items-center gap-1 mt-1 text-[10px] sm:text-[11px] font-semibold ${usdidrChange >= 0 ? "text-app-danger" : "text-app-success"} font-mono`}>
+                     {usdidrChange >= 0 ? "+" : ""}{usdidrChange.toFixed(2)}%
+                   </div>
+                </a>
+              </HoverCard>
+            </div>
+          </>
+        );
+      })()}
 
       {/* MAIN SECTIONS */}
       <div className="flex flex-col gap-6 mb-6">
@@ -3099,8 +3119,6 @@ export default function Investments() {
           )}
         </div>
       </div>
-        </>
-      )}
 
       {/* Modal Simulasi ARA/ARB */}
       {isSimulatorOpen && (

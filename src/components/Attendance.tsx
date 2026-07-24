@@ -475,93 +475,134 @@ export default function Attendance() {
       <div className="space-y-6 md:space-y-8">
 
         {/* Today's Actions */}
-        <HoverCard className="bg-app-card rounded-[18px] border border-app-border p-5 shadow-sm relative overflow-hidden group transition-colors w-full">
+        <HoverCard className="bg-app-card rounded-[18px] border border-app-border p-4 sm:p-5 shadow-sm relative overflow-hidden group transition-colors w-full">
           
           <div className="relative z-10">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-              <h2 className="font-semibold text-app-text-bright flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-app-accent1" />
-                Absen Hari Ini - {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3.5 gap-2 pb-3 border-b border-app-border/60">
+              <h2 className="font-semibold text-app-text-bright text-sm sm:text-base flex items-center gap-2">
+                <Calendar className="w-4.5 h-4.5 text-app-accent1 shrink-0" />
+                <span>Absen Hari Ini - {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
               </h2>
               {todaySchedule && (
-                <div className="text-xs font-medium px-3 py-1.5 rounded-full border bg-app-bg border-app-border text-app-text-bright">
+                <div className="text-xs font-medium px-2.5 py-1 rounded-full border bg-app-bg border-app-border text-app-text-bright self-start sm:self-auto">
                   {todaySchedule.isActive ? `Jadwal: ${todaySchedule.start} - ${todaySchedule.end}` : 'Hari Libur'}
                 </div>
               )}
             </div>
 
             {todayRecord ? (
-              <div className="bg-app-bg p-4 rounded-xl border border-app-border flex flex-col items-center justify-center gap-4 py-8">
-                 <div className="flex gap-4 w-full justify-center">
-                    <div className="text-center bg-app-card border border-app-border rounded-xl p-4 min-w-[120px] shadow-sm flex flex-col items-center">
-                      <p className="text-xs text-app-text/60 mb-1 font-medium">Check In</p>
-                      <div className="flex items-center gap-1.5 justify-center">
-                        <p className="font-semibold text-app-text-bright text-xl">{todayRecord.checkIn ? new Date(todayRecord.checkIn).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) : '-'}</p>
-                        {todayRecord.checkInLocation && (
-                          <a href={`https://maps.google.com/?q=${todayRecord.checkInLocation.lat},${todayRecord.checkInLocation.lng}`} target="_blank" rel="noreferrer" className="text-app-accent1 hover:opacity-80">
-                            <MapPin className="w-4 h-4" />
-                          </a>
-                        )}
+              <div className="bg-app-bg/80 p-3.5 sm:p-4 rounded-xl border border-app-border space-y-3.5">
+                {/* Header status & duration badge */}
+                <div className="flex flex-wrap items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-app-text/60 font-medium">Status:</span>
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${getStatusColor(todayRecord.status)}`}>
+                      {getStatusLabel(todayRecord.status)}
+                    </span>
+                  </div>
+
+                  {todayRecord.checkIn && (
+                    <div className="text-xs text-app-text/70 flex items-center gap-1.5 font-mono">
+                      <Timer className="w-3.5 h-3.5 text-app-accent1" />
+                      <span>Durasi Kerja:</span>
+                      <span className="font-bold text-app-text-bright">
+                        {todayRecord.checkOut
+                          ? `${Math.floor(differenceInMinutes(todayRecord.checkOut, todayRecord.checkIn) / 60)}j ${differenceInMinutes(todayRecord.checkOut, todayRecord.checkIn) % 60}m`
+                          : `${Math.floor(differenceInMinutes(Date.now(), todayRecord.checkIn) / 60)}j ${differenceInMinutes(Date.now(), todayRecord.checkIn) % 60}m`
+                        }
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Check In / Check Out Cards Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto">
+                  <div className="bg-app-card border border-app-border rounded-xl p-3 shadow-sm flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-app-success/15 flex items-center justify-center text-app-success shrink-0">
+                        <Clock className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-app-text/60 font-medium uppercase tracking-wider">Check In</p>
+                        <p className="font-bold text-app-text-bright text-base font-mono">
+                          {todayRecord.checkIn ? new Date(todayRecord.checkIn).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) : '-'}
+                        </p>
                       </div>
                     </div>
-                    <div className="text-center bg-app-card border border-app-border rounded-xl p-4 min-w-[120px] shadow-sm flex flex-col items-center">
-                      <p className="text-xs text-app-text/60 mb-1 font-medium">Check Out</p>
-                      <div className="flex items-center gap-1.5 justify-center">
-                        <p className="font-semibold text-app-text-bright text-xl">{todayRecord.checkOut ? new Date(todayRecord.checkOut).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) : '-'}</p>
-                        {todayRecord.checkOutLocation && (
-                          <a href={`https://maps.google.com/?q=${todayRecord.checkOutLocation.lat},${todayRecord.checkOutLocation.lng}`} target="_blank" rel="noreferrer" className="text-app-accent1 hover:opacity-80">
-                            <MapPin className="w-4 h-4" />
-                          </a>
-                        )}
+                    {todayRecord.checkInLocation && (
+                      <a href={`https://maps.google.com/?q=${todayRecord.checkInLocation.lat},${todayRecord.checkInLocation.lng}`} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-app-bg hover:bg-app-hover text-app-accent1 transition-colors" title="Lokasi Check In">
+                        <MapPin className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="bg-app-card border border-app-border rounded-xl p-3 shadow-sm flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-app-danger/15 flex items-center justify-center text-app-danger shrink-0">
+                        <Clock className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-app-text/60 font-medium uppercase tracking-wider">Check Out</p>
+                        <p className="font-bold text-app-text-bright text-base font-mono">
+                          {todayRecord.checkOut ? new Date(todayRecord.checkOut).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) : '-'}
+                        </p>
                       </div>
                     </div>
-                 </div>
-                 
-                 {todayRecord.status === 'present' && !todayRecord.checkOut && (
-                    <div className="w-full max-w-sm mt-4">
-                       {todayRecord.checkIn && (Date.now() - todayRecord.checkIn > 3 * 60 * 60 * 1000) ? (
-                          <div className="space-y-4">
-                            <div>
-                              <input
-                                type="text"
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                                placeholder="Catatan Pulang (Opsional)"
-                                className="w-full bg-app-bg border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-4 outline-none focus:border-app-accent1"
-                              />
-                            </div>
-                            <button
-                              onClick={() => handleAction('checkOut')}
-                              className="w-full py-4 bg-app-danger text-app-bg rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                            >
-                              <Clock className="w-5 h-5" />
-                              Absen Keluar
-                            </button>
-                          </div>
-                       ) : (
-                          <div className="text-center p-4 bg-app-warning/10 border border-app-warning/20 rounded-xl text-app-warning text-sm font-medium">
-                            Anda sudah Check In. Tombol Check Out akan muncul setelah 3 jam.
-                          </div>
-                       )}
-                    </div>
-                 )}
-                 
-                 {todayRecord.notes && (
-                   <p className="text-sm text-app-text/70 mt-2 bg-app-card px-4 py-2 rounded-lg border border-app-border">Catatan: {todayRecord.notes}</p>
-                 )}
+                    {todayRecord.checkOutLocation && (
+                      <a href={`https://maps.google.com/?q=${todayRecord.checkOutLocation.lat},${todayRecord.checkOutLocation.lng}`} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-app-bg hover:bg-app-hover text-app-accent1 transition-colors" title="Lokasi Check Out">
+                        <MapPin className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions / Notices */}
+                {todayRecord.status === 'present' && !todayRecord.checkOut && (
+                  <div className="max-w-xl mx-auto">
+                    {todayRecord.checkIn && (Date.now() - todayRecord.checkIn > 3 * 60 * 60 * 1000) ? (
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          type="text"
+                          value={notes}
+                          onChange={(e) => setNotes(e.target.value)}
+                          placeholder="Catatan Pulang (Opsional)"
+                          className="flex-1 bg-app-card border border-app-border text-app-text-bright text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-app-accent1"
+                        />
+                        <button
+                          onClick={() => handleAction('checkOut')}
+                          className="px-5 py-2.5 bg-app-danger text-app-bg rounded-xl font-semibold text-xs hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shrink-0"
+                        >
+                          <Clock className="w-4 h-4" />
+                          Absen Keluar
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-center py-2.5 px-4 bg-app-warning/10 border border-app-warning/20 rounded-xl text-app-warning text-xs font-medium">
+                        Anda sudah Check In. Tombol Check Out akan muncul setelah 3 jam.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {todayRecord.notes && (
+                  <div className="max-w-xl mx-auto text-xs text-app-text/70 bg-app-card px-3.5 py-2 rounded-lg border border-app-border flex items-center gap-2">
+                    <FileText className="w-3.5 h-3.5 text-app-accent1 shrink-0" />
+                    <span>Catatan: {todayRecord.notes}</span>
+                  </div>
+                )}
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4 max-w-2xl mx-auto">
                 <div>
-                  <label className="block text-xs font-medium text-app-text/70 mb-3">
+                  <label className="block text-xs font-medium text-app-text/70 mb-2">
                     Status Kehadiran Hari Ini
                   </label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
                     {(['present', 'absent', 'leave', 'sick'] as const).map((s) => (
                       <button
                         key={s}
                         onClick={() => setStatus(s)}
-                        className={`flex flex-col items-center justify-center gap-2 py-4 rounded-xl border transition-all ${
+                        className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl border transition-all ${
                           status === s ? getStatusColor(s) : 'bg-app-bg border-app-border text-app-text/60 hover:bg-app-hover'
                         }`}
                       >
@@ -573,7 +614,7 @@ export default function Attendance() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-app-text/70 mb-2">
+                  <label className="block text-xs font-medium text-app-text/70 mb-1.5">
                     Catatan (Opsional)
                   </label>
                   <input
@@ -581,15 +622,15 @@ export default function Attendance() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Contoh: Terlambat karena macet"
-                    className="w-full bg-app-bg border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-4 outline-none focus:border-app-accent1"
+                    className="w-full bg-app-bg border border-app-border text-app-text-bright text-xs rounded-xl px-3.5 py-3 outline-none focus:border-app-accent1"
                   />
                 </div>
 
                 <button
                   onClick={() => handleAction('checkIn')}
-                  className="w-full py-4 bg-app-accent1 text-app-bg rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-app-accent1 text-app-bg rounded-xl font-semibold text-xs sm:text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                 >
-                  <Clock className="w-5 h-5" />
+                  <Clock className="w-4 h-4" />
                   {status === 'present' ? 'Absen Masuk Sekarang' : `Simpan Status ${getStatusLabel(status)}`}
                 </button>
               </div>

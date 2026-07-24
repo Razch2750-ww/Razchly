@@ -20,6 +20,9 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
   const [name, setName] = useState('');
   const [balance, setBalance] = useState('');
   const [icon, setIcon] = useState('wallet');
+  const [interestEnabled, setInterestEnabled] = useState(false);
+  const [interestRate, setInterestRate] = useState('2.5');
+  const [interestMethod, setInterestMethod] = useState<'daily_compound' | 'monthly' | 'yearly'>('daily_compound');
   const [isSaving, setIsSaving] = useState(false);
   const [shouldRender, setShouldRender] = useState(isOpen);
 
@@ -30,10 +33,16 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
         setName(account.name);
         setBalance(formatNumberInput(account.balance.toString()));
         setIcon(account.icon || 'wallet');
+        setInterestEnabled(Boolean(account.interestEnabled));
+        setInterestRate(account.interestRate ? account.interestRate.toString() : '2.5');
+        setInterestMethod(account.interestMethod || 'daily_compound');
       } else {
         setName('');
         setBalance('');
         setIcon('wallet');
+        setInterestEnabled(false);
+        setInterestRate('2.5');
+        setInterestMethod('daily_compound');
       }
     }
   }, [isOpen, account]);
@@ -47,20 +56,32 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
     const numBalance = parseNumberInput(balance);
     if (isNaN(numBalance)) return;
 
+    const numInterestRate = interestEnabled ? parseFloat(interestRate.replace(',', '.')) || 0 : 0;
+
     setIsSaving(true);
     try {
+      const todayStart = new Date(new Date().setHours(0,0,0,0)).getTime();
+      const payload: any = {
+        name,
+        balance: numBalance,
+        icon,
+        interestEnabled,
+        interestRate: numInterestRate,
+        interestMethod: interestEnabled ? interestMethod : 'daily_compound',
+      };
+
       if (account) {
         const docRef = doc(db, 'users', user.uid, 'accounts', account.id);
-        await updateDoc(docRef, { name, balance: numBalance, icon });
+        if (interestEnabled && !account.lastInterestCalculationDate) {
+          payload.lastInterestCalculationDate = todayStart;
+        }
+        await updateDoc(docRef, payload);
         toast.success("Rekening berhasil diperbarui");
       } else {
         const accountsRef = collection(db, 'users', user.uid, 'accounts');
-        await addDoc(accountsRef, {
-          name, 
-          balance: numBalance,
-          icon,
-          createdAt: Date.now()
-        });
+        payload.createdAt = Date.now();
+        payload.lastInterestCalculationDate = todayStart;
+        await addDoc(accountsRef, payload);
         toast.success("Rekening baru berhasil ditambahkan");
       }
       onClose();
@@ -155,8 +176,78 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
                   required
                 />
                 <label htmlFor="acc-balance" className="floating-label-text">
-                  Saldo Awal (Rp)
+                  Saldo Saat Ini / Awal (Rp)
                 </label>
+              </div>
+
+              {/* Interest Settings Section */}
+              <div className="p-4 rounded-2xl bg-app-bg/60 border border-app-border space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-semibold text-app-text-bright">Hitung Bunga Otomatis</p>
+                    <p className="text-[11px] text-app-text/60">Hitung & tambahkan bunga otomatis dari saldo dinamis</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={interestEnabled}
+                      onChange={(e) => setInterestEnabled(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-app-card border border-app-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-app-text/50 peer-checked:after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-app-accent1"></div>
+                  </label>
+                </div>
+
+                {interestEnabled && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="space-y-4 pt-2 border-t border-app-border/50"
+                  >
+                    <div>
+                      <label className="text-[10px] uppercase font-semibold tracking-wider mb-1.5 block text-app-text/70">
+                        Bunga Tahunan (% p.a.)
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          value={interestRate}
+                          onChange={(e) => setInterestRate(e.target.value)}
+                          placeholder="e.g. 2.5"
+                          className="w-full bg-app-card border border-app-border rounded-xl px-3.5 py-2.5 text-sm font-semibold text-app-text-bright focus:border-app-accent1 outline-none transition-colors"
+                          required={interestEnabled}
+                        />
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-app-text/50">
+                          % / thn
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] uppercase font-semibold tracking-wider mb-1.5 block text-app-text/70">
+                        Metode Bunga
+                      </label>
+                      <select
+                        value={interestMethod}
+                        onChange={(e) => setInterestMethod(e.target.value as any)}
+                        className="w-full bg-app-card border border-app-border rounded-xl px-3.5 py-2.5 text-sm font-semibold text-app-text-bright focus:border-app-accent1 outline-none transition-colors appearance-none cursor-pointer"
+                      >
+                        <option value="daily_compound">Harian Compound (Saldo × % / 365)</option>
+                        <option value="monthly">Bulanan</option>
+                        <option value="yearly">Tahunan</option>
+                      </select>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-app-accent1/10 border border-app-accent1/20 text-[11px] text-app-text/80 space-y-1">
+                      <p className="font-semibold text-app-accent1">Sistem Saldo Dinamis:</p>
+                      <p>• Bunga harian = Saldo Saat Ini × ({interestRate || '0'}% / 365)</p>
+                      <p>• Saldo baru = Saldo Saat Ini + Bunga Harian</p>
+                      <p>• Otomatis tercatat sebagai pemasukan bunga setiap hari.</p>
+                    </div>
+                  </motion.div>
+                )}
               </div>
 
               <div className="pt-4 flex gap-3">
