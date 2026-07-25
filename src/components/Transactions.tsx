@@ -880,11 +880,17 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
   const mobileChartData = useMemo(() => {
     const dateMap = new Map();
+    if (mobileTab === "Harian") {
+      for (let i = 0; i <= 23; i++) {
+        const hourString = i.toString().padStart(2, "0") + ":00";
+        dateMap.set(hourString, { date: hourString, income: 0, expense: 0 });
+      }
+    }
     const sortedTsx = [...mobileFilteredTransactions].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
     );
     sortedTsx.forEach((t) => {
-      const d = format(new Date(t.date), "dd/MM");
+      const d = mobileTab === "Harian" ? format(new Date(t.date), "HH:00") : format(new Date(t.date), "dd/MM");
       if (!dateMap.has(d)) dateMap.set(d, { date: d, income: 0, expense: 0 });
       if (t.type === "income") dateMap.get(d).income += t.amount;
       if (t.type === "expense") dateMap.get(d).expense += t.amount;
@@ -892,10 +898,10 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
     });
     let data = Array.from(dateMap.values());
     if (data.length === 0) {
-      data = [{ date: format(new Date(), "dd/MM"), income: 0, expense: 0 }];
+      data = [{ date: mobileTab === "Harian" ? "00:00" : format(new Date(), "dd/MM"), income: 0, expense: 0 }];
     }
     return data;
-  }, [mobileFilteredTransactions]);
+  }, [mobileFilteredTransactions, mobileTab]);
 
   const mobileStats = useMemo(() => {
     let income = 0;
@@ -1033,13 +1039,17 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
   const desktopChartData = useMemo(() => {
     const dateMap = new Map<string, { date: string; income: number; expense: number; net: number }>();
-
+    if (selectedReportPeriod === "today") {
+      for (let i = 0; i <= 23; i++) {
+        const hourString = i.toString().padStart(2, "0") + ":00";
+        dateMap.set(hourString, { date: hourString, income: 0, expense: 0, net: 0 });
+      }
+    }
     const sortedTsx = [...filteredByPeriodTransactions].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
-
     sortedTsx.forEach((t) => {
-      const d = format(new Date(t.date), "dd/MM");
+      const d = selectedReportPeriod === "today" ? format(new Date(t.date), "HH:00") : format(new Date(t.date), "dd/MM");
       if (!dateMap.has(d)) {
         dateMap.set(d, { date: d, income: 0, expense: 0, net: 0 });
       }
@@ -1049,13 +1059,12 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       if (t.adminFee) item.expense += t.adminFee;
       item.net = item.income - item.expense;
     });
-
     let data = Array.from(dateMap.values());
     if (data.length === 0) {
-      data = [{ date: format(new Date(), "dd/MM"), income: 0, expense: 0, net: 0 }];
+      data = [{ date: selectedReportPeriod === "today" ? "00:00" : format(new Date(), "dd/MM"), income: 0, expense: 0, net: 0 }];
     }
     return data;
-  }, [filteredByPeriodTransactions]);
+  }, [filteredByPeriodTransactions, selectedReportPeriod]);
 
   const filteredAndSearchedTransactions = useMemo(() => {
     let result = filteredTransactions;
@@ -1348,10 +1357,20 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         <div className="bg-app-card border border-app-border rounded-2xl p-4 mb-6 relative shadow-lg">
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart
+              <AreaChart
                 data={mobileChartData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
+                <defs>
+                  <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
+                  </linearGradient>
+                  <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.0} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
                   vertical={false}
@@ -1374,35 +1393,42 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   }}
                 />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: "var(--color-app-card, #1A1A1A)",
-                    borderColor: "var(--color-app-border, #333)",
-                    borderRadius: "8px",
-                  }}
-                  itemStyle={{ fontSize: "12px" }}
-                  labelStyle={{
-                    fontSize: "12px",
-                    color: "var(--color-app-text-bright, #fff)",
-                    marginBottom: "4px",
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-app-card border border-app-border p-3 rounded-xl shadow-xl text-xs space-y-1">
+                          <p className="font-semibold text-app-text-bright mb-1 border-b border-app-border pb-1">
+                            {mobileTab === "Harian" ? `${label}` : `Tanggal ${label}`}
+                          </p>
+                          <p className="text-emerald-400 font-medium">
+                            Pemasukan: Rp {Number(payload[0]?.value || 0).toLocaleString("id-ID")}
+                          </p>
+                          <p className="text-rose-400 font-medium">
+                            Pengeluaran: Rp {Number(payload[1]?.value || 0).toLocaleString("id-ID")}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
                   }}
                 />
-                <Line
+                <Area
                   type="monotone"
                   dataKey="income"
                   stroke="#10b981"
                   strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4, fill: "#10b981" }}
+                  fillOpacity={1}
+                  fill="url(#incomeGrad)"
                 />
-                <Line
+                <Area
                   type="monotone"
                   dataKey="expense"
                   stroke="#ef4444"
                   strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4, fill: "#ef4444" }}
+                  fillOpacity={1}
+                  fill="url(#expenseGrad)"
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -1885,7 +1911,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                           return (
                             <div className="bg-app-card border border-app-border p-3 rounded-xl shadow-xl text-xs space-y-1">
                               <p className="font-semibold text-app-text-bright mb-1 border-b border-app-border pb-1">
-                                Tanggal {label}
+                                {selectedReportPeriod === "today" ? `${label}` : `Tanggal ${label}`}
                               </p>
                               <p className="text-emerald-400 font-medium">
                                 Pemasukan: Rp {Number(payload[0]?.value || 0).toLocaleString("id-ID")}

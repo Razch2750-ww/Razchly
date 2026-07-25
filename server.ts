@@ -1422,7 +1422,9 @@ Jangan hanya memilih saham yang sedang naik. Pertimbangkan secara mendalam keses
         isOffline: false
       });
     } catch (err: any) {
-      console.error("AI Investment insights error:", err);
+      if (err?.status !== 429 && err?.message?.includes('429') === false) {
+        console.error("AI Investment insights error:", err);
+      }
       try {
         const { investments = [], style = "moderate", totalModal = 0, totalEquity = 0, netProfit = 0, marketData = {} } = req.body;
         const fallback = getInvestmentInsightsFallback(investments, style, Number(totalModal), Number(totalEquity), Number(netProfit), marketData);
@@ -1526,7 +1528,12 @@ Jangan hanya memilih saham yang sedang naik. Pertimbangkan secara mendalam keses
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { 
+        middlewareMode: true,
+        hmr: {
+          port: 24678 + Math.floor(Math.random() * 1000)
+        }
+      },
       appType: "spa",
     });
     app.use(vite.middlewares);
@@ -1538,8 +1545,24 @@ Jangan hanya memilih saham yang sedang naik. Pertimbangkan secara mendalam keses
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
+  });
+
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      console.log('Server terminated');
+      process.exit(0);
+    });
+  });
+  
+  process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully');
+    server.close(() => {
+      console.log('Server terminated');
+      process.exit(0);
+    });
   });
 }
 

@@ -565,23 +565,6 @@ export default function Dashboard() {
              </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-           <button 
-             onClick={() => setGlobalAddModalOpen(true)} 
-             className="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-app-accent1 text-app-bg text-xs font-bold active:scale-95 transition-all shadow-sm"
-             title="Tambah Transaksi"
-           >
-             <Plus className="w-3.5 h-3.5" />
-             <span>Tambah</span>
-           </button>
-           <button 
-             onClick={() => navigate('/settings')} 
-             className="w-9 h-9 rounded-xl bg-app-card border border-app-border text-app-text/70 hover:text-app-text-bright active:scale-95 transition-all flex items-center justify-center shadow-sm" 
-             title="Pengaturan"
-           >
-             <Settings className="w-4 h-4" />
-           </button>
-        </div>
       </header>
 
       {/* QUICK SHORTCUTS RIBBON (ALL DEVICES) */}

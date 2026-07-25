@@ -406,14 +406,14 @@ export default function Settings() {
 
       <ScrollReveal className="flex-1 space-y-6 pb-10">
         
-        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
           
-          <button type="button" onClick={() => toggleSection('profil')} className={`relative z-10 w-full flex items-center justify-between ${sections.profil ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
-            <div className="flex items-center gap-2">
-              <UserIcon className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-semibold text-app-text-bright">{t('settings.profil.title')}</h2>
+          <button type="button" onClick={() => toggleSection('profil')} className={`relative z-10 w-full flex items-center justify-between ${sections.profil ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
+            <div className="flex items-center gap-3">
+              <UserIcon className="w-6 h-6 text-app-accent1" />
+              <h2 className="text-base font-bold text-app-text-bright tracking-tight">{t('settings.profil.title')}</h2>
             </div>
-            {sections.profil ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
+            {sections.profil ? <ChevronUp className="w-5 h-5 text-app-text/40" /> : <ChevronDown className="w-5 h-5 text-app-text/40" />}
           </button>
           
           {sections.profil && (
@@ -435,14 +435,14 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/10 via-transparent to-transparent pointer-events-none opacity-[37.5%]" />
-          <button type="button" onClick={() => toggleSection('rekening')} className={`relative z-10 w-full flex items-center justify-between ${sections.rekening ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
-            <div className="flex items-center gap-2">
-              <Wallet className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-semibold text-app-text-bright">{t('settings.rekening.title')}</h2>
+        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/5 via-transparent to-transparent pointer-events-none opacity-50" />
+          <button type="button" onClick={() => toggleSection('rekening')} className={`relative z-10 w-full flex items-center justify-between ${sections.rekening ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
+            <div className="flex items-center gap-3">
+              <Wallet className="w-6 h-6 text-app-accent1" />
+              <h2 className="text-base font-bold text-app-text-bright tracking-tight">{t('settings.rekening.title')}</h2>
             </div>
-            {sections.rekening ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
+            {sections.rekening ? <ChevronUp className="w-5 h-5 text-app-text/40" /> : <ChevronDown className="w-5 h-5 text-app-text/40" />}
           </button>
           
           {sections.rekening && (
@@ -527,14 +527,14 @@ export default function Settings() {
         </section>
 
         {/* SECTION: DAFTAR KATEGORI */}
-        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
           
-          <button type="button" onClick={() => toggleSection('kategori')} className={`relative z-10 w-full flex items-center justify-between ${sections.kategori ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
-            <div className="flex items-center gap-2">
-              <LayoutGrid className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.kategori.title')}</h2>
+          <button type="button" onClick={() => toggleSection('kategori')} className={`relative z-10 w-full flex items-center justify-between ${sections.kategori ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
+            <div className="flex items-center gap-3">
+              <LayoutGrid className="w-6 h-6 text-app-accent1" />
+              <h2 className="text-base font-bold text-app-text-bright tracking-tight uppercase tracking-widest">{t('settings.kategori.title')}</h2>
             </div>
-            {sections.kategori ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
+            {sections.kategori ? <ChevronUp className="w-5 h-5 text-app-text/40" /> : <ChevronDown className="w-5 h-5 text-app-text/40" />}
           </button>
           
           {sections.kategori && (
@@ -626,14 +626,14 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
           
-          <button type="button" onClick={() => toggleSection('grab')} className={`relative z-10 w-full flex items-center justify-between ${sections.grab ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
-            <div className="flex items-center gap-2">
-              <Car className="w-5 h-5 text-app-success" />
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.grab.title')}</h2>
+          <button type="button" onClick={() => toggleSection('grab')} className={`relative z-10 w-full flex items-center justify-between ${sections.grab ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
+            <div className="flex items-center gap-3">
+              <Car className="w-6 h-6 text-app-success" />
+              <h2 className="text-base font-bold text-app-text-bright tracking-tight uppercase tracking-widest">{t('settings.grab.title')}</h2>
             </div>
-            {sections.grab ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
+            {sections.grab ? <ChevronUp className="w-5 h-5 text-app-text/40" /> : <ChevronDown className="w-5 h-5 text-app-text/40" />}
           </button>
           
           {sections.grab && (
@@ -667,14 +667,14 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
           
-          <button type="button" onClick={() => toggleSection('jadwal')} className={`relative z-10 w-full flex items-center justify-between ${sections.jadwal ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
-            <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-app-warning" />
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.jadwal.title')}</h2>
+          <button type="button" onClick={() => toggleSection('jadwal')} className={`relative z-10 w-full flex items-center justify-between ${sections.jadwal ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
+            <div className="flex items-center gap-3">
+              <Calendar className="w-6 h-6 text-app-warning" />
+              <h2 className="text-base font-bold text-app-text-bright tracking-tight uppercase tracking-widest">{t('settings.jadwal.title')}</h2>
             </div>
-            {sections.jadwal ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
+            {sections.jadwal ? <ChevronUp className="w-5 h-5 text-app-text/40" /> : <ChevronDown className="w-5 h-5 text-app-text/40" />}
           </button>
           
           {sections.jadwal && workSchedule && (
@@ -736,14 +736,14 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
           
-          <button type="button" onClick={() => toggleSection('bahasa')} className={`relative z-10 w-full flex items-center justify-between ${sections.bahasa ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
-            <div className="flex items-center gap-2">
-              <Globe className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.bahasa.title')}</h2>
+          <button type="button" onClick={() => toggleSection('bahasa')} className={`relative z-10 w-full flex items-center justify-between ${sections.bahasa ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
+            <div className="flex items-center gap-3">
+              <Globe className="w-6 h-6 text-app-accent1" />
+              <h2 className="text-base font-bold text-app-text-bright tracking-tight uppercase tracking-widest">{t('settings.bahasa.title')}</h2>
             </div>
-            {sections.bahasa ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
+            {sections.bahasa ? <ChevronUp className="w-5 h-5 text-app-text/40" /> : <ChevronDown className="w-5 h-5 text-app-text/40" />}
           </button>
           
           {sections.bahasa && (
@@ -764,14 +764,14 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
           
-          <button type="button" onClick={() => toggleSection('tema')} className={`relative z-10 w-full flex items-center justify-between ${sections.tema ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
-            <div className="flex items-center gap-2">
-              <Palette className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.tema.title')}</h2>
+          <button type="button" onClick={() => toggleSection('tema')} className={`relative z-10 w-full flex items-center justify-between ${sections.tema ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
+            <div className="flex items-center gap-3">
+              <Palette className="w-6 h-6 text-app-accent1" />
+              <h2 className="text-base font-bold text-app-text-bright tracking-tight uppercase tracking-widest">{t('settings.tema.title')}</h2>
             </div>
-            {sections.tema ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
+            {sections.tema ? <ChevronUp className="w-5 h-5 text-app-text/40" /> : <ChevronDown className="w-5 h-5 text-app-text/40" />}
           </button>
 
           {sections.tema && (
@@ -810,14 +810,14 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
           
-          <button type="button" onClick={() => toggleSection('navigasi')} className={`relative z-10 w-full flex items-center justify-between ${sections.navigasi ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
-            <div className="flex items-center gap-2">
-              <LayoutGrid className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.navigasi.title')}</h2>
+          <button type="button" onClick={() => toggleSection('navigasi')} className={`relative z-10 w-full flex items-center justify-between ${sections.navigasi ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
+            <div className="flex items-center gap-3">
+              <LayoutGrid className="w-6 h-6 text-app-accent1" />
+              <h2 className="text-base font-bold text-app-text-bright tracking-tight uppercase tracking-widest">{t('settings.navigasi.title')}</h2>
             </div>
-            {sections.navigasi ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
+            {sections.navigasi ? <ChevronUp className="w-5 h-5 text-app-text/40" /> : <ChevronDown className="w-5 h-5 text-app-text/40" />}
           </button>
 
           {sections.navigasi && (
@@ -874,14 +874,14 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 rounded-[18px] border border-app-border shadow-xl transition-all relative overflow-hidden">
+        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
           
-          <button type="button" onClick={() => toggleSection('font')} className={`relative z-10 w-full flex items-center justify-between ${sections.font ? 'mb-6 border-b border-app-border pb-4' : ''}`}>
-            <div className="flex items-center gap-2">
-              <Type className="w-5 h-5 text-app-accent1" />
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-app-text-bright">{t('settings.font.title')}</h2>
+          <button type="button" onClick={() => toggleSection('font')} className={`relative z-10 w-full flex items-center justify-between ${sections.font ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
+            <div className="flex items-center gap-3">
+              <Type className="w-6 h-6 text-app-accent1" />
+              <h2 className="text-base font-bold text-app-text-bright tracking-tight uppercase tracking-widest">{t('settings.font.title')}</h2>
             </div>
-            {sections.font ? <ChevronUp className="w-5 h-5 text-app-text/50" /> : <ChevronDown className="w-5 h-5 text-app-text/50" />}
+            {sections.font ? <ChevronUp className="w-5 h-5 text-app-text/40" /> : <ChevronDown className="w-5 h-5 text-app-text/40" />}
           </button>
 
           {sections.font && (

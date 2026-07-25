@@ -274,7 +274,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
   };
 
   return (
-    <div className="bg-app-card rounded-[18px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+    <div className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden">
       
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 relative z-10">
@@ -508,7 +508,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
           </div>
 
           {/* Rules Explanation */}
-          <div className="bg-app-card rounded-2xl border border-app-border p-4 text-[11px] text-app-text/60 space-y-3">
+          <div className="bg-app-card rounded-[20px] border border-app-border/60 p-4 sm:p-5 text-xs text-app-text/70 space-y-3 shadow-lg shadow-black/5">
             <h4 className="font-semibold text-app-text-bright">
               Aturan ARA & ARB Bursa Efek Indonesia (BEI):
             </h4>
@@ -1718,32 +1718,32 @@ export default function Investments() {
       mobileActions={mobileActionsInvestments}
     >
       {/* Sub-tab Navigation */}
-      <div className="flex bg-app-bg p-1.5 rounded-2xl border border-app-border self-start mb-6 gap-1.5 relative z-10 shrink-0 shadow-sm">
+      <div className="flex bg-app-card/60 backdrop-blur-md p-1.5 rounded-2xl border border-app-border/60 self-start mb-6 md:mb-8 gap-1.5 relative z-10 shrink-0 shadow-lg shadow-black/5">
         <button
           type="button"
           onClick={() => setActiveTab("dashboard")}
-          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+          className={`px-5 py-2.5 rounded-[14px] text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
             activeTab === "dashboard"
-              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
-              : "text-app-text/60 hover:text-app-text-bright"
+              ? "bg-app-accent1 text-app-bg shadow-md"
+              : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
           }`}
         >
-          <BarChart3 className="w-3.5 h-3.5" />
+          <BarChart3 className="w-4 h-4" />
           {language === "en" ? "Summary" : "Ringkasan"}
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("holding")}
-          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+          className={`px-5 py-2.5 rounded-[14px] text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
             activeTab === "holding"
-              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
-              : "text-app-text/60 hover:text-app-text-bright"
+              ? "bg-app-accent1 text-app-bg shadow-md"
+              : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
           }`}
         >
-          <Briefcase className="w-3.5 h-3.5" />
+          <Briefcase className="w-4 h-4" />
           {language === "en" ? "Portfolio & Audit" : "Portofolio & Audit"}
           {auditedHoldings.length > 0 && (
-            <span className="bg-app-accent1 text-app-bg text-[9px] px-1.5 py-0.5 rounded-full font-semibold">
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${activeTab === "holding" ? "bg-app-bg text-app-accent1" : "bg-app-accent1 text-app-bg"}`}>
               {auditedHoldings.length}
             </span>
           )}
@@ -1754,13 +1754,13 @@ export default function Investments() {
             setActiveTab("ai_insights");
             if (!aiInsightsData) fetchAiInsights(investStyle);
           }}
-          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+          className={`px-5 py-2.5 rounded-[14px] text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === "ai_insights"
-              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
-              : "text-app-text/60 hover:text-app-text-bright"
+              ? "bg-app-accent1 text-app-bg shadow-md"
+              : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
           }`}
         >
-          <Sparkles className="w-3.5 h-3.5 text-app-accent1 animate-pulse" />
+          <Sparkles className={`w-4 h-4 ${activeTab === "ai_insights" ? "text-app-bg" : "text-app-accent1"} animate-pulse`} />
           {language === "en" ? "AI Insights & Stock Picks" : "AI Insights & Rekomendasi Saham"}
         </button>
       </div>
@@ -1772,7 +1772,7 @@ export default function Investments() {
           <div className="lg:col-span-5 flex flex-col gap-6 w-full">
             
             {/* UNIFIED HERO CHART CARD */}
-            <HoverCard className="bg-app-card rounded-[18px] p-5 sm:p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden w-full">
+            <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden w-full">
               
               {/* Header with Mode Toggle & Period Filter */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 relative z-10">
@@ -1976,7 +1976,7 @@ export default function Investments() {
             </HoverCard>
 
             {/* CARD: AI INVESTMENT INSIGHTS & STOCK ADVISOR BANNER */}
-            <HoverCard className="bg-gradient-to-br from-app-card via-app-card to-app-accent1/5 rounded-[18px] p-5 border border-app-accent1/30 flex flex-col shadow-sm relative overflow-hidden w-full group">
+            <HoverCard className="bg-gradient-to-br from-app-card via-app-card to-app-accent1/5 rounded-[20px] p-6 border border-app-accent1/30 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden w-full group">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <BrainCircuit className="w-24 h-24 text-app-accent1" />
               </div>
@@ -2030,7 +2030,7 @@ export default function Investments() {
 
           {/* COLUMN 2: MIDDLE PANEL - TOTAL EQUITY RETURN (lg:col-span-3) */}
           <div className="lg:col-span-3 w-full">
-            <HoverCard className="bg-app-card rounded-[18px] p-5 border border-app-border flex flex-col shadow-sm relative overflow-hidden w-full h-[620px]">
+            <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden w-full h-[620px]">
               
               
               <div className="relative z-10 flex flex-col gap-3 shrink-0 mb-4">
@@ -2144,7 +2144,7 @@ export default function Investments() {
 
           {/* COLUMN 3: RIGHT PANEL - PORTFOLIO ALLOCATION (lg:col-span-4) */}
           <div className="lg:col-span-4 w-full">
-            <HoverCard className="bg-app-card rounded-[18px] p-5 border border-app-border flex flex-col shadow-sm relative overflow-hidden w-full min-h-[620px]">
+            <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden w-full min-h-[620px]">
               
               
               <div className="relative z-10 flex justify-between items-center shrink-0 mb-4">
@@ -2296,54 +2296,54 @@ export default function Investments() {
             {/* WIDGETS (STACK ON MOBILE, GRID ON DESKTOP) */}
             <div className="flex flex-col gap-3.5 mb-6 md:grid md:grid-cols-3 md:gap-5 md:mb-8">
               {/* TOTAL INVESTASI */}
-              <HoverCard className="bg-app-card rounded-[18px] p-4 sm:p-5 border border-app-border flex items-center justify-between shadow-sm relative overflow-hidden cursor-pointer w-full min-h-[92px]">
-                <div className="flex items-center gap-3.5 relative z-10 w-full min-w-0">
-                  <div className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${incomeToday >= 0 ? "bg-app-success/15" : "bg-app-danger/15"}`}>
-                    <BarChart3 className={`w-5.5 h-5.5 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`} />
+              <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex items-center justify-between shadow-lg shadow-black/10 relative overflow-hidden cursor-pointer w-full min-h-[100px]">
+                <div className="flex items-center gap-5 relative z-10 w-full min-w-0">
+                  <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center ${incomeToday >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
+                    <BarChart3 className={`w-7 h-7 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-app-text/60 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-0.5">
+                    <p className="text-app-text/50 text-[11px] font-bold uppercase tracking-widest mb-1">
                       Total Investasi
                     </p>
-                    <p className="text-lg sm:text-xl font-bold text-app-text-bright font-mono leading-tight truncate">
+                    <p className="text-2xl font-bold text-app-text-bright font-mono leading-tight truncate">
                       Rp {totalBalance.toLocaleString("id-ID")}
                     </p>
-                    <div className={`flex items-center gap-1 mt-1 text-[11px] font-semibold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                    <div className={`flex items-center gap-1.5 mt-2 text-[12px] font-semibold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
                       {incomeToday >= 0 ? (
                         <>
-                          <TrendingUp className="w-3.5 h-3.5 shrink-0" /> <span className="whitespace-nowrap">Berjalan baik</span>
+                          <TrendingUp className="w-4 h-4 shrink-0" /> <span className="whitespace-nowrap">Berjalan baik</span>
                         </>
                       ) : (
                         <>
-                          <TrendingDown className="w-3.5 h-3.5 shrink-0" /> <span className="whitespace-nowrap">Sedang menurun</span>
+                          <TrendingDown className="w-4 h-4 shrink-0" /> <span className="whitespace-nowrap">Sedang menurun</span>
                         </>
                       )}
                     </div>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 shrink-0 text-app-text/40 relative z-10 ml-1" />
+                <ChevronRight className="w-5 h-5 shrink-0 text-app-text/30 relative z-10 ml-2" />
               </HoverCard>
 
               {/* RETURN */}
-              <HoverCard className="bg-app-card rounded-[18px] border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer w-full min-h-[92px]">
-                <div className="flex-1 p-3.5 sm:p-4 border-r border-app-border flex flex-col justify-center relative z-10 min-w-0">
-                   <p className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider mb-0.5">Modal Awal</p>
-                   <p className="text-base sm:text-lg font-bold text-app-text-bright font-mono leading-tight truncate">Rp {expenseToday.toLocaleString("id-ID")}</p>
+              <HoverCard className="bg-app-card rounded-[20px] border border-app-border/60 flex shadow-lg shadow-black/10 overflow-hidden relative cursor-pointer w-full min-h-[100px]">
+                <div className="flex-1 p-5 border-r border-app-border/60 flex flex-col justify-center relative z-10 min-w-0">
+                   <p className="text-app-text/50 text-[11px] font-bold uppercase tracking-widest mb-1">Modal Awal</p>
+                   <p className="text-lg font-bold text-app-text-bright font-mono leading-tight truncate">Rp {expenseToday.toLocaleString("id-ID")}</p>
                 </div>
-                <div className="flex-1 p-3.5 sm:p-4 flex flex-col justify-center relative z-10 min-w-0">
-                   <p className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider mb-0.5">Sekarang</p>
-                   <p className={`text-base sm:text-lg font-bold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} font-mono leading-tight truncate`}>
+                <div className="flex-1 p-5 flex flex-col justify-center relative z-10 min-w-0">
+                   <p className="text-app-text/50 text-[11px] font-bold uppercase tracking-widest mb-1">Sekarang</p>
+                   <p className={`text-lg font-bold ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} font-mono leading-tight truncate`}>
                      Rp {totalBalance.toLocaleString("id-ID")}
                    </p>
-                   <div className={`text-[10px] sm:text-[11px] font-semibold mt-1 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} leading-tight font-mono whitespace-nowrap truncate`}>
+                   <div className={`text-[11px] font-semibold mt-1 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"} leading-tight font-mono whitespace-nowrap truncate`}>
                       {incomeToday >= 0 ? "+" : ""}Rp {incomeToday.toLocaleString("id-ID")} ({incomeToday >= 0 ? "+" : ""}{expenseToday > 0 ? ((incomeToday / expenseToday) * 100).toFixed(2) : "0.00"}%)
                    </div>
                 </div>
               </HoverCard>
 
               {/* PASAR: IHSG & KURS RUPIAH */}
-              <HoverCard className="bg-app-card rounded-[18px] border border-app-border flex shadow-sm overflow-hidden relative cursor-pointer w-full min-h-[92px]">
-                <div className="flex-1 p-3.5 sm:p-4 border-r border-app-border hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0">
+              <HoverCard className="bg-app-card rounded-[20px] border border-app-border/60 flex shadow-lg shadow-black/10 overflow-hidden relative cursor-pointer w-full min-h-[100px]">
+                <div className="flex-1 p-3.5 sm:p-5 border-r border-app-border/60 hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0">
                    <div className="flex justify-between items-center mb-0.5">
                      <p className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider">IHSG</p>
                      {ihsgChange >= 0 ? (
@@ -2363,7 +2363,7 @@ export default function Investments() {
                    href="https://www.google.com/search?q=1+dolar"
                    target="_blank"
                    rel="noopener noreferrer"
-                   className="flex-1 p-3.5 sm:p-4 hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0"
+                   className="flex-1 p-3.5 sm:p-5 hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0"
                 >
                    <div className="flex justify-between items-center mb-0.5">
                      <p className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider">USD/IDR</p>
@@ -2389,23 +2389,23 @@ export default function Investments() {
       {/* MAIN SECTIONS */}
       <div className="flex flex-col gap-6 mb-6">
         {/* PERFORMA INVESTASI */}
-        <div className="bg-app-card rounded-[18px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-[20px] p-6 sm:p-8 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden">
           
-          <div className="flex items-center justify-between mb-6 relative z-10">
-            <h2 className="text-app-text-bright font-semibold">
+          <div className="flex items-center justify-between mb-6 md:mb-8 relative z-10">
+            <h2 className="text-app-text-bright text-xl sm:text-2xl font-bold tracking-tight">
               Performa Investasi
             </h2>
             <div className="flex items-center gap-2">
               <div className="bg-app-bg rounded-full p-1 border border-app-border flex">
                 <button
                   onClick={() => setChartPeriod("1W")}
-                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === "1W" ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${chartPeriod === "1W" ? "bg-app-accent1 text-app-bg shadow-md" : "bg-app-bg/50 text-app-text/60 hover:bg-app-hover hover:text-app-text-bright"}`}
                 >
                   7 Hari
                 </button>
                 <button
                   onClick={() => setChartPeriod("1M")}
-                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${chartPeriod === "1M" ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${chartPeriod === "1M" ? "bg-app-accent1 text-app-bg shadow-md" : "bg-app-bg/50 text-app-text/60 hover:bg-app-hover hover:text-app-text-bright"}`}
                 >
                   30 Hari
                 </button>
@@ -2413,9 +2413,9 @@ export default function Investments() {
             </div>
           </div>
 
-          <div className="flex-1 min-h-[250px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
+            <div className="bg-app-card p-6 rounded-[20px] border border-app-border/60 shadow-lg shadow-black/10 flex-1 min-h-[350px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
                 data={chartData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
@@ -2475,6 +2475,13 @@ export default function Investments() {
                   }}
                   formatter={(value: number, name: string) => [`Rp ${value.toLocaleString("id-ID")}`, name]}
                 />
+                <Area
+                  type="monotone"
+                  dataKey="value"
+                  stroke="none"
+                  fill={`url(#colorValue-${chartPeriod})`}
+                  fillOpacity={0.15}
+                />
                 <Line
                   type="monotone"
                   name="Nilai Sekarang"
@@ -2525,18 +2532,18 @@ export default function Investments() {
                   dot={false}
                   activeDot={{ r: 3 }}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* PORTOFOLIO */}
-        <div className="bg-app-card rounded-[18px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-[20px] p-6 sm:p-8 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden">
           
           
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4 md:gap-6 relative z-10">
             <div className="flex flex-col gap-1.5 w-full md:w-auto">
-              <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">
+              <h2 className="text-app-text-bright text-xl sm:text-2xl font-bold tracking-tight">
                 Portofolio Investasi
               </h2>
               <div className="flex bg-app-bg p-1 rounded-xl border border-app-border self-start">
@@ -3088,344 +3095,8 @@ export default function Investments() {
         </div>
       </div>
 
-      {/* REMOVING DUPLICATE AUDIT BLOCK */}
-      <div style={{ display: "none" }}>
-              {/* Alert / Explanation */}
-              <div className="bg-app-accent1/10 border border-app-accent1/20 p-4 rounded-2xl flex items-start gap-3">
-                <Info className="w-5 h-5 text-app-accent1 shrink-0 mt-0.5" />
-                <div className="text-xs text-app-text/90 leading-relaxed">
-                  <p className="font-semibold text-app-text-bright mb-1">Analisis Transaksi & Evaluasi Pasar</p>
-                  Bagian ini secara otomatis memindai seluruh riwayat transaksi keuangan Anda yang menyangkut investasi (Kategori Beli/Jual atau catatan yang sesuai) dan mencocokkannya dengan harga terkini di pasar untuk mengaudit modal riil dan nilai kepemilikan Anda.
-                </div>
-              </div>
+      {/* REMOVED DUPLICATE AUDIT BLOCK */}
 
-              {/* Total Aggregate Widgets */}
-              {(() => {
-                let totalTxModal = 0; // Cost Basis of Active holdings: sum of activeQty * avgBuyPrice
-                let totalTxCurrentValue = 0; // Live value: sum of activeQty * livePrice
-                let totalActualSpent = 0; // Net Cash Flow: sum of all buys - sum of all sells
-                let totalWins = 0;
-                let totalLosses = 0;
-                let totalRealizedPL = 0;
-
-                auditedHoldings.forEach((h) => {
-                  const mult = h.category === "saham" ? 100 : 1;
-                  const avgPrice = h.totalBuyQty > 0 ? h.totalBuyAmount / (h.totalBuyQty * mult) : 0;
-                  
-                  // Net cash spent
-                  totalActualSpent += (h.totalBuyAmount - h.totalSellAmount);
-
-                  // Accumulate trading wins, losses, and realized profit/loss
-                  totalWins += h.wins || 0;
-                  totalLosses += h.losses || 0;
-                  totalRealizedPL += h.realizedPL || 0;
-
-                  if (h.qty > 0) {
-                    const livePrice = getLivePrice({ category: h.category, code: h.code, price: avgPrice } as Investment);
-                    totalTxModal += h.qty * mult * avgPrice;
-                    totalTxCurrentValue += h.qty * mult * livePrice;
-                  }
-                });
-
-                const totalTxProfit = totalTxCurrentValue - totalTxModal;
-                const totalTxProfitPct = totalTxModal > 0 ? (totalTxProfit / totalTxModal) * 100 : 0;
-
-                const totalTrades = totalWins + totalLosses;
-                const winRate = totalTrades > 0 ? (totalWins / totalTrades) * 100 : 0;
-
-                return (
-                  <div className="flex flex-col gap-4">
-                    {/* First Row: Holdings Capital Basis */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
-                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
-                          Modal Kepemilikan (Cost Basis)
-                        </p>
-                        <p className="text-lg font-semibold text-app-text-bright">
-                          Rp {Math.round(totalTxModal).toLocaleString("id-ID")}
-                        </p>
-                        <p className="text-[10px] text-app-text/50 mt-1">
-                          Berdasarkan sisa unit & harga beli rata-rata
-                        </p>
-                      </div>
-
-                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
-                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
-                          Nilai Pasar Saat Ini
-                        </p>
-                        <p className="text-lg font-semibold text-app-text-bright">
-                          Rp {Math.round(totalTxCurrentValue).toLocaleString("id-ID")}
-                        </p>
-                        <p className={`text-[10px] font-semibold mt-1 ${totalTxProfit >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                          {totalTxProfit >= 0 ? "+" : ""}Rp {Math.round(totalTxProfit).toLocaleString("id-ID")} ({totalTxProfit >= 0 ? "+" : ""}{totalTxProfitPct.toFixed(2)}%)
-                        </p>
-                      </div>
-
-                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
-                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
-                          Arus Kas Bersih Keluar
-                        </p>
-                        <p className="text-lg font-semibold text-app-text-bright">
-                          Rp {Math.round(totalActualSpent).toLocaleString("id-ID")}
-                        </p>
-                        <p className="text-[10px] text-app-text/50 mt-1">
-                          Total pembelian dikurangi total penjualan
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Second Row: Realized Sales Performance & Accuracy */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl flex flex-col justify-between">
-                        <div>
-                          <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
-                            Keuntungan Realisasi (Realized Profit/Loss)
-                          </p>
-                          <p className={`text-lg font-semibold ${totalRealizedPL >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                            {totalRealizedPL >= 0 ? "+" : ""}Rp {Math.round(totalRealizedPL).toLocaleString("id-ID")}
-                          </p>
-                        </div>
-                        <p className="text-[10px] text-app-text/50 mt-2">
-                          Total keuntungan/kerugian riil dari transaksi penjualan yang telah direalisasikan
-                        </p>
-                      </div>
-
-                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl flex flex-col justify-between">
-                        <div>
-                          <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
-                            Akurasi Transaksi Jual (Win/Loss Rate)
-                          </p>
-                          <div className="flex items-baseline gap-2 mt-1">
-                            <span className="text-lg font-semibold text-app-text-bright">
-                              {winRate.toFixed(1)}% Win Rate
-                            </span>
-                            <span className="text-xs text-app-text/60">
-                              ({totalWins} Win / {totalLosses} Lose)
-                            </span>
-                          </div>
-                        </div>
-                        <div className="w-full bg-app-border/30 h-1.5 rounded-full overflow-hidden mt-3 relative">
-                          <div 
-                            className="bg-app-success h-full" 
-                            style={{ width: `${totalTrades > 0 ? winRate : 0}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Audited Assets Table */}
-              <div className="border border-app-border rounded-2xl overflow-hidden bg-app-bg/25">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs min-w-[850px]">
-                    <thead>
-                      <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-semibold uppercase tracking-wider text-[10px]">
-                        <th className="py-4 px-4">Instrumen</th>
-                        <th className="py-4 px-4 text-right">Kuantitas</th>
-                        <th className="py-4 px-4 text-right">Avg Beli</th>
-                        <th className="py-4 px-4 text-right">Harga Live</th>
-                        <th className="py-4 px-4 text-right">Hasil Jual (Realized)</th>
-                        <th className="py-4 px-4 text-right">Nilai Sekarang</th>
-                        <th className="py-4 px-4 text-right">Return (P/L)</th>
-                        <th className="py-4 px-4 text-center">Status Portofolio</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-app-border/40 text-app-text/80">
-                      {auditedHoldings.length === 0 ? (
-                        <tr>
-                          <td colSpan={8} className="py-8 text-center text-app-text/50">
-                            Tidak ditemukan transaksi investasi di riwayat Anda.
-                          </td>
-                        </tr>
-                      ) : (
-                        auditedHoldings.map((h) => {
-                          const mult = h.category === "saham" ? 100 : 1;
-                          const avgPrice = h.totalBuyQty > 0 ? h.totalBuyAmount / (h.totalBuyQty * mult) : 0;
-                          const livePrice = getLivePrice({ category: h.category, code: h.code, price: avgPrice } as Investment);
-                          const activeValue = h.qty * mult * livePrice;
-                          const costBasis = h.qty * mult * avgPrice;
-                          const pl = activeValue - costBasis;
-                          const plPct = costBasis > 0 ? (pl / costBasis) * 100 : 0;
-
-                          // Check alignment with active portfolio investments state
-                          const currentMatch = investments.find(inv => inv.category === h.category && inv.code === h.code);
-                          let statusLabel = "Sesuai";
-                          let statusClass = "bg-app-success/15 text-app-success border-app-success/30";
-                          
-                          if (!currentMatch) {
-                            if (h.qty > 0) {
-                              statusLabel = "Belum Tercatat";
-                              statusClass = "bg-yellow-500/15 text-yellow-500 border-yellow-500/30";
-                            } else {
-                              statusLabel = "Lunas (Sudah Jual)";
-                              statusClass = "bg-app-text/10 text-app-text/60 border-app-border";
-                            }
-                          } else if (Math.abs(currentMatch.qty - h.qty) > 0.0001) {
-                            statusLabel = "Selisih Qty";
-                            statusClass = "bg-amber-500/15 text-amber-500 border-amber-500/30";
-                          } else if (Math.abs(currentMatch.price - avgPrice) > 1) {
-                            statusLabel = "Selisih Harga";
-                            statusClass = "bg-blue-500/15 text-blue-500 border-blue-500/30";
-                          }
-
-                          return (
-                            <tr key={`${h.category}-${h.code}`} className="hover:bg-app-hover/30 transition-colors">
-                              <td className="py-3.5 px-4 font-semibold text-app-text-bright flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-app-card border border-app-border flex items-center justify-center overflow-hidden shrink-0">
-                                  <AssetLogo code={h.code} logoid={quotes[h.category === "emas" ? "EMAS" : h.code]?.logoid} />
-                                </div>
-                                <div className="flex flex-col">
-                                  <span className="font-semibold">{h.code}</span>
-                                  <span className="text-[10px] text-app-text/50 font-semibold uppercase">{h.category}</span>
-                                </div>
-                              </td>
-                              <td className="py-3.5 px-4 text-right font-medium text-app-text-bright">
-                                {h.qty} {h.category === "emas" ? "g" : h.category === "crypto" ? "koin" : "lot"}
-                              </td>
-                              <td className="py-3.5 px-4 text-right font-medium">
-                                Rp {Math.round(avgPrice).toLocaleString("id-ID")}
-                              </td>
-                              <td className="py-3.5 px-4 text-right font-medium">
-                                Rp {Math.round(livePrice).toLocaleString("id-ID")}
-                              </td>
-                              <td className="py-3.5 px-4 text-right font-medium">
-                                {h.wins > 0 || h.losses > 0 ? (
-                                  <div className="flex flex-col items-end">
-                                    <span className={`font-semibold ${h.realizedPL >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                                      {h.realizedPL >= 0 ? "+" : ""}Rp {Math.round(h.realizedPL).toLocaleString("id-ID")}
-                                    </span>
-                                    <span className="text-[9px] font-semibold">
-                                      <span className="text-app-success">{h.wins}W</span>
-                                      <span className="text-app-text/50 mx-1">/</span>
-                                      <span className="text-app-danger">{h.losses}L</span>
-                                    </span>
-                                  </div>
-                                ) : (
-                                  <span className="text-app-text/50 font-medium">-</span>
-                                )}
-                              </td>
-                              <td className="py-3.5 px-4 text-right font-semibold text-app-text-bright">
-                                Rp {Math.round(activeValue).toLocaleString("id-ID")}
-                              </td>
-                              <td className={`py-3.5 px-4 text-right font-semibold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                                {pl >= 0 ? "+" : ""}Rp {Math.round(pl).toLocaleString("id-ID")}
-                                <span className="block text-[10px] font-normal opacity-80">
-                                  ({pl >= 0 ? "+" : ""}{plPct.toFixed(2)}%)
-                                </span>
-                              </td>
-                              <td className="py-3.5 px-4 text-center">
-                                <span className={`text-[10px] px-2.5 py-1 rounded-full border font-semibold ${statusClass}`}>
-                                  {statusLabel}
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Action Buttons for synchronization */}
-              {auditedHoldings.length > 0 && (
-                <div className="flex flex-col sm:flex-row justify-between items-center bg-app-bg/50 border border-app-border p-5 rounded-2xl gap-4">
-                  <div className="text-xs text-app-text/70 text-center sm:text-left">
-                    <span className="font-semibold text-app-text-bright block mb-1">Mendeteksi Selisih Antara Riwayat & Portofolio?</span>
-                    Tombol sinkronisasi akan menyelaraskan daftar instrumen portofolio Anda agar sesuai dengan total transaksi pembelian dan penjualan yang tercatat di atas.
-                  </div>
-                  <button
-                    onClick={syncInvestmentsWithTransactions}
-                    className="flex items-center gap-2 bg-app-accent1 hover:bg-app-accent1-hover text-app-bg font-semibold px-5 py-3 rounded-xl transition-all shadow-md shrink-0 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs"
-                  >
-                    <RefreshCw className="w-4 h-4" /> SINKRONKAN PORTOFOLIO SEKARANG
-                  </button>
-                </div>
-              )}
-
-              {/* Detailed Transaction Trail Log */}
-              <div className="space-y-3">
-                <h3 className="text-xs font-semibold text-app-text-bright uppercase tracking-wider flex items-center gap-1.5">
-                  <FileText className="w-4 h-4 text-app-accent1" /> Audit Trail Transaksi Investasi
-                </h3>
-                <div className="border border-app-border rounded-2xl overflow-hidden bg-app-bg/15 max-h-[300px] overflow-y-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-semibold uppercase tracking-wider text-[9px] sticky top-0 z-10">
-                        <th className="py-3 px-4">Tanggal</th>
-                        <th className="py-3 px-4">Jenis</th>
-                        <th className="py-3 px-4">Aset</th>
-                        <th className="py-3 px-4 text-right">Kuantitas</th>
-                        <th className="py-3 px-4 text-right">Total Transaksi</th>
-                        <th className="py-3 px-4">Catatan</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-app-border/30">
-                      {(() => {
-                        const logs = allTransactions
-                          .map(tx => {
-                            const parsed = parseInvestmentFromTransaction(tx);
-                            return parsed ? { tx, parsed } : null;
-                          })
-                          .filter(Boolean);
-
-                        if (logs.length === 0) {
-                          return (
-                            <tr>
-                              <td colSpan={6} className="py-6 text-center text-app-text/50">
-                                Tidak ada log transaksi investasi.
-                              </td>
-                            </tr>
-                          );
-                        }
-
-                        return logs.map((log) => {
-                          if (!log) return null;
-                          const { tx, parsed } = log;
-                          const formattedDate = new Date(tx.date).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit"
-                          });
-                          return (
-                            <tr key={tx.id} className="hover:bg-app-hover/20">
-                              <td className="py-2.5 px-4 text-app-text/60">
-                                {formattedDate}
-                              </td>
-                              <td className="py-2.5 px-4">
-                                <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold border ${
-                                  parsed.type === "buy" 
-                                    ? "bg-app-success/10 text-app-success border-app-success/20" 
-                                    : "bg-app-danger/10 text-app-danger border-app-danger/20"
-                                }`}>
-                                  {parsed.type === "buy" ? "BELI" : "JUAL"}
-                                </span>
-                              </td>
-                              <td className="py-2.5 px-4 font-semibold text-app-text-bright">
-                                {parsed.code}
-                              </td>
-                              <td className="py-2.5 px-4 text-right font-medium">
-                                {parsed.qty} {parsed.category === "emas" ? "g" : parsed.category === "crypto" ? "koin" : "lot"}
-                              </td>
-                              <td className="py-2.5 px-4 text-right font-semibold text-app-text-bright">
-                                Rp {tx.amount.toLocaleString("id-ID")}
-                              </td>
-                              <td className="py-2.5 px-4 text-app-text/70 truncate max-w-[200px]" title={tx.note}>
-                                {tx.note}
-                              </td>
-                            </tr>
-                          );
-                        });
-                      })()}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
         </>
       )}
 
@@ -3433,7 +3104,7 @@ export default function Investments() {
       {activeTab === "ai_insights" && (
         <div className="flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-300 mb-8">
           {/* TOP HEADER & RE-ANALYZE BAR */}
-          <div className="bg-app-card rounded-[20px] p-6 border border-app-border flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+          <div className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg shadow-black/10 relative overflow-hidden">
             <div className="flex items-start gap-3.5 relative z-10">
               <div className="p-3 rounded-2xl bg-app-accent1/10 text-app-accent1 border border-app-accent1/20 shrink-0">
                 <BrainCircuit className="w-6 h-6" />
@@ -3465,7 +3136,7 @@ export default function Investments() {
           </div>
 
           {/* INVESTMENT STYLE SELECTOR (Gaya Investasi) */}
-          <div className="bg-app-card rounded-[20px] p-6 border border-app-border shadow-sm flex flex-col gap-4">
+          <div className="bg-app-card rounded-[20px] p-6 border border-app-border/60 shadow-lg shadow-black/10 flex flex-col gap-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
                 <h3 className="text-sm font-bold text-app-text-bright flex items-center gap-2">
@@ -3566,7 +3237,7 @@ export default function Investments() {
 
           {/* AI LOADING / ERROR STATES */}
           {isAiInsightsLoading && (
-            <div className="bg-app-card rounded-[20px] p-12 border border-app-border flex flex-col items-center justify-center gap-4 text-center">
+            <div className="bg-app-card rounded-[20px] p-12 border border-app-border/60 shadow-lg shadow-black/10 flex flex-col items-center justify-center gap-4 text-center">
               <div className="relative">
                 <div className="w-12 h-12 rounded-full border-2 border-app-accent1/30 border-t-app-accent1 animate-spin" />
                 <BrainCircuit className="w-6 h-6 text-app-accent1 absolute inset-0 m-auto animate-pulse" />
@@ -3604,7 +3275,7 @@ export default function Investments() {
               {/* SECTION 1: PORTFOLIO FLOW INSIGHTS */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* HEALTH SCORE GAUGE & SUMMARY */}
-                <div className="lg:col-span-6 bg-app-card rounded-[20px] p-6 border border-app-border flex flex-col gap-4 shadow-sm">
+                <div className="lg:col-span-6 bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col gap-4 shadow-lg shadow-black/10">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="p-2 rounded-xl bg-app-accent1/10 text-app-accent1">
@@ -3655,7 +3326,7 @@ export default function Investments() {
                 </div>
 
                 {/* STRENGTHS & RISKS BREAKDOWN */}
-                <div className="lg:col-span-6 bg-app-card rounded-[20px] p-6 border border-app-border flex flex-col gap-4 shadow-sm">
+                <div className="lg:col-span-6 bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col gap-4 shadow-lg shadow-black/10">
                   <h3 className="text-sm font-bold text-app-text-bright flex items-center gap-2">
                     <Info className="w-4 h-4 text-app-accent1" />
                     Diagnostik Alur Investasi
@@ -3730,7 +3401,7 @@ export default function Investments() {
                     return (
                       <div
                         key={idx}
-                        className="bg-app-card rounded-[20px] p-5 border border-app-border hover:border-app-accent1/50 transition-all shadow-sm flex flex-col justify-between gap-4 group relative overflow-hidden"
+                        className="bg-app-card rounded-[20px] p-5 border border-app-border/60 hover:border-app-accent1/50 transition-all shadow-lg shadow-black/5 hover:shadow-black/10 flex flex-col justify-between gap-4 group relative overflow-hidden"
                       >
                         <div className="flex flex-col gap-3">
                           {/* CARD HEADER */}
@@ -3903,7 +3574,7 @@ export default function Investments() {
       {/* Modal Simulasi ARA/ARB */}
       {isSimulatorOpen && (
         <div className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-app-card text-app-text w-full max-w-5xl rounded-[18px] shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+          <div className="bg-app-card text-app-text w-full max-w-5xl rounded-[20px] shadow-2xl border border-app-border/60 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg shrink-0">
               <h2 className="text-lg font-semibold text-app-text-bright flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-app-accent1" />
@@ -3926,7 +3597,7 @@ export default function Investments() {
       {/* Modal Tambah Portofolio */}
       {isPortfolioModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full max-w-md rounded-[18px] shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-app-card text-app-text w-full max-w-md rounded-[20px] shadow-2xl border border-app-border/60 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
                 {portoEditId ? "Sesuaikan Portofolio" : portoTxType === "beli" ? "Beli Investasi" : "Jual Investasi"}
