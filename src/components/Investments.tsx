@@ -36,6 +36,21 @@ import {
   List,
   PieChart as PieChartIcon,
   Info,
+  Sparkles,
+  ShieldCheck,
+  Target,
+  Zap,
+  Award,
+  AlertTriangle,
+  CheckCircle2,
+  DollarSign,
+  Layers,
+  Bot,
+  ArrowUpRight,
+  BrainCircuit,
+  Check,
+  Clock,
+  ShieldAlert,
 } from "lucide-react";
 import {
   LineChart,
@@ -638,7 +653,11 @@ export default function Investments() {
     [],
   );
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "holding" | "audit">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "holding" | "audit" | "ai_insights">("dashboard");
+  const [investStyle, setInvestStyle] = useState<"dividend" | "growth" | "value" | "swing" | "moderate" | "conservative">("growth");
+  const [aiInsightsData, setAiInsightsData] = useState<any>(null);
+  const [isAiInsightsLoading, setIsAiInsightsLoading] = useState(false);
+  const [aiInsightsError, setAiInsightsError] = useState<string | null>(null);
   const [chartPeriod, setChartPeriod] = useState<"1W" | "1M" | "3M" | "YTD" | "1Y" | "All">("1M");
   const [equityReturnViewMode, setEquityReturnViewMode] = useState<"daily" | "monthly">("daily");
   const navigate = useNavigate();
@@ -1315,6 +1334,66 @@ export default function Investments() {
     return sum + inv.qty * mult * inv.price;
   }, 0);
 
+  const fetchAiInsights = async (styleToUse?: string) => {
+    const currentStyle = styleToUse || investStyle;
+    setIsAiInsightsLoading(true);
+    setAiInsightsError(null);
+
+    try {
+      const token = await user?.getIdToken();
+      const res = await fetch("/api/ai/investment-insights", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : ""
+        },
+        body: JSON.stringify({
+          investments: activeInvestments.map((inv) => {
+            const livePrice = getLivePrice(inv);
+            const mult = inv.category === "saham" ? 100 : 1;
+            const totalCost = inv.qty * inv.price * mult;
+            const currentValue = inv.qty * livePrice * mult;
+            const profitLoss = currentValue - totalCost;
+            const returnPct = totalCost > 0 ? (profitLoss / totalCost) * 100 : 0;
+            return {
+              category: inv.category,
+              code: inv.code,
+              qty: inv.qty,
+              costBasis: inv.price,
+              totalCost,
+              currentValue,
+              profitLoss,
+              returnPct
+            };
+          }),
+          style: currentStyle,
+          totalModal: expenseToday,
+          totalEquity: totalBalance,
+          netProfit: incomeToday,
+          marketData
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      setAiInsightsData({ ...data, style: currentStyle });
+    } catch (err: any) {
+      console.error("Gagal mengambil AI Investment Insights:", err);
+      setAiInsightsError("Gagal terhubung dengan server AI. Silakan coba beberapa saat lagi.");
+    } finally {
+      setIsAiInsightsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "ai_insights" && (!aiInsightsData || aiInsightsData.style !== investStyle)) {
+      fetchAiInsights(investStyle);
+    }
+  }, [activeTab, investStyle]);
+
   // Calculate days count based on period
   const numDays = useMemo(() => {
     if (chartPeriod === "1W") return 7;
@@ -1676,6 +1755,21 @@ export default function Investments() {
             </span>
           )}
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("ai_insights");
+            if (!aiInsightsData) fetchAiInsights(investStyle);
+          }}
+          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+            activeTab === "ai_insights"
+              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
+              : "text-app-text/60 hover:text-app-text-bright"
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-app-accent1 animate-pulse" />
+          {language === "en" ? "AI Insights & Stock Picks" : "AI Insights & Rekomendasi Saham"}
+        </button>
       </div>
 
       {activeTab === "dashboard" && (
@@ -1885,6 +1979,57 @@ export default function Investments() {
                     {p}
                   </button>
                 ))}
+              </div>
+            </HoverCard>
+
+            {/* CARD: AI INVESTMENT INSIGHTS & STOCK ADVISOR BANNER */}
+            <HoverCard className="bg-gradient-to-br from-app-card via-app-card to-app-accent1/5 rounded-[18px] p-5 border border-app-accent1/30 flex flex-col shadow-sm relative overflow-hidden w-full group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <BrainCircuit className="w-24 h-24 text-app-accent1" />
+              </div>
+
+              <div className="flex items-center justify-between mb-3 relative z-10">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-app-accent1/10 text-app-accent1 border border-app-accent1/20">
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-app-text/60">
+                      AI Investment Advisor
+                    </h3>
+                    <p className="text-sm font-bold text-app-text-bright">
+                      Pantau Alur & Rekomendasi Saham
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-app-accent1/10 text-app-accent1 border border-app-accent1/20">
+                  Gaya: {investStyle.toUpperCase()}
+                </span>
+              </div>
+
+              <p className="text-xs text-app-text/80 line-clamp-2 mb-4 leading-relaxed relative z-10">
+                {aiInsightsData?.portfolioHealth?.summary ||
+                  `Analisis AI memantau ekuitas Rp ${totalBalance.toLocaleString("id-ID")} Anda dan memberikan saran emiten saham pilihan terbaik sesuai gaya ${investStyle}.`}
+              </p>
+
+              <div className="flex items-center justify-between pt-3 border-t border-app-border/50 relative z-10 mt-auto">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-semibold text-app-text/60">Skor Kesehatan:</span>
+                  <span className="text-xs font-extrabold font-mono text-app-accent1 bg-app-accent1/10 px-2 py-0.5 rounded-md">
+                    {aiInsightsData?.portfolioHealth?.score || 78}/100
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab("ai_insights");
+                    if (!aiInsightsData) fetchAiInsights(investStyle);
+                  }}
+                  className="text-xs font-bold text-app-accent1 hover:text-app-accent1/80 flex items-center gap-1 transition-all cursor-pointer group-hover:translate-x-0.5"
+                >
+                  <span>Buka AI Insights</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
             </HoverCard>
 
@@ -2137,7 +2282,7 @@ export default function Investments() {
         </div>
       )}
 
-      {activeTab !== "dashboard" && (() => {
+      {activeTab !== "dashboard" && activeTab !== "ai_insights" && (() => {
         const getMarketChangeVal = (item: any) => {
           if (!item || item.change === undefined) return 0;
           let c = Number(item.change);
@@ -3119,6 +3264,477 @@ export default function Investments() {
           )}
         </div>
       </div>
+
+      {/* AI INSIGHTS & STOCK RECOMMENDATIONS VIEW */}
+      {activeTab === "ai_insights" && (
+        <div className="flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-300 mb-8">
+          {/* TOP HEADER & RE-ANALYZE BAR */}
+          <div className="bg-app-card rounded-[20px] p-6 border border-app-border flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+            <div className="flex items-start gap-3.5 relative z-10">
+              <div className="p-3 rounded-2xl bg-app-accent1/10 text-app-accent1 border border-app-accent1/20 shrink-0">
+                <BrainCircuit className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-lg font-bold text-app-text-bright">
+                    AI Investment Insights & Rekomendasi Saham
+                  </h2>
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-app-accent1 text-app-bg uppercase">
+                    Powered by Gemini
+                  </span>
+                </div>
+                <p className="text-xs text-app-text/70 max-w-2xl">
+                  Sistem cerdas AI yang memantau alur kesehatan portofolio Anda, mengidentifikasi kelebihan & risiko, serta memberikan saran emiten saham IHSG terbaik berdasarkan gaya investasi Anda.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => fetchAiInsights(investStyle)}
+              disabled={isAiInsightsLoading}
+              className="px-4 py-2.5 rounded-xl bg-app-accent1 text-app-bg text-xs font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-md shrink-0 disabled:opacity-50 cursor-pointer"
+            >
+              <RefreshCw className={`w-4 h-4 ${isAiInsightsLoading ? "animate-spin" : ""}`} />
+              <span>{isAiInsightsLoading ? "Menganalisis AI..." : "Analisis Ulang Portofolio"}</span>
+            </button>
+          </div>
+
+          {/* INVESTMENT STYLE SELECTOR (Gaya Investasi) */}
+          <div className="bg-app-card rounded-[20px] p-6 border border-app-border shadow-sm flex flex-col gap-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h3 className="text-sm font-bold text-app-text-bright flex items-center gap-2">
+                  <Target className="w-4 h-4 text-app-accent1" />
+                  Pilih Gaya Investasi Anda (Investment Style)
+                </h3>
+                <p className="text-xs text-app-text/60">
+                  Rekomendasi saham dan strategi akan disesuaikan secara presisi dengan gaya pilihan Anda.
+                </p>
+              </div>
+              <span className="text-xs font-medium text-app-text/60">
+                Terpilih: <strong className="text-app-accent1 uppercase">{investStyle}</strong>
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              {[
+                {
+                  id: "growth",
+                  title: "Growth Compounder",
+                  sub: "Capital Gain & Market Leaders",
+                  icon: TrendingUp,
+                  desc: "Emiten pemimpin pasar dengan pertumbuhan laba konsisten."
+                },
+                {
+                  id: "dividend",
+                  title: "Dividend Hunter",
+                  sub: "Passive Income Cashflow",
+                  icon: DollarSign,
+                  desc: "Yield dividen royal >5-10% untuk pendapatan rutin."
+                },
+                {
+                  id: "value",
+                  title: "Value Investor",
+                  sub: "Diskon & Margin of Safety",
+                  icon: ShieldCheck,
+                  desc: "Saham fundamental bagus yang dijual murah di bawah PBV/PER."
+                },
+                {
+                  id: "swing",
+                  title: "Swing / Momentum",
+                  sub: "Trading Taktis Volatil",
+                  icon: Zap,
+                  desc: "Memanfaatkan momentum pergerakan harga & tren jangka pendek."
+                },
+                {
+                  id: "moderate",
+                  title: "Moderat & Seimbang",
+                  sub: "Saham, Emas & Reksadana",
+                  icon: Layers,
+                  desc: "Pengembangan modal seimbang dengan perlindungan penurunan."
+                },
+                {
+                  id: "conservative",
+                  title: "Konservatif / Aman",
+                  sub: "Proteksi Modal Utama",
+                  icon: Award,
+                  desc: "Fokus menjaga nilai kekayaan dari inflasi dengan risiko minim."
+                }
+              ].map((styleOpt) => {
+                const isSelected = investStyle === styleOpt.id;
+                const IconComp = styleOpt.icon;
+                return (
+                  <button
+                    key={styleOpt.id}
+                    type="button"
+                    onClick={() => {
+                      setInvestStyle(styleOpt.id as any);
+                      fetchAiInsights(styleOpt.id);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between gap-2.5 cursor-pointer relative overflow-hidden ${
+                      isSelected
+                        ? "bg-app-accent1/10 border-app-accent1 text-app-text-bright shadow-sm ring-1 ring-app-accent1"
+                        : "bg-app-bg/50 border-app-border text-app-text/70 hover:border-app-text/30 hover:bg-app-bg"
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-app-accent1 text-app-bg flex items-center justify-center text-[10px]">
+                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <div className={`p-1.5 rounded-lg ${isSelected ? "bg-app-accent1 text-app-bg" : "bg-app-card text-app-text/60"}`}>
+                        <IconComp className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-xs font-bold text-app-text-bright line-clamp-1">
+                        {styleOpt.title}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-app-text/60 line-clamp-2 leading-tight">
+                      {styleOpt.desc}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* AI LOADING / ERROR STATES */}
+          {isAiInsightsLoading && (
+            <div className="bg-app-card rounded-[20px] p-12 border border-app-border flex flex-col items-center justify-center gap-4 text-center">
+              <div className="relative">
+                <div className="w-12 h-12 rounded-full border-2 border-app-accent1/30 border-t-app-accent1 animate-spin" />
+                <BrainCircuit className="w-6 h-6 text-app-accent1 absolute inset-0 m-auto animate-pulse" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-app-text-bright mb-1">
+                  Gemini AI Sedang Menganalisis Portofolio Anda...
+                </h4>
+                <p className="text-xs text-app-text/60">
+                  Memantau alur modal, menghitung rasio diversifikasi, dan mencari emiten saham terbaik untuk gaya "{investStyle.toUpperCase()}".
+                </p>
+              </div>
+            </div>
+          )}
+
+          {aiInsightsError && !isAiInsightsLoading && (
+            <div className="bg-app-danger/10 border border-app-danger/30 rounded-2xl p-4 flex items-center justify-between text-xs text-app-danger">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{aiInsightsError}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => fetchAiInsights(investStyle)}
+                className="px-3 py-1 rounded-lg bg-app-danger text-white text-xs font-semibold cursor-pointer"
+              >
+                Coba Lagi
+              </button>
+            </div>
+          )}
+
+          {/* MAIN AI CONTENT DISPLAY */}
+          {aiInsightsData && !isAiInsightsLoading && (
+            <>
+              {/* SECTION 1: PORTFOLIO FLOW INSIGHTS */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* HEALTH SCORE GAUGE & SUMMARY */}
+                <div className="lg:col-span-6 bg-app-card rounded-[20px] p-6 border border-app-border flex flex-col gap-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-xl bg-app-accent1/10 text-app-accent1">
+                        <BarChart3 className="w-4 h-4" />
+                      </div>
+                      <h3 className="text-sm font-bold text-app-text-bright">
+                        Kesehatan & Alur Portofolio
+                      </h3>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-app-accent1/10 text-app-accent1 border border-app-accent1/20">
+                      {aiInsightsData.portfolioHealth?.statusLabel || "Sehat"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-app-bg border border-app-border">
+                    <div className="flex flex-col items-center justify-center p-3.5 bg-app-card rounded-xl border border-app-border shrink-0 min-w-[90px]">
+                      <span className="text-[10px] font-bold uppercase text-app-text/60 tracking-wider">Skor AI</span>
+                      <span className="text-2xl font-extrabold font-mono text-app-accent1">
+                        {aiInsightsData.portfolioHealth?.score || 78}
+                      </span>
+                      <span className="text-[9px] text-app-text/40">/ 100</span>
+                    </div>
+                    <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                      <div className="w-full bg-app-border/50 h-2.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-app-accent1 h-full rounded-full transition-all duration-1000"
+                          style={{ width: `${Math.min(100, Math.max(10, aiInsightsData.portfolioHealth?.score || 78))}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-app-text/80 leading-relaxed line-clamp-3">
+                        {aiInsightsData.portfolioHealth?.summary}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* RECOMMENDED STRATEGIC ACTION */}
+                  <div className="p-4 rounded-xl bg-app-accent1/5 border border-app-accent1/20 flex items-start gap-3">
+                    <Sparkles className="w-4 h-4 text-app-accent1 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-xs font-bold text-app-accent1 block mb-0.5">
+                        Langkah Strategis Berikutnya:
+                      </span>
+                      <p className="text-xs text-app-text/80 leading-relaxed">
+                        {aiInsightsData.portfolioHealth?.recommendedAction}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* STRENGTHS & RISKS BREAKDOWN */}
+                <div className="lg:col-span-6 bg-app-card rounded-[20px] p-6 border border-app-border flex flex-col gap-4 shadow-sm">
+                  <h3 className="text-sm font-bold text-app-text-bright flex items-center gap-2">
+                    <Info className="w-4 h-4 text-app-accent1" />
+                    Diagnostik Alur Investasi
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+                    {/* STRENGTHS */}
+                    <div className="p-4 rounded-2xl bg-app-success/5 border border-app-success/20 flex flex-col gap-2">
+                      <span className="text-xs font-bold text-app-success flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Kelebihan
+                      </span>
+                      <ul className="flex flex-col gap-2">
+                        {(aiInsightsData.portfolioHealth?.strengths || []).map((st: string, idx: number) => (
+                          <li key={idx} className="text-xs text-app-text/80 flex items-start gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-app-success shrink-0 mt-1.5" />
+                            <span>{st}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* RISKS */}
+                    <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 flex flex-col gap-2">
+                      <span className="text-xs font-bold text-amber-500 flex items-center gap-1.5">
+                        <AlertTriangle className="w-3.5 h-3.5" /> Risiko & Area Perbaikan
+                      </span>
+                      <ul className="flex flex-col gap-2">
+                        {(aiInsightsData.portfolioHealth?.risksAndWeaknesses || []).map((rw: string, idx: number) => (
+                          <li key={idx} className="text-xs text-app-text/80 flex items-start gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 mt-1.5" />
+                            <span>{rw}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* DIVERSIFICATION SUMMARY */}
+                  <div className="p-3.5 rounded-xl bg-app-bg border border-app-border text-xs text-app-text/70 flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-app-accent1 shrink-0" />
+                    <span>{aiInsightsData.portfolioHealth?.diversificationAnalysis}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: AI STOCK RECOMMENDATIONS */}
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <h3 className="text-base font-bold text-app-text-bright flex items-center gap-2">
+                      <Bot className="w-5 h-5 text-app-accent1" />
+                      Rekomendasi Saham Pilihan AI (Gaya {investStyle.toUpperCase()})
+                    </h3>
+                    <p className="text-xs text-app-text/60">
+                      Emiten saham IHSG berkualitas yang paling sesuai dengan gaya investasi Anda saat ini.
+                    </p>
+                  </div>
+                  <span className="text-xs font-medium text-app-text/50">
+                    {aiInsightsData.stockRecommendations?.length || 0} Emiten Direkomendasikan
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {(aiInsightsData.stockRecommendations || []).map((stock: any, idx: number) => {
+                    const riskColor =
+                      stock.riskLevel === "Rendah" || stock.riskLevel === "Sangat Rendah"
+                        ? "bg-app-success/10 text-app-success border-app-success/20"
+                        : stock.riskLevel === "Tinggi"
+                        ? "bg-app-danger/10 text-app-danger border-app-danger/20"
+                        : "bg-amber-500/10 text-amber-500 border-amber-500/20";
+
+                    return (
+                      <div
+                        key={idx}
+                        className="bg-app-card rounded-[20px] p-5 border border-app-border hover:border-app-accent1/50 transition-all shadow-sm flex flex-col justify-between gap-4 group relative overflow-hidden"
+                      >
+                        <div className="flex flex-col gap-3">
+                          {/* CARD HEADER */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="px-2.5 py-1 rounded-xl bg-app-accent1 text-app-bg text-xs font-extrabold tracking-wide">
+                                {stock.code}
+                              </span>
+                              {stock.candidateScore && (
+                                <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-[10px] font-extrabold flex items-center gap-1">
+                                  <Award className="w-3 h-3" /> Skor {stock.candidateScore}/100
+                                </span>
+                              )}
+                              <span className="text-[10px] font-semibold text-app-text/60 truncate max-w-[100px]">
+                                {stock.sector}
+                              </span>
+                            </div>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${riskColor}`}>
+                              {stock.riskLevel}
+                            </span>
+                          </div>
+
+                          <div>
+                            <h4 className="text-sm font-bold text-app-text-bright line-clamp-1">
+                              {stock.name}
+                            </h4>
+                          </div>
+
+                          {/* HOLDING PERIOD BADGE */}
+                          <div className="flex items-center justify-between gap-1.5 px-3 py-1.5 rounded-xl bg-app-accent1/5 border border-app-accent1/20 text-[11px] font-semibold text-app-text-bright">
+                            <span className="flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 text-app-accent1 shrink-0" />
+                              <span>Lama Hold: <strong className="text-app-accent1">{stock.holdingPeriod || "6 - 12 Bulan"}</strong></span>
+                            </span>
+                          </div>
+
+                          {/* METRICS ROW */}
+                          <div className="grid grid-cols-3 gap-2 p-3 rounded-xl bg-app-bg border border-app-border text-center">
+                            <div>
+                              <span className="text-[9px] text-app-text/50 font-semibold block uppercase">Target</span>
+                              <span className="text-xs font-bold font-mono text-app-text-bright">{stock.targetPrice}</span>
+                            </div>
+                            <div>
+                              <span className="text-[9px] text-app-text/50 font-semibold block uppercase">Upside</span>
+                              <span className="text-xs font-bold font-mono text-app-success">{stock.estimatedUpside}</span>
+                            </div>
+                            <div>
+                              <span className="text-[9px] text-app-text/50 font-semibold block uppercase">Dividen</span>
+                              <span className="text-xs font-bold font-mono text-app-accent1">{stock.dividendYield || "-"}</span>
+                            </div>
+                          </div>
+
+                          {/* STRENGTHS & RISKS */}
+                          {(stock.strengths || stock.risks) && (
+                            <div className="grid grid-cols-1 gap-1.5 p-2.5 rounded-xl bg-app-bg border border-app-border text-[10px]">
+                              {stock.strengths && (
+                                <div className="flex items-start gap-1.5 text-app-success">
+                                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                                  <span className="font-medium text-app-text/80"><strong className="text-app-success">Kelebihan:</strong> {stock.strengths}</span>
+                                </div>
+                              )}
+                              {stock.risks && (
+                                <div className="flex items-start gap-1.5 text-app-danger">
+                                  <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                                  <span className="font-medium text-app-text/80"><strong className="text-app-danger">Risiko:</strong> {stock.risks}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* FIT FOR GOAL & DIVERSIFICATION */}
+                          {(stock.fitForGoal || stock.diversificationImpact) && (
+                            <div className="flex flex-col gap-1 p-2.5 rounded-xl bg-app-card/60 border border-app-border/80 text-[10px] text-app-text/80">
+                              {stock.fitForGoal && (
+                                <div>
+                                  <strong className="text-app-accent1">Sesuai Tujuan:</strong> {stock.fitForGoal}
+                                </div>
+                              )}
+                              {stock.diversificationImpact && (
+                                <div>
+                                  <strong className="text-app-text-bright">Dampak Diversifikasi:</strong> {stock.diversificationImpact}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* TRADING & EXITS: TP, SL, TRAILING STOP */}
+                          <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-app-bg border border-app-border">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-app-text/50 flex items-center gap-1">
+                              <ShieldCheck className="w-3 h-3 text-app-accent1" /> Target Exit & Proteksi Risiko
+                            </span>
+                            <div className="flex flex-col gap-1.5">
+                              <div className="flex items-center justify-between gap-1 p-1.5 rounded-lg bg-app-success/5 border border-app-success/15">
+                                <span className="text-[10px] font-bold text-app-success flex items-center gap-1">
+                                  <Target className="w-3 h-3" /> TP (Take Profit):
+                                </span>
+                                <span className="font-bold font-mono text-app-success text-[11px]">
+                                  {stock.takeProfit || stock.targetPrice || "-"}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center justify-between gap-1 p-1.5 rounded-lg bg-app-danger/5 border border-app-danger/15">
+                                <span className="text-[10px] font-bold text-app-danger flex items-center gap-1">
+                                  <ShieldAlert className="w-3 h-3" /> SL (Stop Loss):
+                                </span>
+                                <span className="font-bold font-mono text-app-danger text-[11px]">
+                                  {stock.stopLoss || "-"}
+                                </span>
+                              </div>
+
+                              <div className="flex items-start justify-between gap-1 p-1.5 rounded-lg bg-app-accent1/5 border border-app-accent1/15">
+                                <span className="text-[10px] font-bold text-app-accent1 flex items-center gap-1 shrink-0 mt-0.5">
+                                  <Zap className="w-3 h-3" /> TS (Trailing Stop):
+                                </span>
+                                <span className="font-semibold text-app-text/80 text-[10px] text-right line-clamp-2">
+                                  {stock.trailingStop || "-"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* MATCH REASON */}
+                          <div className="p-3 rounded-xl bg-app-accent1/5 border border-app-accent1/15 flex flex-col gap-1">
+                            <span className="text-[10px] font-bold text-app-accent1 uppercase flex items-center gap-1">
+                              <Sparkles className="w-3 h-3" /> Alasan Cocok:
+                            </span>
+                            <p className="text-[11px] text-app-text/80 leading-relaxed line-clamp-3">
+                              {stock.matchReason}
+                            </p>
+                          </div>
+
+                          {/* ENTRY STRATEGY */}
+                          <div className="p-3 rounded-xl bg-app-bg border border-app-border flex flex-col gap-1">
+                            <span className="text-[10px] font-bold text-app-text/60 uppercase flex items-center gap-1">
+                              <Target className="w-3 h-3 text-app-accent1" /> Area Beli / Strategi:
+                            </span>
+                            <p className="text-[11px] text-app-text/70 leading-relaxed line-clamp-2">
+                              {stock.entryStrategy}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* ACTION BUTTON */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPortoTxType("beli");
+                            setPortoCategory(stock.category === "emas" ? "emas" : "saham");
+                            setPortoCode(stock.code);
+                            setPortoQty("10");
+                            const numPrice = parseFloat((stock.targetPrice || "").replace(/[^0-9]/g, "")) || 0;
+                            setPortoPrice(numPrice > 0 ? numPrice.toString() : "");
+                            setIsPortfolioModalOpen(true);
+                          }}
+                          className="w-full py-2.5 rounded-xl bg-app-accent1/10 hover:bg-app-accent1 hover:text-app-bg text-app-accent1 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-app-accent1/20"
+                        >
+                          <span>Simulasikan / Beli</span>
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Modal Simulasi ARA/ARB */}
       {isSimulatorOpen && (

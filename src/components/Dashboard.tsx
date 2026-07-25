@@ -448,13 +448,27 @@ export default function Dashboard() {
   const getInitials = (name: string) =>
     name.substring(0, 2).toUpperCase() || "US";
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (language === "en") {
+      if (hour >= 3 && hour < 12) return "Good Morning";
+      if (hour >= 12 && hour < 17) return "Good Afternoon";
+      if (hour >= 17 && hour < 21) return "Good Evening";
+      return "Good Night";
+    }
+    if (hour >= 3 && hour < 11) return "Selamat Pagi";
+    if (hour >= 11 && hour < 15) return "Selamat Siang";
+    if (hour >= 15 && hour < 18) return "Selamat Sore";
+    return "Selamat Malam";
+  };
+
   return (
     <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
       {/* DESKTOP HEADER */}
       <header className="hidden md:flex items-start justify-between mb-8 gap-6">
         <div>
           <h1 className="text-[34px] leading-[1.1] font-semibold text-app-text-bright mb-1 tracking-[-0.022em]">
-            <TextReveal key={user?.displayName || "USER"} text={`Selamat datang, ${user?.displayName || "USER"}`} />
+            <TextReveal key={`${user?.displayName}-${getGreeting()}`} text={`${getGreeting()}, ${user?.displayName || "USER"}`} />
           </h1>
           <p className="text-app-text/60 text-[17px] font-normal tracking-[-0.022em]">
             {format(new Date(), "EEEE, d MMMM yyyy", { locale: localeId })} - Ringkasan keuangan hari ini
@@ -496,7 +510,9 @@ export default function Dashboard() {
         {/* MOBILE HEADER */}
       <header className="md:hidden flex items-center justify-between mb-5 px-1">
         <div>
-           <h1 className="text-2xl font-bold text-app-text-bright tracking-tight mb-0.5">RAZCH</h1>
+           <h1 className="text-xl font-bold text-app-text-bright tracking-tight mb-0.5 leading-snug">
+             {getGreeting()}, {user?.displayName || "RAZCH"}
+           </h1>
            <p className="text-app-text/60 text-xs capitalize font-medium">{format(new Date(), "EEEE, d MMMM yyyy", { locale: localeId })}</p>
         </div>
         <div className="flex items-center gap-2">
@@ -1085,11 +1101,11 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="h-[170px] sm:h-[200px] w-full">
+          <div className="flex-1 min-h-[200px] sm:min-h-[260px] w-full my-2">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={chartData}
-                margin={{ top: 5, right: 10, left: -25, bottom: 0 }}
+                margin={{ top: 10, right: 10, left: -25, bottom: 0 }}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -1158,7 +1174,7 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </div>
 
-          <div className="mt-3 flex items-center justify-between border-t border-app-border pt-2.5">
+          <div className="mt-auto pt-3 flex items-center justify-between border-t border-app-border">
             <div className="flex items-center gap-1.5 min-w-0">
               <div className="w-1.5 h-1.5 rounded-full bg-app-accent1 shrink-0"></div>
               <span className="text-app-text/70 text-[11px] font-medium uppercase tracking-wide truncate">

@@ -755,6 +755,418 @@ LAPIS 6 (Smart Basket Risk): Berdasarkan tingkat volatilitas saat ini, kami mere
     };
   }
 
+  function getInvestmentInsightsFallback(
+    investments: any[] = [],
+    style: string = "moderate",
+    totalModal: number = 0,
+    totalEquity: number = 0,
+    netProfit: number = 0,
+    marketData: any = {}
+  ) {
+    const returnPct = totalModal > 0 ? ((netProfit / totalModal) * 100) : 0;
+    
+    const stockDatabase: Record<string, any[]> = {
+      dividend: [
+        {
+          code: "PTBA",
+          name: "Bukit Asam Tbk",
+          category: "saham",
+          sector: "Energi & Batu Bara",
+          candidateScore: 92,
+          targetPrice: "Rp 2.850",
+          estimatedUpside: "+14.2%",
+          dividendYield: "12.5%",
+          riskLevel: "Sedang",
+          holdingPeriod: "6 - 12 Bulan (Cum Dividen)",
+          takeProfit: "Rp 2.850 (TP1) / Rp 3.050 (TP2)",
+          stopLoss: "Rp 2.300 (-6.1%)",
+          trailingStop: "Kunci TS +3% setiap kenaikan +5% di atas Rp 2.650",
+          matchReason: "Dividen yield sangat tinggi (>10%) dengan histori pembagian rutin. Sangat ideal untuk menciptakan aliran pendapatan pasif yang berkala.",
+          strengths: "Dividen yield jumbo 12.5%, kas bersih tebal, porsi ekspor batu bara berkalori tinggi",
+          risks: "Sensitivitas terhadap penurunan harga batu bara acuan global (HBA)",
+          fitForGoal: "Pendapatan pasif berkala & dividen yield tinggi",
+          diversificationImpact: "Memberikan arus kas dividen langsung untuk direinvestasikan ke sektor lain",
+          entryStrategy: "Beli bertahap di kisaran Rp 2.450 - Rp 2.550 menjelang musim RUPS/pembagian dividen."
+        },
+        {
+          code: "ADRO",
+          name: "Adaro Energy Indonesia Tbk",
+          category: "saham",
+          sector: "Energi & Tambang",
+          candidateScore: 90,
+          targetPrice: "Rp 3.900",
+          estimatedUpside: "+18.0%",
+          dividendYield: "9.8%",
+          riskLevel: "Sedang",
+          holdingPeriod: "6 - 12 Bulan",
+          takeProfit: "Rp 3.900 (TP1) / Rp 4.150 (TP2)",
+          stopLoss: "Rp 3.050 (-5.0%)",
+          trailingStop: "Trailing Stop di Rp 3.450 saat harga menembus Rp 3.650",
+          matchReason: "Cashflow operasi sangat solid dengan rasio pembagian dividen royal serta pendorong ekspansi energi hijau.",
+          strengths: "Arus kas operasi sangat melimpah, biaya pengerukan rendah, ekspansi smelter aluminium hijau",
+          risks: "Ketidakpastian regulasi pajak tambang & siklus harga energi",
+          fitForGoal: "Dividen berkala & apresiasi modal dari pertumbuhan energi baru",
+          diversificationImpact: "Memperkuat pilar arus kas dividen dengan eksposur proyek masa depan",
+          entryStrategy: "Cicil saat koreksi mendekati area support Rp 3.200."
+        },
+        {
+          code: "BBNI",
+          name: "Bank Negara Indonesia Tbk",
+          category: "saham",
+          sector: "Perbankan Big-4",
+          candidateScore: 88,
+          targetPrice: "Rp 6.100",
+          estimatedUpside: "+16.5%",
+          dividendYield: "5.2%",
+          riskLevel: "Rendah",
+          holdingPeriod: "1 - 3 Tahun",
+          takeProfit: "Rp 6.100 (TP1) / Rp 6.500 (TP2)",
+          stopLoss: "Rp 4.950 (-5.5%)",
+          trailingStop: "Geser TS +4% setiap breakout ATH baru",
+          matchReason: "Saham perbankan BUMN besar dengan pertumbuhan dividen per lembar saham yang konsisten setiap tahun.",
+          strengths: "Valuasi PBV paling terdiskon di antara Big-4 bank, transformasi digital mobile banking Wondr",
+          risks: "Fluktuasi biaya dana (CoF) akibat era suku bunga tinggi",
+          fitForGoal: "Capital gain stabil & dividen tahunan perbankan BUMN",
+          diversificationImpact: "Jangkar stabilitas portofolio sektor finansial berisiko rendah",
+          entryStrategy: "Akomodasi akumulasi jangka panjang di bawah Rp 5.300."
+        },
+        {
+          code: "TLKM",
+          name: "Telkom Indonesia Tbk",
+          category: "saham",
+          sector: "Telekomunikasi",
+          candidateScore: 86,
+          targetPrice: "Rp 3.800",
+          estimatedUpside: "+22.5%",
+          dividendYield: "6.1%",
+          riskLevel: "Rendah",
+          holdingPeriod: "1 - 2 Tahun",
+          takeProfit: "Rp 3.800 (TP1) / Rp 4.100 (TP2)",
+          stopLoss: "Rp 2.750 (-5.1%)",
+          trailingStop: "Kunci TS di Rp 3.250 saat mencapai Rp 3.500",
+          matchReason: "Monopoli infrastruktur telekomunikasi nasional dengan dividen stabil dan harga saham saat ini terdiskon.",
+          strengths: "Pangsa pasar seluler terluas, bisnis Data Center B2B berkembang pesat, dividen payout ratio >70%",
+          risks: "Persaingan harga paket data & investasi infrastruktur 5G",
+          fitForGoal: "Investasi value terdiskon dengan yield dividen atraktif",
+          diversificationImpact: "Diversifikasi defensive ke sektor infrastruktur telekomunikasi",
+          entryStrategy: "Sangat baik diserap pada rentang Rp 2.900 - Rp 3.100."
+        }
+      ],
+      growth: [
+        {
+          code: "BBCA",
+          name: "Bank Central Asia Tbk",
+          category: "saham",
+          sector: "Perbankan Swasta",
+          targetPrice: "Rp 11.500",
+          estimatedUpside: "+15.0%",
+          dividendYield: "2.8%",
+          riskLevel: "Rendah",
+          holdingPeriod: "Jangka Panjang (>3 Tahun)",
+          takeProfit: "Rp 11.500 (TP1) / Rp 12.500 (TP2)",
+          stopLoss: "Rp 9.200 (-5.0%)",
+          trailingStop: "Kunci TS berkala setiap kuartal laporan keuangan positif",
+          matchReason: "Raja perbankan Indonesia dengan keunggulan dana murah (CASA) dan pertumbuhan laba compounding terbaik secara historis.",
+          entryStrategy: "Sangat cocok untuk DCA (Dollar Cost Averaging) bulanan tanpa menunggu timing pasar."
+        },
+        {
+          code: "BMRI",
+          name: "Bank Mandiri Tbk",
+          category: "saham",
+          sector: "Perbankan BUMN",
+          targetPrice: "Rp 7.800",
+          estimatedUpside: "+17.2%",
+          dividendYield: "4.5%",
+          riskLevel: "Rendah",
+          holdingPeriod: "1 - 3 Tahun",
+          takeProfit: "Rp 7.800 (TP1) / Rp 8.250 (TP2)",
+          stopLoss: "Rp 6.100 (-5.4%)",
+          trailingStop: "Trailing stop +3% di atas area MA-20",
+          matchReason: "Pertumbuhan kredit tercepat di segmen korporasi dan digital Livin' Mandiri yang mendominasi ekosistem.",
+          entryStrategy: "Akumulasi saat ada gelombang tekanan IHSG di rentang Rp 6.400 - Rp 6.600."
+        },
+        {
+          code: "ICBP",
+          name: "Indofood CBP Sukses Makmur Tbk",
+          category: "saham",
+          sector: "Consumer Goods",
+          targetPrice: "Rp 13.200",
+          estimatedUpside: "+19.8%",
+          dividendYield: "3.2%",
+          riskLevel: "Rendah",
+          holdingPeriod: "1 - 2 Tahun",
+          takeProfit: "Rp 13.200 (TP1) / Rp 14.000 (TP2)",
+          stopLoss: "Rp 10.200 (-5.5%)",
+          trailingStop: "TS aktif di Rp 11.800 saat menyentuh Rp 12.500",
+          matchReason: "Penguasa pasar mi instan (Indomie) global dengan penetrasi pasar kuat dan daya tahan inflasi sangat tinggi.",
+          entryStrategy: "Beli saat konsolidasi di area Rp 10.800 - Rp 11.200."
+        },
+        {
+          code: "MYOR",
+          name: "Mayora Indah Tbk",
+          category: "saham",
+          sector: "Makanan & Minuman",
+          targetPrice: "Rp 3.100",
+          estimatedUpside: "+21.0%",
+          dividendYield: "2.5%",
+          riskLevel: "Sedang",
+          holdingPeriod: "6 - 12 Bulan",
+          takeProfit: "Rp 3.100 (TP1) / Rp 3.350 (TP2)",
+          stopLoss: "Rp 2.300 (-6.0%)",
+          trailingStop: "Kunci TS di Rp 2.700 jika menembus Rp 2.850",
+          matchReason: "Ekspansi ekspor makanan olahan ke Asia Pasifik yang berkembang pesat memicu margin keuntungan menguat.",
+          entryStrategy: "Masuk saat memantul dari garis MA-50 di kisaran Rp 2.450."
+        }
+      ],
+      value: [
+        {
+          code: "ASII",
+          name: "Astra International Tbk",
+          category: "saham",
+          sector: "Konglomerasi & Otomotif",
+          targetPrice: "Rp 5.900",
+          estimatedUpside: "+24.0%",
+          dividendYield: "8.5%",
+          riskLevel: "Sedang",
+          holdingPeriod: "1 - 3 Tahun",
+          takeProfit: "Rp 5.900 (TP1) / Rp 6.400 (TP2)",
+          stopLoss: "Rp 4.450 (-5.3%)",
+          trailingStop: "TS di Rp 5.200 setelah breakout resistance Rp 5.500",
+          matchReason: "Valuasi sangat murah (PBV & PER di bawah rata-rata historis 5 tahun) ditambah dividen yield besar.",
+          entryStrategy: "Beli dan simpan dengan target investasi 1-3 tahun di harga Rp 4.700 - Rp 4.900."
+        },
+        {
+          code: "UNTR",
+          name: "United Tractors Tbk",
+          category: "saham",
+          sector: "Alat Berat & Tambang",
+          targetPrice: "Rp 29.500",
+          estimatedUpside: "+20.5%",
+          dividendYield: "9.2%",
+          riskLevel: "Sedang",
+          holdingPeriod: "1 - 2 Tahun",
+          takeProfit: "Rp 29.500 (TP1) / Rp 31.500 (TP2)",
+          stopLoss: "Rp 23.000 (-5.1%)",
+          trailingStop: "Trailing Stop di Rp 26.500 saat menyentuh Rp 28.000",
+          matchReason: "Kas melimpah, rasio utang sangat rendah, serta diversifikasi aktif ke tambang emas dan nikel.",
+          entryStrategy: "Akumulasi bertahap di bawah Rp 24.500."
+        },
+        {
+          code: "PGAS",
+          name: "Perusahaan Gas Negara Tbk",
+          category: "saham",
+          sector: "Infrastruktur Gas",
+          targetPrice: "Rp 1.850",
+          estimatedUpside: "+22.0%",
+          dividendYield: "8.8%",
+          riskLevel: "Sedang",
+          holdingPeriod: "6 - 12 Bulan",
+          takeProfit: "Rp 1.850 (TP1) / Rp 2.000 (TP2)",
+          stopLoss: "Rp 1.400 (-5.4%)",
+          trailingStop: "TS di Rp 1.620 saat menguji Rp 1.720",
+          matchReason: "Margin usaha stabil dengan harga saham yang masih jauh di bawah nilai wajar fundamentalnya.",
+          entryStrategy: "Tentukan posisi beli saat breakout resistance Rp 1.500."
+        },
+        {
+          code: "INDF",
+          name: "Indofood Sukses Makmur Tbk",
+          category: "saham",
+          sector: "Holding Consumer & Agribisnis",
+          targetPrice: "Rp 8.200",
+          estimatedUpside: "+23.5%",
+          dividendYield: "5.8%",
+          riskLevel: "Rendah",
+          holdingPeriod: "1 - 2 Tahun",
+          takeProfit: "Rp 8.200 (TP1) / Rp 8.800 (TP2)",
+          stopLoss: "Rp 6.100 (-5.0%)",
+          trailingStop: "Kunci TS +4% saat harga memasuki rentang Rp 7.200",
+          matchReason: "Diskon induk perusahaan (holding discount) yang signifikan dibanding nilai anak perusahaannya (ICBP & SIMP).",
+          entryStrategy: "Beli bertahap di kisaran Rp 6.400 - Rp 6.600."
+        }
+      ],
+      swing: [
+        {
+          code: "ANTM",
+          name: "Aneka Tambang Tbk",
+          category: "saham",
+          sector: "Tambang Emas & Nikel",
+          targetPrice: "Rp 1.750",
+          estimatedUpside: "+26.0%",
+          dividendYield: "3.5%",
+          riskLevel: "Tinggi",
+          holdingPeriod: "1 - 4 Minggu (Swing Trading)",
+          takeProfit: "Rp 1.750 (TP1) / Rp 1.900 (TP2)",
+          stopLoss: "Rp 1.290 (-4.5%)",
+          trailingStop: "Kunci TS rapat di Rp 1.520 saat menembus Rp 1.600",
+          matchReason: "Sensitivitas tinggi terhadap fluktuasi harga emas dunia dan momentum smelter nikel baru.",
+          entryStrategy: "Beli saat terjadi breakout tren turun dengan stop-loss ketat di bawah Rp 1.300."
+        },
+        {
+          code: "MDKA",
+          name: "Merdeka Copper Gold Tbk",
+          category: "saham",
+          sector: "Tambang Tembaga & Emas",
+          targetPrice: "Rp 2.900",
+          estimatedUpside: "+31.0%",
+          dividendYield: "-",
+          riskLevel: "Tinggi",
+          holdingPeriod: "2 - 6 Minggu (Swing Trading)",
+          takeProfit: "Rp 2.900 (TP1) / Rp 3.200 (TP2)",
+          stopLoss: "Rp 2.020 (-4.8%)",
+          trailingStop: "TS ketat -3% dari puncaknya saat rally berjalan",
+          matchReason: "Volatilitas harga tinggi dengan katalis pengoperasian proyek emas Tujuh Bukit dan tembaga.",
+          entryStrategy: "Manfaatkan momentum swing saat pola reversal di support Rp 2.100."
+        },
+        {
+          code: "MEDC",
+          name: "Medco Energi Internasional Tbk",
+          category: "saham",
+          sector: "Minyak & Gas Bumi",
+          targetPrice: "Rp 1.600",
+          estimatedUpside: "+28.0%",
+          dividendYield: "4.1%",
+          riskLevel: "Tinggi",
+          holdingPeriod: "1 - 3 Minggu",
+          takeProfit: "Rp 1.600 (TP1) / Rp 1.750 (TP2)",
+          stopLoss: "Rp 1.180 (-5.0%)",
+          trailingStop: "Trailing Stop di Rp 1.420 saat harga menyentuh Rp 1.500",
+          matchReason: "Leverage tinggi terhadap kenaikan harga minyak mentah global (Brent/WTI).",
+          entryStrategy: "Entry saat terjadi kenaikan volume beli mendadak di atas Rp 1.250."
+        }
+      ],
+      moderate: [
+        {
+          code: "BBCA",
+          name: "Bank Central Asia Tbk",
+          category: "saham",
+          sector: "Perbankan Big Cap",
+          targetPrice: "Rp 11.500",
+          estimatedUpside: "+15.0%",
+          dividendYield: "2.8%",
+          riskLevel: "Rendah",
+          holdingPeriod: "1 - 3 Tahun",
+          takeProfit: "Rp 11.500 (TP1) / Rp 12.200 (TP2)",
+          stopLoss: "Rp 9.200 (-5.0%)",
+          trailingStop: "Trailing Stop berkala disesuaikan evaluasi portofolio",
+          matchReason: "Pilar utama kestabilan portofolio ekuitas Indonesia dengan risiko penurunan terbatas.",
+          entryStrategy: "Alokasikan 30% dana investasi berkala di saham ini."
+        },
+        {
+          code: "EMAS",
+          name: "Emas Batangan / Antam",
+          category: "emas",
+          sector: "Logam Mulia (Hedge)",
+          targetPrice: "Rp 1.550.000 / gram",
+          estimatedUpside: "+12.0%",
+          dividendYield: "-",
+          riskLevel: "Sangat Rendah",
+          holdingPeriod: "2 - 5 Tahun (Jangka Panjang)",
+          takeProfit: "Rp 1.550.000 / gram",
+          stopLoss: "Tidak Perlu Stop Loss (Aset Lindung Nilai)",
+          trailingStop: "Rebalancing saat alokasi emas melebihi 30% portofolio",
+          matchReason: "Lindung nilai terhadap inflasi dan pelemahan mata uang rupiah untuk menyeimbangkan volatilitas saham.",
+          entryStrategy: "Beli secara rutin setiap bulan sebagai dana darurat dan jangkar keamanan."
+        },
+        {
+          code: "TLKM",
+          name: "Telkom Indonesia Tbk",
+          category: "saham",
+          sector: "Telekomunikasi",
+          targetPrice: "Rp 3.800",
+          estimatedUpside: "+22.5%",
+          dividendYield: "6.1%",
+          riskLevel: "Rendah",
+          holdingPeriod: "6 - 18 Bulan",
+          takeProfit: "Rp 3.800 (TP1) / Rp 4.100 (TP2)",
+          stopLoss: "Rp 2.750 (-5.1%)",
+          trailingStop: "TS di Rp 3.300 jika menembus Rp 3.550",
+          matchReason: "Menggabungkan dividen menarik dengan potensi pemulihan harga dari posisi terendah.",
+          entryStrategy: "Cicil akumulasi pada harga pasar saat ini."
+        }
+      ],
+      conservative: [
+        {
+          code: "EMAS",
+          name: "Emas Batangan Antam",
+          category: "emas",
+          sector: "Aset Lindung Nilai",
+          targetPrice: "Rp 1.550.000 / gram",
+          estimatedUpside: "+10.0%",
+          dividendYield: "-",
+          riskLevel: "Sangat Rendah",
+          holdingPeriod: "> 3 Tahun",
+          takeProfit: "Rp 1.550.000 / gram",
+          stopLoss: "Bebas Stop Loss",
+          trailingStop: "Holding Jangka Panjang",
+          matchReason: "Aset paling aman untuk menjaga daya beli modal investasi tanpa risiko kebangkrutan emiten.",
+          entryStrategy: "Alokasikan 40-50% modal di aset fisik emas."
+        },
+        {
+          code: "BBCA",
+          name: "Bank Central Asia Tbk",
+          category: "saham",
+          sector: "Perbankan Blue-Chip",
+          targetPrice: "Rp 11.500",
+          estimatedUpside: "+15.0%",
+          dividendYield: "2.8%",
+          riskLevel: "Rendah",
+          holdingPeriod: "2 - 5 Tahun",
+          takeProfit: "Rp 11.500 (TP1)",
+          stopLoss: "Rp 9.200 (-5.0%)",
+          trailingStop: "TS Fleksibel",
+          matchReason: "Satu-satunya saham perbankan teraman dengan rasio kredit bermasalah (NPL) paling terkendali.",
+          entryStrategy: "Beli secara bertahap saat terjadi koreksi pasar."
+        },
+        {
+          code: "ICBP",
+          name: "Indofood CBP Sukses Makmur Tbk",
+          category: "saham",
+          sector: "Defensive Consumer Goods",
+          targetPrice: "Rp 13.200",
+          estimatedUpside: "+19.8%",
+          dividendYield: "3.2%",
+          riskLevel: "Rendah",
+          holdingPeriod: "1 - 3 Tahun",
+          takeProfit: "Rp 13.200 (TP1)",
+          stopLoss: "Rp 10.200 (-5.5%)",
+          trailingStop: "TS di Rp 11.800",
+          matchReason: "Produk kebutuhan pokok konsumsi harian yang tidak terpengaruh oleh krisis ekonomi.",
+          entryStrategy: "Masuk saat tren jangka panjang tetap terjaga positif."
+        }
+      ]
+    };
+
+    const chosenPicks = stockDatabase[style] || stockDatabase.moderate;
+
+    let healthScore = 78;
+    if (returnPct > 10) healthScore = 88;
+    else if (returnPct < 0) healthScore = 62;
+
+    let statusLabel = "Sehat & Berkembang";
+    if (healthScore >= 85) statusLabel = "Sangat Prima & Efisien";
+    else if (healthScore < 70) statusLabel = "Perlu Rebalancing";
+
+    return {
+      portfolioHealth: {
+        score: healthScore,
+        statusLabel,
+        summary: `Portofolio investasi Anda saat ini mencatatkan nilai ekuitas Rp ${totalEquity.toLocaleString("id-ID")} dengan return bersih ${returnPct >= 0 ? "+" : ""}${returnPct.toFixed(2)}% dari modal awal Rp ${totalModal.toLocaleString("id-ID")}. Alur investasi menunjukkan stabilitas yang baik dengan fokus pada gaya "${style.toUpperCase()}".`,
+        strengths: [
+          "Pencatatan modal dan ekuitas konsisten terpantau secara riil.",
+          "Aset terkonsentrasi pada instrumen ber-fundamental kuat.",
+          "Alur kas investasi tidak membebankan likuiditas harian."
+        ],
+        risksAndWeaknesses: [
+          "Perlu tambahan rebalancing secara berkala saat volatilitas IHSG meningkat.",
+          "Konsentrasi aset dapat lebih dioptimalkan sesuai target tahunan."
+        ],
+        diversificationAnalysis: `Alokasi modal saat ini berpusat pada ${investments.length > 0 ? investments.length : "beberapa"} instrumen aktif. Menambahkan saham dividen / blue-chip akan memperkuat benteng portofolio Anda.`,
+        recommendedAction: "Pertahankan kontribusi rutin bulanan (DCA) dan pertimbangkan mengeksekusi rekomendasi saham di bawah untuk meningkatkan imbal hasil."
+      },
+      stockRecommendations: chosenPicks
+    };
+  }
+
   // API Route for AI Financial Strategy Recommendation
   app.post("/api/gemini/financial-strategy", requireAuth, rateLimiter(15, 60 * 1000), async (req, res) => {
     const { netProfit, income, expense, avgIncome, avgExpense, count, periodText } = req.body;
@@ -875,6 +1287,152 @@ LAPIS 6 (Smart Basket Risk): Berdasarkan tingkat volatilitas saat ini, kami mere
         });
       } catch (fallbackErr) {
         res.status(500).json({ error: String(err), message: err.message });
+      }
+    }
+  });
+
+  // API Route for AI Investment Insights & Stock Recommendations
+  app.post("/api/ai/investment-insights", requireAuth, rateLimiter(15, 60 * 1000), async (req, res) => {
+    try {
+      const { investments = [], style = "moderate", totalModal = 0, totalEquity = 0, netProfit = 0, marketData = {} } = req.body;
+      const apiKey = process.env.GEMINI_API_KEY;
+
+      if (!apiKey) {
+        console.warn("GEMINI_API_KEY missing, using smart investment fallback");
+        const fallback = getInvestmentInsightsFallback(investments, style, Number(totalModal), Number(totalEquity), Number(netProfit), marketData);
+        return res.json({ ...fallback, isOffline: true });
+      }
+
+      const ai = new GoogleGenAI({
+        apiKey: apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
+        }
+      });
+
+      const responseSchema = {
+        type: Type.OBJECT,
+        properties: {
+          portfolioHealth: {
+            type: Type.OBJECT,
+            properties: {
+              score: { type: Type.NUMBER, description: "Skor kesehatan portofolio dari 0 hingga 100" },
+              statusLabel: { type: Type.STRING, description: "Label status seperti 'Sangat Prima', 'Sehat & Berkembang', atau 'Perlu Rebalancing'" },
+              summary: { type: Type.STRING, description: "Ringkasan mendalam tentang alur dan performa portofolio investasi pengguna" },
+              strengths: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "Daftar kelebihan atau kekuatan alur portofolio investasi pengguna saat ini"
+              },
+              risksAndWeaknesses: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "Daftar risiko atau potensi kelemahan portofolio"
+              },
+              diversificationAnalysis: { type: Type.STRING, description: "Analisis diversifikasi dan alokasi aset" },
+              recommendedAction: { type: Type.STRING, description: "Langkah strategis utama yang harus diambil investor selanjutnya" }
+            },
+            required: ["score", "statusLabel", "summary", "strengths", "risksAndWeaknesses", "diversificationAnalysis", "recommendedAction"]
+          },
+          stockRecommendations: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                code: { type: Type.STRING, description: "Kode emiten saham / instrumen (contoh: BBCA, PTBA, ASII, ANTM)" },
+                name: { type: Type.STRING, description: "Nama lengkap emiten" },
+                category: { type: Type.STRING, description: "Kategori instrumen ('saham', 'emas', 'reksadana')" },
+                sector: { type: Type.STRING, description: "Sektor industri emiten" },
+                candidateScore: { type: Type.NUMBER, description: "Skor kesesuaian kandidat dari 0 hingga 100" },
+                targetPrice: { type: Type.STRING, description: "Target harga prediksi (contoh: 'Rp 11.500')" },
+                estimatedUpside: { type: Type.STRING, description: "Estimasi potensi kenaikan harga (contoh: '+18.5%')" },
+                dividendYield: { type: Type.STRING, description: "Estimasi dividen yield atau '-' jika tidak ada" },
+                riskLevel: { type: Type.STRING, description: "Tingkat risiko: 'Rendah', 'Sedang', atau 'Tinggi'" },
+                holdingPeriod: { type: Type.STRING, description: "Berapa lama estimasi memegang emiten ini (contoh: '6 - 12 Bulan', '1 - 3 Tahun', '1 - 3 Minggu (Swing)')" },
+                takeProfit: { type: Type.STRING, description: "Target Take Profit (TP), contoh: 'Rp 11.500 (TP1) / Rp 12.000 (TP2)'" },
+                stopLoss: { type: Type.STRING, description: "Level Stop Loss (SL) disiplin, contoh: 'Rp 9.250 (-5.0%)'" },
+                trailingStop: { type: Type.STRING, description: "Strategi Trailing Stop (TS) pengunci profit, contoh: 'TS di Rp 10.200 saat mencapai Rp 10.800'" },
+                matchReason: { type: Type.STRING, description: "Penjelasan mendalam mengapa saham ini sangat cocok dengan gaya & portofolio pengguna" },
+                strengths: { type: Type.STRING, description: "Kelebihan utama emiten (contoh: 'Pertumbuhan ROE > 20% & margin usaha tebal')" },
+                risks: { type: Type.STRING, description: "Risiko utama emiten (contoh: 'Sensitif fluktuasi harga komoditas global')" },
+                fitForGoal: { type: Type.STRING, description: "Cocok untuk tujuan investasi apa (contoh: 'Compounding modal jangka panjang & dividen pasif')" },
+                diversificationImpact: { type: Type.STRING, description: "Pengaruh terhadap diversifikasi portofolio pengguna (contoh: 'Menyeimbangkan sektor perbankan dengan sektor konsumer')" },
+                entryStrategy: { type: Type.STRING, description: "Rekomendasi area beli / strategi masuk (misal: 'Beli bertahap saat pullback di area Rp 9.800')" }
+              },
+              required: ["code", "name", "category", "sector", "candidateScore", "targetPrice", "estimatedUpside", "dividendYield", "riskLevel", "holdingPeriod", "takeProfit", "stopLoss", "trailingStop", "matchReason", "strengths", "risks", "fitForGoal", "diversificationImpact", "entryStrategy"]
+            }
+          }
+        },
+        required: ["portfolioHealth", "stockRecommendations"]
+      };
+
+      const holdingsSummary = investments.map((inv: any) => 
+        `- ${inv.code || inv.name} (${inv.category}): Qty ${inv.qty}, Modal Rp ${(inv.totalCost || inv.costBasis || 0).toLocaleString("id-ID")}, Nilai Sekarang Rp ${(inv.currentValue || inv.value || 0).toLocaleString("id-ID")}, Profit/Loss: Rp ${(inv.profitLoss || 0).toLocaleString("id-ID")} (${(inv.returnPct || 0).toFixed(2)}%)`
+      ).join("\n");
+
+      const prompt = `Bertindak sebagai AI Investment Advisor profesional untuk aplikasi keuangan & pasar modal Indonesia (IHSG).
+Jangan memberikan rekomendasi berdasarkan opini mentah atau hype media sosial. Utamakan analisis fundamental, valuasi, momentum, dan struktur portofolio pengguna.
+
+DATA PENGGUNA & PORTOFOLIO:
+- Nilai Portofolio (Total Equity): Rp ${Number(totalEquity).toLocaleString("id-ID")}
+- Modal Investasi Terpakai: Rp ${Number(totalModal).toLocaleString("id-ID")}
+- Net Gain/Loss: Rp ${Number(netProfit).toLocaleString("id-ID")} (${totalModal > 0 ? ((netProfit / totalModal) * 100).toFixed(2) : 0}%)
+- Gaya / Target Investasi Pilihan: "${style.toUpperCase()}"
+- Holdings / Sektor Yang Sudah Dimiliki:
+${holdingsSummary || "Belum ada holding aktif."}
+
+DATA PASAR SAAT INI:
+- Indeks IHSG Composite: ${marketData.COMPOSITE?.price || 7200} (${marketData.COMPOSITE?.change || 0}%)
+- Kurs USD/IDR: ${marketData.USDIDR?.price || 16200}
+
+ANALISIS PORTOFOLIO YANG DIBUTUHKAN:
+1. Nilai kesehatan portofolio (skor 0-100, label status, kelebihan & risiko portofolio).
+2. Diversifikasi sektor & risiko konsentrasi.
+3. Rekomendasi Top kandidat emiten saham/instrumen IHSG terbaik (3-6 emiten).
+
+UNTUK SETIAP KANDIDAT EMITEN:
+- Skor Kesesuaian (candidateScore: 0-100)
+- Alasan Kesesuaian (matchReason)
+- Kelebihan Utama (strengths)
+- Risiko Utama (risks)
+- Cocok Untuk Tujuan Investasi Apa (fitForGoal)
+- Pengaruh Terhadap Diversifikasi Portofolio Pengguna (diversificationImpact)
+- Jangka Waktu Memegang (holdingPeriod)
+- Target Take Profit (takeProfit)
+- Batas Stop Loss (stopLoss)
+- Strategi Trailing Stop (trailingStop)
+- Strategi & Area Beli (entryStrategy)
+
+Jangan hanya memilih saham yang sedang naik. Pertimbangkan secara mendalam kesesuaian dengan kondisi portofolio pengguna.`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.6-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: responseSchema
+        }
+      });
+
+      const result = JSON.parse(response.text || "{}");
+      res.json({
+        ...result,
+        isOffline: false
+      });
+    } catch (err: any) {
+      console.error("AI Investment insights error:", err);
+      try {
+        const { investments = [], style = "moderate", totalModal = 0, totalEquity = 0, netProfit = 0, marketData = {} } = req.body;
+        const fallback = getInvestmentInsightsFallback(investments, style, Number(totalModal), Number(totalEquity), Number(netProfit), marketData);
+        res.json({
+          ...fallback,
+          isOffline: true,
+          error: String(err)
+        });
+      } catch (fallbackErr) {
+        res.status(500).json({ error: String(err), message: err?.message || "Internal server error" });
       }
     }
   });
