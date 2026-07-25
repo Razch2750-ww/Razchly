@@ -24,6 +24,7 @@ import {
   Plus,
   ChevronRight,
   FileText,
+  Briefcase,
   ArrowRight,
   Car,
   BarChart3,
@@ -653,7 +654,8 @@ export default function Investments() {
     [],
   );
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "holding" | "audit" | "ai_insights">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "holding" | "ai_insights">("dashboard");
+  const [heroChartView, setHeroChartView] = useState<"equity" | "return">("equity");
   const [investStyle, setInvestStyle] = useState<"dividend" | "growth" | "value" | "swing" | "moderate" | "conservative">("growth");
   const [aiInsightsData, setAiInsightsData] = useState<any>(null);
   const [isAiInsightsLoading, setIsAiInsightsLoading] = useState(false);
@@ -707,7 +709,7 @@ export default function Investments() {
 
   const [filterCategory, setFilterCategory] = useState<"semua" | "saham" | "crypto" | "emas">("semua");
   const [sortBy, setSortBy] = useState<"terbaru" | "terlama" | "terbesar" | "terkecil">("terbaru");
-  const [portfolioViewMode, setPortfolioViewMode] = useState<"daftar" | "alokasi">("daftar");
+  const [portfolioViewMode, setPortfolioViewMode] = useState<"daftar" | "audit" | "alokasi">("daftar");
   const [allocationViewBy, setAllocationViewBy] = useState<"aset" | "kategori">("aset");
 
   const [marketData, setMarketData] = useState<any>({
@@ -1716,39 +1718,30 @@ export default function Investments() {
       mobileActions={mobileActionsInvestments}
     >
       {/* Sub-tab Navigation */}
-      <div className="flex bg-app-bg p-1 rounded-xl border border-app-border self-start mb-6 gap-1 relative z-10 shrink-0">
+      <div className="flex bg-app-bg p-1.5 rounded-2xl border border-app-border self-start mb-6 gap-1.5 relative z-10 shrink-0 shadow-sm">
         <button
           type="button"
           onClick={() => setActiveTab("dashboard")}
-          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
             activeTab === "dashboard"
               ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
               : "text-app-text/60 hover:text-app-text-bright"
           }`}
         >
+          <BarChart3 className="w-3.5 h-3.5" />
           {language === "en" ? "Summary" : "Ringkasan"}
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("holding")}
-          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
             activeTab === "holding"
               ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
               : "text-app-text/60 hover:text-app-text-bright"
           }`}
         >
-          {language === "en" ? "Active Holdings" : "Kepemilikan Aktif"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("audit")}
-          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-            activeTab === "audit"
-              ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
-              : "text-app-text/60 hover:text-app-text-bright"
-          }`}
-        >
-          {language === "en" ? "Audit History" : "Audit Riwayat"}
+          <Briefcase className="w-3.5 h-3.5" />
+          {language === "en" ? "Portfolio & Audit" : "Portofolio & Audit"}
           {auditedHoldings.length > 0 && (
             <span className="bg-app-accent1 text-app-bg text-[9px] px-1.5 py-0.5 rounded-full font-semibold">
               {auditedHoldings.length}
@@ -1761,7 +1754,7 @@ export default function Investments() {
             setActiveTab("ai_insights");
             if (!aiInsightsData) fetchAiInsights(investStyle);
           }}
-          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
             activeTab === "ai_insights"
               ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
               : "text-app-text/60 hover:text-app-text-bright"
@@ -1778,207 +1771,207 @@ export default function Investments() {
           {/* COLUMN 1: LEFT PANEL (lg:col-span-5) */}
           <div className="lg:col-span-5 flex flex-col gap-6 w-full">
             
-            {/* CARD 1: TOTAL EQUITY */}
-            <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden w-full">
+            {/* UNIFIED HERO CHART CARD */}
+            <HoverCard className="bg-app-card rounded-[18px] p-5 sm:p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden w-full">
               
-              <div className="relative z-10 flex flex-col mb-4">
-                <span className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider mb-1">
-                  Total Equity
-                </span>
-                <span className="text-2xl font-semibold text-app-text-bright break-words leading-tight font-mono">
-                  Rp {totalBalance.toLocaleString("id-ID")}
-                </span>
-              </div>
-
-              {/* Total Equity Chart */}
-              <div className="h-[180px] w-full relative z-10">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 10, right: -5, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorTotalEquity" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--color-app-success)" stopOpacity={0.25} />
-                        <stop offset="100%" stopColor="var(--color-app-success)" stopOpacity={0.0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-app-border)" opacity={0.3} />
-                    <XAxis
-                      dataKey="name"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
-                      dy={5}
-                      opacity={0.5}
-                    />
-                    <YAxis
-                      orientation="right"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
-                      tickFormatter={formatYAxis}
-                      opacity={0.5}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "var(--color-app-card)",
-                        border: "1px solid var(--color-app-border)",
-                        borderRadius: "12px",
-                      }}
-                      itemStyle={{
-                        fontSize: 11,
-                        color: "var(--color-app-text-bright)",
-                      }}
-                      labelStyle={{
-                        fontSize: 11,
-                        color: "var(--color-app-text)",
-                        marginBottom: 2,
-                      }}
-                      formatter={(value: number) => [`Rp ${value.toLocaleString("id-ID")}`, "Equity"]}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="value"
-                      stroke="var(--color-app-success)"
-                      strokeWidth={2}
-                      fillOpacity={1}
-                      fill="url(#colorTotalEquity)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Period Selectors */}
-              <div className="flex gap-2 justify-center mt-4 border-t border-app-border pt-3 relative z-10">
-                {(["1W", "1M", "3M", "YTD", "1Y", "All"] as const).map((p) => (
+              {/* Header with Mode Toggle & Period Filter */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 relative z-10">
+                <div className="flex items-center bg-app-bg p-1 rounded-xl border border-app-border self-start">
                   <button
-                    key={p}
                     type="button"
-                    onClick={() => setChartPeriod(p)}
-                    className={`px-3 py-1.5 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
-                      chartPeriod === p
-                        ? "bg-app-accent1 text-app-bg shadow-sm"
-                        : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
+                    onClick={() => setHeroChartView("equity")}
+                    className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      heroChartView === "equity"
+                        ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
+                        : "text-app-text/60 hover:text-app-text-bright"
                     }`}
                   >
-                    {p}
+                    <TrendingUp className="w-3.5 h-3.5" /> Total Equity
                   </button>
-                ))}
-              </div>
-            </HoverCard>
+                  <button
+                    type="button"
+                    onClick={() => setHeroChartView("return")}
+                    className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      heroChartView === "return"
+                        ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
+                        : "text-app-text/60 hover:text-app-text-bright"
+                    }`}
+                  >
+                    <BarChart3 className="w-3.5 h-3.5" /> Return vs IHSG
+                  </button>
+                </div>
 
-            {/* CARD 2: CUMULATIVE PORTFOLIO RETURN */}
-            <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden w-full">
-              
-              
-              <div className="relative z-10 flex flex-col mb-4">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider">
-                    Cumulative Portfolio Return
-                  </span>
-                  <div className="relative group">
-                    <Info className="w-3.5 h-3.5 text-app-text/50 hover:text-app-text cursor-pointer" />
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-app-card border border-app-border p-2 rounded-lg shadow-xl text-[10px] text-app-text/80 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 leading-relaxed">
-                      Imbal hasil kumulatif portofolio Anda dibandingkan indeks IHSG (COMPOSITE).
+                <div className="flex gap-1 bg-app-bg p-1 rounded-xl border border-app-border self-start sm:self-auto">
+                  {(["1W", "1M", "3M", "YTD", "1Y", "All"] as const).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setChartPeriod(p)}
+                      className={`px-2.5 py-1 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
+                        chartPeriod === p
+                          ? "bg-app-accent1 text-app-bg shadow-sm"
+                          : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dynamic Stats Row */}
+              <div className="relative z-10 flex flex-wrap items-baseline justify-between gap-2 mb-4 pb-3 border-b border-app-border/50">
+                {heroChartView === "equity" ? (
+                  <div>
+                    <span className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider block mb-0.5">
+                      Total Nilai Equity Saat Ini
+                    </span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold text-app-text-bright font-mono">
+                        Rp {totalBalance.toLocaleString("id-ID")}
+                      </span>
+                      <span className={`text-xs font-semibold font-mono ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                        {incomeToday >= 0 ? "+" : ""}Rp {incomeToday.toLocaleString("id-ID")}
+                      </span>
                     </div>
                   </div>
-                </div>
-
-                <div className="flex gap-4 mt-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-3.5 bg-app-success rounded-full" />
-                    <span className="text-xs text-app-text/60 font-semibold">Portfolio:</span>
-                    <span className={`text-xs font-semibold font-mono ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                      {incomeToday >= 0 ? "+" : ""}{(expenseToday > 0 ? ((incomeToday / expenseToday) * 100).toFixed(2) : 0)}%
-                    </span>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <div>
+                      <span className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider block mb-0.5">
+                        Return Portofolio
+                      </span>
+                      <span className={`text-xl font-bold font-mono ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                        {incomeToday >= 0 ? "+" : ""}{(expenseToday > 0 ? ((incomeToday / expenseToday) * 100).toFixed(2) : 0)}%
+                      </span>
+                    </div>
+                    <div className="h-7 w-px bg-app-border" />
+                    <div>
+                      <span className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider block mb-0.5">
+                        IHSG Benchmark
+                      </span>
+                      <span className={`text-xl font-bold font-mono ${marketData.COMPOSITE?.change >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                        {marketData.COMPOSITE?.change >= 0 ? "+" : ""}{marketData.COMPOSITE?.change?.toFixed(2)}%
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-3.5 bg-purple-500 rounded-full" />
-                    <span className="text-xs text-app-text/60 font-semibold">IHSG:</span>
-                    <span className={`text-xs font-semibold font-mono ${marketData.COMPOSITE?.change >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                      {marketData.COMPOSITE?.change >= 0 ? "+" : ""}{marketData.COMPOSITE?.change?.toFixed(2)}%
-                    </span>
-                  </div>
-                </div>
+                )}
               </div>
 
-              {/* Cumulative Return Chart */}
-              <div className="h-[180px] w-full relative z-10">
+              {/* Dynamic Single Chart Canvas */}
+              <div className="h-[220px] w-full relative z-10">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 10, right: -5, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-app-border)" opacity={0.3} />
-                    <XAxis
-                      dataKey="name"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
-                      dy={5}
-                      opacity={0.5}
-                    />
-                    <YAxis
-                      orientation="right"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
-                      tickFormatter={(val) => `${val.toFixed(0)}%`}
-                      opacity={0.5}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "var(--color-app-card)",
-                        border: "1px solid var(--color-app-border)",
-                        borderRadius: "12px",
-                      }}
-                      itemStyle={{
-                        fontSize: 11,
-                        color: "var(--color-app-text-bright)",
-                      }}
-                      labelStyle={{
-                        fontSize: 11,
-                        color: "var(--color-app-text)",
-                        marginBottom: 2,
-                      }}
-                      formatter={(value: number, name: string) => [
-                        `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`,
-                        name === "portfolioReturn" ? "Portfolio" : "IHSG"
-                      ]}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="portfolioReturn"
-                      name="portfolioReturn"
-                      stroke="var(--color-app-success)"
-                      strokeWidth={2.5}
-                      dot={false}
-                      activeDot={{ r: 4 }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="ihsgReturn"
-                      name="ihsgReturn"
-                      stroke="#8B5CF6"
-                      strokeWidth={2}
-                      dot={false}
-                      activeDot={{ r: 4 }}
-                    />
-                  </LineChart>
+                  {heroChartView === "equity" ? (
+                    <AreaChart data={chartData} margin={{ top: 10, right: 5, left: -20, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorTotalEquity" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="var(--color-app-success)" stopOpacity={0.25} />
+                          <stop offset="100%" stopColor="var(--color-app-success)" stopOpacity={0.0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-app-border)" opacity={0.3} />
+                      <XAxis
+                        dataKey="name"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                        dy={5}
+                        opacity={0.5}
+                      />
+                      <YAxis
+                        orientation="right"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                        tickFormatter={formatYAxis}
+                        opacity={0.5}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "var(--color-app-card)",
+                          border: "1px solid var(--color-app-border)",
+                          borderRadius: "12px",
+                        }}
+                        itemStyle={{
+                          fontSize: 11,
+                          color: "var(--color-app-text-bright)",
+                        }}
+                        labelStyle={{
+                          fontSize: 11,
+                          color: "var(--color-app-text)",
+                          marginBottom: 2,
+                        }}
+                        formatter={(value: number) => [`Rp ${value.toLocaleString("id-ID")}`, "Equity"]}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke="var(--color-app-success)"
+                        strokeWidth={2.5}
+                        fillOpacity={1}
+                        fill="url(#colorTotalEquity)"
+                      />
+                    </AreaChart>
+                  ) : (
+                    <LineChart data={chartData} margin={{ top: 10, right: 5, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-app-border)" opacity={0.3} />
+                      <XAxis
+                        dataKey="name"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                        dy={5}
+                        opacity={0.5}
+                      />
+                      <YAxis
+                        orientation="right"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                        tickFormatter={(val) => `${val.toFixed(0)}%`}
+                        opacity={0.5}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "var(--color-app-card)",
+                          border: "1px solid var(--color-app-border)",
+                          borderRadius: "12px",
+                        }}
+                        itemStyle={{
+                          fontSize: 11,
+                          color: "var(--color-app-text-bright)",
+                        }}
+                        labelStyle={{
+                          fontSize: 11,
+                          color: "var(--color-app-text)",
+                          marginBottom: 2,
+                        }}
+                        formatter={(value: number, name: string) => [
+                          `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`,
+                          name === "portfolioReturn" ? "Portfolio" : "IHSG"
+                        ]}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="portfolioReturn"
+                        name="portfolioReturn"
+                        stroke="var(--color-app-success)"
+                        strokeWidth={2.5}
+                        dot={false}
+                        activeDot={{ r: 4 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="ihsgReturn"
+                        name="ihsgReturn"
+                        stroke="#8B5CF6"
+                        strokeWidth={2}
+                        dot={false}
+                        activeDot={{ r: 4 }}
+                      />
+                    </LineChart>
+                  )}
                 </ResponsiveContainer>
-              </div>
-
-              {/* Period Selectors */}
-              <div className="flex gap-2 justify-center mt-4 border-t border-app-border pt-3 relative z-10">
-                {(["1W", "1M", "3M", "YTD", "1Y", "All"] as const).map((p) => (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => setChartPeriod(p)}
-                    className={`px-3 py-1.5 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
-                      chartPeriod === p
-                        ? "bg-app-accent1 text-app-bg shadow-sm"
-                        : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
               </div>
             </HoverCard>
 
@@ -2282,7 +2275,9 @@ export default function Investments() {
         </div>
       )}
 
-      {activeTab !== "dashboard" && activeTab !== "ai_insights" && (() => {
+      {activeTab !== "dashboard" && activeTab !== "ai_insights" && (
+        <>
+          {(() => {
         const getMarketChangeVal = (item: any) => {
           if (!item || item.change === undefined) return 0;
           let c = Number(item.change);
@@ -2544,64 +2539,50 @@ export default function Investments() {
               <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">
                 Portofolio Investasi
               </h2>
-              <div className="flex bg-app-bg p-0.5 rounded-xl border border-app-border self-start">
+              <div className="flex bg-app-bg p-1 rounded-xl border border-app-border self-start">
                 <button
                   type="button"
-                  onClick={() => setActiveTab("holding")}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    activeTab === "holding"
+                  onClick={() => setPortfolioViewMode("daftar")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    portfolioViewMode === "daftar"
                       ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
                       : "text-app-text/60 hover:text-app-text-bright border border-transparent"
                   }`}
                 >
-                  Kepemilikan Aktif
+                  <List className="w-3.5 h-3.5" /> Kepemilikan Aktif
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("audit")}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-                    activeTab === "audit"
+                  onClick={() => setPortfolioViewMode("audit")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    portfolioViewMode === "audit"
                       ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
                       : "text-app-text/60 hover:text-app-text-bright border border-transparent"
                   }`}
                 >
-                  Audit Riwayat Transaksi
+                  <FileText className="w-3.5 h-3.5" /> Audit Riwayat
                   {auditedHoldings.length > 0 && (
                     <span className="bg-app-accent1 text-app-bg text-[9px] px-1.5 py-0.5 rounded-full font-semibold">
                       {auditedHoldings.length}
                     </span>
                   )}
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setPortfolioViewMode("alokasi")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    portfolioViewMode === "alokasi"
+                      ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
+                      : "text-app-text/60 hover:text-app-text-bright border border-transparent"
+                  }`}
+                >
+                  <PieChartIcon className="w-3.5 h-3.5" /> Alokasi
+                </button>
               </div>
             </div>
 
-            {activeTab === "holding" && (
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="flex bg-app-bg p-1 rounded-xl border border-app-border">
-                  <button
-                    onClick={() => setPortfolioViewMode("daftar")}
-                    className={`p-1.5 rounded-lg transition-all ${
-                      portfolioViewMode === "daftar"
-                        ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
-                        : "text-app-text/60 hover:text-app-text-bright border border-transparent"
-                    }`}
-                    title="Tampilan Daftar"
-                  >
-                    <List className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setPortfolioViewMode("alokasi")}
-                    className={`p-1.5 rounded-lg transition-all ${
-                      portfolioViewMode === "alokasi"
-                        ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
-                        : "text-app-text/60 hover:text-app-text-bright border border-transparent"
-                    }`}
-                    title="Tampilan Alokasi"
-                  >
-                    <PieChartIcon className="w-4 h-4" />
-                  </button>
-                </div>
-
+            <div className="flex flex-wrap items-center gap-2">
+              {portfolioViewMode !== "audit" && (
                 <div className="flex bg-app-bg p-1 rounded-xl border border-app-border">
                   {[
                     { id: "semua", label: "Semua" },
@@ -2622,6 +2603,7 @@ export default function Investments() {
                     </button>
                   ))}
                 </div>
+              )}
                 
                 <div className="relative group">
                   <button className="flex items-center gap-2 bg-app-bg px-3 py-2 rounded-xl border border-app-border text-[10px] font-semibold uppercase hover:bg-app-card transition-colors">
@@ -2647,11 +2629,194 @@ export default function Investments() {
                   </div>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
 
-          {activeTab === "holding" ? (
-            portfolioViewMode === "alokasi" ? (
+          {portfolioViewMode === "audit" ? (
+            <div className="flex flex-col gap-6 animate-in fade-in duration-300">
+              {/* Audit Stats Summary */}
+              {(() => {
+                let totalTxModal = 0;
+                let totalTxCurrentValue = 0;
+                let totalActualSpent = 0;
+                let totalRealizedPL = 0;
+                let totalWins = 0;
+                let totalLosses = 0;
+
+                auditedHoldings.forEach((h) => {
+                  const mult = h.category === "saham" ? 100 : 1;
+                  const livePrice = getLivePrice({ category: h.category, code: h.code, qty: h.qty, price: h.avgBuyPrice, id: "" } as Investment);
+                  const costBasis = h.qty * h.avgBuyPrice * mult;
+                  const currentVal = h.qty * livePrice * mult;
+
+                  totalTxModal += costBasis;
+                  totalTxCurrentValue += currentVal;
+                  totalActualSpent += h.totalBuyAmount;
+                  totalRealizedPL += h.realizedPL;
+                  totalWins += h.wins;
+                  totalLosses += h.losses;
+                });
+
+                const totalTxProfit = totalTxCurrentValue - totalTxModal;
+                const totalTxProfitPct = totalTxModal > 0 ? (totalTxProfit / totalTxModal) * 100 : 0;
+                const totalTrades = totalWins + totalLosses;
+                const winRate = totalTrades > 0 ? (totalWins / totalTrades) * 100 : 0;
+
+                return (
+                  <div className="flex flex-col gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
+                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
+                          Modal Kepemilikan (Cost Basis)
+                        </p>
+                        <p className="text-lg font-semibold text-app-text-bright font-mono">
+                          Rp {Math.round(totalTxModal).toLocaleString("id-ID")}
+                        </p>
+                        <p className="text-[10px] text-app-text/50 mt-1">
+                          Berdasarkan sisa unit & harga beli rata-rata
+                        </p>
+                      </div>
+
+                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
+                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
+                          Nilai Pasar Saat Ini
+                        </p>
+                        <p className="text-lg font-semibold text-app-text-bright font-mono">
+                          Rp {Math.round(totalTxCurrentValue).toLocaleString("id-ID")}
+                        </p>
+                        <p className={`text-[10px] font-semibold mt-1 font-mono ${totalTxProfit >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                          {totalTxProfit >= 0 ? "+" : ""}Rp {Math.round(totalTxProfit).toLocaleString("id-ID")} ({totalTxProfit >= 0 ? "+" : ""}{totalTxProfitPct.toFixed(2)}%)
+                        </p>
+                      </div>
+
+                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
+                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
+                          Arus Kas Bersih Keluar
+                        </p>
+                        <p className="text-lg font-semibold text-app-text-bright font-mono">
+                          Rp {Math.round(totalActualSpent).toLocaleString("id-ID")}
+                        </p>
+                        <p className="text-[10px] text-app-text/50 mt-1">
+                          Total pembelian dikurangi total penjualan
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl flex flex-col justify-between">
+                        <div>
+                          <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
+                            Keuntungan Realisasi (Realized Profit/Loss)
+                          </p>
+                          <p className={`text-lg font-semibold font-mono ${totalRealizedPL >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                            {totalRealizedPL >= 0 ? "+" : ""}Rp {Math.round(totalRealizedPL).toLocaleString("id-ID")}
+                          </p>
+                        </div>
+                        <p className="text-[10px] text-app-text/50 mt-2">
+                          Total keuntungan/kerugian riil dari transaksi penjualan yang telah direalisasikan
+                        </p>
+                      </div>
+
+                      <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl flex flex-col justify-between">
+                        <div>
+                          <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
+                            Akurasi Transaksi Jual (Win/Loss Rate)
+                          </p>
+                          <div className="flex items-baseline gap-2 mt-1">
+                            <span className="text-lg font-semibold text-app-text-bright font-mono">
+                              {winRate.toFixed(1)}% Win Rate
+                            </span>
+                            <span className="text-xs text-app-text/60 font-mono">
+                              ({totalWins} Win / {totalLosses} Lose)
+                            </span>
+                          </div>
+                        </div>
+                        <div className="w-full bg-app-border/30 h-1.5 rounded-full overflow-hidden mt-3 relative">
+                          <div 
+                            className="bg-app-success h-full" 
+                            style={{ width: `${totalTrades > 0 ? winRate : 0}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Audited Assets Table */}
+              <div className="border border-app-border rounded-2xl overflow-hidden bg-app-bg/25">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs min-w-[850px]">
+                    <thead>
+                      <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-semibold uppercase tracking-wider text-[10px]">
+                        <th className="py-4 px-4">Instrumen</th>
+                        <th className="py-4 px-4 text-right">Kuantitas</th>
+                        <th className="py-4 px-4 text-right">Avg Beli</th>
+                        <th className="py-4 px-4 text-right">Harga Live</th>
+                        <th className="py-4 px-4 text-right">Hasil Jual (Realized)</th>
+                        <th className="py-4 px-4 text-right">Nilai Sekarang</th>
+                        <th className="py-4 px-4 text-right">Return (P/L)</th>
+                        <th className="py-4 px-4 text-center">Status Portofolio</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-app-border/40 text-app-text/80">
+                      {auditedHoldings.length === 0 ? (
+                        <tr>
+                          <td colSpan={8} className="text-center py-8 text-app-text/50">
+                            Belum ada riwayat transaksi yang diaudit
+                          </td>
+                        </tr>
+                      ) : (
+                        auditedHoldings.map((h) => {
+                          const mult = h.category === "saham" ? 100 : 1;
+                          const unitName = h.category === "saham" ? "Lot" : h.category === "crypto" ? "Koin" : "Gram";
+                          const livePrice = getLivePrice({ category: h.category, code: h.code, qty: h.qty, price: h.avgBuyPrice, id: "" } as Investment);
+                          const costBasis = h.qty * h.avgBuyPrice * mult;
+                          const currentVal = h.qty * livePrice * mult;
+                          const unrealizedPL = currentVal - costBasis;
+                          const unrealizedPLPct = costBasis > 0 ? (unrealizedPL / costBasis) * 100 : 0;
+                          const isProfit = unrealizedPL >= 0;
+
+                          const matchedInv = investments.find(inv => inv.code === h.code);
+                          const manualQty = matchedInv ? matchedInv.qty : 0;
+                          const isMatching = Math.abs(manualQty - h.qty) < 0.001;
+                          const diffUnits = manualQty - h.qty;
+
+                          return (
+                            <tr key={`${h.category}-${h.code}`} className="hover:bg-app-hover/30 transition-colors">
+                              <td className="py-3 px-4 font-bold text-app-text-bright font-mono">{h.code}</td>
+                              <td className="py-3 px-4 text-right font-mono">{h.qty.toLocaleString("id-ID")} {unitName}</td>
+                              <td className="py-3 px-4 text-right font-mono">Rp {Math.round(h.avgBuyPrice).toLocaleString("id-ID")}</td>
+                              <td className="py-3 px-4 text-right font-mono">Rp {Math.round(livePrice).toLocaleString("id-ID")}</td>
+                              <td className={`py-3 px-4 text-right font-mono font-semibold ${h.realizedPL >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                                {h.realizedPL >= 0 ? "+" : ""}Rp {Math.round(h.realizedPL).toLocaleString("id-ID")}
+                              </td>
+                              <td className="py-3 px-4 text-right font-mono font-semibold text-app-text-bright">
+                                Rp {Math.round(currentVal).toLocaleString("id-ID")}
+                              </td>
+                              <td className={`py-3 px-4 text-right font-mono font-bold ${isProfit ? "text-app-success" : "text-app-danger"}`}>
+                                {isProfit ? "+" : ""}Rp {Math.round(unrealizedPL).toLocaleString("id-ID")} ({isProfit ? "+" : ""}{unrealizedPLPct.toFixed(2)}%)
+                              </td>
+                              <td className="py-3 px-4 text-center">
+                                {isMatching ? (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-app-success/15 text-app-success border border-app-success/20">
+                                    Sesuai (Match)
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-500 border border-amber-500/20">
+                                    Selisih {diffUnits > 0 ? `+${diffUnits}` : diffUnits}
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          ) : portfolioViewMode === "alokasi" ? (
               <div className="flex-1 overflow-y-auto pr-2 flex flex-col">
                 <div className="flex bg-app-card border border-app-border rounded-lg p-1 mb-2 shrink-0 mx-1">
                   <button
@@ -2911,10 +3076,20 @@ export default function Investments() {
                   })
                 )}
               </StaggerContainer>
-            )
-          ) : (
-            /* AUDIT TAB VIEW */
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 relative z-10">
+            )}
+
+          <button
+            onClick={openPortfolioModal}
+            className="mt-4 flex items-center justify-center p-4 rounded-2xl border border-dashed border-app-border hover:border-app-text/50 transition cursor-pointer text-app-text/70 text-sm font-medium w-full"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Tambah Portofolio
+          </button>
+        </div>
+      </div>
+
+      {/* REMOVING DUPLICATE AUDIT BLOCK */}
+      <div style={{ display: "none" }}>
               {/* Alert / Explanation */}
               <div className="bg-app-accent1/10 border border-app-accent1/20 p-4 rounded-2xl flex items-start gap-3">
                 <Info className="w-5 h-5 text-app-accent1 shrink-0 mt-0.5" />
@@ -3251,19 +3426,8 @@ export default function Investments() {
                 </div>
               </div>
             </div>
-          )}
-
-          {activeTab === "holding" && (
-            <button
-              onClick={openPortfolioModal}
-              className="mt-4 flex items-center justify-center p-4 rounded-2xl border border-dashed border-app-border hover:border-app-text/50 transition cursor-pointer text-app-text/70 text-sm font-medium"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Portofolio
-            </button>
-          )}
-        </div>
-      </div>
+        </>
+      )}
 
       {/* AI INSIGHTS & STOCK RECOMMENDATIONS VIEW */}
       {activeTab === "ai_insights" && (

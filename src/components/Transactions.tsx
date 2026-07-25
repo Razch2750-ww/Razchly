@@ -49,6 +49,15 @@ import {
   Target,
   Coins,
   Compass,
+  Search,
+  SlidersHorizontal,
+  Filter,
+  PieChart as PieChartIcon,
+  BarChart3,
+  Zap,
+  Copy,
+  Calendar,
+  ShieldCheck
 } from "lucide-react";
 import {
   format,
@@ -79,6 +88,10 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
 } from "recharts";
 
 import { formatNumberInput, parseNumberInput } from "../utils/numberFormat";
@@ -806,12 +819,14 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
     const avgIncome = income / daysInPeriod;
     const avgExpense = expense / daysInPeriod;
+    const savingsRate = income > 0 ? Math.max(0, Math.min(100, Math.round((netProfit / income) * 100))) : 0;
     return {
       income,
       expense,
       netProfit,
       avgIncome,
       avgExpense,
+      savingsRate,
       count: filteredByPeriodTransactions.length,
     };
   }, [filteredByPeriodTransactions, selectedReportPeriod]);
@@ -931,6 +946,170 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
     }
     return "Custom";
   };
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+
+  const financialHealthStatus = useMemo(() => {
+    if (stats.count === 0) {
+      return {
+        label: language === "en" ? "No Data Yet" : "Belum Ada Data",
+        color: "text-app-text/60",
+        bg: "bg-app-card border-app-border/60",
+        badge: "neutral",
+      };
+    }
+    if (stats.netProfit > 0) {
+      return {
+        label: language === "en" ? "Surplus Cash Flow" : "Keuangan Surplus 🟢",
+        color: "text-emerald-400",
+        bg: "bg-emerald-500/15 border-emerald-500/30",
+        badge: "surplus",
+      };
+    }
+    if (stats.netProfit < 0) {
+      return {
+        label: language === "en" ? "Deficit Warning" : "Pengeluaran Defisit 🔴",
+        color: "text-rose-400",
+        bg: "bg-rose-500/15 border-rose-500/30",
+        badge: "deficit",
+      };
+    }
+    return {
+      label: language === "en" ? "Balanced Flow" : "Keuangan Seimbang 🟡",
+      color: "text-amber-400",
+      bg: "bg-amber-500/15 border-amber-500/30",
+      badge: "balanced",
+    };
+  }, [stats, language]);
+
+  const expenseCategoryBreakdown = useMemo(() => {
+    const catMap = new Map<string, { id: string; name: string; icon: string; total: number; count: number }>();
+    const expenseTx = filteredByPeriodTransactions.filter((t) => t.type === "expense");
+
+    expenseTx.forEach((t) => {
+      const catId = t.categoryId || "uncategorized";
+      const catName = t.categoryName || (language === "en" ? "Uncategorized" : "Tanpa Kategori");
+      const catIcon = t.categoryIcon || "shopping-cart";
+
+      const current = catMap.get(catId) || { id: catId, name: catName, icon: catIcon, total: 0, count: 0 };
+      current.total += t.amount + (t.adminFee || 0);
+      current.count += 1;
+      catMap.set(catId, current);
+    });
+
+    const totalExpense = stats.expense || 1;
+    return Array.from(catMap.values())
+      .map((item) => ({
+        ...item,
+        pct: Math.min(100, Math.round((item.total / totalExpense) * 100)),
+      }))
+      .sort((a, b) => b.total - a.total);
+  }, [filteredByPeriodTransactions, stats.expense, language]);
+
+  const incomeCategoryBreakdown = useMemo(() => {
+    const catMap = new Map<string, { id: string; name: string; icon: string; total: number; count: number }>();
+    const incomeTx = filteredByPeriodTransactions.filter((t) => t.type === "income");
+
+    incomeTx.forEach((t) => {
+      const catId = t.categoryId || "uncategorized";
+      const catName = t.categoryName || (language === "en" ? "Uncategorized" : "Tanpa Kategori");
+      const catIcon = t.categoryIcon || "briefcase";
+
+      const current = catMap.get(catId) || { id: catId, name: catName, icon: catIcon, total: 0, count: 0 };
+      current.total += t.amount;
+      current.count += 1;
+      catMap.set(catId, current);
+    });
+
+    const totalIncome = stats.income || 1;
+    return Array.from(catMap.values())
+      .map((item) => ({
+        ...item,
+        pct: Math.min(100, Math.round((item.total / totalIncome) * 100)),
+      }))
+      .sort((a, b) => b.total - a.total);
+  }, [filteredByPeriodTransactions, stats.income, language]);
+
+  const desktopChartData = useMemo(() => {
+    const dateMap = new Map<string, { date: string; income: number; expense: number; net: number }>();
+
+    const sortedTsx = [...filteredByPeriodTransactions].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    sortedTsx.forEach((t) => {
+      const d = format(new Date(t.date), "dd/MM");
+      if (!dateMap.has(d)) {
+        dateMap.set(d, { date: d, income: 0, expense: 0, net: 0 });
+      }
+      const item = dateMap.get(d)!;
+      if (t.type === "income") item.income += t.amount;
+      if (t.type === "expense") item.expense += t.amount;
+      if (t.adminFee) item.expense += t.adminFee;
+      item.net = item.income - item.expense;
+    });
+
+    let data = Array.from(dateMap.values());
+    if (data.length === 0) {
+      data = [{ date: format(new Date(), "dd/MM"), income: 0, expense: 0, net: 0 }];
+    }
+    return data;
+  }, [filteredByPeriodTransactions]);
+
+  const filteredAndSearchedTransactions = useMemo(() => {
+    let result = filteredTransactions;
+
+    if (categoryFilter !== "all") {
+      result = result.filter((t) => t.categoryId === categoryFilter);
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (t) =>
+          (t.note && t.note.toLowerCase().includes(q)) ||
+          (t.categoryName && t.categoryName.toLowerCase().includes(q)) ||
+          t.amount.toString().includes(q)
+      );
+    }
+
+    return result;
+  }, [filteredTransactions, categoryFilter, searchQuery]);
+
+  const groupedTransactions = useMemo(() => {
+    const groups: { [dateKey: string]: { dateStr: string; dateObj: Date; items: Transaction[]; dailyIncome: number; dailyExpense: number } } = {};
+
+    filteredAndSearchedTransactions.forEach((t) => {
+      const tDate = new Date(t.date);
+      const key = format(tDate, "yyyy-MM-dd");
+      if (!groups[key]) {
+        let label = format(tDate, "EEEE, d MMMM yyyy", { locale: currentLocale });
+        if (isSameDay(tDate, new Date())) {
+          label = (language === "en" ? "Today, " : "Hari ini, ") + format(tDate, "d MMMM yyyy", { locale: currentLocale });
+        } else if (isSameDay(tDate, subDays(new Date(), 1))) {
+          label = (language === "en" ? "Yesterday, " : "Kemarin, ") + format(tDate, "d MMMM yyyy", { locale: currentLocale });
+        }
+
+        groups[key] = {
+          dateStr: label,
+          dateObj: tDate,
+          items: [],
+          dailyIncome: 0,
+          dailyExpense: 0,
+        };
+      }
+
+      groups[key].items.push(t);
+      if (t.type === "income") groups[key].dailyIncome += t.amount;
+      if (t.type === "expense") groups[key].dailyExpense += t.amount;
+      if (t.adminFee) groups[key].dailyExpense += t.adminFee;
+    });
+
+    return Object.keys(groups)
+      .sort((a, b) => b.localeCompare(a))
+      .map((k) => groups[k]);
+  }, [filteredAndSearchedTransactions, currentLocale, language]);
 
   const getPeriodText = () => {
     if (selectedReportPeriod === "today")
@@ -1456,261 +1635,423 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
         {/* FILTER & EXPORT BAR */}
         <ScrollReveal>
-          <div className="bg-app-card border border-app-border rounded-2xl p-4 md:p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm shrink-0 relative overflow-hidden">
-          
-          <div className="relative z-10">
-            <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">
-              {language === "en" ? "Financial Report" : "Laporan Keuangan"}
-            </h2>
-            <p className="text-app-text/60 text-xs mt-1">
-              {language === "en" ? "Period:" : "Periode:"} {getPeriodText()}
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3 relative z-10">
-            <div className="relative">
-              <select
-                value={selectedReportAccount}
-                onChange={(e) => setSelectedReportAccount(e.target.value)}
-                className="bg-app-bg border border-app-border text-app-text-bright text-sm rounded-xl pl-4 pr-10 py-2.5 appearance-none outline-none focus:border-app-accent1 cursor-pointer"
-              >
-                <option value="all">{language === "en" ? "All Wallets" : "Semua Dompet"}</option>
-                {accounts.map((acc) => (
-                  <option key={acc.id} value={acc.id}>{acc.name} (Rp {acc.balance.toLocaleString("id-ID")})</option>
-                ))}
-              </select>
-              <ChevronDown className="w-4 h-4 text-app-text/50 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="bg-app-card border border-app-border rounded-[22px] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm shrink-0 relative overflow-hidden">
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-1">
+                <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">
+                  {language === "en" ? "Financial Report" : "Laporan Keuangan"}
+                </h2>
+                <span className="text-[10px] font-semibold tracking-wider uppercase bg-app-accent1/10 text-app-accent1 border border-app-accent1/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" /> AI Analytics
+                </span>
+              </div>
+              <p className="text-app-text/60 text-xs">
+                {language === "en" ? "Period:" : "Periode:"} <span className="font-medium text-app-text-bright">{getPeriodText()}</span>
+              </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-3 relative z-10">
               <div className="relative">
                 <select
-                  value={
-                    selectedReportPeriod.match(/^\d{4}-\d{2}$/)
-                      ? "custom"
-                      : selectedReportPeriod
-                  }
-                  onChange={(e) => {
-                    if (e.target.value === "custom") {
-                      setSelectedReportPeriod(format(new Date(), "yyyy-MM"));
-                    } else {
-                      setSelectedReportPeriod(e.target.value);
-                    }
-                  }}
-                  className="bg-app-bg border border-app-border text-app-text-bright text-sm rounded-xl pl-4 pr-10 py-2.5 appearance-none outline-none focus:border-app-accent1 cursor-pointer"
+                  value={selectedReportAccount}
+                  onChange={(e) => setSelectedReportAccount(e.target.value)}
+                  className="bg-app-bg border border-app-border text-app-text-bright text-xs rounded-xl pl-3.5 pr-9 py-2.5 appearance-none outline-none focus:border-app-accent1 cursor-pointer font-medium"
                 >
-                  <option value="today">{language === "en" ? "Today" : "Hari Ini"}</option>
-                  <option value="this_week">{language === "en" ? "This Week" : "Minggu Ini"}</option>
-                  <option value="this_month">{language === "en" ? "This Month" : "Bulan Ini"}</option>
-                  <option value="last_month">{language === "en" ? "Previous Month" : "Bulan Sebelumnya"}</option>
-                  <option value="custom">{language === "en" ? "Select Month" : "Pilih Bulan"}</option>
+                  <option value="all">{language === "en" ? "All Wallets" : "Semua Dompet"}</option>
+                  {accounts.map((acc) => (
+                    <option key={acc.id} value={acc.id}>{acc.name} (Rp {acc.balance.toLocaleString("id-ID")})</option>
+                  ))}
                 </select>
                 <ChevronDown className="w-4 h-4 text-app-text/50 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
-              {selectedReportPeriod.match(/^\d{4}-\d{2}$/) && (
-                <input
-                  type="month"
-                  value={selectedReportPeriod}
-                  onChange={(e) => setSelectedReportPeriod(e.target.value)}
-                  className="bg-app-bg border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-2.5 outline-none focus:border-app-accent1 cursor-pointer"
-                />
-              )}
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <select
+                    value={
+                      selectedReportPeriod.match(/^\d{4}-\d{2}$/)
+                        ? "custom"
+                        : selectedReportPeriod
+                    }
+                    onChange={(e) => {
+                      if (e.target.value === "custom") {
+                        setSelectedReportPeriod(format(new Date(), "yyyy-MM"));
+                      } else {
+                        setSelectedReportPeriod(e.target.value);
+                      }
+                    }}
+                    className="bg-app-bg border border-app-border text-app-text-bright text-xs rounded-xl pl-3.5 pr-9 py-2.5 appearance-none outline-none focus:border-app-accent1 cursor-pointer font-medium"
+                  >
+                    <option value="today">{language === "en" ? "Today" : "Hari Ini"}</option>
+                    <option value="this_week">{language === "en" ? "This Week" : "Minggu Ini"}</option>
+                    <option value="this_month">{language === "en" ? "This Month" : "Bulan Ini"}</option>
+                    <option value="last_month">{language === "en" ? "Previous Month" : "Bulan Sebelumnya"}</option>
+                    <option value="custom">{language === "en" ? "Select Month" : "Pilih Bulan"}</option>
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-app-text/50 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+                {selectedReportPeriod.match(/^\d{4}-\d{2}$/) && (
+                  <input
+                    type="month"
+                    value={selectedReportPeriod}
+                    onChange={(e) => setSelectedReportPeriod(e.target.value)}
+                    className="bg-app-bg border border-app-border text-app-text-bright text-xs rounded-xl px-3 py-2 outline-none focus:border-app-accent1 cursor-pointer"
+                  />
+                )}
+              </div>
+              <button
+                onClick={exportToExcel}
+                className="flex items-center gap-1.5 px-3.5 py-2.5 border border-app-success/30 text-app-success hover:bg-app-success/10 transition-colors rounded-xl font-medium text-xs cursor-pointer shadow-xs active:scale-95"
+              >
+                <FileSpreadsheet className="w-4 h-4" /> Excel
+              </button>
+              <button
+                onClick={exportToPDF}
+                className="flex items-center gap-1.5 px-3.5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white transition-colors rounded-xl font-medium text-xs cursor-pointer shadow-xs active:scale-95"
+              >
+                <FileText className="w-4 h-4" /> PDF
+              </button>
             </div>
-            <button
-              onClick={exportToExcel}
-              className="flex items-center gap-2 px-4 py-2.5 border border-app-success/30 text-app-success hover:bg-app-success/10 transition-colors rounded-xl font-medium text-sm"
-            >
-              <FileSpreadsheet className="w-4 h-4" /> Excel
-            </button>
-            <button
-              onClick={exportToPDF}
-              className="flex items-center gap-2 px-4 py-2.5 bg-[#d32f2f] hover:bg-[#b71c1c] text-app-bg transition-colors rounded-xl font-medium text-sm"
-            >
-              <FileText className="w-4 h-4" /> PDF
-            </button>
           </div>
-        </div>
         </ScrollReveal>
 
         {/* STATS & AI INSIGHT GRID */}
         <ScrollReveal>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 shrink-0">
-          {/* TOTAL KEUNTUNGAN BERSIH */}
-          <div className="lg:col-span-2 bg-app-card rounded-[18px] p-6 md:p-8 border border-app-border shadow-sm flex flex-col justify-between relative overflow-hidden">
-            {/* DECORATIVE LIGHTING - optional aesthetic */}
-            
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
+            {/* TOTAL KEUNTUNGAN BERSIH */}
+            <div className="lg:col-span-2 bg-app-card rounded-[22px] p-6 border border-app-border shadow-sm flex flex-col justify-between relative overflow-hidden">
+              <div className="relative z-10 mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-semibold tracking-wider uppercase text-app-text/60 bg-app-bg border border-app-border px-3 py-1 rounded-full">
+                    {language === "en" ? "Total Net Profit" : "Total Keuntungan Bersih"}
+                  </span>
+                  <span className={`text-[11px] font-semibold px-3 py-1 rounded-full border ${financialHealthStatus.bg} ${financialHealthStatus.color}`}>
+                    {financialHealthStatus.label}
+                  </span>
+                </div>
+                
+                <h2 className={`text-4xl md:text-5xl font-mono font-bold tracking-tight mb-3 ${stats.netProfit >= 0 ? "text-app-text-bright" : "text-rose-400"}`}>
+                  Rp {stats.netProfit.toLocaleString("id-ID")}
+                </h2>
 
-            <div className="relative z-10 mb-8">
-              <div className="inline-block px-3 py-1 bg-app-success/10 text-app-success text-[10px] font-semibold tracking-wider rounded-full mb-4 uppercase">
-                {language === "en" ? "Total Net Profit" : "Total Keuntungan Bersih"}
+                {/* MARGIN PROGRESS METER */}
+                <div className="space-y-1.5 mt-4 max-w-md">
+                  <div className="flex justify-between text-xs text-app-text/60">
+                    <span>
+                      {stats.income > 0 
+                        ? `Penyimpanan: ${stats.savingsRate}% dari Pemasukan` 
+                        : "Belum ada pemasukan terdeteksi"}
+                    </span>
+                    <span className="font-semibold text-app-text-bright">
+                      Target: min. 20%
+                    </span>
+                  </div>
+                  <div className="h-2 w-full bg-app-bg border border-app-border rounded-full overflow-hidden">
+                    <div
+                      style={{ width: `${Math.min(100, Math.max(0, stats.savingsRate))}%` }}
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        stats.savingsRate >= 20 ? "bg-emerald-500" : stats.savingsRate > 0 ? "bg-amber-500" : "bg-rose-500"
+                      }`}
+                    />
+                  </div>
+                </div>
               </div>
-              <h2 className="text-4xl md:text-5xl font-semibold text-app-text-bright mb-2">
-                Rp {stats.netProfit.toLocaleString("id-ID")}
-              </h2>
-              <div className="flex items-center gap-2 text-app-text/60 text-xs">
-                <Info className="w-4 h-4" /> {language === "en" ? "No previous month data available for comparison" : "Belum ada data bulan sebelumnya untuk perbandingan"}
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 relative z-10 mt-auto pt-4 border-t border-app-border/40">
+                <div className="bg-app-bg/80 border border-app-border/60 rounded-xl p-3.5 flex flex-col items-center justify-center text-center">
+                  <span className="text-lg font-bold text-app-text-bright mb-0.5">
+                    {stats.count}
+                  </span>
+                  <span className="text-[10px] text-app-text/50 font-semibold tracking-wider uppercase">
+                    {language === "en" ? "Total Transactions" : "Total Transaksi"}
+                  </span>
+                </div>
+                <div className="bg-app-bg/80 border border-app-border/60 rounded-xl p-3.5 flex flex-col items-center justify-center text-center">
+                  <span className="text-lg font-bold text-emerald-400 mb-0.5">
+                    Rp {Math.round(stats.avgIncome).toLocaleString("id-ID")}
+                  </span>
+                  <span className="text-[10px] text-app-text/50 font-semibold tracking-wider uppercase">
+                    {language === "en" ? "Income / Day" : "Rata-rata / Hari"}
+                  </span>
+                </div>
+                <div className="bg-app-bg/80 border border-app-border/60 rounded-xl p-3.5 flex flex-col items-center justify-center text-center">
+                  <span className="text-lg font-bold text-rose-400 mb-0.5">
+                    Rp {Math.round(stats.avgExpense).toLocaleString("id-ID")}
+                  </span>
+                  <span className="text-[10px] text-app-text/50 font-semibold tracking-wider uppercase">
+                    {language === "en" ? "Expenses / Day" : "Pengeluaran / Hari"}
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-10 mt-auto">
-              <div className="bg-app-bg border border-app-border rounded-2xl p-5 flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-semibold text-app-text-bright mb-1">
-                  {stats.count}
-                </span>
-                <span className="text-[10px] text-app-text/50 font-semibold tracking-wider uppercase">
-                  {language === "en" ? "Total Transactions" : "Total Transaksi"}
-                </span>
-              </div>
-              <div className="bg-app-bg border border-app-border rounded-2xl p-5 flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-semibold text-app-success mb-1">
-                  Rp {Math.round(stats.avgIncome).toLocaleString("id-ID")}
-                </span>
-                <span className="text-[10px] text-app-text/50 font-semibold tracking-wider uppercase">
-                  {language === "en" ? "Average / Day" : "Rata-rata / Hari"}
-                </span>
-              </div>
-              <div className="bg-app-bg border border-app-border rounded-2xl p-5 flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-semibold text-app-danger mb-1">
-                  Rp {Math.round(stats.avgExpense).toLocaleString("id-ID")}
-                </span>
-                <span className="text-[10px] text-app-text/50 font-semibold tracking-wider uppercase">
-                  {language === "en" ? "Expenses / Day" : "Pengeluaran / Hari"}
+            {/* AI INSIGHT */}
+            <div className="bg-app-card rounded-[22px] p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden group">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-app-accent1 via-app-accent2 to-emerald-400" />
+              
+              <div className="flex items-center justify-between mb-4 relative z-10">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-app-accent1/10 flex items-center justify-center text-app-accent1">
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                  </div>
+                  <span className="text-app-accent1 text-[11px] font-semibold tracking-widest uppercase">
+                    AI Insight & Analytics
+                  </span>
+                </div>
+                <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full border ${financialHealthStatus.bg} ${financialHealthStatus.color}`}>
+                  {financialHealthStatus.label}
                 </span>
               </div>
-            </div>
-          </div>
 
-          {/* AI INSIGHT */}
-          <div className="bg-app-card rounded-[18px] p-6 md:p-8 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
-            
-            <div className="flex items-center gap-2 mb-6 relative z-10">
-              <Sparkles className="w-5 h-5 text-app-accent1" />
-              <span className="text-app-accent1 text-[10px] font-semibold tracking-widest uppercase">
-                AI Insight
-              </span>
-            </div>
-            <h3 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em] mb-3 relative z-10">
-              {stats.count === 0
-                ? `Belum Ada Transaksi ${selectedReportPeriod === "today" ? "Hari Ini" : selectedReportPeriod === "this_week" ? "Minggu Ini" : "Bulan Ini"}`
-                : stats.netProfit > 0
-                  ? "Keuangan Anda Sehat"
-                  : stats.netProfit < 0
-                    ? "Pengeluaran Lebih Besar"
-                    : "Keuangan Seimbang"}
-            </h3>
-            <p className="text-app-text/70 text-sm leading-relaxed mb-8 flex-1 relative z-10">
-              {stats.count === 0
-                ? "Belum ada transaksi tercatat di periode ini. Pastikan transaksi sudah disinkronkan, atau mulai catat transaksi Anda."
-                : stats.netProfit > 0
-                  ? `Bagus! Keuangan Anda surplus. Pemasukan lebih besar Rp ${stats.netProfit.toLocaleString("id-ID")} dibandingkan pengeluaran.`
-                  : stats.netProfit < 0
-                    ? `Hati-hati! Pengeluaran Anda lebih besar Rp ${Math.abs(stats.netProfit).toLocaleString("id-ID")} dari pemasukan pada periode ini.`
-                    : "Pemasukan dan pengeluaran Anda saat ini seimbang."}
-            </p>
-            <button
-              onClick={fetchFinancialStrategy}
-              className="flex items-center gap-2 text-app-accent1 text-xs font-semibold tracking-widest uppercase hover:opacity-80 transition-opacity relative z-10 cursor-pointer"
-            >
-              Pelajari Strategi <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-        </ScrollReveal>
-
-        {/* SUMBER & ALOKASI */}
-        <ScrollReveal>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 shrink-0">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-app-text-bright">
-                Sumber Pendapatan
+              <h3 className="text-app-text-bright text-[18px] font-semibold tracking-tight mb-2 relative z-10">
+                {stats.count === 0
+                  ? `Belum Ada Transaksi ${selectedReportPeriod === "today" ? "Hari Ini" : selectedReportPeriod === "this_week" ? "Minggu Ini" : "Bulan Ini"}`
+                  : stats.netProfit > 0
+                    ? "Keuangan Sehat & Surplus"
+                    : stats.netProfit < 0
+                      ? "Pengeluaran Melebihi Pemasukan"
+                      : "Keuangan Berada di Titik Seimbang"}
               </h3>
+              
+              <p className="text-app-text/70 text-xs leading-relaxed mb-6 flex-1 relative z-10">
+                {stats.count === 0
+                  ? "Belum ada transaksi tercatat pada periode ini. Mulai catat transaksi harian Anda untuk melihat visualisasi dan rekomendasi AI."
+                  : stats.netProfit > 0
+                    ? `Performa keuangan baik! Anda berhasil mencatatkan surplus sebesar Rp ${stats.netProfit.toLocaleString("id-ID")}. Alokasikan sebagian surplus ini ke dana darurat atau instrumen investasi.`
+                    : stats.netProfit < 0
+                      ? `Perhatian! Pengeluaran Anda melebihi pemasukan sebesar Rp ${Math.abs(stats.netProfit).toLocaleString("id-ID")}. Evaluasi kategori pengeluaran terbesar Anda.`
+                      : "Pemasukan dan pengeluaran Anda tepat seimbang. Upayakan efisiensi pengeluaran untuk menciptakan margin tabungan."}
+              </p>
+
               <button
-                onClick={() => {
-                  setTab("Pemasukan");
-                  detailRef.current?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="text-app-accent1 text-xs font-semibold hover:underline"
+                onClick={fetchFinancialStrategy}
+                className="w-full py-3 px-4 rounded-xl bg-app-accent1/10 hover:bg-app-accent1/20 border border-app-accent1/30 text-app-accent1 text-xs font-semibold tracking-wider uppercase transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95"
               >
-                Lihat Detail
+                <span>Pelajari Strategi AI</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
-            <HoverCard
-              onClick={() => {
-                setTab("Pemasukan");
-                detailRef.current?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="bg-app-card border border-app-border rounded-[18px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
-            >
-              
-              <div className="flex items-center gap-4 relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-app-success/10 flex items-center justify-center shrink-0">
-                  <TrendingUp className="w-6 h-6 text-app-success" />
+          </div>
+        </ScrollReveal>
+
+        {/* VISUAL CHARTS SECTION */}
+        <ScrollReveal>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
+            {/* CASH FLOW TREND CHART */}
+            <div className="lg:col-span-2 bg-app-card border border-app-border rounded-[22px] p-6 shadow-sm flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                    <BarChart3 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-app-text-bright">
+                      Tren Arus Kas (Pemasukan vs Pengeluaran)
+                    </h3>
+                    <p className="text-[11px] text-app-text/50">
+                      Visualisasi pergerakan dana harian pada periode terpilih
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-app-text-bright font-semibold text-base">
-                    Total Pemasukan
-                  </p>
-                  <p className="text-app-text/50 text-xs mt-0.5">
-                    {
-                      filteredByPeriodTransactions.filter(
-                        (t) => t.type === "income",
-                      ).length
-                    }{" "}
-                    Transaksi
-                  </p>
+                <div className="flex items-center gap-3 text-xs font-medium">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                    <span className="text-app-text/70">Pemasukan</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+                    <span className="text-app-text/70">Pengeluaran</span>
+                  </div>
                 </div>
               </div>
-              <p className="text-xl font-semibold text-app-success relative z-10">
-                Rp {stats.income.toLocaleString("id-ID")}
-              </p>
-            </HoverCard>
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-app-text-bright">
-                Alokasi Pengeluaran
-              </h3>
+
+              <div className="h-[240px] w-full pt-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={desktopChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
+                      </linearGradient>
+                      <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                    <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                    <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} tickFormatter={(v) => `Rp ${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip
+                      content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-app-card border border-app-border p-3 rounded-xl shadow-xl text-xs space-y-1">
+                              <p className="font-semibold text-app-text-bright mb-1 border-b border-app-border pb-1">
+                                Tanggal {label}
+                              </p>
+                              <p className="text-emerald-400 font-medium">
+                                Pemasukan: Rp {Number(payload[0]?.value || 0).toLocaleString("id-ID")}
+                              </p>
+                              <p className="text-rose-400 font-medium">
+                                Pengeluaran: Rp {Number(payload[1]?.value || 0).toLocaleString("id-ID")}
+                              </p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Area type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#incomeGrad)" />
+                    <Area type="monotone" dataKey="expense" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#expenseGrad)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* CATEGORY BREAKDOWN VISUALIZER */}
+            <div className="bg-app-card border border-app-border rounded-[22px] p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-app-accent1/10 flex items-center justify-center text-app-accent1">
+                      <PieChartIcon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-app-text-bright">
+                        Alokasi Pengeluaran
+                      </h3>
+                      <p className="text-[11px] text-app-text/50">
+                        Kategori pengeluaran terbesar
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {expenseCategoryBreakdown.length === 0 ? (
+                  <div className="text-center py-12 text-app-text/50 text-xs">
+                    Belum ada data pengeluaran.
+                  </div>
+                ) : (
+                  <div className="space-y-3 mt-2">
+                    {expenseCategoryBreakdown.slice(0, 4).map((cat) => (
+                      <div key={cat.id} className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-medium text-app-text-bright truncate max-w-[140px] flex items-center gap-1.5">
+                            <CategoryIcon iconId={cat.icon} className="w-3.5 h-3.5 text-app-accent1" />
+                            <span>{cat.name}</span>
+                          </span>
+                          <span className="font-semibold text-rose-400">
+                            Rp {cat.total.toLocaleString("id-ID")} ({cat.pct}%)
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-app-bg border border-app-border/40 rounded-full overflow-hidden">
+                          <div
+                            style={{ width: `${cat.pct}%` }}
+                            className="h-full bg-rose-500 rounded-full transition-all duration-500"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={() => {
                   setTab("Pengeluaran");
                   detailRef.current?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="text-app-danger text-xs font-semibold hover:underline"
+                className="mt-4 pt-3 border-t border-app-border/50 text-xs font-semibold text-app-accent1 hover:underline text-center w-full"
               >
-                Optimasi Biaya
+                Lihat Semua Kategori →
               </button>
             </div>
-            <HoverCard
-              onClick={() => {
-                setTab("Pengeluaran");
-                detailRef.current?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="bg-app-card border border-app-border rounded-[18px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
-            >
-              
-              <div className="flex items-center gap-4 relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-app-danger/10 flex items-center justify-center shrink-0">
-                  <TrendingDown className="w-6 h-6 text-app-danger" />
-                </div>
-                <div>
-                  <p className="text-app-text-bright font-semibold text-base">
-                    Total Pengeluaran
-                  </p>
-                  <p className="text-app-text/50 text-xs mt-0.5">
-                    {
-                      filteredByPeriodTransactions.filter(
-                        (t) => t.type === "expense",
-                      ).length
-                    }{" "}
-                    Transaksi
-                  </p>
-                </div>
-              </div>
-              <p className="text-xl font-semibold text-app-danger relative z-10">
-                Rp {stats.expense.toLocaleString("id-ID")}
-              </p>
-            </HoverCard>
           </div>
-        </div>
+        </ScrollReveal>
+
+        {/* SUMBER & ALOKASI SUMMARY CARDS */}
+        <ScrollReveal>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-semibold text-app-text-bright">
+                  Sumber Pendapatan
+                </h3>
+                <button
+                  onClick={() => {
+                    setTab("Pemasukan");
+                    detailRef.current?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="text-app-accent1 text-xs font-semibold hover:underline"
+                >
+                  Lihat Detail →
+                </button>
+              </div>
+              <HoverCard
+                onClick={() => {
+                  setTab("Pemasukan");
+                  detailRef.current?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="bg-app-card border border-app-border rounded-[22px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
+              >
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0 border border-emerald-500/20">
+                    <TrendingUp className="w-6 h-6 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-app-text-bright font-semibold text-base">
+                      Total Pemasukan
+                    </p>
+                    <p className="text-app-text/50 text-xs mt-0.5">
+                      {filteredByPeriodTransactions.filter((t) => t.type === "income").length} Transaksi
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xl font-bold font-mono text-emerald-400 relative z-10">
+                  Rp {stats.income.toLocaleString("id-ID")}
+                </p>
+              </HoverCard>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-semibold text-app-text-bright">
+                  Alokasi Pengeluaran
+                </h3>
+                <button
+                  onClick={() => {
+                    setTab("Pengeluaran");
+                    detailRef.current?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="text-rose-400 text-xs font-semibold hover:underline"
+                >
+                  Optimasi Biaya →
+                </button>
+              </div>
+              <HoverCard
+                onClick={() => {
+                  setTab("Pengeluaran");
+                  detailRef.current?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="bg-app-card border border-app-border rounded-[22px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
+              >
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0 border border-rose-500/20">
+                    <TrendingDown className="w-6 h-6 text-rose-400" />
+                  </div>
+                  <div>
+                    <p className="text-app-text-bright font-semibold text-base">
+                      Total Pengeluaran
+                    </p>
+                    <p className="text-app-text/50 text-xs mt-0.5">
+                      {filteredByPeriodTransactions.filter((t) => t.type === "expense").length} Transaksi
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xl font-bold font-mono text-rose-400 relative z-10">
+                  Rp {stats.expense.toLocaleString("id-ID")}
+                </p>
+              </HoverCard>
+            </div>
+          </div>
         </ScrollReveal>
 
         {/* DETAIL TRANSAKSI */}
@@ -1718,165 +2059,221 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           ref={detailRef}
           className="flex-1 flex flex-col shrink-0 min-h-[400px]"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
-            <h3 className="text-xl font-semibold text-app-text-bright">
-              Detail Transaksi
-            </h3>
-            <div className="flex items-center gap-1 bg-app-card p-1 rounded-full border border-app-border relative">
-              {["Semua", "Pemasukan", "Pengeluaran"].map((t) => {
-                const isActive = tab === t;
-                const activeColorClass = t === "Semua" ? "bg-app-accent1" : t === "Pemasukan" ? "bg-app-success" : "bg-app-danger";
-                return (
-                  <button
-                    key={t}
-                    onClick={() => setTab(t as any)}
-                    className="px-5 py-2 rounded-full text-xs font-semibold transition-colors relative"
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeTabTxDesktop"
-                        className={`absolute inset-0 rounded-full ${activeColorClass}`}
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                    <span className={`relative z-10 ${isActive ? "text-app-bg" : "text-app-text/60 hover:text-app-text-bright"}`}>
-                      {t}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          {/* SEARCH & TYPE FILTER BAR */}
+          <div className="bg-app-card border border-app-border rounded-[22px] p-6 shadow-sm flex flex-col space-y-4">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <h3 className="text-lg font-semibold text-app-text-bright">
+                  Detail Transaksi
+                </h3>
+                <span className="text-xs bg-app-bg border border-app-border px-2.5 py-1 rounded-full text-app-text/60 font-medium">
+                  {filteredAndSearchedTransactions.length} Transaksi
+                </span>
+              </div>
 
-          <div className="bg-app-card border border-app-border rounded-[18px] p-6 shadow-sm mb-6 flex-1 overflow-hidden relative flex flex-col">
-            
-            {filteredTransactions.length === 0 ? (
-              <div className="p-8 text-center text-app-text/50 rounded-2xl border border-dashed border-app-border mt-4 relative z-10 flex flex-col items-center justify-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                {/* SEARCH INPUT */}
+                <div className="relative min-w-[200px] flex-1 sm:flex-none">
+                  <Search className="w-4 h-4 text-app-text/40 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari transaksi..."
+                    className="w-full bg-app-bg border border-app-border text-app-text-bright text-xs rounded-xl pl-9 pr-3 py-2 outline-none focus:border-app-accent1 transition-colors"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-app-text/40 hover:text-app-text"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* CATEGORY FILTER SELECT */}
+                <div className="relative">
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="bg-app-bg border border-app-border text-app-text-bright text-xs rounded-xl pl-3 pr-8 py-2 appearance-none outline-none focus:border-app-accent1 cursor-pointer font-medium"
+                  >
+                    <option value="all">Semua Kategori</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-3.5 h-3.5 text-app-text/50 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+
+                {/* TYPE TABS */}
+                <div className="flex items-center gap-1 bg-app-bg p-1 rounded-xl border border-app-border">
+                  {["Semua", "Pemasukan", "Pengeluaran"].map((t) => {
+                    const isActive = tab === t;
+                    const activeColorClass = t === "Semua" ? "bg-app-accent1" : t === "Pemasukan" ? "bg-emerald-500" : "bg-rose-500";
+                    return (
+                      <button
+                        key={t}
+                        onClick={() => setTab(t as any)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all relative cursor-pointer"
+                      >
+                        {isActive && (
+                          <motion.div
+                            layoutId="activeTabTxDesktop"
+                            className={`absolute inset-0 rounded-lg ${activeColorClass}`}
+                            transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                          />
+                        )}
+                        <span className={`relative z-10 ${isActive ? "text-app-bg" : "text-app-text/60 hover:text-app-text-bright"}`}>
+                          {t}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* GROUPED TRANSACTION TIMELINE */}
+            {groupedTransactions.length === 0 ? (
+              <div className="p-12 text-center text-app-text/50 rounded-2xl border border-dashed border-app-border my-2 flex flex-col items-center justify-center gap-3">
                 <MicroLoop type="waggle">
                   <Wallet className="w-10 h-10 text-app-accent1/60" />
                 </MicroLoop>
-                <span>Belum ada transaksi di tab ini.</span>
+                <span className="text-sm font-medium">Tidak ada transaksi yang cocok dengan filter.</span>
               </div>
             ) : (
-              <StaggerContainer className="space-y-2 mt-4 flex-1 overflow-y-auto no-scrollbar relative z-10 pr-2 -mr-2 pb-2">
-                {filteredTransactions.map((t) => (
-                  <StaggerItem key={t.id}>
-                    <div
-                      className="flex items-center justify-between p-4 bg-app-bg hover:bg-app-hover rounded-2xl transition-colors border border-app-border hover:border-app-border cursor-pointer group relative overflow-hidden"
-                    >
-                    
-                    <div className="flex items-center gap-4 relative z-10">
-                      <div
-                        className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border
-                      ${
-                        t.type === "income"
-                          ? "bg-app-success/10 text-app-success border-app-success/20"
-                          : t.type === "expense"
-                            ? "bg-app-danger/10 text-app-danger border-app-danger/20"
-                            : "bg-app-accent1/10 text-app-accent1 border-app-accent1/20"
-                      }`}
-                      >
-                        <AccountIcon
-                          iconId={getAccountIcon(
-                            t.type === "transfer"
-                              ? t.fromAccountId
-                              : t.accountId,
-                          )}
-                          className="w-6 h-6"
-                        />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-sm text-app-text-bright font-semibold">
-                            {t.note ||
-                              (t.type === "income"
-                                ? "Pemasukan"
-                                : t.type === "expense"
-                                  ? "Pengeluaran"
-                                  : "Transfer")}
-                          </p>
-                          {t.type === "transfer" && (
-                            <span className="px-2 py-0.5 bg-app-accent1/10 text-app-accent1 text-[10px] font-semibold rounded-full border border-app-accent1/20 hidden sm:inline-block">
-                              Transfer
-                            </span>
-                          )}
-                          {t.categoryId && (
-                            <span className="px-2 py-0.5 bg-app-card border border-app-border text-app-text text-[10px] font-semibold rounded-full hidden sm:flex items-center gap-1">
-                              <CategoryIcon
-                                iconId={t.categoryIcon || "dollar-sign"}
-                                className="w-3 h-3 text-app-text/70"
-                              />
-                              <span>{t.categoryName}</span>
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] opacity-60 mt-0.5 truncate max-w-[200px] md:max-w-[400px]">
-                          {t.type === "transfer"
-                            ? `Transfer: ${getAccountName(t.fromAccountId)} ➔ ${getAccountName(t.toAccountId)}`
-                            : getAccountName(t.accountId)}{" "}
-                          •{" "}
-                          {format(t.date, "dd MMM yyyy, HH:mm", {
-                            locale: localeId,
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 relative z-10">
-                      <div className="flex flex-col items-end">
-                        <p
-                          className={`text-base font-semibold whitespace-nowrap
-                          ${
-                            t.type === "income"
-                              ? "text-app-success"
-                              : t.type === "expense"
-                                ? "text-app-danger"
-                                : "text-app-text-bright"
-                          }`}
-                        >
-                          {t.type === "income"
-                            ? "+"
-                            : t.type === "expense"
-                              ? "-"
-                              : ""}{" "}
-                          Rp {t.amount.toLocaleString("id-ID")}
-                        </p>
-                        {Boolean(t.adminFee) && (
-                          <p className="text-[10px] text-app-danger font-semibold mt-0.5">
-                            Fee: -Rp {t.adminFee.toLocaleString("id-ID")}
-                          </p>
+              <div className="space-y-6 pt-2 overflow-y-auto max-h-[600px] pr-1">
+                {groupedTransactions.map((group) => (
+                  <div key={group.dateStr} className="space-y-2">
+                    {/* DATE GROUP HEADER */}
+                    <div className="flex items-center justify-between py-1.5 px-3 bg-app-bg/60 border border-app-border/40 rounded-xl text-xs font-semibold text-app-text/70 sticky top-0 z-20 backdrop-blur-md">
+                      <span className="flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5 text-app-accent1" />
+                        <span>{group.dateStr}</span>
+                      </span>
+                      <div className="flex items-center gap-3 font-mono">
+                        {group.dailyIncome > 0 && (
+                          <span className="text-emerald-400">+Rp {group.dailyIncome.toLocaleString("id-ID")}</span>
+                        )}
+                        {group.dailyExpense > 0 && (
+                          <span className="text-rose-400">-Rp {group.dailyExpense.toLocaleString("id-ID")}</span>
                         )}
                       </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openEditModal(t);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 p-2 text-app-accent1 hover:bg-app-accent1/10 rounded-full transition-all md:opacity-0 max-md:opacity-100"
-                        title="Edit Transaksi"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setTsxToDelete(t);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 p-2 text-app-danger hover:bg-app-danger/10 rounded-full transition-all md:opacity-0 max-md:opacity-100"
-                        title="Hapus Transaksi"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    </div>
+
+                    {/* ITEMS LIST */}
+                    <div className="space-y-2">
+                      {group.items.map((t) => (
+                        <div
+                          key={t.id}
+                          className="flex items-center justify-between p-3.5 bg-app-bg hover:bg-app-hover rounded-xl transition-all border border-app-border/60 hover:border-app-accent1/30 cursor-pointer group"
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <div
+                              className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border
+                              ${
+                                t.type === "income"
+                                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                  : t.type === "expense"
+                                    ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                                    : "bg-app-accent1/10 text-app-accent1 border-app-accent1/20"
+                              }`}
+                            >
+                              <AccountIcon
+                                iconId={getAccountIcon(
+                                  t.type === "transfer" ? t.fromAccountId : t.accountId
+                                )}
+                                className="w-5 h-5"
+                              />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="text-xs text-app-text-bright font-semibold">
+                                  {t.note ||
+                                    (t.type === "income"
+                                      ? "Pemasukan"
+                                      : t.type === "expense"
+                                        ? "Pengeluaran"
+                                        : "Transfer")}
+                                </p>
+                                {t.categoryId && (
+                                  <span className="px-2 py-0.5 bg-app-card border border-app-border text-app-text text-[10px] font-medium rounded-md flex items-center gap-1">
+                                    <CategoryIcon
+                                      iconId={t.categoryIcon || "dollar-sign"}
+                                      className="w-3 h-3 text-app-text/70"
+                                    />
+                                    <span>{t.categoryName}</span>
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] opacity-60 mt-0.5">
+                                {t.type === "transfer"
+                                  ? `Transfer: ${getAccountName(t.fromAccountId)} ➔ ${getAccountName(t.toAccountId)}`
+                                  : getAccountName(t.accountId)}{" "}
+                                • {format(new Date(t.date), "HH:mm")}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <p
+                                className={`text-xs font-bold font-mono ${
+                                  t.type === "income"
+                                    ? "text-emerald-400"
+                                    : t.type === "expense"
+                                      ? "text-rose-400"
+                                      : "text-app-text-bright"
+                                }`}
+                              >
+                                {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""} Rp {t.amount.toLocaleString("id-ID")}
+                              </p>
+                              {Boolean(t.adminFee) && (
+                                <p className="text-[10px] text-rose-400 font-semibold">
+                                  Fee: -Rp {t.adminFee.toLocaleString("id-ID")}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openEditModal(t);
+                                }}
+                                className="p-1.5 text-app-accent1 hover:bg-app-accent1/10 rounded-lg transition-all"
+                                title="Edit"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setTsxToDelete(t);
+                                }}
+                                className="p-1.5 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
+                                title="Hapus"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </StaggerItem>
                 ))}
-              </StaggerContainer>
+              </div>
             )}
           </div>
         </div>
-      </div>{" "}
-        </div>
-      )}
+      </div>
+    </div>
+  )}
       {/* End of DESKTOP LAYOUT */}
       {/* Modal Add */}
       {isModalOpen && (
