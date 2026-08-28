@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Star, TrendingUp, Target, ArrowUp, ArrowDown, Plus, Car, AlertTriangle, Sparkles, TrendingDown } from 'lucide-react';
 
 import { formatNumberInput, parseNumberInput } from '../utils/numberFormat';
+import { parseTxDate } from '../utils/dateUtils';
 import { Transaction } from '../types';
 import { isSameMonth, isSameDay } from 'date-fns';
 import confetti from 'canvas-confetti';
@@ -68,12 +69,12 @@ export default function SavingsTarget() {
   };
 
   const incomeThisMonth = useMemo(() => transactions
-    .filter((t) => t.type === "income" && isSameMonth(new Date(t.date), new Date()))
+    .filter((t) => t.type === "income" && isSameMonth(parseTxDate(t.date), new Date()))
     .reduce((sum, t) => sum + t.amount, 0), [transactions]);
     
   const expenseThisMonth = useMemo(() => transactions
     .reduce((sum, t) => {
-      if (isSameMonth(new Date(t.date), new Date())) {
+      if (isSameMonth(parseTxDate(t.date), new Date())) {
         if (t.type === "expense") return sum + t.amount;
         if (t.adminFee) return sum + t.adminFee;
       }
@@ -81,12 +82,12 @@ export default function SavingsTarget() {
     }, 0), [transactions]);
     
   const incomeToday = useMemo(() => transactions
-    .filter((t) => t.type === "income" && isSameDay(new Date(t.date), new Date()))
+    .filter((t) => t.type === "income" && isSameDay(parseTxDate(t.date), new Date()))
     .reduce((sum, t) => sum + t.amount, 0), [transactions]);
     
   const expenseToday = useMemo(() => transactions
     .reduce((sum, t) => {
-      if (isSameDay(new Date(t.date), new Date())) {
+      if (isSameDay(parseTxDate(t.date), new Date())) {
         if (t.type === "expense") return sum + t.amount;
         if (t.adminFee) return sum + t.adminFee;
       }
@@ -166,7 +167,7 @@ export default function SavingsTarget() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <ScrollReveal className="lg:col-span-2">
-          <div className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden h-full">
+          <div className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col relative overflow-hidden h-full">
 
           <h2 className="text-app-text-bright font-semibold mb-6 flex items-center gap-2 relative z-10">
             <Target className="w-5 h-5 text-app-accent1" /> Atur Target Finansial
@@ -314,7 +315,7 @@ export default function SavingsTarget() {
         <StaggerContainer className="lg:col-span-1 flex flex-col gap-6">
           {/* Laba Bersih Card */}
           <StaggerItem className="flex-1">
-            <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden h-full min-h-[140px] w-full">
+            <HoverCard className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col justify-center relative overflow-hidden h-full min-h-[140px] w-full">
 
             <div className="absolute top-0 right-0 p-4 opacity-10">
                <TrendingUp className="w-16 h-16 text-app-success" />
@@ -327,7 +328,7 @@ export default function SavingsTarget() {
 
           {/* Predictive analysis card */}
           <StaggerItem className="flex-1">
-            <HoverCard className={`rounded-[18px] p-6 border shadow-sm flex flex-col relative overflow-hidden h-full w-full ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
+            <HoverCard className={`rounded-2xl p-6 border shadow-xs flex flex-col relative overflow-hidden h-full w-full ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
 
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-3">
@@ -399,7 +400,7 @@ export default function SavingsTarget() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Tabungan Bulanan Berlayer */}
-        <div className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col relative overflow-hidden">
 
           <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <Star className="w-5 h-5 text-app-accent1" /> Tabungan Layered
@@ -460,7 +461,7 @@ export default function SavingsTarget() {
         </div>
 
         {/* Penghasilan Harian Berlayer */}
-        <div className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col relative overflow-hidden">
 
           <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowUp className="w-5 h-5 text-app-success" /> Penghasilan Layered
@@ -521,7 +522,7 @@ export default function SavingsTarget() {
         </div>
 
         {/* Pengeluaran Harian Berlayer */}
-        <div className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col relative overflow-hidden">
 
           <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowDown className="w-5 h-5 text-app-danger" /> Pengeluaran Layered

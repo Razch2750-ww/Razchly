@@ -238,11 +238,28 @@ export default function Attendance() {
     return r.date === today.getTime();
   });
 
+  const getScheduleForDate = (dateObjOrStr: Date | string) => {
+    let d: Date;
+    if (typeof dateObjOrStr === 'string') {
+      const [y, m, day] = dateObjOrStr.split('-').map(Number);
+      d = new Date(y, m - 1, day);
+    } else {
+      d = dateObjOrStr;
+    }
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const dayId = d.getDay().toString();
+    const defaultSchedule = workSchedule?.days?.[dayId] || { isActive: true, start: '08:00', end: '17:00' };
+    const override = workSchedule?.overrides?.[dateStr];
+    return override || defaultSchedule;
+  };
+
   const openAddModalForDate = (date: Date) => {
-    setModalDate(new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split('T')[0]);
+    const formattedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+    setModalDate(formattedDate);
     setModalStatus('present');
-    setModalCheckIn("");
-    setModalCheckOut("");
+    const sched = getScheduleForDate(date);
+    setModalCheckIn(sched.start || "08:00");
+    setModalCheckOut(sched.end || "17:00");
     setModalNotes("");
     setEditingRecord(null);
     setIsModalOpen(true);
@@ -475,7 +492,7 @@ export default function Attendance() {
       <div className="space-y-6 md:space-y-8">
 
         {/* Today's Actions */}
-        <HoverCard className="bg-app-card rounded-[18px] border border-app-border p-4 sm:p-5 shadow-sm relative overflow-hidden group transition-colors w-full">
+        <HoverCard className="bg-app-card rounded-2xl border border-app-border p-4 sm:p-5 shadow-xs relative overflow-hidden group transition-colors w-full">
           
           <div className="relative z-10">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3.5 gap-2 pb-3 border-b border-app-border/60">
@@ -790,7 +807,7 @@ export default function Attendance() {
 
       {isScheduleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-3xl rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-app-bg w-full max-w-3xl rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
               <h2 className="font-semibold text-app-text-bright">Pengaturan Jadwal & Periode</h2>
               <button onClick={() => setIsScheduleModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
@@ -987,7 +1004,7 @@ export default function Attendance() {
 
       {isSalaryModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-3xl rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-app-bg w-full max-w-3xl rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
               <h2 className="font-semibold text-app-text-bright">Perhitungan Gaji</h2>
               <button onClick={() => setIsSalaryModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
@@ -997,7 +1014,7 @@ export default function Attendance() {
             
             <div className="p-6 overflow-y-auto flex-1 space-y-6">
               {/* Salary Calculation */}
-               <div className="bg-app-card p-4 rounded-[18px] border border-app-border overflow-x-auto shadow-sm">
+               <div className="bg-app-card p-4 rounded-2xl border border-app-border overflow-x-auto shadow-xs">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
                     <h3 className="font-semibold text-app-text-bright text-sm flex items-center gap-2">
                       <Calculator className="w-4 h-4 text-app-accent1" />
@@ -1211,7 +1228,7 @@ export default function Attendance() {
 
       {isSaveSalaryModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-sm rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col">
+          <div className="bg-app-bg w-full max-w-sm rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
               <h2 className="font-semibold text-app-text-bright">Simpan Pemasukan</h2>
               <button onClick={() => setIsSaveSalaryModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
@@ -1325,7 +1342,7 @@ export default function Attendance() {
 
       {selectedDateForHours && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-sm rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col">
+          <div className="bg-app-bg w-full max-w-sm rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
               <h2 className="font-semibold text-app-text-bright">Jam Kerja ({selectedDateForHours.toLocaleDateString('id-ID')})</h2>
               <button onClick={() => setSelectedDateForHours(null)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
@@ -1425,7 +1442,7 @@ export default function Attendance() {
 
       {selectedDateActionMenu && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-xs rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
+          <div className="bg-app-bg w-full max-w-xs rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between p-4 border-b border-app-border bg-app-card/30">
               <h2 className="font-semibold text-app-text-bright text-sm">Pilih Tindakan</h2>
               <button 
@@ -1552,7 +1569,7 @@ export default function Attendance() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-md rounded-[18px] border border-app-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-app-bg w-full max-w-md rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
               <h2 className="font-semibold text-app-text-bright">{editingRecord ? 'Edit Absensi' : 'Tambah Absensi Manual'}</h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
@@ -1566,7 +1583,15 @@ export default function Attendance() {
                 <input
                   type="date"
                   value={modalDate}
-                  onChange={(e) => setModalDate(e.target.value)}
+                  onChange={(e) => {
+                    const newDate = e.target.value;
+                    setModalDate(newDate);
+                    if (!editingRecord && newDate) {
+                      const sched = getScheduleForDate(newDate);
+                      setModalCheckIn(sched.start || "08:00");
+                      setModalCheckOut(sched.end || "17:00");
+                    }
+                  }}
                   className="w-full bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                 />
               </div>
@@ -1578,7 +1603,14 @@ export default function Attendance() {
                     <button
                       key={s}
                       type="button"
-                      onClick={() => setModalStatus(s)}
+                      onClick={() => {
+                        setModalStatus(s);
+                        if (s === 'present' && !editingRecord && (!modalCheckIn || !modalCheckOut)) {
+                          const sched = getScheduleForDate(modalDate);
+                          if (!modalCheckIn) setModalCheckIn(sched.start || "08:00");
+                          if (!modalCheckOut) setModalCheckOut(sched.end || "17:00");
+                        }
+                      }}
                       className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border transition-all ${
                         modalStatus === s ? getStatusColor(s) : 'bg-app-bg border-app-border text-app-text/60 hover:bg-app-hover'
                       }`}

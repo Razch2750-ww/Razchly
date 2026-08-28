@@ -142,196 +142,164 @@ export default function Layout() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden fixed inset-0 z-40 bg-app-bg/60 backdrop-blur-md"
+            transition={{ duration: 0.15 }}
+            className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
             onClick={() => setIsFabOpen(false)}
           />
         )}
       </AnimatePresence>
 
       {/* Expanded FAB Menu Items (Arc Layout) */}
-      <div className="md:hidden fixed bottom-[calc(30px+env(safe-area-inset-bottom))] left-1/2 z-50 pointer-events-none">
+      <div className="md:hidden fixed bottom-[calc(24px+env(safe-area-inset-bottom))] left-1/2 z-50 pointer-events-none">
         <AnimatePresence>
           {isFabOpen && (
             <>
               <motion.div 
-                initial={{ opacity: 0, scale: 0.3, x: '-50%', y: 0 }}
-                animate={{ opacity: 1, scale: 1, x: 'calc(-50% - 104px)', y: 'calc(-50% - 60px)' }}
-                exit={{ opacity: 0, scale: 0.3, x: '-50%', y: 0 }}
-                transition={{ type: "spring", stiffness: 350, damping: 25, delay: 0 }}
-                className="absolute w-12 h-12 flex flex-col items-center pointer-events-auto" 
+                initial={{ opacity: 0, scale: 0.8, x: '-50%', y: 0 }}
+                animate={{ opacity: 1, scale: 1, x: 'calc(-50% - 96px)', y: 'calc(-50% - 56px)' }}
+                exit={{ opacity: 0, scale: 0.8, x: '-50%', y: 0 }}
+                transition={{ duration: 0.15 }}
+                className="absolute w-11 h-11 flex flex-col items-center pointer-events-auto" 
               >
                 <button 
                   onClick={() => {
                     setIsFabOpen(false);
                     navigate('/analyze');
                   }}
-                  className="w-12 h-12 rounded-full bg-app-glass border border-app-border text-app-accent1 shadow-lg flex items-center justify-center hover:opacity-90 transition-transform active:scale-[0.98]"
+                  className="w-11 h-11 rounded-full bg-app-card border border-app-border text-app-accent1 shadow-md flex items-center justify-center active:scale-95 transition-transform"
                 >
                   <Scan className="w-5 h-5" />
                 </button>
-                <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border">{t('nav.analyze')}</span>
+                <span className="absolute top-full mt-1 text-app-text-bright font-medium text-[10px] whitespace-nowrap bg-app-card px-2 py-0.5 rounded-md border border-app-border shadow-sm">{t('nav.analyze')}</span>
               </motion.div>
               
               <motion.div 
-                initial={{ opacity: 0, scale: 0.3, x: '-50%', y: 0 }}
-                animate={{ opacity: 1, scale: 1, x: 'calc(-50% - 41px)', y: 'calc(-50% - 112px)' }}
-                exit={{ opacity: 0, scale: 0.3, x: '-50%', y: 0 }}
-                transition={{ type: "spring", stiffness: 350, damping: 25, delay: 0.05 }}
-                className="absolute w-12 h-12 flex flex-col items-center pointer-events-auto" 
+                initial={{ opacity: 0, scale: 0.8, x: '-50%', y: 0 }}
+                animate={{ opacity: 1, scale: 1, x: 'calc(-50% - 36px)', y: 'calc(-50% - 96px)' }}
+                exit={{ opacity: 0, scale: 0.8, x: '-50%', y: 0 }}
+                transition={{ duration: 0.15, delay: 0.02 }}
+                className="absolute w-11 h-11 flex flex-col items-center pointer-events-auto" 
               >
                 <button 
                   onClick={() => {
                     setIsFabOpen(false);
                     navigate('/attendance');
                   }}
-                  className="w-12 h-12 rounded-full bg-app-glass border border-app-border text-app-text-bright shadow-lg flex items-center justify-center hover:opacity-90 transition-transform active:scale-[0.98]"
+                  className="w-11 h-11 rounded-full bg-app-card border border-app-border text-app-text-bright shadow-md flex items-center justify-center active:scale-95 transition-transform"
                 >
                   <CalendarCheck className="w-5 h-5" />
                 </button>
-                <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border">{t('nav.attendance')}</span>
+                <span className="absolute top-full mt-1 text-app-text-bright font-medium text-[10px] whitespace-nowrap bg-app-card px-2 py-0.5 rounded-md border border-app-border shadow-sm">{t('nav.attendance')}</span>
               </motion.div>
               
               <motion.div 
-                initial={{ opacity: 0, scale: 0.3, x: '-50%', y: 0 }}
-                animate={{ opacity: 1, scale: 1, x: 'calc(-50% + 41px)', y: 'calc(-50% - 112px)' }}
-                exit={{ opacity: 0, scale: 0.3, x: '-50%', y: 0 }}
-                transition={{ type: "spring", stiffness: 350, damping: 25, delay: 0.1 }}
-                className="absolute w-12 h-12 flex flex-col items-center pointer-events-auto" 
+                initial={{ opacity: 0, scale: 0.8, x: '-50%', y: 0 }}
+                animate={{ opacity: 1, scale: 1, x: 'calc(-50% + 36px)', y: 'calc(-50% - 96px)' }}
+                exit={{ opacity: 0, scale: 0.8, x: '-50%', y: 0 }}
+                transition={{ duration: 0.15, delay: 0.04 }}
+                className="absolute w-11 h-11 flex flex-col items-center pointer-events-auto" 
               >
                 <button 
                   onClick={() => {
                     setIsFabOpen(false);
                     setGlobalGrabModalOpen(true);
                   }}
-                  className="w-12 h-12 rounded-full bg-app-success text-app-bg shadow-lg flex items-center justify-center hover:opacity-90 transition-transform active:scale-[0.98]"
+                  className="w-11 h-11 rounded-full bg-app-card border border-app-border text-app-success shadow-md flex items-center justify-center active:scale-95 transition-transform"
                 >
                   <Car className="w-5 h-5" />
                 </button>
-                <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border">{t('nav.grab')}</span>
+                <span className="absolute top-full mt-1 text-app-text-bright font-medium text-[10px] whitespace-nowrap bg-app-card px-2 py-0.5 rounded-md border border-app-border shadow-sm">{t('nav.grab')}</span>
               </motion.div>
 
               <motion.div 
-                initial={{ opacity: 0, scale: 0.3, x: '-50%', y: 0 }}
-                animate={{ opacity: 1, scale: 1, x: 'calc(-50% + 104px)', y: 'calc(-50% - 60px)' }}
-                exit={{ opacity: 0, scale: 0.3, x: '-50%', y: 0 }}
-                transition={{ type: "spring", stiffness: 350, damping: 25, delay: 0.15 }}
-                className="absolute w-12 h-12 flex flex-col items-center pointer-events-auto" 
+                initial={{ opacity: 0, scale: 0.8, x: '-50%', y: 0 }}
+                animate={{ opacity: 1, scale: 1, x: 'calc(-50% + 96px)', y: 'calc(-50% - 56px)' }}
+                exit={{ opacity: 0, scale: 0.8, x: '-50%', y: 0 }}
+                transition={{ duration: 0.15, delay: 0.06 }}
+                className="absolute w-11 h-11 flex flex-col items-center pointer-events-auto" 
               >
-              <button 
-                onClick={() => {
-                  setIsFabOpen(false);
-                  setGlobalAddModalOpen(true);
-                }}
-                className="w-12 h-12 rounded-full bg-app-accent1 text-[#0D1421] shadow-lg flex items-center justify-center hover:opacity-90 transition-transform active:scale-[0.98]"
-              >
-                <ArrowLeftRight className="w-5 h-5" />
-              </button>
-              <span className="absolute top-full mt-1.5 text-app-text-bright font-medium text-[10px] whitespace-nowrap drop-shadow-md bg-app-bg/80 px-2 py-0.5 rounded-full border border-app-border">{t('common.add')}</span>
+                <button 
+                  onClick={() => {
+                    setIsFabOpen(false);
+                    setGlobalAddModalOpen(true);
+                  }}
+                  className="w-11 h-11 rounded-full bg-app-accent1 text-app-bg shadow-md flex items-center justify-center active:scale-95 transition-transform"
+                >
+                  <ArrowLeftRight className="w-5 h-5" />
+                </button>
+                <span className="absolute top-full mt-1 text-app-text-bright font-medium text-[10px] whitespace-nowrap bg-app-card px-2 py-0.5 rounded-md border border-app-border shadow-sm">{t('common.add')}</span>
               </motion.div>
             </>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Mobile Bottom Navigation & FAB */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
-        
-        {/* Custom Bottom Bar Background */}
-        <div className="absolute inset-0 drop-shadow-[0_-4px_15px_rgba(0,0,0,0.1)] pointer-events-none">
-          <div className="absolute inset-0 rounded-t-[28px] overflow-hidden">
-            <div 
-              className="absolute inset-0 bg-app-card/75 backdrop-blur-2xl"
-              style={{
-                maskImage: `linear-gradient(black, black), url("data:image/svg+xml,%3Csvg width='120' height='72' viewBox='0 0 120 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 0 0 L 8 0 A 12 12 0 0 1 20 11.5 A 40 40 0 0 0 100 11.5 A 12 12 0 0 1 112 0 L 120 0 L 120 72 L 0 72 Z' fill='black' /%3E%3C/svg%3E"), linear-gradient(black, black)`,
-                maskPosition: 'left top, center top, right top',
-                maskSize: 'calc(50% - 60px) 100%, 120px 100%, calc(50% - 60px) 100%',
-                maskRepeat: 'no-repeat, no-repeat, no-repeat',
-                WebkitMaskImage: `linear-gradient(black, black), url("data:image/svg+xml,%3Csvg width='120' height='72' viewBox='0 0 120 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 0 0 L 8 0 A 12 12 0 0 1 20 11.5 A 40 40 0 0 0 100 11.5 A 12 12 0 0 1 112 0 L 120 0 L 120 72 L 0 72 Z' fill='black' /%3E%3C/svg%3E"), linear-gradient(black, black)`,
-                WebkitMaskPosition: 'left top, center top, right top',
-                WebkitMaskSize: 'calc(50% - 60px) 100%, 120px 100%, calc(50% - 60px) 100%',
-                WebkitMaskRepeat: 'no-repeat, no-repeat, no-repeat',
-              }}
-            >
-              <div className="absolute top-0 left-0 right-[calc(50%+60px)] h-[1px] bg-app-border/40"></div>
-              <div className="absolute top-0 right-0 left-[calc(50%+60px)] h-[1px] bg-app-border/40"></div>
-              <svg className="absolute top-0 left-1/2 -translate-x-1/2 text-app-border/40" width="120" height="72" viewBox="0 0 120 72">
-                <path d="M 0 0.5 L 8 0.5 A 11.5 11.5 0 0 1 20 12 A 40.5 40.5 0 0 0 100 12 A 11.5 11.5 0 0 1 112 0.5 L 120 0.5" fill="none" stroke="currentColor" strokeWidth="1" />
-              </svg>
+      {/* Mobile Bottom Navigation Bar & Elevated Centered Action */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40">
+        <div className="bg-app-card border-t border-app-border relative">
+          <nav className="h-16 flex justify-between items-center px-3 pb-[env(safe-area-inset-bottom)] relative">
+            <div className="flex w-[40%] justify-around h-full items-center">
+              {mobileNavItems.slice(0, 2).map((item) => (
+                <NavLink 
+                  key={item.path} 
+                  to={item.path}
+                  className={({ isActive }) => 
+                    `relative flex flex-col items-center justify-center w-full h-full py-1 transition-colors ${
+                      isActive ? 'text-app-accent1 font-medium' : 'text-app-text/60 hover:text-app-text'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <item.icon className="w-5 h-5 mb-1 shrink-0" strokeWidth={isActive ? 2 : 1.75} />
+                      <span className="text-[10px] tracking-tight leading-none">{t(item.labelKey)}</span>
+                      {isActive && (
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-app-accent1 rounded-full" />
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              ))}
             </div>
-          </div>
-        </div>
+            
+            {/* Center spacing for elevated action */}
+            <div className="w-[20%] flex justify-center h-full relative" />
+            
+            <div className="flex w-[40%] justify-around h-full items-center">
+              {mobileNavItems.slice(2, 4).map((item) => (
+                <NavLink 
+                  key={item.path} 
+                  to={item.path}
+                  className={({ isActive }) => 
+                    `relative flex flex-col items-center justify-center w-full h-full py-1 transition-colors ${
+                      isActive ? 'text-app-accent1 font-medium' : 'text-app-text/60 hover:text-app-text'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <item.icon className="w-5 h-5 mb-1 shrink-0" strokeWidth={isActive ? 2 : 1.75} />
+                      <span className="text-[10px] tracking-tight leading-none">{t(item.labelKey)}</span>
+                      {isActive && (
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-app-accent1 rounded-full" />
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          </nav>
 
-        {/* Bottom Bar Content */}
-        <nav className="h-[72px] pointer-events-auto flex justify-between items-center px-2 pb-[env(safe-area-inset-bottom)] relative z-10">
-          <div className="flex w-[40%] justify-around h-full">
-            {mobileNavItems.slice(0, 2).map((item) => (
-              <NavLink 
-                key={item.path} 
-                to={item.path}
-                onMouseEnter={() => setHoveredMobilePath(item.path)}
-                onMouseLeave={() => setHoveredMobilePath(null)}
-                className={({ isActive }) => `relative flex flex-col items-center justify-center w-full h-full transition-all ${isActive ? 'text-[#A888FF] font-medium' : 'text-app-text/50'}`}
-              >
-                {({ isActive }) => (
-                  <>
-                    <item.icon className="w-6 h-6 mb-1 relative z-10" />
-                    <span className="text-[11px] relative z-10 tracking-wide">{t(item.labelKey)}</span>
-                    
-                    {/* Dynamic Sliding Underline for Mobile active navigation */}
-                    {item.path === window.location.pathname && (
-                      <motion.div 
-                        layoutId="mobile-nav-underline"
-                        className="absolute bottom-[6px] left-1/2 -translate-x-1/2 w-10 h-[3px] bg-[#A888FF] rounded-full shadow-[0_1px_6px_rgba(168,136,255,0.5)]"
-                        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                      />
-                    )}
-                  </>
-                )}
-              </NavLink>
-            ))}
+          {/* Elevated Centered Action Button */}
+          <div className="absolute left-1/2 -translate-x-1/2 -top-5 pointer-events-auto z-20">
+            <button 
+              onClick={() => setIsFabOpen(!isFabOpen)}
+              className={`w-12 h-12 rounded-full bg-app-accent1 text-app-bg shadow-md border-2 border-app-bg flex items-center justify-center active:scale-95 transition-all duration-200 ${isFabOpen ? 'rotate-45' : ''}`}
+              aria-label="Add transaction or action"
+            >
+              <Plus className="w-6 h-6" strokeWidth={2.5} />
+            </button>
           </div>
-          
-          <div className="w-[20%] flex justify-center h-full relative">
-            {/* FAB Placeholder space */}
-          </div>
-          
-          <div className="flex w-[40%] justify-around h-full">
-            {mobileNavItems.slice(2, 4).map((item) => (
-              <NavLink 
-                key={item.path} 
-                to={item.path}
-                onMouseEnter={() => setHoveredMobilePath(item.path)}
-                onMouseLeave={() => setHoveredMobilePath(null)}
-                className={({ isActive }) => `relative flex flex-col items-center justify-center w-full h-full transition-all ${isActive ? 'text-[#A888FF] font-medium' : 'text-app-text/50'}`}
-              >
-                {({ isActive }) => (
-                  <>
-                    <item.icon className="w-6 h-6 mb-1 relative z-10" />
-                    <span className="text-[11px] relative z-10 tracking-wide">{t(item.labelKey)}</span>
-                    
-                    {item.path === window.location.pathname && (
-                      <motion.div 
-                        layoutId="mobile-nav-underline"
-                        className="absolute bottom-[6px] left-1/2 -translate-x-1/2 w-10 h-[3px] bg-[#A888FF] rounded-full shadow-[0_1px_6px_rgba(168,136,255,0.5)]"
-                        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                      />
-                    )}
-                  </>
-                )}
-              </NavLink>
-            ))}
-          </div>
-        </nav>
-
-        {/* Central FAB */}
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-[calc(30px+env(safe-area-inset-bottom))] pointer-events-auto z-20">
-          <button 
-            onClick={() => setIsFabOpen(!isFabOpen)}
-            className={`w-[64px] h-[64px] rounded-full bg-[#A888FF] text-black shadow-[0_4px_15px_rgba(168,136,255,0.4)] flex items-center justify-center hover:opacity-90 transition-all duration-300 ${isFabOpen ? 'rotate-45' : ''}`}
-          >
-            <Plus className="w-10 h-10" strokeWidth={2.5} />
-          </button>
         </div>
       </div>
     </div>

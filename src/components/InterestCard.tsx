@@ -72,11 +72,11 @@ export default function InterestCard({
     return (
       <div 
         onClick={onOpenModal}
-        className="p-5 rounded-[22px] bg-app-card border border-app-border flex flex-col justify-between hover:border-app-accent1/40 transition-all cursor-pointer group relative overflow-hidden"
+        className="p-5 rounded-2xl bg-app-card border border-app-border flex flex-col justify-between hover:border-app-accent1/30 transition-all cursor-pointer group relative overflow-hidden"
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-app-accent1/10 text-app-accent1 border border-app-accent1/20">
+            <div className="p-2 rounded-xl bg-app-accent1/10 text-app-accent1 border border-app-accent1/15">
               <Percent className="w-4 h-4" />
             </div>
             <div>
@@ -86,7 +86,7 @@ export default function InterestCard({
           </div>
           <ArrowRight className="w-4 h-4 text-app-text/40 group-hover:text-app-accent1 group-hover:translate-x-0.5 transition-all" />
         </div>
-        <div className="p-3 rounded-xl bg-app-bg/50 border border-app-border text-xs text-app-text/70 flex items-center justify-between">
+        <div className="p-3 rounded-xl bg-app-bg border border-app-border text-xs text-app-text/70 flex items-center justify-between">
           <span>Pengaturan bunga belum aktif pada rekening.</span>
           <span className="text-app-accent1 font-semibold underline">Aktifkan Sekarang</span>
         </div>
@@ -95,11 +95,11 @@ export default function InterestCard({
   }
 
   return (
-    <div className="p-5 rounded-[22px] bg-app-card border border-app-border flex flex-col justify-between shadow-sm relative overflow-hidden">
+    <div className="p-5 rounded-2xl bg-app-card border border-app-border flex flex-col justify-between shadow-xs relative overflow-hidden">
       {/* Top Header Bar */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-app-accent1/10 text-app-accent1 border border-app-accent1/20">
+          <div className="p-2 rounded-xl bg-app-accent1/10 text-app-accent1 border border-app-accent1/15">
             <Percent className="w-4 h-4" />
           </div>
           <div>

@@ -63,6 +63,7 @@ import {
 } from "recharts";
 import { format, subDays, isSameDay, isSameMonth } from "date-fns";
 import { id as localeId, enUS as localeEn } from "date-fns/locale";
+import { parseTxDate, safeFormatDate } from "../utils/dateUtils";
 import { useTranslation } from "../utils/translations";
 import { AccountModal } from "./AccountModal";
 import InterestCard from "./InterestCard";
@@ -336,12 +337,12 @@ export default function Dashboard() {
 
   // Income & Expense calculation for "Today"
   const incomeToday = recentTransactions
-    .filter((t) => t.type === "income" && isSameDay(t.date, new Date()))
+    .filter((t) => t.type === "income" && isSameDay(parseTxDate(t.date), new Date()))
     .reduce((sum, t) => sum + t.amount, 0);
 
   const expenseToday = recentTransactions
     .reduce((sum, t) => {
-      if (isSameDay(t.date, new Date())) {
+      if (isSameDay(parseTxDate(t.date), new Date())) {
         if (t.type === "expense") return sum + t.amount;
         if (t.adminFee) return sum + t.adminFee;
       }
@@ -350,12 +351,12 @@ export default function Dashboard() {
 
   // Savings this month
   const incomeThisMonth = recentTransactions
-    .filter((t) => t.type === "income" && isSameMonth(t.date, new Date()))
+    .filter((t) => t.type === "income" && isSameMonth(parseTxDate(t.date), new Date()))
     .reduce((sum, t) => sum + t.amount, 0);
     
   const expenseThisMonth = recentTransactions
     .reduce((sum, t) => {
-      if (isSameMonth(t.date, new Date())) {
+      if (isSameMonth(parseTxDate(t.date), new Date())) {
         if (t.type === "expense") return sum + t.amount;
         if (t.adminFee) return sum + t.adminFee;
       }
@@ -369,15 +370,15 @@ export default function Dashboard() {
 
   const financialHealthStatus = useMemo(() => {
     if (recentTransactions.length === 0) {
-      return { label: "Belum Ada Data", color: "text-slate-400", bg: "bg-slate-500/10 border-slate-500/20" };
+      return { label: "Belum Ada Data", color: "text-app-text/70", bg: "bg-app-bg border-app-border" };
     }
     if (savingsThisMonth > 0) {
-      return { label: "Sehat & Surplus", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" };
+      return { label: "Sehat & Surplus", color: "text-app-success", bg: "bg-app-success/10 border-app-success/20" };
     }
     if (savingsThisMonth === 0) {
-      return { label: "Keuangan Seimbang", color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" };
+      return { label: "Keuangan Seimbang", color: "text-app-warning", bg: "bg-app-warning/10 border-app-warning/20" };
     }
-    return { label: "Pengeluaran Tinggi", color: "text-rose-400", bg: "bg-rose-500/10 border-rose-500/20" };
+    return { label: "Pengeluaran Tinggi", color: "text-app-danger", bg: "bg-app-danger/10 border-app-danger/20" };
   }, [recentTransactions.length, savingsThisMonth]);
 
   const loanStats = useMemo(() => {
@@ -416,7 +417,7 @@ export default function Dashboard() {
       for (let i = 0; i <= 24; i++) {
         // filter transactions where hour === i and isSameDay
         const hourTrans = filteredTransactions.filter((t) => {
-          const d = new Date(t.date);
+          const d = parseTxDate(t.date);
           return isSameDay(d, today) && d.getHours() === i;
         });
         const income = hourTrans
@@ -441,7 +442,7 @@ export default function Dashboard() {
         const date = subDays(new Date(), i);
         // Find transactions for this day
         const dayTransactions = filteredTransactions.filter((t) =>
-          isSameDay(new Date(t.date), date),
+          isSameDay(parseTxDate(t.date), date),
         );
         const income = dayTransactions
           .filter((t) => t.type === "income")
@@ -572,37 +573,37 @@ export default function Dashboard() {
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
           <button
             onClick={() => setGlobalAddModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-app-accent1/10 border border-app-accent1/20 text-app-accent1 hover:bg-app-accent1/20 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-app-card border border-app-border text-app-text-bright hover:bg-app-hover hover:border-app-accent1/30 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5 text-app-accent1" />
             <span>Pemasukan / Pengeluaran</span>
           </button>
           <button
             onClick={() => setGlobalGrabModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-app-card border border-app-border text-app-text-bright hover:bg-app-hover hover:border-app-success/30 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
           >
-            <Car className="w-3.5 h-3.5" />
+            <Car className="w-3.5 h-3.5 text-app-success" />
             <span>Usaha Grab</span>
           </button>
           <button
             onClick={() => navigate('/savings')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 hover:bg-sky-500/20 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-app-card border border-app-border text-app-text-bright hover:bg-app-hover hover:border-app-accent1/30 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
           >
-            <PiggyBank className="w-3.5 h-3.5" />
+            <PiggyBank className="w-3.5 h-3.5 text-app-accent1" />
             <span>Tabungan</span>
           </button>
           <button
             onClick={() => navigate('/loans')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-app-card border border-app-border text-app-text-bright hover:bg-app-hover hover:border-app-warning/30 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
           >
-            <HandCoins className="w-3.5 h-3.5" />
+            <HandCoins className="w-3.5 h-3.5 text-app-warning" />
             <span>Hutang & Piutang</span>
           </button>
           <button
             onClick={() => navigate('/analyze')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-app-card border border-app-border text-app-text-bright hover:bg-app-hover hover:border-app-accent1/30 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5 text-app-accent1" />
             <span>Scan AI</span>
           </button>
         </div>
@@ -612,7 +613,7 @@ export default function Dashboard() {
       <ScrollReveal className="md:hidden mb-5">
         <HoverCard 
           onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
-          className="bg-app-card border border-app-border rounded-[22px] p-4 sm:p-5 relative overflow-hidden text-app-text shadow-sm cursor-pointer"
+          className="bg-app-card border border-app-border rounded-2xl p-4 sm:p-5 relative overflow-hidden text-app-text shadow-sm cursor-pointer"
         >
           <div className="flex justify-between items-start relative z-10 mb-3">
               <div className="min-w-0 pr-2">
@@ -650,10 +651,10 @@ export default function Dashboard() {
           </div>
 
           {/* Today & Monthly Cash Flow Box */}
-          <div className="p-3 rounded-2xl bg-app-bg/80 border border-app-border/50 relative z-10 space-y-2.5">
+          <div className="p-3 rounded-xl bg-app-bg/80 border border-app-border/50 relative z-10 space-y-2.5">
             {/* Today Cash Flow (2 columns so labels and values never truncate) */}
             <div className="grid grid-cols-2 gap-2">
-              <div className="bg-app-card/70 p-2.5 rounded-xl border border-app-border/30">
+              <div className="bg-app-card p-2.5 rounded-lg border border-app-border/40">
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-app-success shrink-0" />
                   <span className="text-app-text/60 text-[10px] sm:text-[11px] font-medium whitespace-nowrap">{t('dashboard.incomeToday')}</span>
@@ -661,7 +662,7 @@ export default function Dashboard() {
                 <p className="text-app-success font-bold font-mono text-xs">{formatRp(incomeToday, { forceSign: "+" })}</p>
               </div>
 
-              <div className="bg-app-card/70 p-2.5 rounded-xl border border-app-border/30">
+              <div className="bg-app-card p-2.5 rounded-lg border border-app-border/40">
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-app-danger shrink-0" />
                   <span className="text-app-text/60 text-[10px] sm:text-[11px] font-medium whitespace-nowrap">{t('dashboard.expenseToday')}</span>
@@ -694,7 +695,7 @@ export default function Dashboard() {
         <ScrollReveal delay={0.08} className="h-full">
           <HoverCard 
             onClick={() => navigate("/investments")}
-            className="bg-app-card border border-app-border rounded-[22px] p-4 relative overflow-hidden text-app-text shadow-sm cursor-pointer h-full flex flex-col justify-between"
+            className="bg-app-card border border-app-border rounded-2xl p-4 relative overflow-hidden text-app-text shadow-sm cursor-pointer h-full flex flex-col justify-between"
           >
             <div>
               <div className="flex justify-between items-center mb-1.5 gap-1">
@@ -730,7 +731,7 @@ export default function Dashboard() {
         <ScrollReveal delay={0.12} className="h-full">
           <HoverCard 
             onClick={() => navigate("/loans")}
-            className="bg-app-card border border-app-border rounded-[22px] p-4 relative overflow-hidden text-app-text shadow-sm cursor-pointer h-full flex flex-col justify-between"
+            className="bg-app-card border border-app-border rounded-2xl p-4 relative overflow-hidden text-app-text shadow-sm cursor-pointer h-full flex flex-col justify-between"
           >
             <div>
               <div className="flex justify-between items-center mb-1.5 gap-1">
@@ -760,19 +761,19 @@ export default function Dashboard() {
         </ScrollReveal>
       </div>
 
-      {/* DESKTOP TOP WIDGETS - bento asymmetric layout with equal gap-6 */}
+      {/* DESKTOP TOP WIDGETS */}
       <div className="hidden md:grid grid-cols-3 gap-6 mb-6">
         {/* HERO: TOTAL SALDO - takes 2 cols */}
         <ScrollReveal className="col-span-2 h-full">
           <HoverCard
             onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
-            className="bg-app-card rounded-[22px] p-6 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between"
+            className="bg-app-card rounded-2xl p-6 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between"
           >
             <div className="relative z-10 flex flex-col justify-between h-full">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-app-accent1/15 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-app-accent1/15 flex items-center justify-center">
                       <Wallet className="w-5 h-5 text-app-accent1" />
                     </div>
                     <div>
@@ -799,7 +800,7 @@ export default function Dashboard() {
                   </button>
                 </div>
 
-                <p className="text-[36px] lg:text-[42px] leading-tight font-bold tracking-[-0.02em] text-app-text-bright font-mono">
+                <p className="text-[36px] lg:text-[40px] leading-tight font-bold tracking-[-0.02em] text-app-text-bright font-mono">
                   {formatRp(totalBalance)}
                 </p>
                 <p className="text-app-text/50 text-xs mt-1.5 font-medium">
@@ -808,7 +809,7 @@ export default function Dashboard() {
               </div>
 
               {/* Bottom Financial Breakdown Box */}
-              <div className="mt-5 p-4 rounded-2xl bg-app-bg/60 border border-app-border/50 grid grid-cols-3 gap-4">
+              <div className="mt-5 p-4 rounded-xl bg-app-bg/60 border border-app-border/50 grid grid-cols-3 gap-4">
                 <div>
                   <p className="text-[11px] text-app-text/60 font-medium mb-1 truncate">
                     {language === 'en' ? 'Income (Month)' : 'Pemasukan Bulan Ini'}
@@ -846,7 +847,7 @@ export default function Dashboard() {
             <ScrollReveal delay={0.05} className="h-full">
               <HoverCard
                 onClick={() => navigate("/transactions", { state: { tab: "Pemasukan" } })}
-                className="bg-app-card rounded-[22px] p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-success/40 transition-all"
+                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-success/40 transition-all"
               >
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -873,7 +874,7 @@ export default function Dashboard() {
             <ScrollReveal delay={0.08} className="h-full">
               <HoverCard
                 onClick={() => navigate("/transactions", { state: { tab: "Pengeluaran" } })}
-                className="bg-app-card rounded-[22px] p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-danger/40 transition-all"
+                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-danger/40 transition-all"
               >
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -903,7 +904,7 @@ export default function Dashboard() {
             <ScrollReveal delay={0.1} className="h-full">
               <HoverCard
                 onClick={() => navigate("/investments")}
-                className="bg-app-card rounded-[22px] p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-accent1/40 transition-all"
+                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-accent1/40 transition-all"
               >
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -934,7 +935,7 @@ export default function Dashboard() {
             <ScrollReveal delay={0.12} className="h-full">
               <HoverCard
                 onClick={() => navigate("/loans")}
-                className="bg-app-card rounded-[22px] p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-accent1/40 transition-all"
+                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-accent1/40 transition-all"
               >
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -984,7 +985,7 @@ export default function Dashboard() {
                 const hasCustomColor = iconDetails?.color;
                 
                 return (
-                <div key={acc.id} onClick={() => { setEditingAccount(acc); setIsAccountModalOpen(true); }} className="min-w-[150px] bg-app-card rounded-[22px] p-4 flex flex-col justify-between border border-app-border relative overflow-hidden cursor-pointer shadow-sm">
+                <div key={acc.id} onClick={() => { setEditingAccount(acc); setIsAccountModalOpen(true); }} className="min-w-[150px] bg-app-card rounded-2xl p-4 flex flex-col justify-between border border-app-border relative overflow-hidden cursor-pointer shadow-sm">
                   {hasCustomColor ? (
                     <div 
                       className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-80 block"
@@ -1006,7 +1007,7 @@ export default function Dashboard() {
                   </div>
                 </div>
              )})}
-             <div onClick={() => { navigate('/settings', { state: { expandSection: "accounts" } }) }} className="min-w-[120px] bg-app-card rounded-[22px] p-4 flex flex-col items-center justify-center border border-app-border cursor-pointer shadow-sm">
+             <div onClick={() => { navigate('/settings', { state: { expandSection: "accounts" } }) }} className="min-w-[120px] bg-app-card rounded-2xl p-4 flex flex-col items-center justify-center border border-app-border cursor-pointer shadow-sm">
                 <div className="w-10 h-10 rounded-full bg-app-hover flex items-center justify-center mb-2">
                    <Plus className="w-5 h-5 text-app-accent1" />
                 </div>
@@ -1017,14 +1018,14 @@ export default function Dashboard() {
 
         {/* MOBILE ACTION BUTTONS */}
         <div className="grid grid-cols-2 gap-4">
-            <button onClick={() => navigate('/transactions')} className="bg-app-card border border-app-border p-4 rounded-[22px] flex flex-col items-center justify-center gap-2 active:scale-[0.98] transition-transform hover:bg-app-hover shadow-sm">
-                <div className="w-10 h-10 rounded-2xl bg-app-accent1/10 flex items-center justify-center">
+            <button onClick={() => navigate('/transactions')} className="bg-app-card border border-app-border p-4 rounded-2xl flex flex-col items-center justify-center gap-2 active:scale-[0.98] transition-transform hover:bg-app-hover shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-app-accent1/10 flex items-center justify-center">
                    <BarChart2 className="w-5 h-5 text-app-accent1" />
                 </div>
                 <span className="text-app-text-bright font-semibold text-xs text-center leading-tight">{language === 'en' ? 'Reports' : 'Laporan Keuangan'}</span>
             </button>
-            <button onClick={() => navigate('/grab')} className="bg-app-card border border-app-border p-4 rounded-[22px] flex flex-col items-center justify-center gap-2 active:scale-[0.98] transition-transform hover:bg-app-hover shadow-sm">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+            <button onClick={() => navigate('/grab')} className="bg-app-card border border-app-border p-4 rounded-2xl flex flex-col items-center justify-center gap-2 active:scale-[0.98] transition-transform hover:bg-app-hover shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
                    <TrendingUp className="w-5 h-5 text-emerald-400" />
                 </div>
                 <span className="text-app-text-bright font-semibold text-xs text-center leading-tight">{language === 'en' ? 'Business Analytics' : 'Analisis Usaha'}</span>
@@ -1035,7 +1036,7 @@ export default function Dashboard() {
       {/* DESKTOP MIDDLE SECTION */}
       <div className="hidden md:grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* DOMPET SAYA */}
-        <ScrollReveal className="lg:col-span-1 bg-app-card rounded-[22px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <ScrollReveal className="lg:col-span-1 bg-app-card rounded-2xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
           <div className="flex justify-between items-center mb-5 relative z-10">
             <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">{t('dashboard.myWallets')}</h2>
             <div className="relative">
@@ -1050,7 +1051,7 @@ export default function Dashboard() {
               {showSortMenu && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowSortMenu(false)} />
-                  <div className="absolute right-0 mt-2 w-48 bg-app-card border border-app-border rounded-2xl shadow-xl z-50 py-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+                  <div className="absolute right-0 mt-2 w-48 bg-app-card border border-app-border rounded-xl shadow-xl z-50 py-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
                     <button
                       onClick={() => { setAccountSort("balance_desc"); setShowSortMenu(false); }}
                       className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-app-hover text-app-text transition-colors flex items-center justify-between"
@@ -1096,7 +1097,7 @@ export default function Dashboard() {
                     setEditingAccount(acc);
                     setIsAccountModalOpen(true);
                   }}
-                  className="flex items-center justify-between p-3.5 rounded-2xl bg-app-bg border border-app-border hover:border-app-accent1/50 transition cursor-pointer relative overflow-hidden group"
+                  className="flex items-center justify-between p-3.5 rounded-xl bg-app-bg border border-app-border hover:border-app-accent1/50 transition cursor-pointer relative overflow-hidden group"
                 >
                   {hasCustomColor ? (
                     <div 
@@ -1141,7 +1142,7 @@ export default function Dashboard() {
         </ScrollReveal>
 
         {/* ALUR KAS (CHART) */}
-        <ScrollReveal delay={0.1} className="lg:col-span-2 bg-app-card rounded-[22px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <ScrollReveal delay={0.1} className="lg:col-span-2 bg-app-card rounded-2xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3 relative z-10">
             <div>
               <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">{t('dashboard.cashflowTitle')}</h2>
@@ -1273,7 +1274,7 @@ export default function Dashboard() {
       {/* DESKTOP & MOBILE VISUAL ANALYTICS (PIE CHARTS) */}
       <ScrollReveal className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* PIE CHART 1: ALOKASI SALDO DOMPET */}
-        <div className="bg-app-card rounded-[22px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between mb-4 relative z-10">
             <h2 className="text-app-text-bright text-base sm:text-lg font-semibold tracking-tight">{language === 'en' ? 'Wallet Balance Allocation' : 'Alokasi Saldo Dompet'}</h2>
             <PieChartIcon className="w-4.5 h-4.5 text-app-accent1" />
@@ -1331,7 +1332,7 @@ export default function Dashboard() {
         </div>
 
         {/* PIE CHART 2: DISTRIBUSI PENGELUARAN */}
-        <div className="bg-app-card rounded-[22px] p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between mb-4 relative z-10">
             <h2 className="text-app-text-bright text-base sm:text-lg font-semibold tracking-tight">{language === 'en' ? 'This Month Expense Distribution' : 'Distribusi Pengeluaran Bulan Ini'}</h2>
             <BarChart2 className="w-4.5 h-4.5 text-app-danger" />
@@ -1399,7 +1400,7 @@ export default function Dashboard() {
             <Link to="/transactions" state={{ tab: "Semua" }} className="text-app-accent1 text-[13px] font-medium">Lihat Semua</Link>
         </div>
         {(() => {
-          const todayMobileTransactions = recentTransactions.filter(t => isSameDay(t.date, new Date()));
+          const todayMobileTransactions = recentTransactions.filter(t => isSameDay(parseTxDate(t.date), new Date()));
           return todayMobileTransactions.length === 0 ? (
            <div className="flex flex-col items-center justify-center py-12">
               <div className="w-20 h-20 rounded-full bg-app-card border border-app-border flex items-center justify-center mb-5">
@@ -1437,7 +1438,7 @@ export default function Dashboard() {
                            )}
                          </div>
                          <p className="text-app-text/60 text-[13px]">
-                           {format(t.date, "dd MMM yyyy", { locale: localeId })}
+                           {safeFormatDate(t.date, "dd MMM yyyy", { locale: localeId })}
                          </p>
                        </div>
                      </div>
@@ -1457,7 +1458,7 @@ export default function Dashboard() {
       </div>
 
       {/* DESKTOP BOTTOM SECTION - TRANSACTIONS */}
-      <ScrollReveal className="hidden md:flex bg-app-card rounded-[22px] p-6 border border-app-border flex-col shadow-sm shrink-0 overflow-hidden relative">
+      <ScrollReveal className="hidden md:flex bg-app-card rounded-2xl p-6 border border-app-border flex-col shadow-sm shrink-0 overflow-hidden relative">
         <div className="flex items-center justify-between mb-5 relative z-10">
           <div>
             <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">{t('dashboard.recentTransactions')}</h2>
@@ -1474,7 +1475,7 @@ export default function Dashboard() {
 
         {(() => {
           const filteredBottomTransactions = selectedChartAccount === "all" ? recentTransactions : recentTransactions.filter(t => t.accountId === selectedChartAccount);
-          const todayDesktopTransactions = filteredBottomTransactions.filter(t => isSameDay(t.date, new Date()));
+          const todayDesktopTransactions = filteredBottomTransactions.filter(t => isSameDay(parseTxDate(t.date), new Date()));
           return todayDesktopTransactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 rounded-2xl bg-app-bg border border-app-border border-dashed relative z-10">
               <FileText className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
@@ -1526,7 +1527,7 @@ export default function Dashboard() {
                         )}
                       </div>
                       <p className="text-[11px] text-app-text/60 mt-0.5">
-                        {format(tx.date, "dd MMM yyyy", { locale: currentLocale })}
+                        {safeFormatDate(tx.date, "dd MMM yyyy", { locale: currentLocale })}
                       </p>
                     </div>
                   </div>

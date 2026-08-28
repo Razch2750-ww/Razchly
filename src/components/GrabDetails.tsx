@@ -9,6 +9,7 @@ import { db } from "../lib/firebase";
 import { useStore } from "../store/useStore";
 import { Transaction } from "../types";
 import { format, isSameDay, subDays, addDays, startOfDay, endOfDay, isWithinInterval, startOfMonth, endOfMonth, isSameMonth, subMonths, addMonths } from "date-fns";
+import { parseTxDate, safeFormatDate } from "../utils/dateUtils";
 import { id as localeId } from "date-fns/locale";
 import { Link } from "react-router-dom";
 import {
@@ -149,7 +150,7 @@ export default function GrabDetails() {
 
   const filteredOrders = useMemo(() => {
     return grabOrders.filter((o) => {
-      const oDate = new Date(o.date);
+      const oDate = parseTxDate(o.date);
       if (filterType === "hari_ini") {
         return isSameDay(oDate, currentDate);
       } else if (filterType === "7_hari") {
@@ -159,8 +160,8 @@ export default function GrabDetails() {
       } else if (filterType === "bulanan") {
         return isSameMonth(oDate, currentDate);
       } else if (filterType === "custom") {
-        const start = startOfDay(new Date(customStartDate));
-        const end = endOfDay(new Date(customEndDate));
+        const start = startOfDay(parseTxDate(customStartDate));
+        const end = endOfDay(parseTxDate(customEndDate));
         return isWithinInterval(oDate, { start, end });
       }
       return true;
@@ -188,7 +189,7 @@ export default function GrabDetails() {
         dataMap[format(d, "HH:mm")] = 0;
       }
       filteredOrders.forEach((o) => {
-        const hr = format(new Date(o.date), "HH:00");
+        const hr = safeFormatDate(o.date, "HH:00");
         if (dataMap[hr] !== undefined) dataMap[hr] += o.nominalBersih;
       });
     } else {
@@ -196,19 +197,19 @@ export default function GrabDetails() {
       let numDays = 7;
       if (filterType === "bulanan") numDays = parseInt(format(endOfMonth(currentDate), "dd")) - 1;
       if (filterType === "custom") {
-          const s = startOfDay(new Date(customStartDate));
-          const e = endOfDay(new Date(customEndDate));
+          const s = startOfDay(parseTxDate(customStartDate));
+          const e = endOfDay(parseTxDate(customEndDate));
           numDays = Math.max(1, Math.ceil((e.getTime() - s.getTime()) / (1000 * 3600 * 24)));
       }
       
-      const endD = filterType === "bulanan" ? endOfMonth(currentDate) : filterType === "custom" ? new Date(customEndDate) : currentDate;
+      const endD = filterType === "bulanan" ? endOfMonth(currentDate) : filterType === "custom" ? parseTxDate(customEndDate) : currentDate;
       const startD = filterType === "bulanan" ? startOfMonth(currentDate) : subDays(endD, numDays);
       
       for (let i = 0; i <= numDays; i++) {
         dataMap[format(subDays(endD, numDays - i), "dd MMM")] = 0;
       }
       filteredOrders.forEach((o) => {
-        const dayStr = format(new Date(o.date), "dd MMM");
+        const dayStr = safeFormatDate(o.date, "dd MMM");
         if (dataMap[dayStr] !== undefined) dataMap[dayStr] += o.nominalBersih;
       });
     }
@@ -317,7 +318,7 @@ export default function GrabDetails() {
       {/* STATS OVERVIEW */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
         {/* TOTAL PENDAPATAN */}
-        <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
+        <HoverCard className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col justify-center relative overflow-hidden w-full">
              
              <div className="absolute top-0 right-0 p-4 opacity-10">
                <TrendingUp className="w-16 h-16 text-app-success" />
@@ -331,7 +332,7 @@ export default function GrabDetails() {
         </HoverCard>
 
         {/* TOTAL ORDERAN */}
-        <HoverCard className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
+        <HoverCard className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col justify-center relative overflow-hidden w-full">
              
              <div className="absolute top-0 right-0 p-4 opacity-10">
                <Receipt className="w-16 h-16 text-blue-500" />
@@ -345,7 +346,7 @@ export default function GrabDetails() {
         </HoverCard>
 
         {/* TOTAL HEMAT */}
-        <HoverCard className="bg-app-card border border-app-border rounded-[18px] p-6 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
+        <HoverCard className="bg-app-card border border-app-border rounded-2xl p-6 shadow-xs flex flex-col justify-center relative overflow-hidden w-full">
              
             <div className="absolute top-0 right-0 p-4 opacity-10">
                <Tags className="w-16 h-16 text-app-accent1" />
@@ -359,7 +360,7 @@ export default function GrabDetails() {
         </HoverCard>
 
         {/* NOMINAL POTONGAN HEMAT */}
-        <HoverCard className="bg-app-card border border-app-danger/30 rounded-[18px] p-6 shadow-sm flex flex-col justify-center relative overflow-hidden w-full">
+        <HoverCard className="bg-app-card border border-app-danger/30 rounded-2xl p-6 shadow-xs flex flex-col justify-center relative overflow-hidden w-full">
              
              <div className="absolute top-0 right-0 p-4 opacity-5">
                <PiggyBank className="w-16 h-16 text-app-danger" />
@@ -379,7 +380,7 @@ export default function GrabDetails() {
       </h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {categoryStats.map((cat) => (
-          <div key={cat.label} className="bg-app-card border border-app-border rounded-2xl p-4 shadow-sm flex flex-col items-center text-center hover:border-app-accent1/50 transition-colors relative overflow-hidden">
+          <div key={cat.label} className="bg-app-card border border-app-border rounded-2xl p-4 shadow-xs flex flex-col items-center text-center hover:border-app-accent1/50 transition-colors relative overflow-hidden">
             
             <div className="relative z-10 w-full">
               <p className="text-app-text/70 text-xs font-semibold uppercase tracking-wider mb-2">{cat.label}</p>
@@ -396,7 +397,7 @@ export default function GrabDetails() {
       </div>
 
       {/* GRAFIK PENDAPATAN */}
-      <div className="bg-app-card border border-app-border rounded-[18px] p-6 shadow-sm mb-8 relative overflow-hidden">
+      <div className="bg-app-card border border-app-border rounded-2xl p-6 shadow-xs mb-8 relative overflow-hidden">
         
         <h3 className="text-lg font-semibold text-app-text-bright mb-6 flex items-center gap-2 relative z-10">
           <LineChartIcon className="w-5 h-5 text-app-accent1" /> Grafik Pendapatan

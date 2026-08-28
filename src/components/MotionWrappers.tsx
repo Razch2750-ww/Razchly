@@ -87,16 +87,15 @@ export function HoverCard({ children, className = '', onClick, id }: HoverCardPr
       <motion.div
         className="absolute inset-0 -z-10 pointer-events-none transition-opacity duration-300"
         style={{
-          background: 'var(--color-app-accent1)',
-          opacity: isHovered ? 0.04 : 0,
+          background: 'var(--color-app-hover)',
+          opacity: isHovered ? 0.4 : 0,
         }}
       />
-      {/* Outer border glow effect on hover */}
+      {/* Outer border highlight on hover */}
       <div 
-        className="absolute inset-0 rounded-[inherit] border border-app-accent1/20 transition-opacity duration-300 pointer-events-none -z-10"
+        className="absolute inset-0 rounded-[inherit] border border-app-border transition-opacity duration-200 pointer-events-none -z-10"
         style={{
-          boxShadow: '0 0 20px -3px var(--color-app-accent1)',
-          opacity: isHovered ? 0.12 : 0,
+          opacity: isHovered ? 1 : 0,
         }}
       />
       <div className="h-full w-full relative z-10">
@@ -178,8 +177,7 @@ export function StaggerContainer({ children, className = '', id }: StaggerContai
       className={className}
       variants={staggerContainerVariants}
       initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, margin: '-10px' }}
+      animate="show"
     >
       {children}
     </motion.div>
@@ -418,35 +416,5 @@ interface ParallaxBackgroundProps {
 }
 
 export function ParallaxBackground({ containerRef }: ParallaxBackgroundProps) {
-  const shouldReduceMotion = useReducedMotion();
-  const { scrollY } = useScroll({ container: containerRef });
-  
-  // Multi-layered speed depths (moving 30% to 50% slower than main scrolling content)
-  const y1 = useTransform(scrollY, [0, 1000], [0, 300]);
-  const y2 = useTransform(scrollY, [0, 1000], [0, -200]);
-  const y3 = useTransform(scrollY, [0, 1000], [0, 150]);
-
-  if (shouldReduceMotion) {
-    return null; // completely disable background glow movement when reduced motion is enabled
-  }
-
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden -z-20">
-      {/* Glow blob 1 - Depth layer 1 */}
-      <motion.div
-        style={{ y: y1, willChange: 'transform' }}
-        className="absolute top-24 left-[10%] w-[25vw] h-[25vw] rounded-full bg-app-accent1/10 blur-[80px] opacity-35"
-      />
-      {/* Glow blob 2 - Depth layer 2 */}
-      <motion.div
-        style={{ y: y2, willChange: 'transform' }}
-        className="absolute top-[50vh] right-[15%] w-[30vw] h-[30vw] rounded-full bg-app-accent2/8 blur-[100px] opacity-25"
-      />
-      {/* Fine particle ring / Accent Blob 3 - Depth layer 3 */}
-      <motion.div
-        style={{ y: y3, willChange: 'transform' }}
-        className="absolute top-[100vh] left-[25%] w-[15vw] h-[15vw] rounded-full border border-app-accent1/10 bg-app-accent1/3 blur-[40px] opacity-20"
-      />
-    </div>
-  );
+  return null;
 }

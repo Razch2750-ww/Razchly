@@ -95,6 +95,7 @@ import {
 } from "recharts";
 
 import { formatNumberInput, parseNumberInput } from "../utils/numberFormat";
+import { parseTxDate, safeFormatDate } from "../utils/dateUtils";
 import { toast } from "react-hot-toast";
 import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal, MicroLoop } from "./MotionWrappers";
 import { ActionBtn } from "./PageShell";
@@ -758,7 +759,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
   const filteredByPeriodTransactions = useMemo(() => {
     const today = new Date();
     return filteredByAccountTransactions.filter((t) => {
-      const tDate = new Date(t.date);
+      const tDate = parseTxDate(t.date);
       if (selectedReportPeriod === "this_month") {
         return isSameMonth(tDate, today);
       }
@@ -849,14 +850,15 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
     // Period filter
     filtered = filtered.filter(t => {
-      const tDate = new Date(t.date);
+      const tDate = parseTxDate(t.date);
       if (mobileTab === "Harian") return isSameDay(tDate, mobileCurrentDate);
       if (mobileTab === "Mingguan") return isSameWeek(tDate, mobileCurrentDate, { locale: currentLocale });
       if (mobileTab === "Bulanan") return isSameMonth(tDate, mobileCurrentDate);
       if (mobileTab === "Custom") {
         if (!mobileCustomStartDate || !mobileCustomEndDate) return true;
-        const start = new Date(mobileCustomStartDate);
-        const end = new Date(mobileCustomEndDate);
+        const start = parseTxDate(mobileCustomStartDate);
+        start.setHours(0, 0, 0, 0);
+        const end = parseTxDate(mobileCustomEndDate);
         end.setHours(23, 59, 59, 999);
         return tDate >= start && tDate <= end;
       }
@@ -870,13 +872,22 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
     // Category filter
     filtered = filtered.filter(t => {
-      if (t.type === "income" && mobileIncomeFilter !== "Semua") return t.categoryId === mobileIncomeFilter;
-      if (t.type === "expense" && mobileExpenseFilter !== "Semua") return t.categoryId === mobileExpenseFilter;
+      if (mobileIncomeFilter !== "Semua" && mobileExpenseFilter !== "Semua") {
+        return t.categoryId === mobileIncomeFilter || t.categoryId === mobileExpenseFilter;
+      }
+      if (mobileIncomeFilter !== "Semua") {
+        if (t.type === "income") return t.categoryId === mobileIncomeFilter;
+        return false;
+      }
+      if (mobileExpenseFilter !== "Semua") {
+        if (t.type === "expense") return t.categoryId === mobileExpenseFilter;
+        return false;
+      }
       return true;
     });
 
     return filtered;
-  }, [transactions, mobileTab, mobileCurrentDate, mobileCustomStartDate, mobileCustomEndDate, mobileAccountFilter, mobileIncomeFilter, mobileExpenseFilter]);
+  }, [transactions, mobileTab, mobileCurrentDate, mobileCustomStartDate, mobileCustomEndDate, mobileAccountFilter, mobileIncomeFilter, mobileExpenseFilter, currentLocale]);
 
   const mobileChartData = useMemo(() => {
     const dateMap = new Map();
@@ -887,10 +898,10 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       }
     }
     const sortedTsx = [...mobileFilteredTransactions].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      (a, b) => parseTxDate(a.date).getTime() - parseTxDate(b.date).getTime(),
     );
     sortedTsx.forEach((t) => {
-      const d = mobileTab === "Harian" ? format(new Date(t.date), "HH:00") : format(new Date(t.date), "dd/MM");
+      const d = mobileTab === "Harian" ? safeFormatDate(t.date, "HH:00") : safeFormatDate(t.date, "dd/MM");
       if (!dateMap.has(d)) dateMap.set(d, { date: d, income: 0, expense: 0 });
       if (t.type === "income") dateMap.get(d).income += t.amount;
       if (t.type === "expense") dateMap.get(d).expense += t.amount;
@@ -898,7 +909,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
     });
     let data = Array.from(dateMap.values());
     if (data.length === 0) {
-      data = [{ date: mobileTab === "Harian" ? "00:00" : format(new Date(), "dd/MM"), income: 0, expense: 0 }];
+      data = [{ date: mobileTab === "Harian" ? "00:00" : safeFormatDate(new Date(), "dd/MM"), income: 0, expense: 0 }];
     }
     return data;
   }, [mobileFilteredTransactions, mobileTab]);
@@ -1090,14 +1101,14 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
     const groups: { [dateKey: string]: { dateStr: string; dateObj: Date; items: Transaction[]; dailyIncome: number; dailyExpense: number } } = {};
 
     filteredAndSearchedTransactions.forEach((t) => {
-      const tDate = new Date(t.date);
-      const key = format(tDate, "yyyy-MM-dd");
+      const tDate = parseTxDate(t.date);
+      const key = safeFormatDate(tDate, "yyyy-MM-dd");
       if (!groups[key]) {
-        let label = format(tDate, "EEEE, d MMMM yyyy", { locale: currentLocale });
+        let label = safeFormatDate(tDate, "EEEE, d MMMM yyyy", { locale: currentLocale });
         if (isSameDay(tDate, new Date())) {
-          label = (language === "en" ? "Today, " : "Hari ini, ") + format(tDate, "d MMMM yyyy", { locale: currentLocale });
+          label = (language === "en" ? "Today, " : "Hari ini, ") + safeFormatDate(tDate, "d MMMM yyyy", { locale: currentLocale });
         } else if (isSameDay(tDate, subDays(new Date(), 1))) {
-          label = (language === "en" ? "Yesterday, " : "Kemarin, ") + format(tDate, "d MMMM yyyy", { locale: currentLocale });
+          label = (language === "en" ? "Yesterday, " : "Kemarin, ") + safeFormatDate(tDate, "d MMMM yyyy", { locale: currentLocale });
         }
 
         groups[key] = {
@@ -1490,7 +1501,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 Belum ada transaksi di periode ini.
               </div>
             ) : (
-              <StaggerContainer className="space-y-2 relative z-10">
+              <StaggerContainer key={`${mobileCurrentDate.toISOString()}_${mobileTab}_${mobileIncomeFilter}_${mobileExpenseFilter}_${mobileAccountFilter}`} className="space-y-2 relative z-10">
                 {mobileFilteredTransactions.map((t) => (
                   <StaggerItem key={t.id}>
                     <div
@@ -1547,7 +1558,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                             ? `${getAccountName(t.fromAccountId)} ➔ ${getAccountName(t.toAccountId)}`
                             : getAccountName(t.accountId)}{" "}
                           •{" "}
-                          {format(t.date, "dd MMM, HH:mm", {
+                          {safeFormatDate(t.date, "dd MMM, HH:mm", {
                             locale: currentLocale,
                           })}
                         </p>
@@ -1661,10 +1672,10 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
         {/* FILTER & EXPORT BAR */}
         <ScrollReveal>
-          <div className="bg-app-card border border-app-border rounded-[22px] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm shrink-0 relative overflow-hidden">
+          <div className="bg-app-card border border-app-border rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs shrink-0 relative overflow-hidden">
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-1">
-                <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">
+                <h2 className="text-app-text-bright text-[20px] font-semibold tracking-tight">
                   {language === "en" ? "Financial Report" : "Laporan Keuangan"}
                 </h2>
                 <span className="text-[10px] font-semibold tracking-wider uppercase bg-app-accent1/10 text-app-accent1 border border-app-accent1/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
@@ -1743,7 +1754,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         <ScrollReveal>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
             {/* TOTAL KEUNTUNGAN BERSIH */}
-            <div className="lg:col-span-2 bg-app-card rounded-[22px] p-6 border border-app-border shadow-sm flex flex-col justify-between relative overflow-hidden">
+            <div className="lg:col-span-2 bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col justify-between relative overflow-hidden">
               <div className="relative z-10 mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-semibold tracking-wider uppercase text-app-text/60 bg-app-bg border border-app-border px-3 py-1 rounded-full">
@@ -1810,13 +1821,13 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </div>
 
             {/* AI INSIGHT */}
-            <div className="bg-app-card rounded-[22px] p-6 border border-app-border shadow-sm flex flex-col relative overflow-hidden group">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-app-accent1 via-app-accent2 to-emerald-400" />
+            <div className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col relative overflow-hidden group">
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-app-accent1/60" />
               
               <div className="flex items-center justify-between mb-4 relative z-10">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-app-accent1/10 flex items-center justify-center text-app-accent1">
-                    <Sparkles className="w-4 h-4 animate-pulse" />
+                    <Sparkles className="w-4 h-4" />
                   </div>
                   <span className="text-app-accent1 text-[11px] font-semibold tracking-widest uppercase">
                     AI Insight & Analytics
@@ -1862,7 +1873,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         <ScrollReveal>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
             {/* CASH FLOW TREND CHART */}
-            <div className="lg:col-span-2 bg-app-card border border-app-border rounded-[22px] p-6 shadow-sm flex flex-col">
+            <div className="lg:col-span-2 bg-app-card border border-app-border rounded-2xl p-6 shadow-xs flex flex-col">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
@@ -1933,7 +1944,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </div>
 
             {/* CATEGORY BREAKDOWN VISUALIZER */}
-            <div className="bg-app-card border border-app-border rounded-[22px] p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-app-card border border-app-border rounded-2xl p-6 shadow-xs flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
@@ -2016,7 +2027,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   setTab("Pemasukan");
                   detailRef.current?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="bg-app-card border border-app-border rounded-[22px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
+                className="bg-app-card border border-app-border rounded-2xl p-6 flex justify-between items-center shadow-xs overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
               >
                 <div className="flex items-center gap-4 relative z-10">
                   <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0 border border-emerald-500/20">
@@ -2057,7 +2068,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   setTab("Pengeluaran");
                   detailRef.current?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="bg-app-card border border-app-border rounded-[22px] p-6 flex justify-between items-center shadow-sm overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
+                className="bg-app-card border border-app-border rounded-2xl p-6 flex justify-between items-center shadow-xs overflow-hidden relative cursor-pointer hover:bg-app-hover transition-colors w-full"
               >
                 <div className="flex items-center gap-4 relative z-10">
                   <div className="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0 border border-rose-500/20">
@@ -2086,7 +2097,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           className="flex-1 flex flex-col shrink-0 min-h-[400px]"
         >
           {/* SEARCH & TYPE FILTER BAR */}
-          <div className="bg-app-card border border-app-border rounded-[22px] p-6 shadow-sm flex flex-col space-y-4">
+          <div className="bg-app-card border border-app-border rounded-2xl p-6 shadow-xs flex flex-col space-y-4">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <h3 className="text-lg font-semibold text-app-text-bright">
@@ -2240,7 +2251,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                                 {t.type === "transfer"
                                   ? `Transfer: ${getAccountName(t.fromAccountId)} ➔ ${getAccountName(t.toAccountId)}`
                                   : getAccountName(t.accountId)}{" "}
-                                • {format(new Date(t.date), "HH:mm")}
+                                • {safeFormatDate(t.date, "HH:mm")}
                               </p>
                             </div>
                           </div>

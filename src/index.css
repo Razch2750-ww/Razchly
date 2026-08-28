@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "SF Pro Text", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: "Outfit", "SF Pro Text", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   --color-app-bg: var(--bg-color);
@@ -20,22 +20,27 @@
   --color-app-accent8: var(--accent8-color, var(--accent1-color));
   --color-app-accent9: var(--accent9-color, var(--accent1-color));
   --color-app-accent10: var(--accent10-color, var(--accent1-color));
-  --color-app-success: #34c759;
-  --color-app-danger: #ff3b30;
+  --color-app-success: var(--success-color, #2EB886);
+  --color-app-danger: var(--danger-color, #E25858);
 }
 
-/* Custom premium styles */
+/* Custom smooth styles */
 .bg-app-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  box-shadow: none;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  transition: background-color 300ms cubic-bezier(0.25, 0.1, 0.25, 1), 
+              border-color 300ms cubic-bezier(0.25, 0.1, 0.25, 1), 
+              box-shadow 300ms ease;
 }
 
 .bg-app-glass {
-  background-color: color-mix(in srgb, var(--card-bg) 70%, transparent);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background-color: color-mix(in srgb, var(--card-bg) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid var(--border-color);
+  transition: background-color 300ms cubic-bezier(0.25, 0.1, 0.25, 1), 
+              border-color 300ms cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .text-gradient {
@@ -101,7 +106,7 @@
 
 .floating-label-input:focus, .floating-label-select:focus {
   border-color: var(--accent1-color) !important;
-  box-shadow: 0 0 12px rgba(139, 92, 246, 0.25) !important; /* Soft glow effect */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent1-color) 20%, transparent) !important;
 }
 
 .floating-label-input::placeholder {
@@ -133,7 +138,7 @@
   body {
     background-color: var(--bg-color);
     color: var(--text-color);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 300ms cubic-bezier(0.25, 0.1, 0.25, 1), color 300ms cubic-bezier(0.25, 0.1, 0.25, 1);
     overscroll-behavior-y: none;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
@@ -154,38 +159,74 @@
     cursor: pointer;
   }
 
-  /* Premium Button Micro-Interactions */
+  /* Smooth Interactive Controls */
   button:not(:disabled), .btn-interactive {
-    transition: transform 180ms ease-in-out, 
-                background-color 180ms ease-in-out, 
-                box-shadow 180ms ease-in-out, 
-                filter 150ms ease-in-out;
+    transition: transform 200ms cubic-bezier(0.25, 0.1, 0.25, 1), 
+                background-color 200ms ease, 
+                border-color 200ms ease,
+                color 200ms ease,
+                box-shadow 200ms ease, 
+                opacity 150ms ease;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform: translateZ(0);
   }
   
   button:not(:disabled):hover, .btn-interactive:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    filter: brightness(1.06) contrast(0.97);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   }
   
   button:not(:disabled):active, .btn-interactive:active {
-    transform: scale(0.98);
-    filter: brightness(0.94);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    transform: translateY(0px) scale(0.98);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
   }
 
-  /* Global Soft Focus Glow & Transition for all fields */
+  /* Interactive Micro-Animations for Cards, Rows, Badges & Lists */
+  .interactive-card, .interactive-row, .clickable-item, [role="button"] {
+    transition: transform 200ms cubic-bezier(0.25, 0.1, 0.25, 1),
+                box-shadow 200ms cubic-bezier(0.25, 0.1, 0.25, 1),
+                border-color 200ms ease,
+                background-color 200ms ease;
+    will-change: transform;
+  }
+  
+  .interactive-card:hover, .interactive-row:hover, .clickable-item:hover, [role="button"]:hover {
+    transform: translateY(-1px);
+  }
+
+  .interactive-card:active, .interactive-row:active, .clickable-item:active, [role="button"]:active {
+    transform: translateY(0px) scale(0.99);
+  }
+
+  /* Active Press Feedback for Pill Tabs, Badges & Filter Chips */
+  .tab-pill, .badge-pill, .chip-interactive {
+    transition: transform 150ms cubic-bezier(0.25, 0.1, 0.25, 1),
+                background-color 200ms ease,
+                border-color 200ms ease,
+                color 200ms ease,
+                box-shadow 200ms ease;
+  }
+  
+  .tab-pill:hover, .chip-interactive:hover {
+    transform: translateY(-1px);
+  }
+
+  .tab-pill:active, .chip-interactive:active {
+    transform: scale(0.97);
+  }
+
+  /* Global Focus & Transition for all fields */
   input:not([type="checkbox"]):not([type="radio"]), select, textarea {
-    transition: border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: border-color 200ms cubic-bezier(0.25, 0.1, 0.25, 1), 
+                box-shadow 200ms cubic-bezier(0.25, 0.1, 0.25, 1), 
+                background-color 200ms ease, 
+                color 200ms ease !important;
   }
 
   input:not([type="checkbox"]):not([type="radio"]):focus, select:focus, textarea:focus {
     border-color: var(--accent1-color) !important;
-    box-shadow: 0 0 12px rgba(var(--accent1-color), 0.25) !important;
-    transform: translateY(-1px);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent1-color) 15%, transparent) !important;
   }
 }
 

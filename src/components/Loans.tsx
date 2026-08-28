@@ -225,7 +225,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
   const payManualAmountLabel = isLend ? "Nominal Penerimaan Manual" : "Nominal Pembayaran Manual";
 
   return (
-    <HoverCard className={`bg-app-card rounded-[18px] border ${isLend ? 'border-app-success/20 hover:border-app-success/40' : 'border-app-accent1/20 hover:border-app-accent1/40'} p-5 shadow-sm flex flex-col relative overflow-hidden group transition-colors w-full`}>
+    <HoverCard className={`bg-app-card rounded-2xl border ${isLend ? 'border-app-success/20 hover:border-app-success/40' : 'border-app-accent1/20 hover:border-app-accent1/40'} p-5 shadow-xs flex flex-col relative overflow-hidden group transition-colors w-full`}>
 
       <div className="flex justify-between items-center mb-4 relative z-10">
         <div className="flex items-center gap-3">
@@ -938,7 +938,7 @@ export default function Loans() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto pt-20">
-          <div className="bg-app-card text-app-text w-full max-w-md rounded-[18px] shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
+          <div className="bg-app-card text-app-text w-full max-w-md rounded-2xl shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 className="text-lg font-semibold text-app-text-bright">
                 {editingLoan ? (type === 'lend' ? "Edit Piutang" : "Edit Pinjaman") : (type === 'lend' ? "Tambah Piutang" : "Tambah Pinjaman")}

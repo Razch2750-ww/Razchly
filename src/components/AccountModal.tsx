@@ -110,7 +110,7 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.94, opacity: 0, y: 15 }}
             transition={{ type: "spring", damping: 20, stiffness: 200 }}
-            className="bg-app-card text-app-text w-full max-w-md rounded-[18px] shadow-2xl border border-app-border overflow-hidden"
+            className="bg-app-card text-app-text w-full max-w-md rounded-2xl shadow-xl border border-app-border overflow-hidden"
           >
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg/50">
               <h2 className="text-lg font-semibold text-app-text-bright">

@@ -406,7 +406,7 @@ export default function Settings() {
 
       <ScrollReveal className="flex-1 space-y-6 pb-10">
         
-        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
+        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border shadow-xs transition-all duration-300 relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('profil')} className={`relative z-10 w-full flex items-center justify-between ${sections.profil ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -435,8 +435,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-app-accent1/5 via-transparent to-transparent pointer-events-none opacity-50" />
+        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border shadow-xs transition-all duration-300 relative overflow-hidden">
           <button type="button" onClick={() => toggleSection('rekening')} className={`relative z-10 w-full flex items-center justify-between ${sections.rekening ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
               <Wallet className="w-6 h-6 text-app-accent1" />
@@ -527,7 +526,7 @@ export default function Settings() {
         </section>
 
         {/* SECTION: DAFTAR KATEGORI */}
-        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
+        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border shadow-xs transition-all duration-300 relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('kategori')} className={`relative z-10 w-full flex items-center justify-between ${sections.kategori ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -626,7 +625,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
+        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border shadow-xs transition-all duration-300 relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('grab')} className={`relative z-10 w-full flex items-center justify-between ${sections.grab ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -667,7 +666,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
+        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border shadow-xs transition-all duration-300 relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('jadwal')} className={`relative z-10 w-full flex items-center justify-between ${sections.jadwal ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -736,7 +735,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
+        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border shadow-xs transition-all duration-300 relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('bahasa')} className={`relative z-10 w-full flex items-center justify-between ${sections.bahasa ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -764,7 +763,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
+        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border shadow-xs transition-all duration-300 relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('tema')} className={`relative z-10 w-full flex items-center justify-between ${sections.tema ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -810,7 +809,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-8 rounded-2xl border border-app-border/60 shadow-lg shadow-black/5 transition-all duration-300 relative overflow-hidden hover:shadow-xl hover:shadow-black/10">
+        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border shadow-xs transition-all duration-300 relative overflow-hidden">
           
           <button type="button" onClick={() => toggleSection('navigasi')} className={`relative z-10 w-full flex items-center justify-between ${sections.navigasi ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">

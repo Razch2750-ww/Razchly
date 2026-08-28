@@ -19,40 +19,579 @@ export interface ThemeDef {
 }
 
 export const themes: ThemeDef[] = [
-  // LIGHT MODE
-  { id: "sepia-paper", name: "Sepia Paper", category: "light", colors: { bg: "#F4ECD8", text: "#433422", accent1: "#A67C52", accent2: "#C19A6B", accent3: "#D7B899", accent4: "#8C6A43", accent5: "#E8D8C3", accent6: "#B58B60", accent7: "#D9C2A3", accent8: "#9C7350", accent9: "#EDE1D1", accent10: "#7A5B3A" } },
-  { id: "nordic-light", name: "Nordic Light", category: "light", colors: { bg: "#F3F4F6", text: "#2D3748", accent1: "#5AB2C7", accent2: "#8BC9D8", accent3: "#D8EEF3", accent4: "#7B8794", accent5: "#AAB7C4", accent6: "#6FAFC0", accent7: "#C4DCE4", accent8: "#607086", accent9: "#E4EDF2", accent10: "#90A4B4" } },
-  { id: "matcha-latte", name: "Matcha Latte", category: "light", colors: { bg: "#E8EFE9", text: "#2F3E32", accent1: "#8AA682", accent2: "#AFC8A6", accent3: "#6F8F68", accent4: "#D6E3D2", accent5: "#B8C7B2", accent6: "#95B08D", accent7: "#7C9875", accent8: "#E3ECE0", accent9: "#5E775A", accent10: "#C8D6C3" } },
-  { id: "rose-quartz", name: "Rose Quartz", category: "light", colors: { bg: "#FAF0F2", text: "#4A3E41", accent1: "#D4A5B1", accent2: "#E8C6CF", accent3: "#BE8A97", accent4: "#F3DDE3", accent5: "#A56F7D", accent6: "#C796A3", accent7: "#EFD0D8", accent8: "#8E5D69", accent9: "#F7E8EC", accent10: "#B98491" } },
-  { id: "soft-sand", name: "Soft Sand", category: "light", colors: { bg: "#F0EAE1", text: "#3E3A35", accent1: "#C2A685", accent2: "#D6C0A7", accent3: "#AE8F6A", accent4: "#E8D9C8", accent5: "#8F7759", accent6: "#CDB396", accent7: "#F0E5D8", accent8: "#7C654C", accent9: "#B89A76", accent10: "#DCCAB5" } },
-  { id: "cloudy-day", name: "Cloudy Day", category: "light", colors: { bg: "#EAECEE", text: "#2C3E50", accent1: "#7FB3D5", accent2: "#A9CCE3", accent3: "#5D8AA8", accent4: "#D6EAF8", accent5: "#4A6C8C", accent6: "#8EBEDB", accent7: "#C5DFF0", accent8: "#6E9EBB", accent9: "#E8F3FA", accent10: "#547692" } },
-  { id: "lavender-mist", name: "Lavender Mist", category: "light", colors: { bg: "#F2EFF9", text: "#3F3A4F", accent1: "#A393BF", accent2: "#C8BFE0", accent3: "#8674A8", accent4: "#E3DEF1", accent5: "#6A5A88", accent6: "#B5A8D0", accent7: "#D7D0E9", accent8: "#7A689A", accent9: "#EFEAF8", accent10: "#9485B5" } },
-  { id: "vanilla-cream", name: "Vanilla Cream", category: "light", colors: { bg: "#FAF6E8", text: "#423F35", accent1: "#DEC27A", accent2: "#E9D6A5", accent3: "#C7A85A", accent4: "#F5ECCC", accent5: "#A98A45", accent6: "#D5B86A", accent7: "#F0E2B8", accent8: "#B5944E", accent9: "#FBF4DB", accent10: "#8F7539" } },
-  { id: "sage-garden", name: "Sage Garden", category: "light", colors: { bg: "#EEF1EC", text: "#353D32", accent1: "#9DB298", accent2: "#B7C8B3", accent3: "#7E9879", accent4: "#D7E1D4", accent5: "#5F775B", accent6: "#A8BCA3", accent7: "#C8D6C4", accent8: "#718A6C", accent9: "#E7EEE5", accent10: "#8DA287" } },
-  { id: "oatmeal", name: "Oatmeal", category: "light", colors: { bg: "#F5F2EB", text: "#4A4741", accent1: "#C5B499", accent2: "#D9CCB7", accent3: "#AA9578", accent4: "#EDE5D9", accent5: "#8C7760", accent6: "#CDBEA7", accent7: "#E4D8C8", accent8: "#9A846B", accent9: "#F5F0E7", accent10: "#B6A085" } },
+  // LIGHT MODE - Sophisticated earthy & editorial neutrals
+  { 
+    id: "sepia-paper", 
+    name: "Sepia Paper", 
+    category: "light", 
+    colors: { 
+      bg: "#F6F1E7", 
+      text: "#3D3024", 
+      accent1: "#8D6843", 
+      accent2: "#B08B64", 
+      accent3: "#C9A782", 
+      accent4: "#DFD0BF", 
+      accent5: "#6E4F30", 
+      accent6: "#A17C55", 
+      accent7: "#CFB698", 
+      accent8: "#543C23", 
+      accent9: "#EDE2D2", 
+      accent10: "#B89673" 
+    } 
+  },
+  { 
+    id: "nordic-light", 
+    name: "Nordic Light", 
+    category: "light", 
+    colors: { 
+      bg: "#F8FAFC", 
+      text: "#1E293B", 
+      accent1: "#3B82F6", 
+      accent2: "#60A5FA", 
+      accent3: "#93C5FD", 
+      accent4: "#CBD5E1", 
+      accent5: "#1D4ED8", 
+      accent6: "#4B90E2", 
+      accent7: "#BFDBFE", 
+      accent8: "#1E40AF", 
+      accent9: "#E2E8F0", 
+      accent10: "#64748B" 
+    } 
+  },
+  { 
+    id: "matcha-latte", 
+    name: "Matcha Latte", 
+    category: "light", 
+    colors: { 
+      bg: "#F1F5F0", 
+      text: "#253529", 
+      accent1: "#4E7A57", 
+      accent2: "#739F7C", 
+      accent3: "#9CBFA4", 
+      accent4: "#D2E3D6", 
+      accent5: "#35563D", 
+      accent6: "#608D6A", 
+      accent7: "#B9D4C0", 
+      accent8: "#28432E", 
+      accent9: "#E4EDE4", 
+      accent10: "#86A88E" 
+    } 
+  },
+  { 
+    id: "rose-quartz", 
+    name: "Rose Quartz", 
+    category: "light", 
+    colors: { 
+      bg: "#FAF4F5", 
+      text: "#3D2C31", 
+      accent1: "#9E5D6F", 
+      accent2: "#C18394", 
+      accent3: "#DCAAB7", 
+      accent4: "#EED4DC", 
+      accent5: "#753E4E", 
+      accent6: "#AF7081", 
+      accent7: "#E5BFC9", 
+      accent8: "#5C2F3D", 
+      accent9: "#F5E6EA", 
+      accent10: "#986775" 
+    } 
+  },
+  { 
+    id: "soft-sand", 
+    name: "Soft Sand", 
+    category: "light", 
+    colors: { 
+      bg: "#F4F0EA", 
+      text: "#3B352E", 
+      accent1: "#8A7156", 
+      accent2: "#AE9579", 
+      accent3: "#CBBAA2", 
+      accent4: "#E6DDCF", 
+      accent5: "#67523B", 
+      accent6: "#9C8367", 
+      accent7: "#D9CCBD", 
+      accent8: "#4F3E2B", 
+      accent9: "#EFE8DC", 
+      accent10: "#B8A38B" 
+    } 
+  },
+  { 
+    id: "cloudy-day", 
+    name: "Cloudy Day", 
+    category: "light", 
+    colors: { 
+      bg: "#F1F4F6", 
+      text: "#243342", 
+      accent1: "#476E8E", 
+      accent2: "#6C93B3", 
+      accent3: "#99B7D1", 
+      accent4: "#D0DFEB", 
+      accent5: "#2F4D67", 
+      accent6: "#597F9E", 
+      accent7: "#B5CDDF", 
+      accent8: "#21384D", 
+      accent9: "#E2EAF0", 
+      accent10: "#7EA2BF" 
+    } 
+  },
+  { 
+    id: "lavender-mist", 
+    name: "Lavender Mist", 
+    category: "light", 
+    colors: { 
+      bg: "#F5F3F9", 
+      text: "#2E283C", 
+      accent1: "#6F5E8E", 
+      accent2: "#9382B2", 
+      accent3: "#B9ACD3", 
+      accent4: "#DFD9EC", 
+      accent5: "#4F406A", 
+      accent6: "#8170A0", 
+      accent7: "#CAC1DF", 
+      accent8: "#3D3053", 
+      accent9: "#EDE8F4", 
+      accent10: "#A597C3" 
+    } 
+  },
+  { 
+    id: "vanilla-cream", 
+    name: "Vanilla Cream", 
+    category: "light", 
+    colors: { 
+      bg: "#FAF7EE", 
+      text: "#393427", 
+      accent1: "#967A38", 
+      accent2: "#BA9E5B", 
+      accent3: "#D9C387", 
+      accent4: "#EDE1BD", 
+      accent5: "#6E5621", 
+      accent6: "#A88C49", 
+      accent7: "#E4D3A4", 
+      accent8: "#544015", 
+      accent9: "#F4EDD6", 
+      accent10: "#C4AC6F" 
+    } 
+  },
+  { 
+    id: "sage-garden", 
+    name: "Sage Garden", 
+    category: "light", 
+    colors: { 
+      bg: "#F2F5F1", 
+      text: "#2C362A", 
+      accent1: "#55755A", 
+      accent2: "#79987E", 
+      accent3: "#A2BCA6", 
+      accent4: "#D4E2D7", 
+      accent5: "#3C5540", 
+      accent6: "#67866C", 
+      accent7: "#BDD1C1", 
+      accent8: "#2D4130", 
+      accent9: "#E5ECE5", 
+      accent10: "#8CA990" 
+    } 
+  },
+  { 
+    id: "oatmeal", 
+    name: "Oatmeal", 
+    category: "light", 
+    colors: { 
+      bg: "#F5F3EC", 
+      text: "#38352F", 
+      accent1: "#85735B", 
+      accent2: "#A6947C", 
+      accent3: "#C6B7A2", 
+      accent4: "#E5DDD0", 
+      accent5: "#61523E", 
+      accent6: "#96846B", 
+      accent7: "#D7CCBD", 
+      accent8: "#4B3D2C", 
+      accent9: "#ECE6DB", 
+      accent10: "#B4A48E" 
+    } 
+  },
 
-  // DARK MODE
-  { id: "dracula-soft", name: "Dracula Soft", category: "dark", colors: { bg: "#282A36", text: "#F8F8F2", accent1: "#FF79C6", accent2: "#FFB3DA", accent3: "#BD93F9", accent4: "#8BE9FD", accent5: "#F1FA8C", accent6: "#FF92CF", accent7: "#D3B3FF", accent8: "#C7F3FD", accent9: "#FFF5B1", accent10: "#E5D7FF" } },
-  { id: "deep-ocean", name: "Deep Ocean", category: "dark", colors: { bg: "#0F172A", text: "#E2E8F0", accent1: "#38BDF8", accent2: "#7DD3FC", accent3: "#0EA5E9", accent4: "#BFDBFE", accent5: "#1D4ED8", accent6: "#5BC8F7", accent7: "#8CCFF4", accent8: "#2C7FB8", accent9: "#D8ECFF", accent10: "#6AA7D8" } },
-  { id: "charcoal-mist", name: "Charcoal Mist", category: "dark", colors: { bg: "#202124", text: "#E8EAED", accent1: "#8AB4F8", accent2: "#AFCBFA", accent3: "#669DF6", accent4: "#D2E3FC", accent5: "#4A86E8", accent6: "#9ABFF8", accent7: "#C5D9FC", accent8: "#5B95F0", accent9: "#E6F0FF", accent10: "#7AA9F4" } },
-  { id: "forest-night", name: "Forest Night", category: "dark", colors: { bg: "#141E17", text: "#E1E9E3", accent1: "#528B67", accent2: "#7AA388", accent3: "#3D6E50", accent4: "#BFD3C4", accent5: "#96B39E", accent6: "#6F9B7C", accent7: "#D6E1D8", accent8: "#315A42", accent9: "#A8BFAE", accent10: "#4A7A59" } },
-  { id: "evergreen", name: "Evergreen", category: "dark", colors: { bg: "#1A231F", text: "#E6EDE9", accent1: "#D4AF37", accent2: "#E3C96A", accent3: "#B89225", accent4: "#F0E0A8", accent5: "#8A6E1F", accent6: "#C9A73A", accent7: "#EAD588", accent8: "#A68320", accent9: "#F7EDC9", accent10: "#6E5619" } },
-  { id: "midnight-blue", name: "Midnight Blue", category: "dark", colors: { bg: "#101424", text: "#E0E4F0", accent1: "#F0C243", accent2: "#F5D67A", accent3: "#D9A520", accent4: "#FFF0B8", accent5: "#A67C00", accent6: "#E4BC52", accent7: "#F8E0A0", accent8: "#BF9420", accent9: "#FFF6D6", accent10: "#8A6700" } },
-  { id: "chocolate-dark", name: "Chocolate Dark", category: "dark", colors: { bg: "#1F1A17", text: "#EBE6E1", accent1: "#C99A72", accent2: "#DDBA9A", accent3: "#A97A53", accent4: "#E9D4BF", accent5: "#8B5E3C", accent6: "#C6A17F", accent7: "#F2E4D4", accent8: "#755037", accent9: "#B98A63", accent10: "#D8B89D" } },
-  { id: "slate-stone", name: "Slate Stone", category: "dark", colors: { bg: "#1E222B", text: "#ABB2BF", accent1: "#61AFEF", accent2: "#8FC6F4", accent3: "#3D8ED8", accent4: "#CFE6FA", accent5: "#275F8A", accent6: "#76BAF0", accent7: "#B7D8F8", accent8: "#4A98D8", accent9: "#E6F3FD", accent10: "#316D99" } },
-  { id: "nord-night", name: "Nord Night", category: "dark", colors: { bg: "#2E3440", text: "#D8DEE9", accent1: "#88C0D0", accent2: "#A3D5DF", accent3: "#5E81AC", accent4: "#81A1C1", accent5: "#BFDDE5", accent6: "#739EB0", accent7: "#D4E8EE", accent8: "#4C698C", accent9: "#9DB7C8", accent10: "#6F8FAF" } },
-  { id: "shadow-grey", name: "Shadow Grey", category: "dark", colors: { bg: "#1C1C1C", text: "#D6D6D6", accent1: "#7D7D7D", accent2: "#A3A3A3", accent3: "#5A5A5A", accent4: "#D1D1D1", accent5: "#3A3A3A", accent6: "#8E8E8E", accent7: "#BFBFBF", accent8: "#686868", accent9: "#E8E8E8", accent10: "#4A4A4A" } },
+  // DARK MODE - Tailored architectural & editorial palettes (no neon, no hot glow)
+  { 
+    id: "dracula-soft", 
+    name: "Dracula Soft", 
+    category: "dark", 
+    colors: { 
+      bg: "#1E1F29", 
+      text: "#E2E4EC", 
+      accent1: "#8B7CB6", 
+      accent2: "#A99CD0", 
+      accent3: "#685994", 
+      accent4: "#CBD0E6", 
+      accent5: "#B4708A", 
+      accent6: "#9C8DC4", 
+      accent7: "#C1B6E0", 
+      accent8: "#524479", 
+      accent9: "#DED6F2", 
+      accent10: "#7969A3" 
+    } 
+  },
+  { 
+    id: "deep-ocean", 
+    name: "Deep Ocean", 
+    category: "dark", 
+    colors: { 
+      bg: "#0F172A", 
+      text: "#E2E8F0", 
+      accent1: "#3B82F6", 
+      accent2: "#60A5FA", 
+      accent3: "#2563EB", 
+      accent4: "#93C5FD", 
+      accent5: "#1D4ED8", 
+      accent6: "#4B90E2", 
+      accent7: "#BFDBFE", 
+      accent8: "#1E40AF", 
+      accent9: "#DBEAFE", 
+      accent10: "#60A5FA" 
+    } 
+  },
+  { 
+    id: "charcoal-mist", 
+    name: "Charcoal Mist", 
+    category: "dark", 
+    colors: { 
+      bg: "#1E2024", 
+      text: "#E4E7EC", 
+      accent1: "#5E7EB8", 
+      accent2: "#82A0D8", 
+      accent3: "#436098", 
+      accent4: "#B2C6EC", 
+      accent5: "#304877", 
+      accent6: "#7090C8", 
+      accent7: "#C8D7F3", 
+      accent8: "#23375C", 
+      accent9: "#DEE7F8", 
+      accent10: "#4D6B9F" 
+    } 
+  },
+  { 
+    id: "forest-night", 
+    name: "Forest Night", 
+    category: "dark", 
+    colors: { 
+      bg: "#131915", 
+      text: "#E1E8E3", 
+      accent1: "#417855", 
+      accent2: "#5F9874", 
+      accent3: "#2C583D", 
+      accent4: "#A4CBB3", 
+      accent5: "#1E3F2A", 
+      accent6: "#508764", 
+      accent7: "#BDDBC9", 
+      accent8: "#163120", 
+      accent9: "#D7E9DF", 
+      accent10: "#366848" 
+    } 
+  },
+  { 
+    id: "evergreen", 
+    name: "Evergreen", 
+    category: "dark", 
+    colors: { 
+      bg: "#171E1A", 
+      text: "#E3E9E5", 
+      accent1: "#B0923C", 
+      accent2: "#CBB05C", 
+      accent3: "#8D7227", 
+      accent4: "#E4D293", 
+      accent5: "#6B5518", 
+      accent6: "#BDA14D", 
+      accent7: "#EFE2B3", 
+      accent8: "#54410F", 
+      accent9: "#F5ECD0", 
+      accent10: "#997C2D" 
+    } 
+  },
+  { 
+    id: "midnight-blue", 
+    name: "Midnight Blue", 
+    category: "dark", 
+    colors: { 
+      bg: "#121624", 
+      text: "#E1E6F3", 
+      accent1: "#4A6DB5", 
+      accent2: "#6C8FD4", 
+      accent3: "#335293", 
+      accent4: "#A8C0ED", 
+      accent5: "#223A6D", 
+      accent6: "#5B7EC4", 
+      accent7: "#C2D4F4", 
+      accent8: "#182C54", 
+      accent9: "#DCE7FB", 
+      accent10: "#3D5D9E" 
+    } 
+  },
+  { 
+    id: "chocolate-dark", 
+    name: "Chocolate Dark", 
+    category: "dark", 
+    colors: { 
+      bg: "#1C1715", 
+      text: "#EBE4DF", 
+      accent1: "#9E7452", 
+      accent2: "#BC9270", 
+      accent3: "#7D5839", 
+      accent4: "#D8B89E", 
+      accent5: "#5A3D24", 
+      accent6: "#AD8361", 
+      accent7: "#E5CDBA", 
+      accent8: "#452C17", 
+      accent9: "#F0E1D5", 
+      accent10: "#8C6544" 
+    } 
+  },
+  { 
+    id: "slate-stone", 
+    name: "Slate Stone", 
+    category: "dark", 
+    colors: { 
+      bg: "#171B22", 
+      text: "#D8DEE9", 
+      accent1: "#4E7DA6", 
+      accent2: "#6E9CC4", 
+      accent3: "#365D82", 
+      accent4: "#A7C6E4", 
+      accent5: "#254564", 
+      accent6: "#5E8BB5", 
+      accent7: "#C2DAF0", 
+      accent8: "#1B334B", 
+      accent9: "#DCEDFA", 
+      accent10: "#3F6B92" 
+    } 
+  },
+  { 
+    id: "nord-night", 
+    name: "Nord Night", 
+    category: "dark", 
+    colors: { 
+      bg: "#242933", 
+      text: "#D8DEE9", 
+      accent1: "#5E81AC", 
+      accent2: "#81A1C1", 
+      accent3: "#4C698C", 
+      accent4: "#A3BE8C", 
+      accent5: "#B48EAD", 
+      accent6: "#6F91BA", 
+      accent7: "#C2D3E4", 
+      accent8: "#3B5270", 
+      accent9: "#DCE5EE", 
+      accent10: "#506F94" 
+    } 
+  },
+  { 
+    id: "shadow-grey", 
+    name: "Shadow Grey", 
+    category: "dark", 
+    colors: { 
+      bg: "#18181B", 
+      text: "#D4D4D8", 
+      accent1: "#71717A", 
+      accent2: "#A1A1AA", 
+      accent3: "#52525B", 
+      accent4: "#E4E4E7", 
+      accent5: "#3F3F46", 
+      accent6: "#888891", 
+      accent7: "#D1D1D6", 
+      accent8: "#27272A", 
+      accent9: "#F4F4F5", 
+      accent10: "#5E5E66" 
+    } 
+  },
 
-  // AMOLED
-  { id: "amoled-cyber", name: "AMOLED Cyber", category: "amoled", colors: { bg: "#000000", text: "#E5E7EB", accent1: "#FF66B2", accent2: "#4DEEEA", accent3: "#B388FF", accent4: "#7DF9FF", accent5: "#FFC6E5", accent6: "#D8A8FF", accent7: "#A7F6F2", accent8: "#FF9AD0", accent9: "#E5D4FF", accent10: "#BFEFF2" } },
-  { id: "pitch-black-mint", name: "Pitch Black Mint", category: "amoled", colors: { bg: "#000000", text: "#D1FAE5", accent1: "#34D399", accent2: "#6EE7B7", accent3: "#10B981", accent4: "#A7F3D0", accent5: "#065F46", accent6: "#5AD6A5", accent7: "#C9F8E0", accent8: "#0F8A64", accent9: "#E2FFF1", accent10: "#7FE0BF" } },
-  { id: "true-obsidian", name: "True Obsidian", category: "amoled", colors: { bg: "#000000", text: "#9CA3AF", accent1: "#F3F4F6", accent2: "#D1D5DB", accent3: "#6B7280", accent4: "#E5E7EB", accent5: "#374151", accent6: "#BFC5CF", accent7: "#F8F9FA", accent8: "#4B5563", accent9: "#A7AFBC", accent10: "#DDE1E7" } },
-  { id: "midnight-gold", name: "Midnight Gold", category: "amoled", colors: { bg: "#000000", text: "#EAE6DF", accent1: "#E5A93C", accent2: "#F2C66D", accent3: "#C88B1E", accent4: "#FFE3A8", accent5: "#8A5A00", accent6: "#DDA43D", accent7: "#F7D99A", accent8: "#A87110", accent9: "#FFF0CC", accent10: "#734900" } },
-  { id: "eink-slate", name: "Eink Slate", category: "amoled", colors: { bg: "#000000", text: "#CCCCCC", accent1: "#666666", accent2: "#888888", accent3: "#AAAAAA", accent4: "#DDDDDD", accent5: "#444444", accent6: "#777777", accent7: "#BBBBBB", accent8: "#555555", accent9: "#EEEEEE", accent10: "#333333" } },
-  { id: "cosmic-dusk", name: "Cosmic Dusk", category: "amoled", colors: { bg: "#000000", text: "#E0DBEC", accent1: "#A78BFA", accent2: "#C4B5FD", accent3: "#F43F5E", accent4: "#F9A8D4", accent5: "#7C3AED", accent6: "#B29AFB", accent7: "#E4D8FF", accent8: "#E55A78", accent9: "#FFD0E2", accent10: "#5B21B6" } },
-  { id: "black-coral", name: "Black Coral", category: "amoled", colors: { bg: "#000000", text: "#FCE7F3", accent1: "#FB923C", accent2: "#FDBA74", accent3: "#F472B6", accent4: "#FBCFE8", accent5: "#EA580C", accent6: "#FCAB5E", accent7: "#FFD8B2", accent8: "#EC7CBF", accent9: "#FFE4F1", accent10: "#C2410C" } },
-  { id: "onyx-teal", name: "Onyx Teal", category: "amoled", colors: { bg: "#000000", text: "#CCFBFF", accent1: "#2DD4BF", accent2: "#5EEAD4", accent3: "#14B8A6", accent4: "#99F6E4", accent5: "#0F766E", accent6: "#44D8C8", accent7: "#D6FFFA", accent8: "#11897F", accent9: "#7CEFE2", accent10: "#C0FFF7" } },
-  { id: "dark-nebula", name: "Dark Nebula", category: "amoled", colors: { bg: "#000000", text: "#E0E7FF", accent1: "#818CF8", accent2: "#A5B4FC", accent3: "#6366F1", accent4: "#C7D2FE", accent5: "#4338CA", accent6: "#909AF5", accent7: "#DDE4FF", accent8: "#5A56D8", accent9: "#B8C4FF", accent10: "#EEF2FF" } },
-  { id: "mono-minimalist", name: "Mono Minimalist", category: "amoled", colors: { bg: "#000000", text: "#E5E5E5", accent1: "#404040", accent2: "#525252", accent3: "#737373", accent4: "#A3A3A3", accent5: "#D4D4D4", accent6: "#5F5F5F", accent7: "#B8B8B8", accent8: "#8A8A8A", accent9: "#F0F0F0", accent10: "#2B2B2B" } }
+  // AMOLED - Pure black OLED luxury with calibrated, anti-neon accents
+  { 
+    id: "amoled-cyber", 
+    name: "AMOLED Sapphire", 
+    category: "amoled", 
+    colors: { 
+      bg: "#000000", 
+      text: "#E5E7EB", 
+      accent1: "#3B82F6", 
+      accent2: "#60A5FA", 
+      accent3: "#2563EB", 
+      accent4: "#93C5FD", 
+      accent5: "#1D4ED8", 
+      accent6: "#4B90E2", 
+      accent7: "#BFDBFE", 
+      accent8: "#1E40AF", 
+      accent9: "#DBEAFE", 
+      accent10: "#60A5FA" 
+    } 
+  },
+  { 
+    id: "pitch-black-mint", 
+    name: "Pitch Black Mint", 
+    category: "amoled", 
+    colors: { 
+      bg: "#000000", 
+      text: "#E2F4EB", 
+      accent1: "#279668", 
+      accent2: "#45BA8A", 
+      accent3: "#1A744E", 
+      accent4: "#8CD9B6", 
+      accent5: "#105436", 
+      accent6: "#36A879", 
+      accent7: "#B1E8CE", 
+      accent8: "#0C3E28", 
+      accent9: "#D8F5E7", 
+      accent10: "#22835A" 
+    } 
+  },
+  { 
+    id: "true-obsidian", 
+    name: "True Obsidian", 
+    category: "amoled", 
+    colors: { 
+      bg: "#000000", 
+      text: "#D4D4D8", 
+      accent1: "#E4E4E7", 
+      accent2: "#A1A1AA", 
+      accent3: "#71717A", 
+      accent4: "#F4F4F5", 
+      accent5: "#52525B", 
+      accent6: "#BDBDC2", 
+      accent7: "#FFFFFF", 
+      accent8: "#3F3F46", 
+      accent9: "#FAFAFA", 
+      accent10: "#8E8E93" 
+    } 
+  },
+  { 
+    id: "midnight-gold", 
+    name: "Midnight Gold", 
+    category: "amoled", 
+    colors: { 
+      bg: "#000000", 
+      text: "#EBE7DF", 
+      accent1: "#B88B35", 
+      accent2: "#D3A854", 
+      accent3: "#946B20", 
+      accent4: "#E8C985", 
+      accent5: "#6E4D10", 
+      accent6: "#C69B45", 
+      accent7: "#F2DCAB", 
+      accent8: "#543A08", 
+      accent9: "#F9EED4", 
+      accent10: "#9E7628" 
+    } 
+  },
+  { 
+    id: "eink-slate", 
+    name: "Eink Slate", 
+    category: "amoled", 
+    colors: { 
+      bg: "#000000", 
+      text: "#D4D4D4", 
+      accent1: "#737373", 
+      accent2: "#949494", 
+      accent3: "#525252", 
+      accent4: "#CCCCCC", 
+      accent5: "#383838", 
+      accent6: "#858585", 
+      accent7: "#E0E0E0", 
+      accent8: "#262626", 
+      accent9: "#F0F0F0", 
+      accent10: "#606060" 
+    } 
+  },
+  { 
+    id: "cosmic-dusk", 
+    name: "Cosmic Dusk", 
+    category: "amoled", 
+    colors: { 
+      bg: "#000000", 
+      text: "#EDE9F5", 
+      accent1: "#7D68B8", 
+      accent2: "#9B88D4", 
+      accent3: "#A35C78", 
+      accent4: "#CBB6EC", 
+      accent5: "#5A488B", 
+      accent6: "#8C77C6", 
+      accent7: "#DDD0F4", 
+      accent8: "#44346E", 
+      accent9: "#EFE8FA", 
+      accent10: "#6D5A9F" 
+    } 
+  },
+  { 
+    id: "black-coral", 
+    name: "Black Coral", 
+    category: "amoled", 
+    colors: { 
+      bg: "#000000", 
+      text: "#F7ECE9", 
+      accent1: "#BA5B34", 
+      accent2: "#D67750", 
+      accent3: "#984422", 
+      accent4: "#EAB097", 
+      accent5: "#732E14", 
+      accent6: "#C86A42", 
+      accent7: "#F2CCC0", 
+      accent8: "#57200B", 
+      accent9: "#FAEDE9", 
+      accent10: "#A34C27" 
+    } 
+  },
+  { 
+    id: "onyx-teal", 
+    name: "Onyx Teal", 
+    category: "amoled", 
+    colors: { 
+      bg: "#000000", 
+      text: "#E0F2F1", 
+      accent1: "#257E77", 
+      accent2: "#3FA098", 
+      accent3: "#175E58", 
+      accent4: "#7FC3BD", 
+      accent5: "#0F443F", 
+      accent6: "#328F88", 
+      accent7: "#A7DDD8", 
+      accent8: "#0A332F", 
+      accent9: "#D1F0ED", 
+      accent10: "#1E6C66" 
+    } 
+  },
+  { 
+    id: "dark-nebula", 
+    name: "Dark Nebula", 
+    category: "amoled", 
+    colors: { 
+      bg: "#000000", 
+      text: "#E5E7F7", 
+      accent1: "#5B67B7", 
+      accent2: "#7B88D6", 
+      accent3: "#424D94", 
+      accent4: "#B1BAEC", 
+      accent5: "#2E3773", 
+      accent6: "#6A77C7", 
+      accent7: "#CBD1F3", 
+      accent8: "#212859", 
+      accent9: "#E3E7FA", 
+      accent10: "#4D58A0" 
+    } 
+  },
+  { 
+    id: "mono-minimalist", 
+    name: "Mono Minimalist", 
+    category: "amoled", 
+    colors: { 
+      bg: "#000000", 
+      text: "#E5E5E5", 
+      accent1: "#525252", 
+      accent2: "#737373", 
+      accent3: "#3D3D3D", 
+      accent4: "#A3A3A3", 
+      accent5: "#262626", 
+      accent6: "#636363", 
+      accent7: "#BEBEBE", 
+      accent8: "#1A1A1A", 
+      accent9: "#DEDEDE", 
+      accent10: "#454545" 
+    } 
+  }
 ];
-

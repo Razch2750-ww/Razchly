@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { isSameMonth, isSameDay } from 'date-fns';
+import { parseTxDate } from '../utils/dateUtils';
 import { toast } from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 import { sendDeviceNotification, requestNotificationPermission } from '../utils/notification';
@@ -69,12 +70,12 @@ export default function GlobalGoalNotifier() {
     const currentDayStr = new Date().toISOString().slice(0, 10);
 
     const incomeThisMonth = transactions
-      .filter((t) => t.type === "income" && isSameMonth(new Date(t.date), new Date()))
+      .filter((t) => t.type === "income" && isSameMonth(parseTxDate(t.date), new Date()))
       .reduce((sum, t) => sum + t.amount, 0);
 
     const expenseThisMonth = transactions
       .reduce((sum, t) => {
-        if (isSameMonth(new Date(t.date), new Date())) {
+        if (isSameMonth(parseTxDate(t.date), new Date())) {
           if (t.type === "expense") return sum + t.amount;
           if (t.adminFee) return sum + t.adminFee;
         }
@@ -82,12 +83,12 @@ export default function GlobalGoalNotifier() {
       }, 0);
 
     const incomeToday = transactions
-      .filter((t) => t.type === "income" && isSameDay(new Date(t.date), new Date()))
+      .filter((t) => t.type === "income" && isSameDay(parseTxDate(t.date), new Date()))
       .reduce((sum, t) => sum + t.amount, 0);
 
     const expenseToday = transactions
       .reduce((sum, t) => {
-        if (isSameDay(new Date(t.date), new Date())) {
+        if (isSameDay(parseTxDate(t.date), new Date())) {
           if (t.type === "expense") return sum + t.amount;
           if (t.adminFee) return sum + t.adminFee;
         }

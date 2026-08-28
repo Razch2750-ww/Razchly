@@ -37,23 +37,29 @@ export default function ThemeApplicator() {
     }
     
     if (theme.category === 'amoled') {
-      document.documentElement.style.setProperty('--card-bg', '#111111');
-      document.documentElement.style.setProperty('--border-color', '#222222');
-      document.documentElement.style.setProperty('--hover-bg', '#1a1a1a');
-      document.documentElement.style.setProperty('--text-bright', '#ffffff');
-      document.documentElement.style.setProperty('--inner-border', 'rgba(255, 255, 255, 0.05)');
+      document.documentElement.style.setProperty('--card-bg', '#0E0F12');
+      document.documentElement.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.08)');
+      document.documentElement.style.setProperty('--hover-bg', '#16171D');
+      document.documentElement.style.setProperty('--text-bright', '#E8EAEE');
+      document.documentElement.style.setProperty('--inner-border', 'rgba(255, 255, 255, 0.04)');
+      document.documentElement.style.setProperty('--success-color', '#32B484');
+      document.documentElement.style.setProperty('--danger-color', '#E25858');
     } else if (isDark) {
       document.documentElement.style.setProperty('--card-bg', `color-mix(in srgb, ${theme.colors.bg} 92%, white)`);
-      document.documentElement.style.setProperty('--border-color', `color-mix(in srgb, ${theme.colors.bg} 85%, white)`);
-      document.documentElement.style.setProperty('--hover-bg', `color-mix(in srgb, ${theme.colors.bg} 90%, white)`);
-      document.documentElement.style.setProperty('--text-bright', '#ffffff');
-      document.documentElement.style.setProperty('--inner-border', 'rgba(255, 255, 255, 0.06)');
+      document.documentElement.style.setProperty('--border-color', `color-mix(in srgb, ${theme.colors.bg} 87%, white)`);
+      document.documentElement.style.setProperty('--hover-bg', `color-mix(in srgb, ${theme.colors.bg} 88%, white)`);
+      document.documentElement.style.setProperty('--text-bright', `color-mix(in srgb, ${theme.colors.text} 82%, white)`);
+      document.documentElement.style.setProperty('--inner-border', 'rgba(255, 255, 255, 0.05)');
+      document.documentElement.style.setProperty('--success-color', '#34B688');
+      document.documentElement.style.setProperty('--danger-color', '#E25C5C');
     } else {
-      document.documentElement.style.setProperty('--card-bg', `color-mix(in srgb, ${theme.colors.bg} 95%, black)`);
-      document.documentElement.style.setProperty('--border-color', `color-mix(in srgb, ${theme.colors.bg} 90%, black)`);
-      document.documentElement.style.setProperty('--hover-bg', `color-mix(in srgb, ${theme.colors.bg} 92%, black)`);
-      document.documentElement.style.setProperty('--text-bright', '#000000');
-      document.documentElement.style.setProperty('--inner-border', 'rgba(255, 255, 255, 0.35)');
+      document.documentElement.style.setProperty('--card-bg', `color-mix(in srgb, ${theme.colors.bg} 35%, #FFFFFF)`);
+      document.documentElement.style.setProperty('--border-color', `color-mix(in srgb, ${theme.colors.bg} 88%, ${theme.colors.text})`);
+      document.documentElement.style.setProperty('--hover-bg', `color-mix(in srgb, ${theme.colors.bg} 94%, ${theme.colors.text})`);
+      document.documentElement.style.setProperty('--text-bright', `color-mix(in srgb, ${theme.colors.text} 90%, black)`);
+      document.documentElement.style.setProperty('--inner-border', 'rgba(0, 0, 0, 0.04)');
+      document.documentElement.style.setProperty('--success-color', '#26966C');
+      document.documentElement.style.setProperty('--danger-color', '#D94D4D');
     }
   }, [themeId]);
 

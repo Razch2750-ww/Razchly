@@ -148,31 +148,24 @@ export function EmptyState({ icon, title, description, action }: {
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-6 rounded-2xl border border-dashed border-app-border text-center">
-      <div className="w-12 h-12 rounded-2xl bg-app-card border border-app-border flex items-center justify-center text-app-text/50 mb-4">
+    <div className="flex flex-col items-center justify-center py-12 px-6 rounded-xl border border-dashed border-app-border bg-app-card/30 text-center">
+      <div className="w-11 h-11 rounded-lg bg-app-card border border-app-border flex items-center justify-center text-app-text/50 mb-3">
         {icon}
       </div>
-      <p className="font-semibold text-app-text-bright mb-1">{title}</p>
-      {description && <p className="text-app-text/60 text-sm max-w-xs mt-1">{description}</p>}
-      {action && <div className="mt-5">{action}</div>}
+      <p className="font-semibold text-app-text-bright text-sm mb-1">{title}</p>
+      {description && <p className="text-app-text/60 text-xs max-w-xs mt-0.5">{description}</p>}
+      {action && <div className="mt-4">{action}</div>}
     </div>
   );
 }
 
 // ─── KpiCard ──────────────────────────────────────────────────────────────────
 
-const kpiTint: Record<string, string> = {
-  accent:  "from-app-accent1/8",
-  success: "from-app-success/8",
-  danger:  "from-app-danger/6",
-  neutral: "from-app-card",
-};
-
 const kpiIconTint: Record<string, string> = {
-  accent:  "bg-app-accent1/12 text-app-accent1",
-  success: "bg-app-success/12 text-app-success",
-  danger:  "bg-app-danger/10 text-app-danger",
-  neutral: "bg-app-hover text-app-text",
+  accent:  "bg-app-accent1/10 text-app-accent1 border border-app-accent1/20",
+  success: "bg-app-success/10 text-app-success border border-app-success/20",
+  danger:  "bg-app-danger/10 text-app-danger border border-app-danger/20",
+  neutral: "bg-app-card border border-app-border text-app-text",
 };
 
 export function KpiCard({ label, value, sub, icon, onClick, color = "accent" }: {
@@ -188,19 +181,18 @@ export function KpiCard({ label, value, sub, icon, onClick, color = "accent" }: 
       onClick={onClick}
       role={onClick ? "button" : undefined}
       className={[
-        "relative bg-app-card rounded-2xl p-5 border border-app-border overflow-hidden",
-        onClick ? "cursor-pointer hover:border-app-accent1/30 transition-colors" : "",
+        "bg-app-card rounded-xl p-4 md:p-5 border border-app-border transition-colors",
+        onClick ? "cursor-pointer hover:border-app-accent1/40 hover:bg-app-hover/50" : "",
       ].join(" ")}
     >
-      
-      <div className="relative z-10 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-app-text/60 text-xs font-medium mb-2">{label}</p>
-          <p className="text-xl font-semibold text-app-text-bright leading-none">{value}</p>
-          {sub && <div className="mt-1.5 text-xs">{sub}</div>}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-app-text/60 text-xs font-medium mb-1.5">{label}</p>
+          <div className="text-lg md:text-xl font-bold text-app-text-bright font-mono tabular-nums leading-tight">{value}</div>
+          {sub && <div className="mt-1.5 text-xs text-app-text/70">{sub}</div>}
         </div>
         {icon && (
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${kpiIconTint[color]}`}>
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${kpiIconTint[color]}`}>
             {icon}
           </div>
         )}
@@ -208,3 +200,41 @@ export function KpiCard({ label, value, sub, icon, onClick, color = "accent" }: 
     </div>
   );
 }
+
+// ─── SegmentedTabs ────────────────────────────────────────────────────────────
+
+export function SegmentedTabs<T extends string>({
+  options,
+  value,
+  onChange,
+  className = "",
+}: {
+  options: { id: T; label: string; icon?: React.ReactNode }[];
+  value: T;
+  onChange: (val: T) => void;
+  className?: string;
+}) {
+  return (
+    <div className={`inline-flex items-center p-1 bg-app-card border border-app-border rounded-lg gap-1 ${className}`}>
+      {options.map((opt) => {
+        const active = opt.id === value;
+        return (
+          <button
+            key={opt.id}
+            type="button"
+            onClick={() => onChange(opt.id)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+              active
+                ? "bg-app-accent1 text-app-bg shadow-sm font-semibold"
+                : "text-app-text/70 hover:text-app-text-bright hover:bg-app-hover"
+            }`}
+          >
+            {opt.icon && <span className="shrink-0">{opt.icon}</span>}
+            <span>{opt.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
