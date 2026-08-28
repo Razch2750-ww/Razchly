@@ -270,22 +270,6 @@
     border-color: var(--border-color);
   }
 
-  .app-surface {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-  }
-
-  .app-divider-list > * + * {
-    border-top: 1px solid var(--border-color);
-  }
-
-  .app-number {
-    font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.035em;
-  }
-
   .app-action-sheet {
     background: color-mix(in srgb, var(--card-bg) 98%, transparent);
     border: 1px solid var(--border-color);

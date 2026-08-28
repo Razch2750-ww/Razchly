@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeftRight, CalendarCheck, Car, ChevronLeft, Cpu, HandCoins, Home,
@@ -35,19 +35,9 @@ export default function Layout() {
   const setGlobalAddModalOpen = useStore((state) => state.setGlobalAddModalOpen);
   const setGlobalGrabModalOpen = useStore((state) => state.setGlobalGrabModalOpen);
   const { t } = useTranslation();
-  const mainRef = useRef<HTMLElement>(null);
-
-  const visibleNavItems = useMemo(
-    () => NAV_ITEMS.filter((item) => !hiddenTabs.includes(item.path)),
-    [hiddenTabs],
-  );
-
-  const mobileNavItems = useMemo(
-    () => NAV_ITEMS.filter((item) =>
-      ["/", "/transactions", "/investments", "/loans"].includes(item.path) &&
-      !hiddenTabs.includes(item.path)),
-    [hiddenTabs],
-  );
+  const visibleNavItems = NAV_ITEMS.filter((item) => !hiddenTabs.includes(item.path));
+  const mobileNavItems = visibleNavItems.filter((item) =>
+    ["/", "/transactions", "/investments", "/loans"].includes(item.path));
 
   const openAction = (action: "transaction" | "grab" | "scan" | "attendance") => {
     setActionSheetOpen(false);
@@ -112,7 +102,7 @@ export default function Layout() {
         </div>
       </aside>
 
-      <main id="main-content" ref={mainRef} className="relative flex min-w-0 max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto bg-app-bg pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
+      <main id="main-content" className="relative flex min-w-0 max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto bg-app-bg pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
         <motion.div key={location.pathname} initial={reduceMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduceMotion ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }} className="flex min-h-full w-full flex-1 flex-col">
           <Outlet />
         </motion.div>
