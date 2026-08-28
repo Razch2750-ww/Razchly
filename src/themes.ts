@@ -347,22 +347,22 @@ export const themes: ThemeDef[] = [
   },
   { 
     id: "slate-stone", 
-    name: "Slate Stone", 
-    category: "dark", 
-    colors: { 
-      bg: "#171B22", 
-      text: "#D8DEE9", 
-      accent1: "#4E7DA6", 
-      accent2: "#6E9CC4", 
-      accent3: "#365D82", 
-      accent4: "#A7C6E4", 
-      accent5: "#254564", 
-      accent6: "#5E8BB5", 
-      accent7: "#C2DAF0", 
-      accent8: "#1B334B", 
-      accent9: "#DCEDFA", 
-      accent10: "#3F6B92" 
-    } 
+    name: "Kinpaku Slate",
+    category: "dark",
+    colors: {
+      bg: "#0D0E0C",
+      text: "#D8D4CB",
+      accent1: "#C7A55B",
+      accent2: "#D2B66F",
+      accent3: "#A88743",
+      accent4: "#E1CE9C",
+      accent5: "#8B6C32",
+      accent6: "#B9954B",
+      accent7: "#E8D9AF",
+      accent8: "#6F5426",
+      accent9: "#F0E7D2",
+      accent10: "#9E7E3D"
+    }
   },
   { 
     id: "nord-night", 

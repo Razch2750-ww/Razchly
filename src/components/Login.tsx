@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { signInWithPopup, GoogleAuthProvider, signInAnonymously } from 'firebase/auth';
 import { auth } from '../lib/firebase';
-import { Loader2 } from 'lucide-react';
+import { ArrowRight, ChartNoAxesCombined, Layers3, Loader2, ScanLine } from 'lucide-react';
 import { useTranslation } from '../utils/translations';
 
 export default function Login() {
@@ -32,42 +32,66 @@ export default function Login() {
     }
   };
 
-  return (
-    <div className="min-h-[100dvh] bg-app-bg text-app-text flex flex-col items-center justify-center p-6 select-none font-sans">
-      <div className="max-w-sm w-full flex flex-col items-center text-center">
-        <div className="w-14 h-14 mb-6 rounded-xl overflow-hidden border border-app-border bg-app-card flex items-center justify-center shadow-sm">
-          <img src="/icon.svg" alt="Razchly Logo" className="w-9 h-9 object-contain" />
-        </div>
-        
-        <h1 className="text-2xl font-bold text-app-text-bright tracking-tight mb-1">Razchly</h1>
-        <p className="text-app-text/60 text-sm mb-8 leading-relaxed">{t('login.subtitle')}</p>
+  const capabilities = [
+    { icon: Layers3, text: 'Rekening, transaksi, pinjaman, dan target dalam satu tempat' },
+    { icon: ChartNoAxesCombined, text: 'Pantau arus kas dan portofolio dengan angka yang jelas' },
+    { icon: ScanLine, text: 'Catat transaksi lebih cepat dengan pemindai struk' },
+  ];
 
-        <div className="w-full space-y-3">
-          <button 
-            onClick={handleGoogle} 
-            disabled={loading}
-            className="w-full h-11 rounded-lg bg-app-accent1 text-app-bg font-semibold hover:opacity-90 active:scale-[0.99] transition-all flex justify-center items-center gap-2 text-sm shadow-sm disabled:opacity-50"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            <span>{t('login.googleBtn')}</span>
-          </button>
-          
-          <button 
-            onClick={handleAnon}
-            disabled={loading}
-            className="w-full h-11 rounded-lg border border-app-border bg-app-card hover:bg-app-hover text-app-text-bright font-medium active:scale-[0.99] transition-all flex justify-center items-center gap-2 text-sm shadow-sm disabled:opacity-50"
-          >
-            <span>{t('login.guestBtn')}</span>
-          </button>
-        </div>
-        
-        {error && (
-          <div className="mt-6 p-3 rounded-lg bg-app-danger/10 border border-app-danger/20 text-app-danger text-xs leading-relaxed w-full text-left">
-            {error}
+  return (
+    <main className="relative grid min-h-[100dvh] overflow-hidden bg-app-bg text-app-text lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="relative hidden min-h-[100dvh] flex-col justify-between border-r border-app-border p-12 lg:flex xl:p-16">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-app-accent1/10">
+            <img src="/icon.svg" alt="" className="h-7 w-7" />
           </div>
-        )}
-      </div>
-    </div>
+          <span className="text-xl font-semibold tracking-[-0.035em] text-app-text-bright">Razchly</span>
+        </div>
+
+        <div className="max-w-[680px] py-16">
+          <h1 className="max-w-[620px] text-balance text-[clamp(2.8rem,5vw,5.6rem)] font-semibold leading-[0.98] tracking-[-0.04em] text-app-text-bright">
+            Uang Anda, terbaca dengan tenang.
+          </h1>
+          <p className="mt-7 max-w-[52ch] text-base leading-7 text-app-text/64">{t('login.subtitle')}</p>
+        </div>
+
+        <div className="grid max-w-[760px] grid-cols-3 gap-6 border-t border-app-border pt-6">
+          {capabilities.map((item) => (
+            <div key={item.text} className="space-y-3">
+              <item.icon className="h-5 w-5 text-app-accent1" strokeWidth={1.5} />
+              <p className="text-sm leading-6 text-app-text/62">{item.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="flex min-h-[100dvh] items-center justify-center px-5 py-10 sm:px-10 lg:px-14">
+        <div className="w-full max-w-[420px]">
+          <div className="mb-10 flex items-center gap-3 lg:hidden">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-app-accent1/10">
+              <img src="/icon.svg" alt="" className="h-7 w-7" />
+            </div>
+            <span className="text-xl font-semibold tracking-[-0.035em] text-app-text-bright">Razchly</span>
+          </div>
+
+          <h2 className="text-3xl font-semibold tracking-[-0.035em] text-app-text-bright">Masuk ke ruang finansial Anda</h2>
+          <p className="mt-3 max-w-[38ch] text-sm leading-6 text-app-text/60">Gunakan akun Google untuk sinkronisasi, atau masuk sebagai tamu untuk mencoba.</p>
+
+          <div className="mt-8 space-y-3">
+            <button onClick={handleGoogle} disabled={loading} className="group flex h-12 w-full items-center justify-between rounded-xl bg-app-accent1 px-4 text-sm font-semibold text-app-bg disabled:cursor-not-allowed disabled:opacity-50">
+              <span className="flex items-center gap-2.5">{loading && <Loader2 className="h-4 w-4 animate-spin" />} {t('login.googleBtn')}</span>
+              {!loading && <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />}
+            </button>
+            <button onClick={handleAnon} disabled={loading} className="flex h-12 w-full items-center justify-center rounded-xl border border-app-border bg-app-card text-sm font-medium text-app-text-bright hover:bg-app-hover disabled:cursor-not-allowed disabled:opacity-50">
+              {t('login.guestBtn')}
+            </button>
+          </div>
+
+          {error && <div role="alert" className="mt-5 w-full rounded-xl border border-app-danger/25 bg-app-danger/10 p-3 text-left text-xs leading-relaxed text-app-danger">{error}</div>}
+
+          <p className="mt-6 text-xs leading-5 text-app-text/42">Data tamu tersimpan pada sesi perangkat ini. Masuk dengan Google untuk menggunakan akun Anda kembali di perangkat lain.</p>
+        </div>
+      </section>
+    </main>
   );
 }
-

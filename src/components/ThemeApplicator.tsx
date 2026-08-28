@@ -9,11 +9,6 @@ export default function ThemeApplicator() {
   useEffect(() => {
     const theme = themes.find((t) => t.id === themeId) || themes.find(t => t.id === 'slate-stone') || themes[0];
     
-    const color1 = theme.colors.accent1;
-    const color2 = theme.colors.accent2 || color1;
-    const color3 = theme.colors.accent3 || color2;
-    document.documentElement.style.setProperty('--accent-gradient', `linear-gradient(135deg, ${color1}, ${color2}, ${color3})`);
-
     document.documentElement.style.setProperty('--bg-color', theme.colors.bg);
     document.documentElement.style.setProperty('--text-color', theme.colors.text);
     document.documentElement.style.setProperty('--accent1-color', theme.colors.accent1);
@@ -45,10 +40,10 @@ export default function ThemeApplicator() {
       document.documentElement.style.setProperty('--success-color', '#32B484');
       document.documentElement.style.setProperty('--danger-color', '#E25858');
     } else if (isDark) {
-      document.documentElement.style.setProperty('--card-bg', `color-mix(in srgb, ${theme.colors.bg} 92%, white)`);
-      document.documentElement.style.setProperty('--border-color', `color-mix(in srgb, ${theme.colors.bg} 87%, white)`);
-      document.documentElement.style.setProperty('--hover-bg', `color-mix(in srgb, ${theme.colors.bg} 88%, white)`);
-      document.documentElement.style.setProperty('--text-bright', `color-mix(in srgb, ${theme.colors.text} 82%, white)`);
+      document.documentElement.style.setProperty('--card-bg', `color-mix(in srgb, ${theme.colors.bg} 94%, white)`);
+      document.documentElement.style.setProperty('--border-color', `color-mix(in srgb, ${theme.colors.bg} 88%, white)`);
+      document.documentElement.style.setProperty('--hover-bg', `color-mix(in srgb, ${theme.colors.bg} 90%, white)`);
+      document.documentElement.style.setProperty('--text-bright', `color-mix(in srgb, ${theme.colors.text} 88%, white)`);
       document.documentElement.style.setProperty('--inner-border', 'rgba(255, 255, 255, 0.05)');
       document.documentElement.style.setProperty('--success-color', '#34B688');
       document.documentElement.style.setProperty('--danger-color', '#E25C5C');
