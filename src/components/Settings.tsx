@@ -402,9 +402,9 @@ export default function Settings() {
   const getInitials = (name: string) => name.substring(0, 2).toUpperCase() || 'US';
 
   return (
-    <PageShell title={t('settings.title')} subtitle={t('settings.subtitle')}>
+    <PageShell className="route-settings" title={t('settings.title')} subtitle={t('settings.subtitle')}>
 
-      <ScrollReveal className="flex-1 space-y-6 pb-10">
+      <ScrollReveal className="settings-register flex-1 space-y-0 pb-10">
 
         <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden">
 
@@ -427,7 +427,7 @@ export default function Settings() {
               <input type="url" value={photoURL} onChange={e => setPhotoURL(e.target.value)} className="w-full bg-app-bg border border-app-border rounded-lg px-4 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright placeholder-app-text/30" placeholder="https://..." />
             </div>
             <div className="pt-2">
-              <button type="submit" disabled={isUpdatingProfile} className="bg-app-accent1 disabled:opacity-800 disabled:cursor-not-allowed hover:bg-opacity-90 text-app-bg px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
+              <button type="submit" disabled={isUpdatingProfile} className="bg-app-accent1 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 text-app-bg px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
                 {isUpdatingProfile ? t('settings.profil.savingBtn') : t('settings.profil.saveBtn')}
               </button>
             </div>

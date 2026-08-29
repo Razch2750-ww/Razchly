@@ -544,13 +544,13 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       let notifTitle = "";
       const actionStr = editingTransaction ? "diperbarui" : "berhasil dicatat";
       if (type === "income") {
-        notifTitle = editingTransaction ? "Pemasukan Diperbarui 💰" : "Pemasukan Baru 💰";
+        notifTitle = editingTransaction ? "Pemasukan diperbarui" : "Pemasukan baru";
         notifBody = `Pemasukan sebesar Rp ${numAmount.toLocaleString("id-ID")} ${actionStr}.\nKeterangan: ${note || "-"}`;
       } else if (type === "expense") {
-        notifTitle = editingTransaction ? "Pengeluaran Diperbarui 💸" : "Pengeluaran Baru 💸";
+        notifTitle = editingTransaction ? "Pengeluaran diperbarui" : "Pengeluaran baru";
         notifBody = `Pengeluaran sebesar Rp ${numAmount.toLocaleString("id-ID")} ${actionStr}.\nKeterangan: ${note || "-"}`;
       } else if (type === "transfer") {
-        notifTitle = editingTransaction ? "Transfer Diperbarui 🔄" : "Transfer Baru 🔄";
+        notifTitle = editingTransaction ? "Transfer diperbarui" : "Transfer baru";
         notifBody = `Transfer sebesar Rp ${numAmount.toLocaleString("id-ID")} dari ${getAccountName(fromAccountId)} ke ${getAccountName(toAccountId)} ${actionStr}.\nKeterangan: ${note || "-"}`;
       }
       if (notifTitle) {
@@ -1216,7 +1216,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
   return (
     <>
       {!modalOnly && (
-        <div className="transaction-workspace flex h-full w-full flex-1 flex-col overflow-y-auto p-0 text-app-text">
+        <div className="route-transactions transaction-workspace flex h-full w-full flex-1 flex-col overflow-y-auto p-0 text-app-text">
           {/* MOBILE LAYOUT */}
           <div className="transaction-mobile flex min-h-[100dvh] w-full flex-col px-4 pb-32 pt-5 md:hidden">
         {/* Header */}
@@ -2899,7 +2899,6 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                   <>
                     {/* EXECUTIVE SUMMARY CARD */}
                     <div className="p-5 rounded-2xl bg-app-accent1/10 border border-app-accent1/20 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-app-accent1/5 rounded-full blur-xl pointer-events-none" />
                       <p className="text-sm text-app-text-bright font-medium leading-relaxed">
                         {strategyRecommendation.summary}
                       </p>

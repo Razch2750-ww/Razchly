@@ -131,6 +131,12 @@
     @apply font-sans;
   }
 
+  input,
+  textarea,
+  [contenteditable="true"] {
+    caret-color: var(--accent1-color);
+  }
+
   ::selection {
     background: color-mix(in srgb, var(--accent1-color) 35%, transparent);
     color: var(--text-bright);
@@ -151,9 +157,18 @@
     border-radius: 999px;
   }
 
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
   *:focus-visible {
     outline: 2px solid color-mix(in srgb, var(--accent1-color) 74%, white);
     outline-offset: 3px;
+  }
+
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
   
   .font-mono {
@@ -219,14 +234,67 @@
     --card-bg: var(--ledger-paper-raised);
     --border-color: var(--ledger-rule);
     --hover-bg: rgba(22,23,19,.05);
-    --text-color: #3f403a;
+    --text-color: color-mix(in srgb, var(--ledger-ink) 76%, transparent);
     --text-bright: var(--ledger-ink);
-    --accent1-color: #8c6826;
+    --accent1-color: var(--ledger-gold);
     background: var(--ledger-paper);
     border: 1px solid var(--ledger-rule);
     border-bottom: 0;
     border-radius: 18px 18px 0 0;
     color: var(--ledger-ink);
+  }
+
+  .command-trigger {
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 8px;
+    background: rgba(255,255,255,.035);
+  }
+
+  .command-trigger:hover {
+    border-color: rgba(215,182,105,.42);
+    background: rgba(255,255,255,.06);
+  }
+
+  .command-palette {
+    --bg-color: var(--ledger-paper);
+    --card-bg: var(--ledger-paper-raised);
+    --border-color: var(--ledger-rule);
+    --hover-bg: rgba(22,23,19,.05);
+    --text-color: color-mix(in srgb, var(--ledger-ink) 76%, transparent);
+    --text-bright: var(--ledger-ink);
+    --accent1-color: var(--ledger-gold);
+    border: 1px solid rgba(215,182,105,.46);
+    border-radius: 14px;
+    background: var(--ledger-paper-raised);
+    color: var(--ledger-ink);
+    box-shadow: 0 28px 80px rgba(0,0,0,.38);
+  }
+
+  .command-search,
+  .command-footer {
+    border-color: var(--ledger-rule);
+  }
+
+  .command-search {
+    border-bottom: 1px solid var(--ledger-rule);
+  }
+
+  .command-search input:focus {
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .command-result + .command-result {
+    border-top: 1px solid rgba(22,23,19,.09);
+  }
+
+  .command-result:hover,
+  .command-result[data-first-result="true"] {
+    background: rgba(22,23,19,.045);
+  }
+
+  .command-footer {
+    border-top: 1px solid var(--ledger-rule);
   }
 
   .app-nav-item::before {
@@ -268,15 +336,369 @@
   background: var(--bg-color);
 }
 
+.route-workbench {
+  --bg-color: var(--ledger-paper);
+  --card-bg: var(--ledger-paper-raised);
+  --border-color: var(--ledger-rule);
+  --hover-bg: rgba(22,23,19,.05);
+  --text-color: color-mix(in srgb, var(--ledger-ink) 76%, transparent);
+  --text-bright: var(--ledger-ink);
+  --accent1-color: var(--ledger-gold);
+  --success-color: #287658;
+  --danger-color: #b1433e;
+  background: var(--ledger-paper);
+  color: var(--ledger-ink);
+}
+
+.route-workbench .page-shell-header,
+.route-workbench > header:first-child {
+  padding-bottom: 1.35rem;
+  border-bottom: 1px solid var(--ledger-rule);
+}
+
+.route-workbench h1 {
+  font-family: var(--font-ledger);
+  font-weight: 400;
+  letter-spacing: -.028em;
+}
+
+.route-workbench .page-display-title {
+  font-size: clamp(2.35rem, 4vw, 4rem);
+  line-height: .96;
+}
+
+.route-workbench .bg-app-card {
+  box-shadow: none !important;
+}
+
+.route-workbench [class*="backdrop-blur"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.route-workbench [class*="rounded-2xl"],
+.route-workbench [class*="rounded-[18px]"],
+.route-workbench [class*="rounded-[20px]"] {
+  border-radius: 12px !important;
+}
+
+.route-workbench [class*="shadow-xl"],
+.route-workbench [class*="shadow-2xl"],
+.route-workbench [class*="shadow-lg"] {
+  box-shadow: none !important;
+}
+
+.route-workbench .kpi-ledger {
+  border-radius: 0;
+  border-inline: 0;
+  border-top: 0;
+  background: transparent;
+}
+
+.route-workbench .empty-state-ledger {
+  background: transparent;
+}
+
+.route-workbench input:not([type="checkbox"]):not([type="radio"]),
+.route-workbench select,
+.route-workbench textarea {
+  color: var(--text-bright);
+}
+
+.page-shell-header,
+.workbench-hero {
+  position: relative;
+  min-height: 148px;
+  padding-top: 1rem;
+}
+
+.page-shell-header {
+  align-items: flex-end;
+}
+
+.page-heading-copy,
+.workbench-hero-copy {
+  max-width: 780px;
+}
+
+.page-kicker {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  margin-bottom: .85rem;
+  color: color-mix(in srgb, var(--text-color) 72%, transparent);
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.page-kicker span {
+  display: inline-flex;
+  width: 1.7rem;
+  height: 1.7rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--accent1-color) 66%, transparent);
+  color: var(--accent1-color);
+  letter-spacing: 0;
+}
+
+.page-deck,
+.workbench-hero-copy > p:last-child {
+  text-wrap: pretty;
+}
+
+.page-header-actions,
+.workbench-hero-actions {
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--ledger-rule);
+}
+
+.section-ledger-heading svg {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 1.6;
+}
+
+.route-workbench .register-tabs {
+  border-radius: 0;
+}
+
+.route-workbench .kpi-ledger {
+  min-height: 118px;
+  padding-block: 1.25rem;
+}
+
+.route-workbench .kpi-ledger:hover {
+  background: rgba(22,23,19,.025);
+}
+
+.investment-hero-register,
+.attendance-clock,
+.grab-cashflow-ledger,
+.savings-plan-sheet > :last-child,
+.analysis-dropzone,
+.market-tape {
+  --bg-color: var(--ledger-frame);
+  --card-bg: var(--ledger-frame-soft);
+  --border-color: rgba(255,255,255,.13);
+  --hover-bg: rgba(255,255,255,.055);
+  --text-color: rgba(255,255,255,.68);
+  --text-bright: #f4efe5;
+  --accent1-color: var(--ledger-gold);
+  --success-color: #65bb91;
+  --danger-color: #e2726a;
+  background: var(--ledger-frame-soft) !important;
+  color: rgba(255,255,255,.72);
+}
+
+/* Investments: one dark analysis desk followed by a paper holdings register. */
+.investment-register-tabs {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.investment-register-tabs button {
+  flex: none;
+  border-radius: 0 !important;
+  background: transparent !important;
+  white-space: nowrap;
+}
+
+.investment-register-tabs button[class*="bg-app-accent1"] {
+  color: var(--text-bright) !important;
+  box-shadow: inset 0 -2px 0 var(--accent1-color);
+}
+
+.investment-hero-register {
+  min-height: 420px;
+  border-color: rgba(215,182,105,.32) !important;
+  border-radius: 0 !important;
+}
+
+.investment-hero-register [class*="rounded-"] {
+  border-radius: 5px !important;
+}
+
+/* Loans: folios replace the masonry-card wall. */
+.loan-register {
+  gap: 0;
+  border-top: 1px solid var(--ledger-rule);
+  border-left: 1px solid var(--ledger-rule);
+}
+
+.loan-register > * {
+  min-width: 0;
+}
+
+.loan-folio {
+  height: 100%;
+  border-width: 0 1px 1px 0 !important;
+  border-color: var(--ledger-rule) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.loan-folio--payable {
+  box-shadow: inset 3px 0 0 color-mix(in srgb, var(--accent1-color) 72%, transparent) !important;
+}
+
+.loan-folio--receivable,
+.loan-folio--settled {
+  box-shadow: inset 3px 0 0 color-mix(in srgb, var(--success-color) 72%, transparent) !important;
+}
+
+.loan-folio-register {
+  background: transparent;
+  border-radius: 0;
+}
+
+/* Attendance: the active shift is a command surface, history remains paper. */
+.attendance-clock {
+  border-color: rgba(215,182,105,.34) !important;
+  border-radius: 0 !important;
+}
+
+.attendance-clock [class*="rounded-"] {
+  border-radius: 6px !important;
+}
+
+/* Grab: settlement numbers read as one register instead of four cards. */
+.metric-register > *,
+.category-register > * {
+  min-width: 0;
+  border-width: 0 1px 0 0 !important;
+  border-color: var(--ledger-rule) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.metric-register > *:last-child,
+.category-register > *:last-child {
+  border-right-width: 0 !important;
+}
+
+.metric-register > * > .absolute {
+  display: none;
+}
+
+.grab-cashflow-ledger {
+  min-height: 390px;
+  border-color: rgba(215,182,105,.3) !important;
+  border-radius: 0 !important;
+}
+
+/* Savings: editing sheet and goal folios share rules, not progress-track decoration. */
+.savings-plan-sheet > * {
+  min-width: 0;
+}
+
+.savings-plan-sheet > :first-child > div,
+.savings-plan-sheet > :last-child,
+.savings-plan-sheet > :last-child > * {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.savings-plan-sheet > :last-child {
+  background: var(--ledger-frame-soft);
+}
+
+.savings-goal-register > * {
+  min-width: 0;
+  border-width: 0 1px 0 0 !important;
+  border-color: var(--ledger-rule) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.savings-goal-register > *:last-child {
+  border-right-width: 0 !important;
+}
+
+/* Image extraction: a dark intake desk gives the task one unmistakable focus. */
+.analysis-workspace {
+  border-width: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.analysis-dropzone {
+  --border-color: rgba(255,255,255,.18);
+  border-color: rgba(215,182,105,.36) !important;
+  border-radius: 0 !important;
+}
+
+/* Market analysis: price tape and panels use dense terminal geometry without neon. */
+.market-tape {
+  border-color: rgba(215,182,105,.34) !important;
+  border-radius: 0 !important;
+}
+
+.market-search-register {
+  border-inline: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.route-ai-trading .bg-app-card,
+.route-ai-trading [class*="rounded-2xl"],
+.route-ai-trading [class*="rounded-[18px]"] {
+  border-radius: 5px !important;
+}
+
+/* Settings: an indexed configuration document rather than stacked cards. */
+.settings-register {
+  border-top: 1px solid var(--ledger-rule);
+}
+
+.settings-register > section {
+  padding: 1.6rem 0 !important;
+  border-width: 0 0 1px !important;
+  border-color: var(--ledger-rule) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.settings-register > section > button:first-child {
+  min-height: 48px;
+}
+
+.settings-register > section > button:first-child h2 {
+  font-family: var(--font-ledger);
+  font-size: 1.35rem;
+  font-weight: 400;
+  letter-spacing: -.018em !important;
+  text-transform: none !important;
+}
+
+.settings-register > section > button:first-child svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  stroke-width: 1.55;
+}
+
+@media (min-width: 1024px) {
+  .savings-plan-sheet > :last-child {
+    border-left: 1px solid rgba(22,23,19,.3) !important;
+  }
+}
+
 .dashboard-ledger,
 .transaction-workspace {
   --bg-color: var(--ledger-paper);
   --card-bg: var(--ledger-paper-raised);
   --border-color: var(--ledger-rule);
   --hover-bg: rgba(22,23,19,.05);
-  --text-color: #3f403a;
+  --text-color: color-mix(in srgb, var(--ledger-ink) 76%, transparent);
   --text-bright: var(--ledger-ink);
-  --accent1-color: #8c6826;
+  --accent1-color: var(--ledger-gold);
   --success-color: #287658;
   --danger-color: #b1433e;
   background: var(--ledger-paper);
@@ -340,6 +762,37 @@
 
 .statement-add {
   margin: 1.25rem 1.5rem 1.5rem;
+}
+
+.mobile-daybook .daybook-row + .daybook-row {
+  border-top: 1px solid var(--border-color);
+}
+
+.daybook-row:hover {
+  background: var(--hover-bg);
+}
+
+.daybook-empty {
+  border-block: 1px solid var(--border-color);
+}
+
+.dashboard-daybook-table th,
+.dashboard-daybook-table td {
+  padding: .9rem 1.5rem;
+  border-bottom: 1px solid var(--ledger-rule);
+  vertical-align: middle;
+}
+
+.dashboard-daybook-table th {
+  color: rgba(22,23,19,.52);
+  font-size: .66rem;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.dashboard-daybook-table tbody tr:hover {
+  background: rgba(22,23,19,.025);
 }
 
 .dashboard-workbench,
@@ -453,9 +906,9 @@
   --card-bg: var(--ledger-paper-raised);
   --border-color: var(--ledger-rule);
   --hover-bg: rgba(22,23,19,.05);
-  --text-color: #3f403a;
+  --text-color: color-mix(in srgb, var(--ledger-ink) 76%, transparent);
   --text-bright: var(--ledger-ink);
-  --accent1-color: #8c6826;
+  --accent1-color: var(--ledger-gold);
   --success-color: #287658;
   --danger-color: #b1433e;
   border-color: var(--ledger-rule);
@@ -523,7 +976,8 @@
 
 @media (max-width: 767px) {
   .dashboard-ledger,
-  .transaction-workspace {
+  .transaction-workspace,
+  .route-workbench {
     --bg-color: var(--ledger-frame);
     --card-bg: var(--ledger-frame-soft);
     --border-color: rgba(255,255,255,.12);
@@ -535,6 +989,85 @@
     --danger-color: #e06b64;
     background: var(--ledger-frame);
     color: rgba(255,255,255,.7);
+  }
+
+  .route-workbench .page-shell-header,
+  .route-workbench > header:first-child {
+    border-color: rgba(255,255,255,.12);
+  }
+
+  .page-shell-header,
+  .workbench-hero {
+    min-height: 0;
+    padding-top: .35rem;
+  }
+
+  .page-shell-header {
+    align-items: flex-start;
+  }
+
+  .page-kicker {
+    margin-bottom: .65rem;
+    color: rgba(255,255,255,.5);
+  }
+
+  .page-header-actions,
+  .workbench-hero-actions {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .investment-register-tabs {
+    width: 100%;
+  }
+
+  .investment-hero-register,
+  .attendance-clock,
+  .grab-cashflow-ledger,
+  .analysis-dropzone,
+  .market-tape {
+    border-color: rgba(215,182,105,.3) !important;
+  }
+
+  .metric-register > *,
+  .category-register > *,
+  .savings-goal-register > * {
+    border-color: rgba(255,255,255,.12) !important;
+  }
+
+  .metric-register > :nth-child(2),
+  .category-register > :nth-child(2) {
+    border-right-width: 0 !important;
+  }
+
+  .metric-register > :nth-child(-n+2),
+  .category-register > :nth-child(-n+2) {
+    border-bottom-width: 1px !important;
+  }
+
+  .savings-goal-register > * {
+    border-right-width: 0 !important;
+    border-bottom-width: 1px !important;
+  }
+
+  .savings-goal-register > *:last-child {
+    border-bottom-width: 0 !important;
+  }
+
+  .settings-register {
+    border-color: rgba(255,255,255,.12);
+  }
+
+  .settings-register > section {
+    border-color: rgba(255,255,255,.12) !important;
+  }
+
+  .route-workbench .page-display-title {
+    font-size: 2rem;
+  }
+
+  .route-workbench .empty-state-ledger {
+    border-color: rgba(255,255,255,.12);
   }
 
   .mobile-statement {

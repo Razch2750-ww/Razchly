@@ -484,6 +484,7 @@ export default function Attendance() {
 
   return (
     <PageShell
+      className="route-attendance"
       title="Absensi"
       subtitle="Catat dan pantau kehadiran Anda."
       actions={attendanceActions}
@@ -492,7 +493,7 @@ export default function Attendance() {
       <div className="space-y-6 md:space-y-8">
 
         {/* Today's Actions */}
-        <HoverCard className="bg-app-card rounded-2xl border border-app-border p-4 sm:p-5 relative overflow-hidden group transition-colors w-full">
+        <HoverCard className="attendance-clock relative w-full overflow-hidden border border-app-border bg-app-card p-4 transition-colors sm:p-5">
 
           <div className="relative z-10">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3.5 gap-2 pb-3 border-b border-app-border/60">

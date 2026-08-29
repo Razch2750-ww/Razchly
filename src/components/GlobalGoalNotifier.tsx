@@ -5,7 +5,6 @@ import { db } from '../lib/firebase';
 import { isSameMonth, isSameDay } from 'date-fns';
 import { parseTxDate } from '../utils/dateUtils';
 import { toast } from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 import { sendDeviceNotification, requestNotificationPermission } from '../utils/notification';
 import { Transaction } from '../types';
 
@@ -18,7 +17,7 @@ export default function GlobalGoalNotifier() {
     requestNotificationPermission();
   }, []);
 
-  // Sync/celebrate on other tabs via localStorage storage event
+  // Sync notifications across tabs via the storage event.
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
       if (e.newValue) {
@@ -26,12 +25,6 @@ export default function GlobalGoalNotifier() {
           try {
             const { message } = JSON.parse(e.newValue);
             toast.success(message, { duration: 5000 });
-            confetti({
-              particleCount: 150,
-              spread: 80,
-              origin: { y: 0.6 },
-              colors: ['#4ade80', '#3b82f6', '#facc15', '#f43f5e']
-            });
           } catch (err) {
             console.error("Storage event error", err);
           }
@@ -97,18 +90,14 @@ export default function GlobalGoalNotifier() {
 
     const savingsThisMonth = incomeThisMonth - expenseThisMonth;
 
-    let celebrated = false;
-
     // 1. Monthly Savings targets
     if (monthlySavingsTargets && monthlySavingsTargets.length > 0) {
       monthlySavingsTargets.forEach((target, idx) => {
         const key = `celebrated_savings_${currentMonthStr}_layer_${idx}`;
         if (target > 0 && savingsThisMonth >= target && !localStorage.getItem(key)) {
           localStorage.setItem(key, "true");
-          celebrated = true;
-
-          const title = "Target Tabungan Tercapai! 🎉";
-          const message = `Selamat! Target Tabungan Layer ${idx + 1} tercapai! (Rp ${target.toLocaleString('id-ID')})`;
+          const title = "Target tabungan tercapai";
+          const message = `Target tabungan layer ${idx + 1} tercapai sebesar Rp ${target.toLocaleString('id-ID')}.`;
 
           setTimeout(() => {
             toast.success(message, { duration: 5000 });
@@ -133,10 +122,8 @@ export default function GlobalGoalNotifier() {
         const key = `celebrated_income_${currentDayStr}_layer_${idx}`;
         if (target > 0 && incomeToday >= target && !localStorage.getItem(key)) {
           localStorage.setItem(key, "true");
-          celebrated = true;
-
-          const title = "Target Penghasilan Harian Tercapai! 🚀";
-          const message = `Luar Biasa! Penghasilan Harian Layer ${idx + 1} tercapai! (Rp ${target.toLocaleString('id-ID')})`;
+          const title = "Target penghasilan harian tercapai";
+          const message = `Target penghasilan harian layer ${idx + 1} tercapai sebesar Rp ${target.toLocaleString('id-ID')}.`;
 
           setTimeout(() => {
             toast.success(message, { duration: 5000 });
@@ -162,8 +149,8 @@ export default function GlobalGoalNotifier() {
         if (target > 0 && expenseToday > target && !localStorage.getItem(key)) {
           localStorage.setItem(key, "true");
 
-          const title = "Batas Pengeluaran Melebihi Batas! 💸";
-          const message = `Perhatian: Pengeluaran melebihi Batas Layer ${idx + 1}! (Batas: Rp ${target.toLocaleString('id-ID')})`;
+          const title = "Batas pengeluaran terlewati";
+          const message = `Pengeluaran melewati batas layer ${idx + 1} sebesar Rp ${target.toLocaleString('id-ID')}.`;
 
           setTimeout(() => {
             toast.error(message, { duration: 5000 });
@@ -199,7 +186,7 @@ export default function GlobalGoalNotifier() {
             const daysUntilRunOut = Math.max(0, Math.floor(monthlyExpenseBudget / dailySpendingRate) - currentDay);
             const runOutDay = Math.floor(monthlyExpenseBudget / dailySpendingRate);
 
-            const title = "Peringatan Anggaran PWA! ⚠️";
+            const title = "Peringatan anggaran bulanan";
             const message = `Rata-rata belanja Rp ${Math.round(dailySpendingRate).toLocaleString('id-ID')}/hari diproyeksikan menghabiskan Rp ${Math.round(projectedMonthlyExpense).toLocaleString('id-ID')} bulan ini, melebihi anggaran Rp ${monthlyExpenseBudget.toLocaleString('id-ID')}. Sisa dana diproyeksikan habis dalam ${daysUntilRunOut} hari (pada tanggal ${runOutDay}).`;
 
             setTimeout(() => {
@@ -217,15 +204,6 @@ export default function GlobalGoalNotifier() {
           }
         }
       }
-    }
-
-    if (celebrated) {
-      confetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 },
-        colors: ['#4ade80', '#3b82f6', '#facc15', '#f43f5e']
-      });
     }
 
   }, [monthlySavingsTargets, monthlyExpenseBudget, dailyIncomeTargets, dailyExpenseLimits, transactions]);

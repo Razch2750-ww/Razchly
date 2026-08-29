@@ -17,18 +17,23 @@ export default function ThemeApplicator() {
     document.documentElement.style.setProperty('--bg-color', theme.colors.bg);
     document.documentElement.style.setProperty('--text-color', theme.colors.text);
     document.documentElement.style.setProperty('--accent1-color', theme.colors.accent1);
-    if (theme.colors.accent2) document.documentElement.style.setProperty('--accent2-color', theme.colors.accent2);
-    if (theme.colors.accent3) document.documentElement.style.setProperty('--accent3-color', theme.colors.accent3);
-    if (theme.colors.accent4) document.documentElement.style.setProperty('--accent4-color', theme.colors.accent4);
-    if (theme.colors.accent5) document.documentElement.style.setProperty('--accent5-color', theme.colors.accent5);
-    if (theme.colors.accent6) document.documentElement.style.setProperty('--accent6-color', theme.colors.accent6);
-    if (theme.colors.accent7) document.documentElement.style.setProperty('--accent7-color', theme.colors.accent7);
-    if (theme.colors.accent8) document.documentElement.style.setProperty('--accent8-color', theme.colors.accent8);
-    if (theme.colors.accent9) document.documentElement.style.setProperty('--accent9-color', theme.colors.accent9);
-    if (theme.colors.accent10) document.documentElement.style.setProperty('--accent10-color', theme.colors.accent10);
+    (['accent2', 'accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8', 'accent9', 'accent10'] as const).forEach((key) => {
+      document.documentElement.style.setProperty(`--${key}-color`, theme.colors[key] || theme.colors.accent1);
+    });
 
     const isDark = theme.category === 'dark' || theme.category === 'amoled';
+    const isDefaultLedger = theme.id === 'slate-stone';
     document.documentElement.style.setProperty('color-scheme', isDark ? 'dark' : 'light');
+
+    // Keep Obsidian Ledger as the default art direction while allowing the
+    // existing theme picker to recolor the same layout system.
+    document.documentElement.style.setProperty('--ledger-frame', isDefaultLedger ? '#10120F' : (isDark ? theme.colors.bg : '#10120F'));
+    document.documentElement.style.setProperty('--ledger-frame-soft', isDefaultLedger ? '#171915' : (isDark ? `color-mix(in srgb, ${theme.colors.bg} 92%, white)` : '#171915'));
+    document.documentElement.style.setProperty('--ledger-paper', isDefaultLedger ? '#F3EEE3' : theme.colors.bg);
+    document.documentElement.style.setProperty('--ledger-paper-raised', isDefaultLedger ? '#F8F4EA' : (isDark ? `color-mix(in srgb, ${theme.colors.bg} 94%, white)` : `color-mix(in srgb, ${theme.colors.bg} 35%, white)`));
+    document.documentElement.style.setProperty('--ledger-ink', isDefaultLedger ? '#161713' : theme.colors.text);
+    document.documentElement.style.setProperty('--ledger-rule', isDefaultLedger ? 'rgba(22, 23, 19, 0.18)' : `color-mix(in srgb, ${theme.colors.text} 18%, transparent)`);
+    document.documentElement.style.setProperty('--ledger-gold', isDefaultLedger ? '#D7B669' : theme.colors.accent1);
 
     // Update theme-color meta tag for PWA
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
