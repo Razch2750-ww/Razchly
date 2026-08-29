@@ -78,11 +78,11 @@ export default function Login() {
           <p className="mt-3 max-w-[38ch] text-sm leading-6 text-app-text/60">Gunakan akun Google untuk sinkronisasi, atau masuk sebagai tamu untuk mencoba.</p>
 
           <div className="mt-8 space-y-3">
-            <button onClick={handleGoogle} disabled={loading} className="group flex h-12 w-full items-center justify-between rounded-xl bg-app-accent1 px-4 text-sm font-semibold text-app-bg disabled:cursor-not-allowed disabled:opacity-50">
+            <button type="button" onClick={handleGoogle} disabled={loading} className="group flex h-12 w-full items-center justify-between rounded-xl bg-app-accent1 px-4 text-sm font-semibold text-app-bg disabled:cursor-not-allowed disabled:opacity-50">
               <span className="flex items-center gap-2.5">{loading && <Loader2 className="h-4 w-4 animate-spin" />} {t('login.googleBtn')}</span>
               {!loading && <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />}
             </button>
-            <button onClick={handleAnon} disabled={loading} className="flex h-12 w-full items-center justify-center rounded-xl border border-app-border bg-app-card text-sm font-medium text-app-text-bright hover:bg-app-hover disabled:cursor-not-allowed disabled:opacity-50">
+            <button type="button" onClick={handleAnon} disabled={loading} className="flex h-12 w-full items-center justify-center rounded-xl border border-app-border bg-app-card text-sm font-medium text-app-text-bright hover:bg-app-hover disabled:cursor-not-allowed disabled:opacity-50">
               {t('login.guestBtn')}
             </button>
           </div>

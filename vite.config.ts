@@ -20,10 +20,9 @@ export default defineConfig(() => {
           short_name: 'Razchly',
           name: 'Razchly',
           description: 'Catat keuangan dan manajemen transaksi Grab Anda.',
-          theme_color: '#ffffff',
-          background_color: '#ffffff',
+          theme_color: '#0D0E0C',
+          background_color: '#0D0E0C',
           display: 'standalone',
-          orientation: 'portrait',
           icons: [
             {
               src: '/icon.svg',
@@ -41,7 +40,7 @@ export default defineConfig(() => {
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
+      // File watching is disabled there to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},

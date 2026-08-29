@@ -201,10 +201,10 @@ export default function GrabDetails() {
           const e = endOfDay(parseTxDate(customEndDate));
           numDays = Math.max(1, Math.ceil((e.getTime() - s.getTime()) / (1000 * 3600 * 24)));
       }
-      
+
       const endD = filterType === "bulanan" ? endOfMonth(currentDate) : filterType === "custom" ? parseTxDate(customEndDate) : currentDate;
       const startD = filterType === "bulanan" ? startOfMonth(currentDate) : subDays(endD, numDays);
-      
+
       for (let i = 0; i <= numDays; i++) {
         dataMap[format(subDays(endD, numDays - i), "dd MMM")] = 0;
       }
@@ -213,7 +213,7 @@ export default function GrabDetails() {
         if (dataMap[dayStr] !== undefined) dataMap[dayStr] += o.nominalBersih;
       });
     }
-    
+
     return Object.keys(dataMap).map((k) => ({ name: k, amount: dataMap[k] }));
   }, [filteredOrders, filterType, currentDate, customEndDate, customStartDate]);
 
@@ -249,10 +249,10 @@ export default function GrabDetails() {
         </div>
 
         <div className="flex items-center gap-4 hidden md:flex">
-          <button onClick={() => setGlobalGrabModalOpen(true)} className="w-10 h-10 rounded-full bg-app-success hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm" title="Transaksi Grab">
+          <button type="button" onClick={() => setGlobalGrabModalOpen(true)} className="w-10 h-10 rounded-full bg-app-success hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity" title="Transaksi Grab">
             <Car className="w-5 h-5" />
           </button>
-          <button onClick={() => setGlobalAddModalOpen(true)} className="w-10 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm" title="Tambah Transaksi">
+          <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="w-10 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity" title="Tambah Transaksi">
             <Plus className="w-5 h-5" />
           </button>
           <Link to="/settings" className="px-4 h-10 rounded-full bg-app-card flex items-center justify-center text-sm font-semibold text-app-text-bright border border-app-border gap-2 hover:bg-app-hover cursor-pointer transition-colors">
@@ -271,13 +271,13 @@ export default function GrabDetails() {
       {/* Filter */}
       <div className="bg-app-card rounded-xl p-1 flex items-center justify-between mb-6 border border-app-border w-full shrink-0">
         {["hari_ini", "7_hari", "bulanan", "custom"].map((ft) => (
-          <button
+          <button type="button"
             key={ft}
             onClick={() => {
               setFilterType(ft as any);
               setCurrentDate(new Date());
             }}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-colors ${filterType === ft ? "bg-app-accent1 text-app-bg shadow-md" : "bg-transparent text-app-text/60 hover:text-app-text-bright"}`}
+            className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-colors ${filterType === ft ? "bg-app-accent1 text-app-bg" : "bg-transparent text-app-text/60 hover:text-app-text-bright"}`}
           >
             {ft === "hari_ini" ? "Harian" : ft === "7_hari" ? "Mingguan" : ft === "bulanan" ? "Bulanan" : "Custom"}
           </button>
@@ -286,16 +286,16 @@ export default function GrabDetails() {
 
       {/* Date Navigator / Custom Range */}
       {filterType === "custom" ? (
-        <div className="flex items-center gap-2 mb-6 px-2 shrink-0 animate-in zoom-in-95 duration-200">
-          <input 
-            type="date" 
+        <div className="flex items-center gap-2 mb-6 px-2 shrink-0 animate-in fade-in duration-200">
+          <input
+            type="date"
             value={customStartDate}
             onChange={(e) => setCustomStartDate(e.target.value)}
             className="flex-1 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-3 py-2 outline-none focus:border-app-accent1"
           />
           <span className="text-app-text/50">-</span>
-          <input 
-            type="date" 
+          <input
+            type="date"
             value={customEndDate}
             onChange={(e) => setCustomEndDate(e.target.value)}
             className="flex-1 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-3 py-2 outline-none focus:border-app-accent1"
@@ -303,13 +303,13 @@ export default function GrabDetails() {
         </div>
       ) : (
         <div className="flex items-center justify-between mb-6 px-2 shrink-0">
-          <button onClick={handlePrev} className="p-1 hover:bg-app-hover rounded-full transition-colors cursor-pointer">
+          <button type="button" onClick={handlePrev} className="p-1 hover:bg-app-hover rounded-full transition-colors cursor-pointer" aria-label="Periode sebelumnya">
             <ChevronLeft className="w-5 h-5 text-app-accent1" />
           </button>
           <span className="font-semibold text-sm text-app-text-bright">
             {getPeriodText()}
           </span>
-          <button onClick={handleNext} className="p-1 hover:bg-app-hover rounded-full transition-colors cursor-pointer">
+          <button type="button" onClick={handleNext} className="p-1 hover:bg-app-hover rounded-full transition-colors cursor-pointer" aria-label="Periode berikutnya">
             <ChevronRight className="w-5 h-5 text-app-accent1" />
           </button>
         </div>
@@ -318,12 +318,12 @@ export default function GrabDetails() {
       {/* STATS OVERVIEW */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
         {/* TOTAL PENDAPATAN */}
-        <HoverCard className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col justify-center relative overflow-hidden w-full">
-             
+        <HoverCard className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col justify-center relative overflow-hidden w-full">
+
              <div className="absolute top-0 right-0 p-4 opacity-10">
                <TrendingUp className="w-16 h-16 text-app-success" />
              </div>
-             <p className="text-app-text/70 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
+             <p className="text-app-text/70 text-xs md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
                 Total Pendapatan
              </p>
              <h3 className="text-xl md:text-3xl font-semibold text-app-text-bright relative z-10 font-mono">
@@ -332,12 +332,12 @@ export default function GrabDetails() {
         </HoverCard>
 
         {/* TOTAL ORDERAN */}
-        <HoverCard className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col justify-center relative overflow-hidden w-full">
-             
+        <HoverCard className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col justify-center relative overflow-hidden w-full">
+
              <div className="absolute top-0 right-0 p-4 opacity-10">
                <Receipt className="w-16 h-16 text-blue-500" />
              </div>
-             <p className="text-app-text/70 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
+             <p className="text-app-text/70 text-xs md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
                 Total Orderan
              </p>
              <h3 className="text-xl md:text-3xl font-semibold text-app-text-bright relative z-10 font-mono">
@@ -346,12 +346,12 @@ export default function GrabDetails() {
         </HoverCard>
 
         {/* TOTAL HEMAT */}
-        <HoverCard className="bg-app-card border border-app-border rounded-2xl p-6 shadow-xs flex flex-col justify-center relative overflow-hidden w-full">
-             
+        <HoverCard className="bg-app-card border border-app-border rounded-2xl p-6 flex flex-col justify-center relative overflow-hidden w-full">
+
             <div className="absolute top-0 right-0 p-4 opacity-10">
                <Tags className="w-16 h-16 text-app-accent1" />
              </div>
-            <p className="text-app-text/70 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
+            <p className="text-app-text/70 text-xs md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
               Total Order Hemat
             </p>
             <h3 className="text-xl md:text-3xl font-semibold text-app-text-bright relative z-10 font-mono">
@@ -360,12 +360,12 @@ export default function GrabDetails() {
         </HoverCard>
 
         {/* NOMINAL POTONGAN HEMAT */}
-        <HoverCard className="bg-app-card border border-app-danger/30 rounded-2xl p-6 shadow-xs flex flex-col justify-center relative overflow-hidden w-full">
-             
+        <HoverCard className="bg-app-card border border-app-danger/30 rounded-2xl p-6 flex flex-col justify-center relative overflow-hidden w-full">
+
              <div className="absolute top-0 right-0 p-4 opacity-5">
                <PiggyBank className="w-16 h-16 text-app-danger" />
              </div>
-             <p className="text-app-danger/80 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
+             <p className="text-app-danger/80 text-xs md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
                 Nominal Potongan Hemat
              </p>
              <h3 className="text-xl md:text-3xl font-semibold text-app-danger relative z-10 font-mono">
@@ -380,12 +380,12 @@ export default function GrabDetails() {
       </h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {categoryStats.map((cat) => (
-          <div key={cat.label} className="bg-app-card border border-app-border rounded-2xl p-4 shadow-xs flex flex-col items-center text-center hover:border-app-accent1/50 transition-colors relative overflow-hidden">
-            
+          <div key={cat.label} className="bg-app-card border border-app-border rounded-2xl p-4 flex flex-col items-center text-center hover:border-app-accent1/50 transition-colors relative overflow-hidden">
+
             <div className="relative z-10 w-full">
               <p className="text-app-text/70 text-xs font-semibold uppercase tracking-wider mb-2">{cat.label}</p>
               <h4 className="text-app-success font-semibold mb-1">Rp {cat.total.toLocaleString("id-ID")}</h4>
-              <p className="text-[10px] text-app-text/50">{cat.count} Orderan</p>
+              <p className="text-xs text-app-text/50">{cat.count} Orderan</p>
             </div>
           </div>
         ))}
@@ -397,20 +397,14 @@ export default function GrabDetails() {
       </div>
 
       {/* GRAFIK PENDAPATAN */}
-      <div className="bg-app-card border border-app-border rounded-2xl p-6 shadow-xs mb-8 relative overflow-hidden">
-        
+      <div className="bg-app-card border border-app-border rounded-2xl p-6 mb-8 relative overflow-hidden">
+
         <h3 className="text-lg font-semibold text-app-text-bright mb-6 flex items-center gap-2 relative z-10">
           <LineChartIcon className="w-5 h-5 text-app-accent1" /> Grafik Pendapatan
         </h3>
         <div className="h-[300px] w-full relative z-10">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <defs>
-                   <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                     <stop offset="5%" stopColor="var(--color-app-success)" stopOpacity={0.3}/>
-                     <stop offset="95%" stopColor="var(--color-app-success)" stopOpacity={0}/>
-                   </linearGradient>
-                </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
                   stroke="var(--color-app-border)"
@@ -419,14 +413,14 @@ export default function GrabDetails() {
                 <XAxis
                   dataKey="name"
                   stroke="var(--color-app-text)"
-                  fontSize={10}
+                  fontSize={11}
                   tickLine={false}
                   axisLine={false}
                   opacity={0.5}
                 />
                 <YAxis
                   stroke="var(--color-app-text)"
-                  fontSize={10}
+                  fontSize={11}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(val) => `Rp ${(val / 1000)}k`}
@@ -462,4 +456,3 @@ export default function GrabDetails() {
     </div>
   );
 }
-

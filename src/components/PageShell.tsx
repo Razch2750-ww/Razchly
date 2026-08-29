@@ -122,13 +122,13 @@ export function ActionBtn({
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const hasLabel = !!children;
   return (
-    <button
+    <button type="button"
       {...rest}
       className={[
         "inline-flex items-center justify-center gap-1.5 rounded-xl font-medium text-sm transition-colors",
         "disabled:opacity-50 disabled:cursor-not-allowed",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-accent1/50",
-        hasLabel ? "h-9 px-4" : "h-9 w-9",
+        hasLabel ? "h-11 px-4" : "h-11 w-11",
         variantCls[variant],
         className,
       ].join(" ")}
@@ -180,6 +180,12 @@ export function KpiCard({ label, value, sub, icon, onClick, color = "accent" }: 
     <div
       onClick={onClick}
       role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={(event) => {
+        if (!onClick || (event.key !== "Enter" && event.key !== " ")) return;
+        event.preventDefault();
+        onClick();
+      }}
       className={[
         "bg-app-card rounded-xl p-4 md:p-5 border border-app-border transition-colors",
         onClick ? "cursor-pointer hover:border-app-accent1/40 hover:bg-app-hover/50" : "",
@@ -223,9 +229,10 @@ export function SegmentedTabs<T extends string>({
             key={opt.id}
             type="button"
             onClick={() => onChange(opt.id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+            aria-pressed={active}
+            className={`flex min-h-11 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition-colors ${
               active
-                ? "bg-app-accent1 text-app-bg shadow-sm font-semibold"
+                ? "bg-app-accent1 text-app-bg font-semibold"
                 : "text-app-text/70 hover:text-app-text-bright hover:bg-app-hover"
             }`}
           >
@@ -237,4 +244,3 @@ export function SegmentedTabs<T extends string>({
     </div>
   );
 }
-

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
 import { Percent, TrendingUp, Calendar, ArrowRight, Play, RefreshCw, Wallet } from 'lucide-react';
 import { Account, Transaction } from '../types';
 import { calculateInterestMetrics, processInterestForAccount } from '../utils/interestUtils';
@@ -70,7 +69,7 @@ export default function InterestCard({
 
   if (interestAccounts.length === 0) {
     return (
-      <div 
+      <div
         onClick={onOpenModal}
         className="p-5 rounded-2xl bg-app-card border border-app-border flex flex-col justify-between hover:border-app-accent1/30 transition-all cursor-pointer group relative overflow-hidden"
       >
@@ -95,7 +94,7 @@ export default function InterestCard({
   }
 
   return (
-    <div className="p-5 rounded-2xl bg-app-card border border-app-border flex flex-col justify-between shadow-xs relative overflow-hidden">
+    <div className="p-5 rounded-2xl bg-app-card border border-app-border flex flex-col justify-between relative overflow-hidden">
       {/* Top Header Bar */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
@@ -105,7 +104,7 @@ export default function InterestCard({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-bold text-app-text-bright">Bunga Rekening Otomatis</h3>
-              <span className="px-2 py-0.5 rounded-full bg-app-success/15 text-app-success text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-app-success/15 text-app-success text-xs font-bold">
                 {interestAccounts.length} Rekening
               </span>
             </div>
@@ -114,9 +113,8 @@ export default function InterestCard({
         </div>
 
         <div className="flex items-center gap-2">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button
+            type="button"
             onClick={handleProcessToday}
             disabled={isProcessing}
             className="flex items-center gap-1.5 bg-app-accent1 text-app-bg px-3 py-1.5 rounded-xl text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
@@ -128,12 +126,13 @@ export default function InterestCard({
               <Play className="w-3 h-3 fill-current" />
             )}
             <span className="hidden sm:inline">{isProcessing ? 'Memproses...' : 'Proses Hari Ini'}</span>
-          </motion.button>
+          </button>
 
-          <button
+          <button type="button"
             onClick={onOpenModal}
             className="p-1.5 text-app-text/60 hover:text-app-accent1 hover:bg-app-hover rounded-xl transition-colors cursor-pointer"
             title="Lihat Detail Bunga"
+            aria-label="Lihat detail bunga"
           >
             <ArrowRight className="w-4 h-4" />
           </button>
@@ -143,7 +142,7 @@ export default function InterestCard({
       {/* 4 Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-3">
         <div className="p-3 rounded-xl bg-app-bg border border-app-border">
-          <div className="flex items-center gap-1 text-[10px] uppercase font-semibold text-app-text/60 mb-0.5">
+          <div className="flex items-center gap-1 text-xs uppercase font-semibold text-app-text/60 mb-0.5">
             <Calendar className="w-3 h-3 text-app-accent1" />
             <span>Hari Ini</span>
           </div>
@@ -153,7 +152,7 @@ export default function InterestCard({
         </div>
 
         <div className="p-3 rounded-xl bg-app-bg border border-app-border">
-          <div className="flex items-center gap-1 text-[10px] uppercase font-semibold text-app-text/60 mb-0.5">
+          <div className="flex items-center gap-1 text-xs uppercase font-semibold text-app-text/60 mb-0.5">
             <TrendingUp className="w-3 h-3 text-app-accent1" />
             <span>Bulan Ini</span>
           </div>
@@ -163,7 +162,7 @@ export default function InterestCard({
         </div>
 
         <div className="p-3 rounded-xl bg-app-bg border border-app-border">
-          <div className="flex items-center gap-1 text-[10px] uppercase font-semibold text-app-text/60 mb-0.5">
+          <div className="flex items-center gap-1 text-xs uppercase font-semibold text-app-text/60 mb-0.5">
             <Percent className="w-3 h-3 text-app-accent1" />
             <span>Tahun Ini</span>
           </div>
@@ -173,7 +172,7 @@ export default function InterestCard({
         </div>
 
         <div className="p-3 rounded-xl bg-app-bg border border-app-border">
-          <div className="flex items-center gap-1 text-[10px] uppercase font-semibold text-app-text/60 mb-0.5">
+          <div className="flex items-center gap-1 text-xs uppercase font-semibold text-app-text/60 mb-0.5">
             <Wallet className="w-3 h-3 text-app-accent1" />
             <span>Saldo + Bunga</span>
           </div>
@@ -184,7 +183,7 @@ export default function InterestCard({
       </div>
 
       {/* Account badges preview */}
-      <div 
+      <div
         onClick={onOpenModal}
         className="flex items-center justify-between text-[11px] text-app-text/60 bg-app-bg/60 p-2.5 rounded-xl border border-app-border hover:border-app-accent1/30 transition-colors cursor-pointer"
       >

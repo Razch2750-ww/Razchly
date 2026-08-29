@@ -1,20 +1,20 @@
 import React from 'react';
-import { 
-  Utensils, 
-  Car, 
-  Home, 
-  ShoppingBag, 
-  Zap, 
-  TrendingDown, 
-  Popcorn, 
-  Gift, 
-  Plus, 
-  Briefcase, 
-  TrendingUp, 
-  DollarSign, 
-  Heart, 
-  Monitor, 
-  Music, 
+import {
+  Utensils,
+  Car,
+  Home,
+  ShoppingBag,
+  Zap,
+  TrendingDown,
+  Popcorn,
+  Gift,
+  Plus,
+  Briefcase,
+  TrendingUp,
+  DollarSign,
+  Heart,
+  Monitor,
+  Music,
   CreditCard,
   Wifi,
   Bus,
@@ -83,7 +83,7 @@ export const CATEGORY_ICONS = [
 
 export const getCategoryIconDetails = (iconId?: string) => {
   if (!iconId) return { icon: DollarSign, name: 'Default', id: 'dollar-sign' };
-  
+
   const found = CATEGORY_ICONS.find(icon => icon.id === iconId);
   return found || { icon: DollarSign, name: 'Default', id: 'dollar-sign' };
 };
@@ -91,6 +91,6 @@ export const getCategoryIconDetails = (iconId?: string) => {
 export const CategoryIcon = ({ iconId, className }: { iconId?: string, className?: string }) => {
   const iconInfo = getCategoryIconDetails(iconId);
   const IconComponent = iconInfo.icon;
-  
+
   return <IconComponent className={className} />;
 };

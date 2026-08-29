@@ -153,8 +153,8 @@ export default function Dashboard() {
   }, [investments]);
 
   const totalInvestmentReturn = totalInvestmentValue - totalInvestmentCapital;
-  const totalInvestmentReturnPercent = totalInvestmentCapital > 0 
-    ? (totalInvestmentReturn / totalInvestmentCapital) * 100 
+  const totalInvestmentReturnPercent = totalInvestmentCapital > 0
+    ? (totalInvestmentReturn / totalInvestmentCapital) * 100
     : 0;
 
   const accountPieData = useMemo(() => {
@@ -324,7 +324,7 @@ export default function Dashboard() {
     } else if (options?.showSign) {
       sign = value >= 0 ? "+" : "-";
     }
-    
+
     const formattedVal = Math.abs(value).toLocaleString("id-ID");
     const rpStr = options?.noRp ? "" : "Rp ";
     if (value < 0 && !options?.showSign && !options?.forceSign) {
@@ -353,7 +353,7 @@ export default function Dashboard() {
   const incomeThisMonth = recentTransactions
     .filter((t) => t.type === "income" && isSameMonth(parseTxDate(t.date), new Date()))
     .reduce((sum, t) => sum + t.amount, 0);
-    
+
   const expenseThisMonth = recentTransactions
     .reduce((sum, t) => {
       if (isSameMonth(parseTxDate(t.date), new Date())) {
@@ -362,7 +362,7 @@ export default function Dashboard() {
       }
       return sum;
     }, 0);
-    
+
   const savingsThisMonth = incomeThisMonth - expenseThisMonth;
   const savingsTargets = useStore((state) => state.monthlySavingsTargets);
   const savingsTarget = savingsTargets && savingsTargets.length > 0 ? Math.max(...savingsTargets) : 0;
@@ -408,8 +408,8 @@ export default function Dashboard() {
   // Chart data generation
   const chartData = useMemo(() => {
     const data = [];
-    const filteredTransactions = selectedChartAccount === "all" 
-      ? recentTransactions 
+    const filteredTransactions = selectedChartAccount === "all"
+      ? recentTransactions
       : recentTransactions.filter(t => t.accountId === selectedChartAccount);
 
     if (chartPeriod === 0) {
@@ -495,10 +495,6 @@ export default function Dashboard() {
             <h1 className="text-[32px] leading-[1.1] font-semibold text-app-text-bright tracking-[-0.022em]">
               <TextReveal key={`${user?.displayName}-${getGreeting()}`} text={`${getGreeting()}, ${user?.displayName || "USER"}`} />
             </h1>
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${financialHealthStatus.bg} ${financialHealthStatus.color}`}>
-              <ShieldCheck className="w-3.5 h-3.5" />
-              {financialHealthStatus.label}
-            </span>
           </div>
           <p className="text-app-text/60 text-[15px] font-normal tracking-[-0.02em]">
             {format(new Date(), "EEEE, d MMMM yyyy", { locale: localeId })} — Ringkasan aktivitas & kesehatan keuangan Anda
@@ -506,17 +502,17 @@ export default function Dashboard() {
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <button
+          <button type="button"
             onClick={() => setGlobalGrabModalOpen(true)}
-            className="flex items-center gap-2 h-10 px-4 rounded-2xl bg-app-card border border-app-border hover:bg-app-hover text-app-text-bright text-xs font-semibold transition-all shadow-sm active:scale-95"
+            className="flex h-11 items-center gap-2 rounded-xl border border-app-border bg-app-card px-4 text-xs font-semibold text-app-text-bright hover:bg-app-hover"
             title="Transaksi Grab"
           >
-            <Car className="w-4 h-4 text-emerald-400" />
+            <Car className="w-4 h-4 text-app-success" />
             Catat Grab
           </button>
-          <button
+          <button type="button"
             onClick={() => setGlobalAddModalOpen(true)}
-            className="flex items-center gap-2 h-10 px-5 rounded-2xl bg-app-accent1 hover:opacity-90 active:scale-95 text-app-bg text-xs font-bold transition-all shadow-sm"
+            className="flex h-11 items-center gap-2 rounded-xl bg-app-accent1 px-5 text-xs font-semibold text-app-bg hover:opacity-90"
             title="Tambah Transaksi"
           >
             <Plus className="w-4 h-4" />
@@ -525,7 +521,7 @@ export default function Dashboard() {
           <Link
             to="/settings"
             state={{ expandSection: 'profile' }}
-            className="flex items-center gap-2.5 h-10 px-3.5 rounded-2xl bg-app-card border border-app-border text-xs font-semibold text-app-text-bright hover:bg-app-hover transition-colors cursor-pointer"
+            className="flex h-11 items-center gap-2.5 rounded-xl border border-app-border bg-app-card px-3.5 text-xs font-semibold text-app-text-bright hover:bg-app-hover"
           >
             <div className="w-6 h-6 rounded-full bg-app-accent1 text-[11px] font-bold flex items-center justify-center text-app-bg overflow-hidden">
               {user?.photoURL ? (
@@ -545,7 +541,8 @@ export default function Dashboard() {
           <Link
             to="/settings"
             state={{ expandSection: 'profile' }}
-            className="w-10 h-10 rounded-2xl bg-app-card border border-app-border flex items-center justify-center shrink-0 shadow-sm overflow-hidden active:scale-95 transition-all"
+            className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-app-border bg-app-card"
+            aria-label="Buka pengaturan profil"
           >
             {user?.photoURL ? (
               <img src={user.photoURL} alt="avatar" className="w-full h-full object-cover" />
@@ -569,39 +566,39 @@ export default function Dashboard() {
       </header>
 
       {/* QUICK SHORTCUTS RIBBON (ALL DEVICES) */}
-      <ScrollReveal className="mb-5">
+      <ScrollReveal className="mb-5 md:hidden">
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-          <button
+          <button type="button"
             onClick={() => setGlobalAddModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-app-card border border-app-border text-app-text-bright hover:bg-app-hover hover:border-app-accent1/30 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
+            className="flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-app-border bg-app-card px-3 text-xs font-semibold text-app-text-bright hover:border-app-accent1/30 hover:bg-app-hover"
           >
             <Plus className="w-3.5 h-3.5 text-app-accent1" />
             <span>Pemasukan / Pengeluaran</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => setGlobalGrabModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-app-card border border-app-border text-app-text-bright hover:bg-app-hover hover:border-app-success/30 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
+            className="flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-app-border bg-app-card px-3 text-xs font-semibold text-app-text-bright hover:border-app-success/30 hover:bg-app-hover"
           >
             <Car className="w-3.5 h-3.5 text-app-success" />
             <span>Usaha Grab</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => navigate('/savings')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-app-card border border-app-border text-app-text-bright hover:bg-app-hover hover:border-app-accent1/30 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
+            className="flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-app-border bg-app-card px-3 text-xs font-semibold text-app-text-bright hover:border-app-accent1/30 hover:bg-app-hover"
           >
             <PiggyBank className="w-3.5 h-3.5 text-app-accent1" />
             <span>Tabungan</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => navigate('/loans')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-app-card border border-app-border text-app-text-bright hover:bg-app-hover hover:border-app-warning/30 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
+            className="flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-app-border bg-app-card px-3 text-xs font-semibold text-app-text-bright hover:border-app-warning/30 hover:bg-app-hover"
           >
             <HandCoins className="w-3.5 h-3.5 text-app-warning" />
             <span>Hutang & Piutang</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => navigate('/analyze')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-app-card border border-app-border text-app-text-bright hover:bg-app-hover hover:border-app-accent1/30 transition-all text-xs font-semibold whitespace-nowrap shrink-0 active:scale-95"
+            className="flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-app-border bg-app-card px-3 text-xs font-semibold text-app-text-bright hover:border-app-accent1/30 hover:bg-app-hover"
           >
             <Sparkles className="w-3.5 h-3.5 text-app-accent1" />
             <span>Scan AI</span>
@@ -609,359 +606,194 @@ export default function Dashboard() {
         </div>
       </ScrollReveal>
 
-      {/* MOBILE TOTAL SALDO WIDGET */}
-      <ScrollReveal className="md:hidden mb-5">
-        <HoverCard 
-          onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
-          className="bg-app-card border border-app-border rounded-2xl p-4 sm:p-5 relative overflow-hidden text-app-text shadow-sm cursor-pointer"
-        >
-          <div className="flex justify-between items-start relative z-10 mb-3">
-              <div className="min-w-0 pr-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-7 h-7 rounded-lg bg-app-accent1/15 flex items-center justify-center shrink-0">
-                    <Wallet className="w-4 h-4 text-app-accent1" />
-                  </div>
-                  <p className="text-app-text/70 text-xs font-semibold">Total Saldo</p>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${financialHealthStatus.bg} ${financialHealthStatus.color}`}>
-                    {financialHealthStatus.label}
-                  </span>
-                </div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-app-text-bright break-words tracking-tight leading-tight my-1 font-mono">
-                  {formatRp(totalBalance)}
-                </h2>
-                <p className="text-app-text/50 text-[11px] font-medium">
-                  {accounts.length} {t('dashboard.allWallets')} · {format(new Date(), "MMMM yyyy", { locale: localeId })}
-                </p>
-             </div>
-             <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleHideBalances();
-                }}
-                className="p-2 rounded-xl bg-app-bg border border-app-border/60 text-app-text/60 hover:text-app-text-bright transition-colors shrink-0"
-                title={hideBalances ? (language === 'en' ? "Show Balances" : "Tampilkan Saldo") : (language === 'en' ? "Hide Balances" : "Sembunyikan Saldo")}
-             >
-                {hideBalances ? (
-                  <EyeOff className="w-4 h-4 text-app-accent1" />
-                ) : (
-                  <Eye className="w-4 h-4 text-app-text/70" />
-                )}
-             </button>
+      {/* MOBILE LEDGER */}
+      <section className="mb-7 border-y border-app-border py-5 md:hidden">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Wallet className="h-4 w-4 text-app-accent1" strokeWidth={1.7} />
+            <h2 className="text-sm font-semibold text-app-text-bright">{t('dashboard.totalBalance')}</h2>
           </div>
+          <button
+            type="button"
+            onClick={toggleHideBalances}
+            className="flex h-11 w-11 items-center justify-center rounded-xl text-app-text/60 hover:bg-app-hover hover:text-app-text-bright"
+            aria-label={hideBalances ? (language === 'en' ? "Show balances" : "Tampilkan saldo") : (language === 'en' ? "Hide balances" : "Sembunyikan saldo")}
+          >
+            {hideBalances ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
+        </div>
+        <p className="break-words font-mono text-[30px] font-semibold leading-tight tracking-[-0.035em] text-app-text-bright">
+          {formatRp(totalBalance)}
+        </p>
+        <div className="mt-2 flex items-center justify-between gap-3 text-xs">
+          <span className="text-app-text/55">{accounts.length} {t('dashboard.allWallets')} · {format(new Date(), "MMMM yyyy", { locale: localeId })}</span>
+          <span className={`shrink-0 font-medium ${financialHealthStatus.color}`}>{financialHealthStatus.label}</span>
+        </div>
 
-          {/* Today & Monthly Cash Flow Box */}
-          <div className="p-3 rounded-xl bg-app-bg/80 border border-app-border/50 relative z-10 space-y-2.5">
-            {/* Today Cash Flow (2 columns so labels and values never truncate) */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-app-card p-2.5 rounded-lg border border-app-border/40">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-app-success shrink-0" />
-                  <span className="text-app-text/60 text-[10px] sm:text-[11px] font-medium whitespace-nowrap">{t('dashboard.incomeToday')}</span>
-                </div>
-                <p className="text-app-success font-bold font-mono text-xs">{formatRp(incomeToday, { forceSign: "+" })}</p>
-              </div>
-
-              <div className="bg-app-card p-2.5 rounded-lg border border-app-border/40">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-app-danger shrink-0" />
-                  <span className="text-app-text/60 text-[10px] sm:text-[11px] font-medium whitespace-nowrap">{t('dashboard.expenseToday')}</span>
-                </div>
-                <p className="text-app-danger font-bold font-mono text-xs">{formatRp(expenseToday, { forceSign: "-" })}</p>
-              </div>
-            </div>
-
-            {/* Monthly Summary */}
-            <div className="pt-2 border-t border-app-border/40 grid grid-cols-3 gap-1 text-center">
-              <div>
-                <p className="text-app-text/50 text-[10px] font-medium whitespace-nowrap">{language === 'en' ? 'Income' : 'Masuk (Bln)'}</p>
-                <p className="text-app-success font-semibold font-mono text-[11px] mt-0.5 leading-tight">{formatRp(incomeThisMonth)}</p>
-              </div>
-              <div>
-                <p className="text-app-text/50 text-[10px] font-medium whitespace-nowrap">{language === 'en' ? 'Expense' : 'Keluar (Bln)'}</p>
-                <p className="text-app-danger font-semibold font-mono text-[11px] mt-0.5 leading-tight">{formatRp(expenseThisMonth)}</p>
-              </div>
-              <div>
-                <p className="text-app-text/50 text-[10px] font-medium whitespace-nowrap">Net (Bln)</p>
-                <p className={`font-semibold font-mono text-[11px] mt-0.5 leading-tight ${savingsThisMonth >= 0 ? 'text-app-accent1' : 'text-app-danger'}`}>{formatRp(savingsThisMonth, { showSign: true })}</p>
-              </div>
-            </div>
+        <dl className="mt-5 grid grid-cols-3 divide-x divide-app-border border-t border-app-border pt-4">
+          <div className="pr-3">
+            <dt className="text-xs text-app-text/50">{language === 'en' ? 'Income' : 'Masuk'}</dt>
+            <dd className="mt-1 font-mono text-sm font-semibold text-app-success">{formatRp(incomeThisMonth)}</dd>
           </div>
-        </HoverCard>
-      </ScrollReveal>
+          <div className="px-3">
+            <dt className="text-xs text-app-text/50">{language === 'en' ? 'Expense' : 'Keluar'}</dt>
+            <dd className="mt-1 font-mono text-sm font-semibold text-app-danger">{formatRp(expenseThisMonth)}</dd>
+          </div>
+          <div className="pl-3">
+            <dt className="text-xs text-app-text/50">Net</dt>
+            <dd className={`mt-1 font-mono text-sm font-semibold ${savingsThisMonth >= 0 ? "text-app-accent1" : "text-app-danger"}`}>
+              {formatRp(savingsThisMonth, { showSign: true })}
+            </dd>
+          </div>
+        </dl>
+      </section>
 
-      {/* MOBILE INVESTASI & PINJAMAN WIDGETS */}
-      <div className="md:hidden grid grid-cols-2 gap-4 mb-6">
-        <ScrollReveal delay={0.08} className="h-full">
-          <HoverCard 
+      <section className="mb-8 md:hidden">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-app-text-bright">{language === 'en' ? 'Other positions' : 'Posisi lainnya'}</h2>
+          <button type="button" onClick={() => navigate("/transactions")} className="flex h-11 items-center gap-1 px-2 text-xs font-semibold text-app-accent1">
+            Detail <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="divide-y divide-app-border border-y border-app-border">
+          <button
+            type="button"
             onClick={() => navigate("/investments")}
-            className="bg-app-card border border-app-border rounded-2xl p-4 relative overflow-hidden text-app-text shadow-sm cursor-pointer h-full flex flex-col justify-between"
+            className="flex min-h-[76px] w-full items-center justify-between py-4 text-left"
           >
-            <div>
-              <div className="flex justify-between items-center mb-1.5 gap-1">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <div className="w-6 h-6 rounded-lg bg-app-accent1/15 flex items-center justify-center shrink-0">
-                    <TrendingUp className={`w-3.5 h-3.5 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`} />
-                  </div>
-                  <span className="text-app-text/90 text-xs font-semibold whitespace-nowrap">{t('dashboard.investments')}</span>
-                </div>
-                <span className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ${totalInvestmentReturn >= 0 ? "bg-app-success/15 text-app-success" : "bg-app-danger/15 text-app-danger"}`}>
-                  {totalInvestmentReturn >= 0 ? "+" : ""}{totalInvestmentReturnPercent.toFixed(1)}%
-                </span>
-              </div>
-
-              <h2 className="text-sm font-bold text-app-text-bright font-mono my-1 leading-tight">{formatRp(totalInvestmentValue)}</h2>
-            </div>
-
-            <div className="pt-2 mt-2 border-t border-app-border/40 space-y-1 text-[10px]">
-               <div className="flex justify-between items-center gap-1">
-                  <span className="text-app-text/50 font-medium whitespace-nowrap">{t('dashboard.capital')}</span>
-                  <span className="text-app-text-bright font-semibold font-mono text-right">{formatRp(totalInvestmentCapital)}</span>
-               </div>
-               <div className="flex justify-between items-center gap-1">
-                  <span className="text-app-text/50 font-medium whitespace-nowrap">{t('dashboard.returns')}</span>
-                  <span className={`font-semibold font-mono text-right ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                     {formatRp(totalInvestmentReturn, { showSign: true })}
-                  </span>
-               </div>
-            </div>
-          </HoverCard>
-        </ScrollReveal>
-
-        <ScrollReveal delay={0.12} className="h-full">
-          <HoverCard 
+            <span>
+              <span className="block text-xs text-app-text/55">{t('dashboard.investments')}</span>
+              <span className="mt-1 block font-mono text-base font-semibold text-app-text-bright">{formatRp(totalInvestmentValue)}</span>
+            </span>
+            <span className={`font-mono text-xs font-semibold ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
+              {formatRp(totalInvestmentReturn, { showSign: true })}
+            </span>
+          </button>
+          <button
+            type="button"
             onClick={() => navigate("/loans")}
-            className="bg-app-card border border-app-border rounded-2xl p-4 relative overflow-hidden text-app-text shadow-sm cursor-pointer h-full flex flex-col justify-between"
+            className="flex min-h-[76px] w-full items-center justify-between py-4 text-left"
           >
-            <div>
-              <div className="flex justify-between items-center mb-1.5 gap-1">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <div className="w-6 h-6 rounded-lg bg-app-warning/15 flex items-center justify-center shrink-0">
-                    <HandCoins className="w-3.5 h-3.5 text-app-accent1" />
-                  </div>
-                  <span className="text-app-text/90 text-xs font-semibold whitespace-nowrap">{language === 'en' ? 'Loans' : 'Pinjaman'}</span>
-                </div>
-                <span className="text-[9.5px] font-bold text-app-text/60 bg-app-hover px-1 py-0.5 rounded-md shrink-0">Net</span>
+            <span>
+              <span className="block text-xs text-app-text/55">{language === 'en' ? 'Loans' : 'Pinjaman'}</span>
+              <span className="mt-1 block font-mono text-base font-semibold text-app-text-bright">{formatRp(loanStats.totalPiutang - loanStats.totalHutang)}</span>
+            </span>
+            <span className="text-right text-xs text-app-text/50">
+              <span className="block text-app-success">+{formatRp(loanStats.totalPiutang, { noRp: true })}</span>
+              <span className="mt-1 block text-app-danger">-{formatRp(loanStats.totalHutang, { noRp: true })}</span>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      {/* DESKTOP LEDGER — 3 + 5 + 4 columns, no nested cards */}
+      <section className="mb-8 hidden grid-cols-12 border-y border-app-border md:grid">
+        <div className="col-span-3 flex min-h-[248px] flex-col justify-between p-6">
+          <div>
+            <div className="mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <Wallet className="h-4 w-4 text-app-accent1" strokeWidth={1.7} />
+                <h2 className="text-sm font-semibold text-app-text-bright">{t('dashboard.totalBalance')}</h2>
               </div>
-
-              <h2 className="text-sm font-bold text-app-text-bright font-mono my-1 leading-tight">{formatRp(loanStats.totalPiutang - loanStats.totalHutang)}</h2>
-            </div>
-
-            <div className="pt-2 mt-2 border-t border-app-border/40 space-y-1 text-[10px]">
-               <div className="flex justify-between items-center gap-1">
-                  <span className="text-app-text/50 font-medium whitespace-nowrap">{language === 'en' ? 'Receivable' : 'Piutang'}</span>
-                  <span className="text-app-success font-semibold font-mono text-right">{formatRp(loanStats.totalPiutang)}</span>
-               </div>
-               <div className="flex justify-between items-center gap-1">
-                  <span className="text-app-text/50 font-medium whitespace-nowrap">{language === 'en' ? 'Debt' : 'Hutang'}</span>
-                  <span className="text-app-danger font-semibold font-mono text-right">{formatRp(loanStats.totalHutang)}</span>
-               </div>
-            </div>
-          </HoverCard>
-        </ScrollReveal>
-      </div>
-
-      {/* DESKTOP TOP WIDGETS */}
-      <div className="hidden md:grid grid-cols-3 gap-6 mb-6">
-        {/* HERO: TOTAL SALDO - takes 2 cols */}
-        <ScrollReveal className="col-span-2 h-full">
-          <HoverCard
-            onClick={() => navigate("/transactions", { state: { tab: "Semua" } })}
-            className="bg-app-card rounded-2xl p-6 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between"
-          >
-            <div className="relative z-10 flex flex-col justify-between h-full">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-app-accent1/15 flex items-center justify-center">
-                      <Wallet className="w-5 h-5 text-app-accent1" />
-                    </div>
-                    <div>
-                      <span className="text-app-text/70 text-xs font-semibold block">{t('dashboard.totalBalance')}</span>
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border mt-0.5 ${financialHealthStatus.bg} ${financialHealthStatus.color}`}>
-                        {financialHealthStatus.label}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleHideBalances();
-                    }}
-                    className="p-2 rounded-xl hover:bg-app-hover text-app-text/60 hover:text-app-text-bright transition-colors"
-                    title={hideBalances ? (language === 'en' ? "Show Balances" : "Tampilkan Saldo") : (language === 'en' ? "Hide Balances" : "Sembunyikan Saldo")}
-                  >
-                    {hideBalances ? (
-                      <EyeOff className="w-5 h-5 text-app-accent1" />
-                    ) : (
-                      <Eye className="w-5 h-5 text-app-text/40" />
-                    )}
-                  </button>
-                </div>
-
-                <p className="text-[36px] lg:text-[40px] leading-tight font-bold tracking-[-0.02em] text-app-text-bright font-mono">
-                  {formatRp(totalBalance)}
-                </p>
-                <p className="text-app-text/50 text-xs mt-1.5 font-medium">
-                  {accounts.length} {t('dashboard.allWallets')} · {format(new Date(), "MMMM yyyy", { locale: currentLocale })}
-                </p>
-              </div>
-
-              {/* Bottom Financial Breakdown Box */}
-              <div className="mt-5 p-4 rounded-xl bg-app-bg/60 border border-app-border/50 grid grid-cols-3 gap-4">
-                <div>
-                  <p className="text-[11px] text-app-text/60 font-medium mb-1 truncate">
-                    {language === 'en' ? 'Income (Month)' : 'Pemasukan Bulan Ini'}
-                  </p>
-                  <p className="text-sm lg:text-base font-bold text-app-success font-mono truncate">
-                    {formatRp(incomeThisMonth)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[11px] text-app-text/60 font-medium mb-1 truncate">
-                    {language === 'en' ? 'Expense (Month)' : 'Pengeluaran Bulan Ini'}
-                  </p>
-                  <p className="text-sm lg:text-base font-bold text-app-danger font-mono truncate">
-                    {formatRp(expenseThisMonth)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[11px] text-app-text/60 font-medium mb-1 truncate">
-                    {language === 'en' ? 'Net Cash Flow' : 'Arus Kas (Net)'}
-                  </p>
-                  <p className={`text-sm lg:text-base font-bold font-mono truncate ${savingsThisMonth >= 0 ? 'text-app-accent1' : 'text-app-danger'}`}>
-                    {formatRp(savingsThisMonth, { showSign: true })}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </HoverCard>
-        </ScrollReveal>
-
-        {/* RIGHT SIDE: 2×2 compact grid */}
-        <div className="grid grid-rows-2 gap-4 h-full">
-          {/* Row 1: Pemasukan + Pengeluaran side by side */}
-          <div className="grid grid-cols-2 gap-4 h-full">
-            {/* Pemasukan */}
-            <ScrollReveal delay={0.05} className="h-full">
-              <HoverCard
-                onClick={() => navigate("/transactions", { state: { tab: "Pemasukan" } })}
-                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-success/40 transition-all"
+              <button
+                type="button"
+                onClick={toggleHideBalances}
+                className="flex h-11 w-11 items-center justify-center rounded-xl text-app-text/60 hover:bg-app-hover hover:text-app-text-bright"
+                aria-label={hideBalances ? (language === 'en' ? "Show balances" : "Tampilkan saldo") : (language === 'en' ? "Hide balances" : "Sembunyikan saldo")}
               >
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-app-success/15 flex items-center justify-center shrink-0">
-                      <TrendingUp className="w-3.5 h-3.5 text-app-success" />
-                    </div>
-                    <span className="text-app-text/80 text-xs font-semibold">{language === 'en' ? 'Income' : 'Masuk'}</span>
-                  </div>
-                  <span className="text-[10px] font-medium text-app-text/50 bg-app-hover px-1.5 py-0.5 rounded-md">{t('common.today')}</span>
-                </div>
-
-                <p className="text-app-text-bright text-base lg:text-lg font-bold tracking-tight font-mono relative z-10 truncate my-1">
-                  {formatRp(incomeToday)}
-                </p>
-
-                <div className="text-[11px] text-app-text/50 font-medium flex items-center justify-between pt-2 border-t border-app-border/40 relative z-10">
-                  <span className="truncate">{language === 'en' ? 'Month' : 'Bulan Ini'}</span>
-                  <span className="text-app-success font-semibold font-mono truncate ml-1">{formatRp(incomeThisMonth)}</span>
-                </div>
-              </HoverCard>
-            </ScrollReveal>
-
-            {/* Pengeluaran */}
-            <ScrollReveal delay={0.08} className="h-full">
-              <HoverCard
-                onClick={() => navigate("/transactions", { state: { tab: "Pengeluaran" } })}
-                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-danger/40 transition-all"
-              >
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-app-danger/15 flex items-center justify-center shrink-0">
-                      <TrendingDown className="w-3.5 h-3.5 text-app-danger" />
-                    </div>
-                    <span className="text-app-text/80 text-xs font-semibold">{language === 'en' ? 'Expenses' : 'Keluar'}</span>
-                  </div>
-                  <span className="text-[10px] font-medium text-app-text/50 bg-app-hover px-1.5 py-0.5 rounded-md">{t('common.today')}</span>
-                </div>
-
-                <p className="text-app-text-bright text-base lg:text-lg font-bold tracking-tight font-mono relative z-10 truncate my-1">
-                  {formatRp(expenseToday)}
-                </p>
-
-                <div className="text-[11px] text-app-text/50 font-medium flex items-center justify-between pt-2 border-t border-app-border/40 relative z-10">
-                  <span className="truncate">{language === 'en' ? 'Month' : 'Bulan Ini'}</span>
-                  <span className="text-app-danger font-semibold font-mono truncate ml-1">{formatRp(expenseThisMonth)}</span>
-                </div>
-              </HoverCard>
-            </ScrollReveal>
+                {hideBalances ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            </div>
+            <p className="break-words font-mono text-[30px] font-semibold leading-[1.08] tracking-[-0.035em] text-app-text-bright">
+              {formatRp(totalBalance)}
+            </p>
+            <p className="mt-2 text-xs text-app-text/55">
+              {accounts.length} {t('dashboard.allWallets')} · {format(new Date(), "MMMM yyyy", { locale: currentLocale })}
+            </p>
           </div>
-
-          {/* Row 2: Investasi + Pinjaman side by side */}
-          <div className="grid grid-cols-2 gap-4 h-full">
-            {/* Investasi */}
-            <ScrollReveal delay={0.1} className="h-full">
-              <HoverCard
-                onClick={() => navigate("/investments")}
-                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-accent1/40 transition-all"
-              >
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-app-accent1/15 flex items-center justify-center shrink-0">
-                      <TrendingUp className={`w-3.5 h-3.5 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`} />
-                    </div>
-                    <span className="text-app-text/80 text-xs font-semibold">{t('dashboard.investments')}</span>
-                  </div>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${totalInvestmentReturn >= 0 ? "bg-app-success/15 text-app-success" : "bg-app-danger/15 text-app-danger"}`}>
-                    {totalInvestmentReturn >= 0 ? "+" : ""}{totalInvestmentReturnPercent.toFixed(1)}%
-                  </span>
-                </div>
-
-                <p className="text-app-text-bright text-base lg:text-lg font-bold tracking-tight font-mono relative z-10 truncate my-1">
-                  {formatRp(totalInvestmentValue)}
-                </p>
-
-                <div className="text-[11px] text-app-text/50 font-medium flex items-center justify-between pt-2 border-t border-app-border/40 relative z-10">
-                  <span className="truncate">Return</span>
-                  <span className={`font-semibold font-mono truncate ml-1 ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
-                    {formatRp(totalInvestmentReturn, { showSign: true })}
-                  </span>
-                </div>
-              </HoverCard>
-            </ScrollReveal>
-
-            {/* Pinjaman */}
-            <ScrollReveal delay={0.12} className="h-full">
-              <HoverCard
-                onClick={() => navigate("/loans")}
-                className="bg-app-card rounded-2xl p-4 border border-app-border shadow-sm cursor-pointer overflow-hidden relative h-full flex flex-col justify-between hover:border-app-accent1/40 transition-all"
-              >
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-app-warning/15 flex items-center justify-center shrink-0">
-                      <HandCoins className="w-3.5 h-3.5 text-app-accent1" />
-                    </div>
-                    <span className="text-app-text/80 text-xs font-semibold">{t('dashboard.loans')}</span>
-                  </div>
-                  <span className="text-[10px] font-medium text-app-text/50 bg-app-hover px-1.5 py-0.5 rounded-md">Net</span>
-                </div>
-
-                <p className="text-app-text-bright text-base lg:text-lg font-bold tracking-tight font-mono relative z-10 truncate my-1">
-                  {formatRp(loanStats.totalPiutang - loanStats.totalHutang)}
-                </p>
-
-                <div className="text-[11px] text-app-text/50 font-medium flex items-center justify-between pt-2 border-t border-app-border/40 relative z-10">
-                  <span className="text-app-success font-mono truncate">+{formatRp(loanStats.totalPiutang, { noRp: true })}</span>
-                  <span className="text-app-danger font-mono truncate ml-1">-{formatRp(loanStats.totalHutang, { noRp: true })}</span>
-                </div>
-              </HoverCard>
-            </ScrollReveal>
+          <div className="flex items-center justify-between border-t border-app-border pt-4">
+            <span className={`flex items-center gap-2 text-xs font-medium ${financialHealthStatus.color}`}>
+              <ShieldCheck className="h-4 w-4" />
+              {financialHealthStatus.label}
+            </span>
+            <Link to="/settings" state={{ expandSection: "accounts" }} className="text-xs font-semibold text-app-accent1 hover:text-app-text-bright">
+              Kelola
+            </Link>
           </div>
         </div>
-      </div>
 
+        <div className="col-span-5 flex min-h-[248px] flex-col justify-between border-l border-app-border p-6">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-app-text-bright">{language === 'en' ? 'Monthly cash flow' : 'Arus kas bulan ini'}</h2>
+              <p className="mt-1 text-xs text-app-text/50">{language === 'en' ? 'Income, expense, and net position' : 'Pemasukan, pengeluaran, dan posisi bersih'}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/transactions")}
+              className="flex h-11 items-center gap-2 rounded-xl px-3 text-xs font-semibold text-app-accent1 hover:bg-app-hover"
+            >
+              Detail
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+          <dl className="grid grid-cols-3 divide-x divide-app-border border-y border-app-border">
+            <div className="py-5 pr-4">
+              <dt className="mb-2 text-xs text-app-text/55">{language === 'en' ? 'Income' : 'Masuk'}</dt>
+              <dd className="font-mono text-base font-semibold text-app-success">{formatRp(incomeThisMonth)}</dd>
+            </div>
+            <div className="px-4 py-5">
+              <dt className="mb-2 text-xs text-app-text/55">{language === 'en' ? 'Expense' : 'Keluar'}</dt>
+              <dd className="font-mono text-base font-semibold text-app-danger">{formatRp(expenseThisMonth)}</dd>
+            </div>
+            <div className="py-5 pl-4">
+              <dt className="mb-2 text-xs text-app-text/55">Net</dt>
+              <dd className={`font-mono text-base font-semibold ${savingsThisMonth >= 0 ? "text-app-accent1" : "text-app-danger"}`}>
+                {formatRp(savingsThisMonth, { showSign: true })}
+              </dd>
+            </div>
+          </dl>
+          <div className="mt-4 flex items-center justify-between text-xs">
+            <span className="text-app-text/50">{language === 'en' ? 'Today' : 'Hari ini'}</span>
+            <span className="font-mono text-app-text-bright">
+              <span className="text-app-success">+{formatRp(incomeToday, { noRp: true })}</span>
+              <span className="mx-2 text-app-text/30">/</span>
+              <span className="text-app-danger">-{formatRp(expenseToday, { noRp: true })}</span>
+            </span>
+          </div>
+        </div>
 
+        <div className="col-span-4 min-h-[248px] border-l border-app-border p-6">
+          <div className="mb-3">
+            <h2 className="text-sm font-semibold text-app-text-bright">{language === 'en' ? 'Other positions' : 'Posisi lainnya'}</h2>
+            <p className="mt-1 text-xs text-app-text/50">{language === 'en' ? 'Investments and outstanding loans' : 'Investasi serta pinjaman berjalan'}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("/investments")}
+            className="flex min-h-[76px] w-full items-center justify-between border-t border-app-border py-4 text-left hover:text-app-text-bright"
+          >
+            <span>
+              <span className="block text-xs text-app-text/55">{t('dashboard.investments')}</span>
+              <span className="mt-1 block font-mono text-base font-semibold text-app-text-bright">{formatRp(totalInvestmentValue)}</span>
+            </span>
+            <span className={`font-mono text-xs font-semibold ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
+              {formatRp(totalInvestmentReturn, { showSign: true })}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/loans")}
+            className="flex min-h-[76px] w-full items-center justify-between border-y border-app-border py-4 text-left hover:text-app-text-bright"
+          >
+            <span>
+              <span className="block text-xs text-app-text/55">{t('dashboard.loans')}</span>
+              <span className="mt-1 block font-mono text-base font-semibold text-app-text-bright">{formatRp(loanStats.totalPiutang - loanStats.totalHutang)}</span>
+            </span>
+            <ArrowRight className="h-4 w-4 text-app-text/40" />
+          </button>
+        </div>
+      </section>
       {/* INTEREST OVERVIEW CARD */}
       <ScrollReveal className="mb-6 w-full">
         <InterestCard
@@ -971,105 +803,100 @@ export default function Dashboard() {
         />
       </ScrollReveal>
 
-      {/* MOBILE MIDDLE SECTION */}
-      <div className="md:hidden space-y-6 mb-6">
-        {/* DOMPET SAYA */}
-        <div>
-          <div className="flex justify-between items-center mb-3 px-1">
-              <h2 className="text-app-text-bright text-lg font-semibold tracking-[-0.01em]">{t('dashboard.myWallets')}</h2>
-              <Link to="/settings" state={{ expandSection: "accounts" }} className="text-app-accent1 text-xs font-semibold">{t('dashboard.viewAll')}</Link>
-          </div>
-          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-             {sortedAccounts.map(acc => {
-                const iconDetails = getAccountIconDetails(acc.icon);
-                const hasCustomColor = iconDetails?.color;
-                
-                return (
-                <div key={acc.id} onClick={() => { setEditingAccount(acc); setIsAccountModalOpen(true); }} className="min-w-[150px] bg-app-card rounded-2xl p-4 flex flex-col justify-between border border-app-border relative overflow-hidden cursor-pointer shadow-sm">
-                  {hasCustomColor ? (
-                    <div 
-                      className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-80 block"
-                      style={{ background: `linear-gradient(to bottom right, color-mix(in srgb, ${iconDetails.color} 25%, transparent), transparent, transparent)` }}
-                    />
-                  ) : (
-                    <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${iconDetails?.type === 'cash' ? 'from-app-success/5' : 'from-app-accent1/15'} via-transparent to-transparent pointer-events-none opacity-80 block`} />
-                  )}
-                  <div className="relative z-10">
-                     <AccountIcon iconId={acc.icon} className="w-10 h-10 shrink-0 mb-3" />
-                     <div>
-                        <p className="text-app-text-bright text-xs mb-0.5 line-clamp-1 uppercase font-semibold">{acc.name}</p>
-                        <p className="text-app-success font-bold font-mono text-sm mb-1.5">{formatRp(acc.balance)}</p>
-                        <div className="flex items-center gap-1 text-app-text/60 text-[10px]">
-                           <Edit2 className="w-3 h-3" />
-                           <span>{language === 'en' ? 'Adjust' : 'Sesuaikan'}</span>
-                        </div>
-                     </div>
-                  </div>
-                </div>
-             )})}
-             <div onClick={() => { navigate('/settings', { state: { expandSection: "accounts" } }) }} className="min-w-[120px] bg-app-card rounded-2xl p-4 flex flex-col items-center justify-center border border-app-border cursor-pointer shadow-sm">
-                <div className="w-10 h-10 rounded-full bg-app-hover flex items-center justify-center mb-2">
-                   <Plus className="w-5 h-5 text-app-accent1" />
-                </div>
-                <p className="text-app-text/60 text-xs font-semibold text-center">{language === 'en' ? 'Manage' : 'Kelola'}<br/>{language === 'en' ? 'Wallets' : 'Dompet'}</p>
-             </div>
-          </div>
+      {/* MOBILE WALLET LIST */}
+      <section className="mb-8 md:hidden">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-app-text-bright">{t('dashboard.myWallets')}</h2>
+          <Link to="/settings" state={{ expandSection: "accounts" }} className="flex min-h-11 items-center px-2 text-xs font-semibold text-app-accent1">
+            {t('dashboard.viewAll')}
+          </Link>
         </div>
-
-        {/* MOBILE ACTION BUTTONS */}
-        <div className="grid grid-cols-2 gap-4">
-            <button onClick={() => navigate('/transactions')} className="bg-app-card border border-app-border p-4 rounded-2xl flex flex-col items-center justify-center gap-2 active:scale-[0.98] transition-transform hover:bg-app-hover shadow-sm">
-                <div className="w-10 h-10 rounded-xl bg-app-accent1/10 flex items-center justify-center">
-                   <BarChart2 className="w-5 h-5 text-app-accent1" />
-                </div>
-                <span className="text-app-text-bright font-semibold text-xs text-center leading-tight">{language === 'en' ? 'Reports' : 'Laporan Keuangan'}</span>
-            </button>
-            <button onClick={() => navigate('/grab')} className="bg-app-card border border-app-border p-4 rounded-2xl flex flex-col items-center justify-center gap-2 active:scale-[0.98] transition-transform hover:bg-app-hover shadow-sm">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                   <TrendingUp className="w-5 h-5 text-emerald-400" />
-                </div>
-                <span className="text-app-text-bright font-semibold text-xs text-center leading-tight">{language === 'en' ? 'Business Analytics' : 'Analisis Usaha'}</span>
-            </button>
+        <div className="divide-y divide-app-border border-y border-app-border">
+          {sortedAccounts.length === 0 ? (
+            <div className="flex flex-col items-center py-10 text-center text-xs text-app-text/55">
+              <Wallet className="mb-3 h-8 w-8 text-app-text/30" />
+              <span className="font-medium text-app-text-bright">{language === 'en' ? 'No wallets yet' : 'Belum ada dompet'}</span>
+            </div>
+          ) : (
+            sortedAccounts.map((acc) => (
+              <button
+                type="button"
+                key={acc.id}
+                onClick={() => {
+                  setEditingAccount(acc);
+                  setIsAccountModalOpen(true);
+                }}
+                className="flex min-h-[72px] w-full items-center gap-3 py-3 text-left"
+              >
+                <AccountIcon iconId={acc.icon} className="h-10 w-10 shrink-0" />
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-2">
+                    <span className="truncate text-sm font-medium text-app-text-bright">{acc.name}</span>
+                    {acc.isPrimary && <span className="text-[11px] text-app-accent1">{language === 'en' ? 'Primary' : 'Utama'}</span>}
+                  </span>
+                  <span className="mt-1 block truncate font-mono text-sm font-semibold text-app-text-bright">{formatRp(acc.balance)}</span>
+                </span>
+                <ChevronRight className="h-4 w-4 shrink-0 text-app-text/40" />
+              </button>
+            ))
+          )}
+          <Link
+            to="/settings"
+            state={{ expandSection: "accounts" }}
+            className="flex min-h-14 items-center gap-2 py-3 text-sm font-medium text-app-accent1"
+          >
+            <Plus className="h-4 w-4" />
+            {language === 'en' ? 'Manage wallets' : 'Kelola dompet'}
+          </Link>
         </div>
-      </div>
+      </section>
 
       {/* DESKTOP MIDDLE SECTION */}
       <div className="hidden md:grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* DOMPET SAYA */}
-        <ScrollReveal className="lg:col-span-1 bg-app-card rounded-2xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <ScrollReveal className="lg:col-span-1 bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
           <div className="flex justify-between items-center mb-5 relative z-10">
             <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">{t('dashboard.myWallets')}</h2>
             <div className="relative">
-              <button 
+              <button type="button"
                 onClick={() => setShowSortMenu(!showSortMenu)}
                 className="flex items-center gap-1.5 text-xs font-semibold text-app-text/70 hover:text-app-text px-2.5 py-1.5 rounded-xl hover:bg-app-hover transition-colors border border-app-border/50"
                 title={language === 'en' ? 'Sort' : 'Urutkan'}
+                aria-haspopup="menu"
+                aria-expanded={showSortMenu}
+                aria-controls="wallet-sort-menu"
               >
                 <ArrowUpDown className="w-3.5 h-3.5" />
                 {language === 'en' ? 'Sort' : 'Urutkan'}
               </button>
               {showSortMenu && (
                 <>
-                  <div className="fixed inset-0 z-40" onClick={() => setShowSortMenu(false)} />
-                  <div className="absolute right-0 mt-2 w-48 bg-app-card border border-app-border rounded-xl shadow-xl z-50 py-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
-                    <button
+                  <div className="fixed inset-0 z-40" onClick={() => setShowSortMenu(false)} aria-hidden="true" />
+                  <div id="wallet-sort-menu" role="menu" className="absolute right-0 mt-2 w-48 bg-app-card border border-app-border rounded-xl z-50 py-1.5 overflow-hidden animate-in fade-in duration-100">
+                    <button type="button"
                       onClick={() => { setAccountSort("balance_desc"); setShowSortMenu(false); }}
                       className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-app-hover text-app-text transition-colors flex items-center justify-between"
+                      role="menuitemradio"
+                      aria-checked={accountSort === "balance_desc"}
                     >
                       {t('dashboard.sortBalanceDesc')}
                       {accountSort === "balance_desc" && <Check className="w-3.5 h-3.5 text-app-accent1" />}
                     </button>
-                    <button
+                    <button type="button"
                       onClick={() => { setAccountSort("balance_asc"); setShowSortMenu(false); }}
                       className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-app-hover text-app-text transition-colors flex items-center justify-between"
+                      role="menuitemradio"
+                      aria-checked={accountSort === "balance_asc"}
                     >
                       {t('dashboard.sortBalanceAsc')}
                       {accountSort === "balance_asc" && <Check className="w-3.5 h-3.5 text-app-accent1" />}
                     </button>
                     <div className="h-px w-full bg-app-border/50 my-1" />
-                    <button
+                    <button type="button"
                       onClick={() => { setAccountSort("name_asc"); setShowSortMenu(false); }}
                       className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-app-hover text-app-text transition-colors flex items-center justify-between"
+                      role="menuitemradio"
+                      aria-checked={accountSort === "name_asc"}
                     >
                       {t('dashboard.sortNameAsc')}
                       {accountSort === "name_asc" && <Check className="w-3.5 h-3.5 text-app-accent1" />}
@@ -1082,32 +909,21 @@ export default function Dashboard() {
           <div className="space-y-3 flex-1 max-h-[320px] overflow-y-auto pr-1 overflow-x-hidden scrollbar-thin">
             {sortedAccounts.length === 0 ? (
               <div className="flex flex-col items-center justify-center text-app-text/50 text-xs py-8">
-                <Wallet className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
+                <Wallet className="mb-2 h-8 w-8 text-app-text/30" />
                 {language === 'en' ? 'No wallets yet' : 'Belum ada dompet'}
               </div>
             ) : (
-              sortedAccounts.map((acc, index) => {
-                const iconDetails = getAccountIconDetails(acc.icon);
-                const hasCustomColor = iconDetails?.color;
-
-                return (
-                <div
+              sortedAccounts.map((acc) => (
+                <button
+                  type="button"
                   key={acc.id}
                   onClick={() => {
                     setEditingAccount(acc);
                     setIsAccountModalOpen(true);
                   }}
-                  className="flex items-center justify-between p-3.5 rounded-xl bg-app-bg border border-app-border hover:border-app-accent1/50 transition cursor-pointer relative overflow-hidden group"
+                  className="group flex min-h-[64px] w-full items-center justify-between rounded-xl border border-app-border bg-app-bg p-3.5 text-left hover:border-app-accent1/50"
                 >
-                  {hasCustomColor ? (
-                    <div 
-                      className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-80 block"
-                      style={{ background: `linear-gradient(to bottom right, color-mix(in srgb, ${iconDetails.color} 25%, transparent), transparent, transparent)` }}
-                    />
-                  ) : (
-                    <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${iconDetails?.type === 'cash' ? 'from-app-success/5' : 'from-app-accent1/15'} via-transparent to-transparent pointer-events-none opacity-80 block`} />
-                  )}
-                  <div className="flex items-center gap-3.5 relative z-10">
+                  <div className="flex items-center gap-3.5">
                     <AccountIcon iconId={acc.icon} className="w-9 h-9 shrink-0" />
                     <div>
                       <div className="flex items-center gap-2">
@@ -1115,8 +931,8 @@ export default function Dashboard() {
                           {acc.name}
                         </p>
                         {acc.isPrimary && (
-                          <span className="bg-app-accent1/20 text-app-accent1 text-[9px] font-bold px-2 py-0.5 rounded-md">
-                            {language === 'en' ? 'PRIMARY' : 'UTAMA'}
+                          <span className="text-[11px] font-medium text-app-accent1">
+                            {language === 'en' ? 'Primary' : 'Utama'}
                           </span>
                         )}
                       </div>
@@ -1125,10 +941,9 @@ export default function Dashboard() {
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-app-text/40 group-hover:text-app-accent1 transition-colors relative z-10" />
-                </div>
-                );
-              })
+                  <ChevronRight className="h-4 w-4 text-app-text/40 group-hover:text-app-accent1" />
+                </button>
+              ))
             )}
           </div>
           <Link
@@ -1142,7 +957,7 @@ export default function Dashboard() {
         </ScrollReveal>
 
         {/* ALUR KAS (CHART) */}
-        <ScrollReveal delay={0.1} className="lg:col-span-2 bg-app-card rounded-2xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <ScrollReveal delay={0.1} className="lg:col-span-2 bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3 relative z-10">
             <div>
               <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">{t('dashboard.cashflowTitle')}</h2>
@@ -1152,7 +967,7 @@ export default function Dashboard() {
               <select
                 value={selectedChartAccount}
                 onChange={(e) => setSelectedChartAccount(e.target.value)}
-                className="bg-app-bg border border-app-border rounded-xl px-3 py-1.5 text-xs font-medium text-app-text-bright focus:outline-none focus:border-app-accent1 transition-colors cursor-pointer"
+                className="min-h-11 cursor-pointer rounded-xl border border-app-border bg-app-bg px-3 text-xs font-medium text-app-text-bright focus:border-app-accent1 focus:outline-none"
               >
                 <option value="all">{language === 'en' ? 'All Accounts' : 'Semua Rekening'}</option>
                 {accounts.map(acc => (
@@ -1161,20 +976,26 @@ export default function Dashboard() {
               </select>
               <div className="bg-app-bg rounded-xl p-1 border border-app-border flex gap-1">
                 <button
+                  type="button"
                   onClick={() => setChartPeriod(0)}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${chartPeriod === 0 ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
+                  aria-pressed={chartPeriod === 0}
+                  className={`min-h-11 rounded-lg px-3 text-xs font-semibold transition-colors ${chartPeriod === 0 ? "bg-app-accent1 text-app-bg" : "text-app-text/60 hover:text-app-text-bright"}`}
                 >
                   {t('dashboard.day')}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setChartPeriod(7)}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${chartPeriod === 7 ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
+                  aria-pressed={chartPeriod === 7}
+                  className={`min-h-11 rounded-lg px-3 text-xs font-semibold transition-colors ${chartPeriod === 7 ? "bg-app-accent1 text-app-bg" : "text-app-text/60 hover:text-app-text-bright"}`}
                 >
                   {language === 'en' ? '7 Days' : '7 Hari'}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setChartPeriod(30)}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${chartPeriod === 30 ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text/60 hover:text-app-text-bright"}`}
+                  aria-pressed={chartPeriod === 30}
+                  className={`min-h-11 rounded-lg px-3 text-xs font-semibold transition-colors ${chartPeriod === 30 ? "bg-app-accent1 text-app-bg" : "text-app-text/60 hover:text-app-text-bright"}`}
                 >
                   {language === 'en' ? '30 Days' : '30 Hari'}
                 </button>
@@ -1188,16 +1009,6 @@ export default function Dashboard() {
                 data={chartData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
-                <defs>
-                  <linearGradient id="dashboardIncomeGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-app-success)" stopOpacity={0.25}/>
-                    <stop offset="95%" stopColor="var(--color-app-success)" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="dashboardExpenseGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-app-danger)" stopOpacity={0.25}/>
-                    <stop offset="95%" stopColor="var(--color-app-danger)" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
                   vertical={false}
@@ -1207,14 +1018,14 @@ export default function Dashboard() {
                   dataKey="name"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 10, fill: "var(--color-app-text)" }}
+                  tick={{ fontSize: 11, fill: "var(--color-app-text)" }}
                   dy={5}
                   opacity={0.7}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 10, fill: "var(--color-app-text)" }}
+                  tick={{ fontSize: 11, fill: "var(--color-app-text)" }}
                   opacity={0.7}
                 />
                 <Tooltip
@@ -1223,8 +1034,7 @@ export default function Dashboard() {
                     backgroundColor: "var(--color-app-card)",
                     border: "1px solid var(--color-app-border)",
                     borderRadius: "12px",
-                    padding: "8px 12px",
-                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)"
+                    padding: "8px 12px"
                   }}
                   itemStyle={{
                     fontSize: 12,
@@ -1242,7 +1052,8 @@ export default function Dashboard() {
                   name={t('dashboard.income')}
                   dataKey="income"
                   stroke="var(--color-app-success)"
-                  fill="url(#dashboardIncomeGrad)"
+                  fill="transparent"
+                  fillOpacity={0}
                   strokeWidth={2.5}
                 />
                 <Area
@@ -1250,7 +1061,8 @@ export default function Dashboard() {
                   name={t('dashboard.expense')}
                   dataKey="expense"
                   stroke="var(--color-app-danger)"
-                  fill="url(#dashboardExpenseGrad)"
+                  fill="transparent"
+                  fillOpacity={0}
                   strokeWidth={2.5}
                 />
               </AreaChart>
@@ -1274,7 +1086,7 @@ export default function Dashboard() {
       {/* DESKTOP & MOBILE VISUAL ANALYTICS (PIE CHARTS) */}
       <ScrollReveal className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* PIE CHART 1: ALOKASI SALDO DOMPET */}
-        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
           <div className="flex items-center justify-between mb-4 relative z-10">
             <h2 className="text-app-text-bright text-base sm:text-lg font-semibold tracking-tight">{language === 'en' ? 'Wallet Balance Allocation' : 'Alokasi Saldo Dompet'}</h2>
             <PieChartIcon className="w-4.5 h-4.5 text-app-accent1" />
@@ -1332,7 +1144,7 @@ export default function Dashboard() {
         </div>
 
         {/* PIE CHART 2: DISTRIBUSI PENGELUARAN */}
-        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col shadow-sm relative overflow-hidden">
+        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
           <div className="flex items-center justify-between mb-4 relative z-10">
             <h2 className="text-app-text-bright text-base sm:text-lg font-semibold tracking-tight">{language === 'en' ? 'This Month Expense Distribution' : 'Distribusi Pengeluaran Bulan Ini'}</h2>
             <BarChart2 className="w-4.5 h-4.5 text-app-danger" />
@@ -1404,7 +1216,7 @@ export default function Dashboard() {
           return todayMobileTransactions.length === 0 ? (
            <div className="flex flex-col items-center justify-center py-12">
               <div className="w-20 h-20 rounded-full bg-app-card border border-app-border flex items-center justify-center mb-5">
-                 <FileText className="w-8 h-8 text-app-accent1 animate-waggle" />
+                 <FileText className="w-8 h-8 text-app-accent1" />
               </div>
               <p className="text-app-text-bright font-semibold mb-1.5">Belum ada transaksi hari ini</p>
               <p className="text-app-text/60 text-[13px]">Mulai catat transaksi pertama Anda hari ini</p>
@@ -1412,8 +1224,8 @@ export default function Dashboard() {
           ) : (
            <div className="space-y-3">
               {todayMobileTransactions.map((t) => (
-                 <div key={t.id} onClick={() => navigate('/transactions', { state: { tab: "Semua" } })} className="flex items-center justify-between p-4 rounded-2xl bg-app-card border border-app-border active:scale-[0.98] transition-transform relative overflow-hidden">
-                     
+                 <button type="button" key={t.id} onClick={() => navigate('/transactions', { state: { tab: "Semua" } })} className="relative flex w-full items-center justify-between overflow-hidden rounded-2xl border border-app-border bg-app-card p-4 text-left">
+
                      <div className="flex items-center gap-4 relative z-10">
                        <div className={`w-12 h-12 rounded-[1.1rem] flex items-center justify-center shrink-0 ${t.type === "income" ? "bg-app-success/10 text-app-success" : t.type === "expense" ? "bg-app-danger/10 text-app-danger" : "bg-app-accent1/10 text-app-accent1"}`}>
                          {t.type === "income" && <TrendingUp className="w-5 h-5" />}
@@ -1431,7 +1243,7 @@ export default function Dashboard() {
                              {t.note || (t.type === "income" ? "Pemasukan" : t.type === "expense" ? "Pengeluaran" : "Transfer")}
                            </p>
                            {t.categoryId && (
-                              <span className="px-2 py-0.5 bg-app-bg border border-app-border text-app-text text-[10px] font-semibold rounded-full hidden sm:flex items-center gap-1">
+                              <span className="px-2 py-0.5 bg-app-bg border border-app-border text-app-text text-[11px] font-semibold rounded-full hidden sm:flex items-center gap-1">
                                 <CategoryIcon iconId={t.categoryIcon || 'dollar-sign'} className="w-3 h-3 text-app-text/70" />
                                 <span>{t.categoryName}</span>
                               </span>
@@ -1445,12 +1257,12 @@ export default function Dashboard() {
                      <p className={`text-[17px] font-semibold whitespace-nowrap relative z-10 ${t.type === "income" ? "text-app-success" : t.type === "expense" ? "text-app-danger" : "text-app-text"}`}>
                        {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""} Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(t.amount)}
                        {Boolean(t.adminFee) && (
-                         <span className="block text-[10px] text-app-danger font-semibold text-right mt-0.5">
+                         <span className="block text-[11px] text-app-danger font-semibold text-right mt-0.5">
                            Fee: -Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(t.adminFee)}
                          </span>
                        )}
                      </p>
-                 </div>
+                 </button>
               ))}
            </div>
           );
@@ -1458,7 +1270,7 @@ export default function Dashboard() {
       </div>
 
       {/* DESKTOP BOTTOM SECTION - TRANSACTIONS */}
-      <ScrollReveal className="hidden md:flex bg-app-card rounded-2xl p-6 border border-app-border flex-col shadow-sm shrink-0 overflow-hidden relative">
+      <ScrollReveal className="hidden md:flex bg-app-card rounded-2xl p-6 border border-app-border flex-col shrink-0 overflow-hidden relative">
         <div className="flex items-center justify-between mb-5 relative z-10">
           <div>
             <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">{t('dashboard.recentTransactions')}</h2>
@@ -1478,7 +1290,7 @@ export default function Dashboard() {
           const todayDesktopTransactions = filteredBottomTransactions.filter(t => isSameDay(parseTxDate(t.date), new Date()));
           return todayDesktopTransactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 rounded-2xl bg-app-bg border border-app-border border-dashed relative z-10">
-              <FileText className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
+              <FileText className="w-8 h-8 text-app-text/30 mb-2" />
               <p className="text-app-text/60 text-xs font-medium">{language === 'en' ? 'No transactions recorded today' : 'Belum ada transaksi yang dicatat hari ini'}</p>
             </div>
           ) : (
@@ -1491,7 +1303,7 @@ export default function Dashboard() {
                 >
                   <div className="flex items-center gap-3.5 relative z-10">
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0
                         ${
                           tx.type === "income"
                             ? "bg-app-success/10 text-app-success"
@@ -1520,7 +1332,7 @@ export default function Dashboard() {
                                 : "Transfer")}
                         </p>
                         {tx.categoryId && (
-                            <span className="px-2 py-0.5 bg-app-card border border-app-border text-app-text text-[10px] font-semibold rounded-full hidden sm:flex items-center gap-1">
+                            <span className="px-2 py-0.5 bg-app-card border border-app-border text-app-text text-[11px] font-semibold rounded-full hidden sm:flex items-center gap-1">
                               <CategoryIcon iconId={tx.categoryIcon || 'dollar-sign'} className="w-3 h-3 text-app-text/70" />
                               <span>{tx.categoryName}</span>
                             </span>
@@ -1546,7 +1358,7 @@ export default function Dashboard() {
                       Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(tx.amount)}
                     </p>
                     {Boolean(tx.adminFee) && (
-                      <p className="text-[10px] text-app-danger font-semibold mt-0.5">
+                      <p className="text-[11px] text-app-danger font-semibold mt-0.5">
                         Fee: -Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(tx.adminFee)}
                       </p>
                     )}
@@ -1557,10 +1369,10 @@ export default function Dashboard() {
           );
         })()}
       </ScrollReveal>
-      <AccountModal 
-        isOpen={isAccountModalOpen} 
-        onClose={() => setIsAccountModalOpen(false)} 
-        account={editingAccount} 
+      <AccountModal
+        isOpen={isAccountModalOpen}
+        onClose={() => setIsAccountModalOpen(false)}
+        account={editingAccount}
       />
       <InterestOverviewModal
         isOpen={isInterestModalOpen}

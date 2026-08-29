@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeftRight, CalendarCheck, Car, ChevronLeft, Cpu, HandCoins, Home,
@@ -9,7 +9,8 @@ import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { useStore } from "../store/useStore";
 import { useTranslation } from "../utils/translations";
-import Transactions from "./Transactions";
+
+const Transactions = lazy(() => import("./Transactions"));
 
 const NAV_ITEMS = [
   { path: "/", labelKey: "nav.home", icon: Home },
@@ -34,6 +35,8 @@ export default function Layout() {
   const hiddenTabs = useStore((state) => state.hiddenTabs);
   const setGlobalAddModalOpen = useStore((state) => state.setGlobalAddModalOpen);
   const setGlobalGrabModalOpen = useStore((state) => state.setGlobalGrabModalOpen);
+  const isGlobalAddModalOpen = useStore((state) => state.isGlobalAddModalOpen);
+  const isGlobalGrabModalOpen = useStore((state) => state.isGlobalGrabModalOpen);
   const { t } = useTranslation();
   const visibleNavItems = NAV_ITEMS.filter((item) => !hiddenTabs.includes(item.path));
   const mobileNavItems = visibleNavItems.filter((item) =>
@@ -71,6 +74,7 @@ export default function Layout() {
               key={item.path}
               to={item.path}
               end={item.path === "/"}
+              aria-label={t(item.labelKey)}
               className={({ isActive }) => `app-nav-item relative flex min-h-11 items-center rounded-xl transition-colors ${isSidebarOpen ? "gap-3 px-3.5" : "justify-center px-0"} ${isActive ? "bg-app-hover text-app-text-bright" : "text-app-text/62 hover:bg-app-hover/55 hover:text-app-text-bright"}`}
               title={!isSidebarOpen ? t(item.labelKey) : undefined}
             >
@@ -85,13 +89,13 @@ export default function Layout() {
         </nav>
 
         <div className="border-t border-app-border p-3">
-          <NavLink to="/settings" className={`mb-1 flex min-h-11 items-center rounded-xl text-app-text/70 hover:bg-app-hover hover:text-app-text-bright ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
+          <NavLink to="/settings" aria-label="Buka pengaturan profil" className={`mb-1 flex min-h-11 items-center rounded-xl text-app-text/70 hover:bg-app-hover hover:text-app-text-bright ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
             <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-app-accent1/12 text-xs font-semibold text-app-accent1">
               {user?.photoURL ? <img src={user.photoURL} alt="" className="h-full w-full object-cover" /> : firstName[0]}
             </div>
             {isSidebarOpen && <span className="min-w-0 flex-1 truncate text-sm font-medium">{firstName}</span>}
           </NavLink>
-          <button type="button" onClick={() => signOut(auth)} className={`flex min-h-10 w-full items-center rounded-xl text-app-text/55 hover:bg-app-danger/10 hover:text-app-danger ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
+          <button type="button" onClick={() => signOut(auth)} aria-label={t("nav.logout")} className={`flex min-h-11 w-full items-center rounded-xl text-app-text/55 hover:bg-app-danger/10 hover:text-app-danger ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
             <LogOut className="h-[18px] w-[18px]" strokeWidth={1.6} />
             {isSidebarOpen && <span className="text-[13px] font-medium">{t("nav.logout")}</span>}
           </button>
@@ -106,17 +110,21 @@ export default function Layout() {
         <motion.div key={location.pathname} initial={reduceMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduceMotion ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }} className="flex min-h-full w-full flex-1 flex-col">
           <Outlet />
         </motion.div>
-        <Transactions modalOnly />
+        {(isGlobalAddModalOpen || isGlobalGrabModalOpen) && (
+          <Suspense fallback={<span className="sr-only" role="status">Memuat formulir transaksi</span>}>
+            <Transactions modalOnly />
+          </Suspense>
+        )}
       </main>
 
       <AnimatePresence>
         {isActionSheetOpen && (
           <>
-            <motion.button type="button" aria-label="Tutup menu tambah" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }} className="fixed inset-0 z-40 bg-[#050604]/72 md:hidden" onClick={() => setActionSheetOpen(false)} />
-            <motion.section initial={reduceMotion ? false : { y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ duration: reduceMotion ? 0 : 0.34, ease: [0.16, 1, 0.3, 1] }} className="app-action-sheet fixed inset-x-0 bottom-0 z-50 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-3 md:hidden" aria-label="Tindakan cepat">
+            <motion.button type="button" aria-label="Tutup menu tambah" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }} className="fixed inset-0 z-40 bg-black/75 md:hidden" onClick={() => setActionSheetOpen(false)} />
+            <motion.section initial={reduceMotion ? false : { y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ duration: reduceMotion ? 0 : 0.34, ease: [0.16, 1, 0.3, 1] }} className="app-action-sheet fixed inset-x-0 bottom-0 z-50 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-3 md:hidden" role="dialog" aria-modal="true" aria-labelledby="quick-action-title">
               <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-app-text/25" />
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold tracking-tight text-app-text-bright">Tambah aktivitas</h2>
+                <h2 id="quick-action-title" className="text-lg font-semibold tracking-tight text-app-text-bright">Tambah aktivitas</h2>
                 <button type="button" onClick={() => setActionSheetOpen(false)} className="flex h-10 w-10 items-center justify-center rounded-xl text-app-text/60 hover:bg-app-hover hover:text-app-text-bright" aria-label="Tutup">
                   <X className="h-5 w-5" />
                 </button>
@@ -154,7 +162,7 @@ export default function Layout() {
 
 function MobileNavItem({ item, label }: { item: (typeof NAV_ITEMS)[number]; label: string }) {
   return (
-    <NavLink to={item.path} end={item.path === "/"} className={({ isActive }) => `relative flex h-full min-w-0 flex-col items-center justify-center gap-1 px-0.5 text-[10px] transition-colors ${isActive ? "text-app-accent1" : "text-app-text/58"}`}>
+    <NavLink to={item.path} end={item.path === "/"} aria-label={label} className={({ isActive }) => `relative flex h-full min-w-0 flex-col items-center justify-center gap-1 px-0.5 text-[11px] transition-colors ${isActive ? "text-app-accent1" : "text-app-text/58"}`}>
       {({ isActive }) => <><item.icon className="h-5 w-5" strokeWidth={isActive ? 2 : 1.55} /><span className="max-w-full truncate">{label}</span>{isActive && <span className="absolute bottom-0 h-0.5 w-6 rounded-full bg-app-accent1" />}</>}
     </NavLink>
   );

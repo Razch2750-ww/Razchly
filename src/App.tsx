@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './lib/firebase';
@@ -6,34 +6,40 @@ import { doc, getDoc, setDoc, onSnapshot, collection, query, where, getDocs, wri
 import { useStore } from './store/useStore';
 import ThemeApplicator from './components/ThemeApplicator';
 import { Toaster } from 'react-hot-toast';
-import Layout from './components/Layout';
 import GlobalGoalNotifier from './components/GlobalGoalNotifier';
 import { processAllAccountsInterest } from './utils/interestUtils';
 
 import Login from './components/Login';
-import Transactions from './components/Transactions';
-import Dashboard from './components/Dashboard';
-import Investments from './components/Investments';
-import Loans from './components/Loans';
-import Attendance from './components/Attendance';
-import Settings from './components/Settings';
-import GrabDetails from './components/GrabDetails';
-import SavingsTarget from './components/SavingsTarget';
-import ImageAnalysis from './components/ImageAnalysis';
-import AiTrading from './components/AiTrading';
+
+const Layout = lazy(() => import('./components/Layout'));
+const Transactions = lazy(() => import('./components/Transactions'));
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const Investments = lazy(() => import('./components/Investments'));
+const Loans = lazy(() => import('./components/Loans'));
+const Attendance = lazy(() => import('./components/Attendance'));
+const Settings = lazy(() => import('./components/Settings'));
+const GrabDetails = lazy(() => import('./components/GrabDetails'));
+const SavingsTarget = lazy(() => import('./components/SavingsTarget'));
+const ImageAnalysis = lazy(() => import('./components/ImageAnalysis'));
+const AiTrading = lazy(() => import('./components/AiTrading'));
 
 const LoadingFallback = () => (
-  <div className="flex flex-col w-full h-full p-4 md:p-8 animate-pulse">
-    <div className="w-full flex items-center justify-between mb-8">
-      <div className="w-32 h-8 bg-app-card rounded-lg" />
-      <div className="w-10 h-10 bg-app-card rounded-full" />
+  <div
+    className="flex min-h-[60vh] w-full flex-col p-4 md:p-8"
+    role="status"
+    aria-live="polite"
+    aria-label="Memuat halaman"
+  >
+    <div className="mb-8 flex w-full items-center justify-between">
+      <div className="h-8 w-32 rounded-lg bg-app-card" />
+      <div className="h-10 w-10 rounded-xl bg-app-card" />
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-      <div className="col-span-1 h-32 bg-app-card rounded-[18px]" />
-      <div className="col-span-1 h-32 bg-app-card rounded-[18px]" />
-      <div className="col-span-1 h-32 bg-app-card rounded-[18px]" />
+    <div className="grid grid-cols-1 border-y border-app-border md:grid-cols-12 md:divide-x md:divide-app-border">
+      <div className="h-36 md:col-span-3" />
+      <div className="h-36 border-t border-app-border md:col-span-5 md:border-t-0" />
+      <div className="h-36 border-t border-app-border md:col-span-4 md:border-t-0" />
     </div>
-    <div className="w-full h-64 bg-app-card rounded-[18px]" />
+    <div className="mt-8 h-64 w-full border-y border-app-border" />
   </div>
 );
 
@@ -152,7 +158,7 @@ export default function App() {
           } else {
             // init user settings
             await setDoc(userDocRef, {
-              theme: 'dracula-soft',
+              theme: 'slate-stone',
               language: 'id'
             });
           }
@@ -216,10 +222,9 @@ export default function App() {
 
   if (!authChecked) {
     return (
-      <div className="flex h-screen w-full bg-app-bg text-app-text overflow-hidden select-none font-sans">
-        {/* Sidebar Skeleton (Default collapsed style: w-[72px] on desktop, hidden on mobile) */}
-        <aside className="hidden md:flex flex-col w-[72px] border-r border-app-border bg-app-bg h-full shrink-0">
-          <div className="h-16 flex items-center justify-center border-b border-app-border px-3">
+      <div className="flex h-[100dvh] w-full overflow-hidden bg-app-bg font-sans text-app-text" role="status" aria-live="polite" aria-label="Menyiapkan Razchly">
+        <aside className="hidden h-full w-[84px] shrink-0 flex-col border-r border-app-border bg-app-bg md:flex">
+          <div className="flex h-[76px] items-center justify-center border-b border-app-border px-3">
             <div className="w-8 h-8 rounded-xl bg-app-card relative overflow-hidden border border-app-border">
               <div className="absolute inset-0 shimmer-bg" />
             </div>
@@ -352,25 +357,27 @@ export default function App() {
           border: '1px solid var(--color-app-border)',
         },
       }} />
-      <Routes>
-        {!user ? (
-          <Route path="*" element={<Login />} />
-        ) : (
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="transactions" element={<Transactions />} />
-            <Route path="investments" element={<Investments />} />
-            <Route path="ai-trading" element={<AiTrading />} />
-            <Route path="loans" element={<Loans />} />
-            <Route path="attendance" element={<Attendance />} />
-            <Route path="grab" element={<GrabDetails />} />
-            <Route path="savings" element={<SavingsTarget />} />
-            <Route path="analyze" element={<ImageAnalysis />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Route>
-        )}
-      </Routes>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          {!user ? (
+            <Route path="*" element={<Login />} />
+          ) : (
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="transactions" element={<Transactions />} />
+              <Route path="investments" element={<Investments />} />
+              <Route path="ai-trading" element={<AiTrading />} />
+              <Route path="loans" element={<Loans />} />
+              <Route path="attendance" element={<Attendance />} />
+              <Route path="grab" element={<GrabDetails />} />
+              <Route path="savings" element={<SavingsTarget />} />
+              <Route path="analyze" element={<ImageAnalysis />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+          )}
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

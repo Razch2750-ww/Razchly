@@ -4,11 +4,16 @@ import { themes } from '../themes';
 
 export default function ThemeApplicator() {
   const themeId = useStore((state) => state.themeId);
+  const language = useStore((state) => state.language);
   const customFontBase64 = useStore((state) => state.customFontBase64);
 
   useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
+  useEffect(() => {
     const theme = themes.find((t) => t.id === themeId) || themes.find(t => t.id === 'slate-stone') || themes[0];
-    
+
     document.documentElement.style.setProperty('--bg-color', theme.colors.bg);
     document.documentElement.style.setProperty('--text-color', theme.colors.text);
     document.documentElement.style.setProperty('--accent1-color', theme.colors.accent1);
@@ -21,16 +26,16 @@ export default function ThemeApplicator() {
     if (theme.colors.accent8) document.documentElement.style.setProperty('--accent8-color', theme.colors.accent8);
     if (theme.colors.accent9) document.documentElement.style.setProperty('--accent9-color', theme.colors.accent9);
     if (theme.colors.accent10) document.documentElement.style.setProperty('--accent10-color', theme.colors.accent10);
-    
+
     const isDark = theme.category === 'dark' || theme.category === 'amoled';
     document.documentElement.style.setProperty('color-scheme', isDark ? 'dark' : 'light');
-    
+
     // Update theme-color meta tag for PWA
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
       metaThemeColor.setAttribute('content', theme.colors.bg);
     }
-    
+
     if (theme.category === 'amoled') {
       document.documentElement.style.setProperty('--card-bg', '#0E0F12');
       document.documentElement.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.08)');

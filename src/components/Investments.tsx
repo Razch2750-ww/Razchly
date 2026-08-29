@@ -224,20 +224,20 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
 
   const simulationSteps = useMemo(() => {
     if (parsedPrice <= 0) return [];
-    
+
     const steps: SimulationStep[] = [];
     let currentPrice = parsedPrice;
     const maxDays = Math.min(Math.max(1, days), 100);
-    
+
     for (let i = 1; i <= maxDays; i++) {
       const prev = currentPrice;
       const frac = getFraction(prev);
-      
+
       let pct = 0;
       let theoryChange = 0;
       let change = 0;
       let nextPrice = 0;
-      
+
       if (direction === "ara") {
         pct = getAraPercentage(prev);
         theoryChange = prev * pct;
@@ -249,7 +249,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
         change = Math.floor(theoryChange / frac) * frac;
         nextPrice = Math.max(50, prev - change);
       }
-      
+
       steps.push({
         day: i,
         prevPrice: prev,
@@ -259,7 +259,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
         price: nextPrice,
         totalValue: nextPrice * parsedLots * 100,
       });
-      
+
       currentPrice = nextPrice;
     }
     return steps;
@@ -274,9 +274,9 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
   };
 
   return (
-    <div className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden">
-      
-      
+    <div className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col relative overflow-hidden">
+
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 relative z-10">
         <div>
           <h2 className="text-app-text-bright font-semibold flex items-center gap-2 text-lg">
@@ -286,7 +286,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
             Hitung potensi auto rejection berdasarkan regulasi fraksi harga dan batasan BEI terbaru.
           </p>
         </div>
-        
+
         {/* Toggle ARA / ARB */}
         <div className="flex bg-app-bg p-1 rounded-xl border border-app-border">
           <button
@@ -294,7 +294,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
             onClick={() => setDirection("ara")}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold uppercase transition-all flex items-center gap-1.5 ${
               direction === "ara"
-                ? "bg-app-success text-white shadow-sm font-semibold"
+                ? "bg-app-success text-white font-semibold"
                 : "text-app-text/60 hover:text-app-text-bright font-semibold"
             }`}
           >
@@ -305,7 +305,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
             onClick={() => setDirection("arb")}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold uppercase transition-all flex items-center gap-1.5 ${
               direction === "arb"
-                ? "bg-app-danger text-white shadow-sm font-semibold"
+                ? "bg-app-danger text-white font-semibold"
                 : "text-app-text/60 hover:text-app-text-bright font-semibold"
             }`}
           >
@@ -319,7 +319,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
         <div className="bg-app-bg/40 p-5 rounded-2xl border border-app-border space-y-5">
           {/* Section 1: Quick Select */}
           <div>
-            <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
+            <label className="text-xs uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
               Pilih Contoh / Portofolio
             </label>
             <div className="flex flex-wrap gap-2">
@@ -337,7 +337,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
               >
                 Rp 1.255 (Contoh 2)
               </button>
-              
+
               {ownedStocks.map((stock) => (
                 <button
                   key={stock.id}
@@ -347,7 +347,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
                 >
                   <span className="font-semibold text-app-accent1">{stock.code}</span>
                   <span className="text-app-text/60">Rp {stock.price.toLocaleString("id-ID")}</span>
-                  {stock.qty && <span className="px-1 py-0.5 rounded bg-app-bg text-[9px] text-app-accent2">{stock.qty} Lot</span>}
+                  {stock.qty && <span className="px-1 py-0.5 rounded bg-app-bg text-[11px] text-app-accent2">{stock.qty} Lot</span>}
                 </button>
               ))}
             </div>
@@ -356,7 +356,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
           {/* Section 2: Main inputs in a clean responsive grid */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
-              <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
+              <label className="text-xs uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                 Nama / Kode Saham
               </label>
               <input
@@ -369,7 +369,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
+              <label className="text-xs uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                 Harga Sebelumnya (Rp)
               </label>
               <input
@@ -383,7 +383,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
+              <label className="text-xs uppercase font-semibold tracking-wider mb-2 block text-app-text/70">
                 Jumlah Lot
               </label>
               <input
@@ -397,7 +397,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70 flex justify-between">
+              <label className="text-xs uppercase font-semibold tracking-wider mb-2 block text-app-text/70 flex justify-between">
                 <span>Berapa Kali ARA/ARB ({days}x)</span>
               </label>
               <div className="flex items-center gap-2">
@@ -442,11 +442,11 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
           <div className="bg-app-bg/50 rounded-2xl border border-app-border p-5">
             <h3 className="text-xs font-semibold text-app-text-bright uppercase tracking-wider mb-4 flex items-center justify-between">
               <span>Hasil Proyeksi Hari-ke-Hari {stockName ? `Saham ${stockName}` : ""}</span>
-              <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${direction === "ara" ? "bg-app-success/10 text-app-success border border-app-success/20" : "bg-app-danger/10 text-app-danger border border-app-danger/20"}`}>
+              <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${direction === "ara" ? "bg-app-success/10 text-app-success border border-app-success/20" : "bg-app-danger/10 text-app-danger border border-app-danger/20"}`}>
                 {direction.toUpperCase()} MODE
               </span>
             </h3>
-            
+
             {simulationSteps.length === 0 ? (
               <p className="text-xs text-app-text/50 text-center py-8">
                 Masukkan harga acuan yang valid untuk melihat simulasi.
@@ -490,7 +490,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
                               </td>
                               <td className={`py-3 text-right font-semibold text-xs ${diffTotal >= 0 ? "text-app-success" : "text-app-danger"}`}>
                                 {diffTotal >= 0 ? "+" : ""}Rp {diffTotal.toLocaleString("id-ID")}
-                                <span className="block text-[10px] font-normal opacity-80">
+                                <span className="block text-xs font-normal opacity-80">
                                   ({diffTotal >= 0 ? "+" : ""}{pctTotal.toFixed(2)}%)
                                 </span>
                               </td>
@@ -508,7 +508,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
           </div>
 
           {/* Rules Explanation */}
-          <div className="bg-app-card rounded-[20px] border border-app-border/60 p-4 sm:p-5 text-xs text-app-text/70 space-y-3 shadow-lg shadow-black/5">
+          <div className="bg-app-card rounded-[20px] border border-app-border/60 p-4 sm:p-5 text-xs text-app-text/70 space-y-3">
             <h4 className="font-semibold text-app-text-bright">
               Aturan ARA & ARB Bursa Efek Indonesia (BEI):
             </h4>
@@ -531,28 +531,28 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
                 </p>
               </div>
             </div>
-            
+
             <div className="pt-2 border-t border-app-border">
               <span className="font-semibold text-app-text-bright">Tabel Fraksi Harga:</span>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-1.5">
                 <div className="bg-app-bg/40 p-1.5 rounded border border-app-border text-center">
-                  <p className="text-app-text/50 text-[9px] uppercase font-semibold">Selalu &lt; 200</p>
+                  <p className="text-app-text/50 text-[11px] uppercase font-semibold">Selalu &lt; 200</p>
                   <p className="font-semibold text-app-text-bright">Rp 1</p>
                 </div>
                 <div className="bg-app-bg/40 p-1.5 rounded border border-app-border text-center">
-                  <p className="text-app-text/50 text-[9px] uppercase font-semibold">200 - &lt; 500</p>
+                  <p className="text-app-text/50 text-[11px] uppercase font-semibold">200 - &lt; 500</p>
                   <p className="font-semibold text-app-text-bright">Rp 2</p>
                 </div>
                 <div className="bg-app-bg/40 p-1.5 rounded border border-app-border text-center">
-                  <p className="text-app-text/50 text-[9px] uppercase font-semibold">500 - &lt; 2.000</p>
+                  <p className="text-app-text/50 text-[11px] uppercase font-semibold">500 - &lt; 2.000</p>
                   <p className="font-semibold text-app-text-bright">Rp 5</p>
                 </div>
                 <div className="bg-app-bg/40 p-1.5 rounded border border-app-border text-center">
-                  <p className="text-app-text/50 text-[9px] uppercase font-semibold">2.000 - &lt; 5.000</p>
+                  <p className="text-app-text/50 text-[11px] uppercase font-semibold">2.000 - &lt; 5.000</p>
                   <p className="font-semibold text-app-text-bright">Rp 10</p>
                 </div>
                 <div className="bg-app-bg/40 p-1.5 rounded border border-app-border text-center col-span-2 sm:col-span-1">
-                  <p className="text-app-text/50 text-[9px] uppercase font-semibold">&ge; 5.000</p>
+                  <p className="text-app-text/50 text-[11px] uppercase font-semibold">&ge; 5.000</p>
                   <p className="font-semibold text-app-text-bright">Rp 25</p>
                 </div>
               </div>
@@ -568,12 +568,12 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
 export function parseInvestmentFromTransaction(tx: any) {
   const note = (tx.note || "").trim();
   const categoryId = tx.categoryId || "";
-  
+
   // Try strict format first (the one generated by Investments.tsx)
   // e.g. "Beli Saham - BBCA (10 Lot)"
   const strictBuyRegex = /Beli\s+(Saham|Crypto|Emas)\s+-\s+([A-Z0-9]+)\s+\(([\d.]+)\s+(Lot|Koin|Gram)\)/i;
   const strictSellRegex = /Jual\s+(Saham|Crypto|Emas)\s+-\s+([A-Z0-9]+)\s+\(([\d.]+)\s+(Lot|Koin|Gram)\)/i;
-  
+
   let match = note.match(strictBuyRegex);
   if (match) {
     const category = match[1].toLowerCase() as "saham" | "crypto" | "emas";
@@ -582,7 +582,7 @@ export function parseInvestmentFromTransaction(tx: any) {
     const type = "buy";
     return { category, code, qty, type, date: tx.date, amount: tx.amount };
   }
-  
+
   match = note.match(strictSellRegex);
   if (match) {
     const category = match[1].toLowerCase() as "saham" | "crypto" | "emas";
@@ -596,7 +596,7 @@ export function parseInvestmentFromTransaction(tx: any) {
   // If categoryId is "investment-buy" or note contains indicators
   const isBuy = categoryId === "investment-buy" || /beli|buy/i.test(note);
   const isSell = categoryId === "investment-sell" || /jual|sell/i.test(note);
-  
+
   if (isBuy || isSell) {
     let category: "saham" | "crypto" | "emas" = "saham";
     if (/crypto|btc|eth|sol|bnb|doge|usdt/i.test(note)) category = "crypto";
@@ -640,7 +640,7 @@ export function parseInvestmentFromTransaction(tx: any) {
       amount: tx.amount
     };
   }
-  
+
   return null;
 }
 
@@ -783,7 +783,7 @@ export default function Investments() {
   const selectSymbol = (sym: any) => {
     setPortoCode(sym.symbol);
     setShowDropdown(false);
-    
+
     // Proactively cache to avoid logo/name popping in later
     setQuotes((prev) => {
       const merged = { ...prev };
@@ -1158,7 +1158,7 @@ export default function Investments() {
           } else if (sellPricePerUnit < h.avgBuyPrice) {
             h.losses += 1;
           }
-          
+
           // Realized profit/loss calculation
           const profitPerUnit = sellPricePerUnit - h.avgBuyPrice;
           h.realizedPL += profitPerUnit * sellQty * mult;
@@ -1232,7 +1232,7 @@ export default function Investments() {
         if (h.qty <= 0) return;
         const mult = h.category === "saham" ? 100 : 1;
         const avgPrice = h.totalBuyQty > 0 ? h.totalBuyAmount / (h.totalBuyQty * mult) : 0;
-        
+
         const invRef = doc(collection(db, "users", user.uid, "investments"));
         batch.set(invRef, {
           category: h.category,
@@ -1255,12 +1255,12 @@ export default function Investments() {
   useEffect(() => {
     const fetchQuotes = async () => {
       const symbols = new Set<string>();
-      
+
       // Collect from manual portfolio
       investments.forEach((i) => {
         symbols.add(i.category === "emas" ? "EMAS" : i.code);
       });
-      
+
       // Collect from transaction-audited portfolio
       auditedInvestments.forEach((i) => {
         symbols.add(i.category === "emas" ? "EMAS" : i.code);
@@ -1492,14 +1492,14 @@ export default function Investments() {
         if (h.qty <= 0) return;
         const mult = h.category === "saham" ? 100 : 1;
         modalForDay += h.qty * h.avgPrice * mult;
-        
+
         let finalPrice = getLivePrice({ category: h.category, code: h.code, price: h.avgPrice } as Investment);
-        
+
         const daysSinceBuy = Math.max(1, Math.floor((new Date().getTime() - h.earliestTxDate) / (1000 * 60 * 60 * 24)));
         const daysFromBuyToCurrentPoint = Math.floor((timeMs - h.earliestTxDate) / (1000 * 60 * 60 * 24));
-        
+
         let simulatedPrice = finalPrice;
-        
+
         if (timeMs < h.earliestTxDate) {
            const noiseSeed = i + h.code.charCodeAt(0) + (h.code.charCodeAt(h.code.length-1) || 0);
            const noise = Math.sin(noiseSeed) * 0.008;
@@ -1517,7 +1517,7 @@ export default function Investments() {
 
       const totalEquity = valueForDay;
       const portfolioReturn = modalForDay > 0 ? ((valueForDay - modalForDay) / modalForDay) * 100 : 0;
-      
+
       const progress = numDays > 0 ? (numDays - i) / numDays : 1;
       const wave = Math.sin(progress * Math.PI * 3) * 6 + Math.sin(progress * Math.PI * 7) * 2;
       const ihsgReturn = progress * targetIhsg + wave;
@@ -1566,7 +1566,7 @@ export default function Investments() {
   }, [activeInvestments, filterCategory, sortBy, quotes]);
 
   const COLORS = useMemo(() => [
-    "#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#EF4444", 
+    "#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#EF4444",
     "#14B8A6", "#6366f1", "#EC4899", "#f97316"
   ], []);
 
@@ -1604,12 +1604,12 @@ export default function Investments() {
 
   const monthlyRows = useMemo(() => {
     const groups: Record<string, { monthKey: string; dateLabel: string; finalValue: number; initialValue: number; totalNetInflow: number; rawDate: Date }> = {};
-    
+
     chartData.forEach((d) => {
       const date = d.rawDate;
       const monthKey = format(date, "yyyy-MM");
       const label = format(date, "MMM yy", { locale: localeId });
-      
+
       if (!groups[monthKey]) {
         groups[monthKey] = {
           monthKey,
@@ -1624,9 +1624,9 @@ export default function Investments() {
         groups[monthKey].totalNetInflow += (d.netInflow || 0);
       }
     });
-    
+
     const sortedMonths = Object.values(groups).sort((a, b) => a.monthKey.localeCompare(b.monthKey));
-    
+
     return sortedMonths.map((m, idx) => {
       const prevMonthVal = idx > 0 ? sortedMonths[idx - 1].finalValue : m.initialValue;
       const pnl = (m.finalValue - prevMonthVal) - m.totalNetInflow;
@@ -1718,13 +1718,13 @@ export default function Investments() {
       mobileActions={mobileActionsInvestments}
     >
       {/* Sub-tab Navigation */}
-      <div className="flex bg-app-card/60 backdrop-blur-md p-1.5 rounded-2xl border border-app-border/60 self-start mb-6 md:mb-8 gap-1.5 relative z-10 shrink-0 shadow-lg shadow-black/5">
+      <div className="flex bg-app-card/60 backdrop-blur-md p-1.5 rounded-2xl border border-app-border/60 self-start mb-6 md:mb-8 gap-1.5 relative z-10 shrink-0">
         <button
           type="button"
           onClick={() => setActiveTab("dashboard")}
           className={`px-5 py-2.5 rounded-[14px] text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
             activeTab === "dashboard"
-              ? "bg-app-accent1 text-app-bg shadow-md"
+              ? "bg-app-accent1 text-app-bg"
               : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
           }`}
         >
@@ -1736,14 +1736,14 @@ export default function Investments() {
           onClick={() => setActiveTab("holding")}
           className={`px-5 py-2.5 rounded-[14px] text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
             activeTab === "holding"
-              ? "bg-app-accent1 text-app-bg shadow-md"
+              ? "bg-app-accent1 text-app-bg"
               : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
           }`}
         >
           <Briefcase className="w-4 h-4" />
           {language === "en" ? "Portfolio & Audit" : "Portofolio & Audit"}
           {auditedHoldings.length > 0 && (
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${activeTab === "holding" ? "bg-app-bg text-app-accent1" : "bg-app-accent1 text-app-bg"}`}>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-extrabold ${activeTab === "holding" ? "bg-app-bg text-app-accent1" : "bg-app-accent1 text-app-bg"}`}>
               {auditedHoldings.length}
             </span>
           )}
@@ -1756,24 +1756,24 @@ export default function Investments() {
           }}
           className={`px-5 py-2.5 rounded-[14px] text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === "ai_insights"
-              ? "bg-app-accent1 text-app-bg shadow-md"
+              ? "bg-app-accent1 text-app-bg"
               : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
           }`}
         >
-          <Sparkles className={`w-4 h-4 ${activeTab === "ai_insights" ? "text-app-bg" : "text-app-accent1"} animate-pulse`} />
+          <Sparkles className={`w-4 h-4 ${activeTab === "ai_insights" ? "text-app-bg" : "text-app-accent1"}`} />
           {language === "en" ? "AI Insights & Stock Picks" : "AI Insights & Rekomendasi Saham"}
         </button>
       </div>
 
       {activeTab === "dashboard" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-in fade-in slide-in-from-bottom-2 duration-500 w-full mb-6">
-          
+
           {/* COLUMN 1: LEFT PANEL (lg:col-span-5) */}
           <div className="lg:col-span-5 flex flex-col gap-6 w-full">
-            
+
             {/* UNIFIED HERO CHART CARD */}
-            <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden w-full">
-              
+            <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col relative overflow-hidden w-full">
+
               {/* Header with Mode Toggle & Period Filter */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 relative z-10">
                 <div className="flex items-center bg-app-bg p-1 rounded-xl border border-app-border self-start">
@@ -1782,7 +1782,7 @@ export default function Investments() {
                     onClick={() => setHeroChartView("equity")}
                     className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                       heroChartView === "equity"
-                        ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
+                        ? "bg-app-card text-app-accent1 border border-app-border"
                         : "text-app-text/60 hover:text-app-text-bright"
                     }`}
                   >
@@ -1793,7 +1793,7 @@ export default function Investments() {
                     onClick={() => setHeroChartView("return")}
                     className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                       heroChartView === "return"
-                        ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
+                        ? "bg-app-card text-app-accent1 border border-app-border"
                         : "text-app-text/60 hover:text-app-text-bright"
                     }`}
                   >
@@ -1807,9 +1807,9 @@ export default function Investments() {
                       key={p}
                       type="button"
                       onClick={() => setChartPeriod(p)}
-                      className={`px-2.5 py-1 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
+                      className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                         chartPeriod === p
-                          ? "bg-app-accent1 text-app-bg shadow-sm"
+                          ? "bg-app-accent1 text-app-bg"
                           : "text-app-text/60 hover:text-app-text-bright hover:bg-app-hover/50"
                       }`}
                     >
@@ -1823,7 +1823,7 @@ export default function Investments() {
               <div className="relative z-10 flex flex-wrap items-baseline justify-between gap-2 mb-4 pb-3 border-b border-app-border/50">
                 {heroChartView === "equity" ? (
                   <div>
-                    <span className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider block mb-0.5">
+                    <span className="text-app-text/60 text-xs font-bold uppercase tracking-wider block mb-0.5">
                       Total Nilai Equity Saat Ini
                     </span>
                     <div className="flex items-baseline gap-2">
@@ -1838,7 +1838,7 @@ export default function Investments() {
                 ) : (
                   <div className="flex items-center gap-4">
                     <div>
-                      <span className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider block mb-0.5">
+                      <span className="text-app-text/60 text-xs font-bold uppercase tracking-wider block mb-0.5">
                         Return Portofolio
                       </span>
                       <span className={`text-xl font-bold font-mono ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`}>
@@ -1847,7 +1847,7 @@ export default function Investments() {
                     </div>
                     <div className="h-7 w-px bg-app-border" />
                     <div>
-                      <span className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider block mb-0.5">
+                      <span className="text-app-text/60 text-xs font-bold uppercase tracking-wider block mb-0.5">
                         IHSG Benchmark
                       </span>
                       <span className={`text-xl font-bold font-mono ${marketData.COMPOSITE?.change >= 0 ? "text-app-success" : "text-app-danger"}`}>
@@ -1863,18 +1863,12 @@ export default function Investments() {
                 <ResponsiveContainer width="100%" height="100%">
                   {heroChartView === "equity" ? (
                     <AreaChart data={chartData} margin={{ top: 10, right: 5, left: -20, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="colorTotalEquity" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="var(--color-app-success)" stopOpacity={0.25} />
-                          <stop offset="100%" stopColor="var(--color-app-success)" stopOpacity={0.0} />
-                        </linearGradient>
-                      </defs>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-app-border)" opacity={0.3} />
                       <XAxis
                         dataKey="name"
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                        tick={{ fontSize: 11, fill: "var(--color-app-text)" }}
                         dy={5}
                         opacity={0.5}
                       />
@@ -1882,7 +1876,7 @@ export default function Investments() {
                         orientation="right"
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                        tick={{ fontSize: 11, fill: "var(--color-app-text)" }}
                         tickFormatter={formatYAxis}
                         opacity={0.5}
                       />
@@ -1908,8 +1902,8 @@ export default function Investments() {
                         dataKey="value"
                         stroke="var(--color-app-success)"
                         strokeWidth={2.5}
-                        fillOpacity={1}
-                        fill="url(#colorTotalEquity)"
+                        fillOpacity={0}
+                        fill="transparent"
                       />
                     </AreaChart>
                   ) : (
@@ -1919,7 +1913,7 @@ export default function Investments() {
                         dataKey="name"
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                        tick={{ fontSize: 11, fill: "var(--color-app-text)" }}
                         dy={5}
                         opacity={0.5}
                       />
@@ -1927,7 +1921,7 @@ export default function Investments() {
                         orientation="right"
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 9, fill: "var(--color-app-text)" }}
+                        tick={{ fontSize: 11, fill: "var(--color-app-text)" }}
                         tickFormatter={(val) => `${val.toFixed(0)}%`}
                         opacity={0.5}
                       />
@@ -1976,7 +1970,7 @@ export default function Investments() {
             </HoverCard>
 
             {/* CARD: AI INVESTMENT INSIGHTS & STOCK ADVISOR BANNER */}
-            <HoverCard className="bg-gradient-to-br from-app-card via-app-card to-app-accent1/5 rounded-[20px] p-6 border border-app-accent1/30 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden w-full group">
+            <HoverCard className="flex w-full flex-col overflow-hidden rounded-[20px] border border-app-accent1/30 bg-app-card p-6">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <BrainCircuit className="w-24 h-24 text-app-accent1" />
               </div>
@@ -1984,7 +1978,7 @@ export default function Investments() {
               <div className="flex items-center justify-between mb-3 relative z-10">
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-xl bg-app-accent1/10 text-app-accent1 border border-app-accent1/20">
-                    <Sparkles className="w-4 h-4 animate-pulse" />
+                    <Sparkles className="h-4 w-4" />
                   </div>
                   <div>
                     <h3 className="text-xs font-bold uppercase tracking-wider text-app-text/60">
@@ -1995,7 +1989,7 @@ export default function Investments() {
                     </p>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-app-accent1/10 text-app-accent1 border border-app-accent1/20">
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-app-accent1/10 text-app-accent1 border border-app-accent1/20">
                   Gaya: {investStyle.toUpperCase()}
                 </span>
               </div>
@@ -2018,7 +2012,7 @@ export default function Investments() {
                     setActiveTab("ai_insights");
                     if (!aiInsightsData) fetchAiInsights(investStyle);
                   }}
-                  className="text-xs font-bold text-app-accent1 hover:text-app-accent1/80 flex items-center gap-1 transition-all cursor-pointer group-hover:translate-x-0.5"
+                  className="flex items-center gap-1 text-xs font-bold text-app-accent1 hover:text-app-accent1/80"
                 >
                   <span>Buka AI Insights</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -2030,17 +2024,17 @@ export default function Investments() {
 
           {/* COLUMN 2: MIDDLE PANEL - TOTAL EQUITY RETURN (lg:col-span-3) */}
           <div className="lg:col-span-3 w-full">
-            <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden w-full h-[620px]">
-              
-              
+            <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col relative overflow-hidden w-full h-[620px]">
+
+
               <div className="relative z-10 flex flex-col gap-3 shrink-0 mb-4">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider">
+                  <span className="text-app-text/70 text-xs font-semibold uppercase tracking-wider">
                     Total Equity Return
                   </span>
                   <div className="relative group">
                     <Info className="w-3.5 h-3.5 text-app-text/50 hover:text-app-text cursor-pointer" />
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-app-card border border-app-border p-2 rounded-lg shadow-xl text-[10px] text-app-text/80 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 leading-relaxed">
+                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-app-card border border-app-border p-2 rounded-lg text-xs text-app-text/80 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 leading-relaxed">
                       Catatan performa harian/bulanan nilai investasi dan P&L Anda.
                     </div>
                   </div>
@@ -2052,9 +2046,9 @@ export default function Investments() {
                     <button
                       type="button"
                       onClick={() => setEquityReturnViewMode("daily")}
-                      className={`px-3 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
+                      className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                         equityReturnViewMode === "daily"
-                          ? "bg-app-card text-app-accent1 shadow-sm"
+                          ? "bg-app-card text-app-accent1"
                           : "text-app-text/60 hover:text-app-text-bright"
                       }`}
                     >
@@ -2063,16 +2057,16 @@ export default function Investments() {
                     <button
                       type="button"
                       onClick={() => setEquityReturnViewMode("monthly")}
-                      className={`px-3 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
+                      className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                         equityReturnViewMode === "monthly"
-                          ? "bg-app-card text-app-accent1 shadow-sm"
+                          ? "bg-app-card text-app-accent1"
                           : "text-app-text/60 hover:text-app-text-bright"
                       }`}
                     >
                       Monthly
                     </button>
                   </div>
-                  <span className="text-[10px] font-semibold text-app-text/50 capitalize font-sans">
+                  <span className="text-xs font-semibold text-app-text/50 capitalize font-sans">
                     {chartPeriod === "YTD" ? "Year to Date" : chartPeriod === "All" ? "All Time" : `Last ${chartPeriod}`}
                   </span>
                 </div>
@@ -2082,7 +2076,7 @@ export default function Investments() {
               <div className="flex-1 overflow-y-auto pr-1 relative z-10 border border-app-border rounded-xl bg-app-bg/15">
                 <table className="w-full text-left text-xs font-mono">
                   <thead>
-                    <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-semibold font-sans uppercase tracking-wider text-[9px] sticky top-0 z-10">
+                    <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-semibold font-sans uppercase tracking-wider text-[11px] sticky top-0 z-10">
                       <th className="py-2.5 px-3">Date</th>
                       <th className="py-2.5 px-3 text-right">Equity</th>
                       <th className="py-2.5 px-3 text-right">P&L</th>
@@ -2107,7 +2101,7 @@ export default function Investments() {
                             </td>
                             <td className={`py-2.5 px-3 text-right font-semibold ${row.pnl >= 0 ? "text-app-success" : "text-app-danger"}`}>
                               <div>{row.pnl >= 0 ? "+" : ""}{row.pnl.toLocaleString("id-ID")}</div>
-                              <div className="text-[9px] font-normal opacity-85">({row.pnl >= 0 ? "+" : ""}{row.pnlPercent.toFixed(2)}%)</div>
+                              <div className="text-[11px] font-normal opacity-85">({row.pnl >= 0 ? "+" : ""}{row.pnlPercent.toFixed(2)}%)</div>
                             </td>
                           </tr>
                         ))
@@ -2130,7 +2124,7 @@ export default function Investments() {
                             </td>
                             <td className={`py-3 px-3 text-right font-semibold ${row.pnl >= 0 ? "text-app-success" : "text-app-danger"}`}>
                               <div>{row.pnl >= 0 ? "+" : ""}{row.pnl.toLocaleString("id-ID")}</div>
-                              <div className="text-[9px] font-normal opacity-85">({row.pnl >= 0 ? "+" : ""}{row.pnlPercent.toFixed(2)}%)</div>
+                              <div className="text-[11px] font-normal opacity-85">({row.pnl >= 0 ? "+" : ""}{row.pnlPercent.toFixed(2)}%)</div>
                             </td>
                           </tr>
                         ))
@@ -2144,11 +2138,11 @@ export default function Investments() {
 
           {/* COLUMN 3: RIGHT PANEL - PORTFOLIO ALLOCATION (lg:col-span-4) */}
           <div className="lg:col-span-4 w-full">
-            <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden w-full min-h-[620px]">
-              
-              
+            <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col relative overflow-hidden w-full min-h-[620px]">
+
+
               <div className="relative z-10 flex justify-between items-center shrink-0 mb-4">
-                <span className="text-app-text/70 text-[10px] font-semibold uppercase tracking-wider">
+                <span className="text-app-text/70 text-xs font-semibold uppercase tracking-wider">
                   Portfolio Allocation
                 </span>
 
@@ -2157,9 +2151,9 @@ export default function Investments() {
                   <button
                     type="button"
                     onClick={() => setAllocationViewBy("aset")}
-                    className={`px-3 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
+                    className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                       allocationViewBy === "aset"
-                        ? "bg-app-card text-app-accent1 shadow-sm"
+                        ? "bg-app-card text-app-accent1"
                         : "text-app-text/60 hover:text-app-text-bright"
                     }`}
                   >
@@ -2168,9 +2162,9 @@ export default function Investments() {
                   <button
                     type="button"
                     onClick={() => setAllocationViewBy("kategori")}
-                    className={`px-3 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
+                    className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                       allocationViewBy === "kategori"
-                        ? "bg-app-card text-app-accent1 shadow-sm"
+                        ? "bg-app-card text-app-accent1"
                         : "text-app-text/60 hover:text-app-text-bright"
                     }`}
                   >
@@ -2186,7 +2180,7 @@ export default function Investments() {
                 if (totalAllocValue === 0) {
                   return (
                     <div className="flex-1 flex flex-col items-center justify-center text-app-text/50 text-xs py-8 border border-dashed border-app-border rounded-xl relative z-10 bg-app-bg/10 min-h-[300px]">
-                      <TrendingUp className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
+                      <TrendingUp className="w-8 h-8 text-app-text/30 mb-2" />
                       Belum ada instrumen investasi
                     </div>
                   );
@@ -2230,7 +2224,7 @@ export default function Investments() {
                         <span className="text-[15px] font-semibold text-app-text-bright break-words leading-tight font-mono">
                           Rp {totalAllocValue.toLocaleString("id-ID")}
                         </span>
-                        <span className="text-[10px] text-app-text/50 mt-1 font-semibold">
+                        <span className="text-xs text-app-text/50 mt-1 font-semibold">
                           {allocationData.length} {allocationViewBy === "aset" ? "Stocks" : "Sub-Sectors"}
                         </span>
                       </div>
@@ -2246,19 +2240,19 @@ export default function Investments() {
                           <div key={item.id} className="flex flex-col gap-1.5 group">
                             <div className="flex justify-between items-center text-xs">
                               <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-full bg-app-card border border-app-border flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                                <div className="w-7 h-7 rounded-full bg-app-card border border-app-border flex items-center justify-center shrink-0 overflow-hidden">
                                   <AssetLogo logoid={item.logoid} code={item.name} description={item.description} />
                                 </div>
                                 <div className="flex flex-col">
                                   <span className="font-semibold text-app-text-bright">{item.name}</span>
-                                  <span className="text-[9px] text-app-text/50 font-mono">Rp {item.value.toLocaleString("id-ID")}</span>
+                                  <span className="text-[11px] text-app-text/50 font-mono">Rp {item.value.toLocaleString("id-ID")}</span>
                                 </div>
                               </div>
                               <span className="font-semibold text-app-text-bright font-mono">{percentage.toFixed(2)}%</span>
                             </div>
                             <div className="w-full h-1.5 bg-app-border/20 rounded-full overflow-hidden relative">
-                              <div 
-                                className="h-full rounded-full transition-all duration-1000 ease-out" 
+                              <div
+                                className="h-full rounded-full transition-all duration-1000 ease-out"
                                 style={{ width: `${percentage}%`, backgroundColor: color }}
                               />
                             </div>
@@ -2296,7 +2290,7 @@ export default function Investments() {
             {/* WIDGETS (STACK ON MOBILE, GRID ON DESKTOP) */}
             <div className="flex flex-col gap-3.5 mb-6 md:grid md:grid-cols-3 md:gap-5 md:mb-8">
               {/* TOTAL INVESTASI */}
-              <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex items-center justify-between shadow-lg shadow-black/10 relative overflow-hidden cursor-pointer w-full min-h-[100px]">
+              <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex items-center justify-between relative overflow-hidden cursor-pointer w-full min-h-[100px]">
                 <div className="flex items-center gap-5 relative z-10 w-full min-w-0">
                   <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center ${incomeToday >= 0 ? "bg-app-success/10" : "bg-app-danger/10"}`}>
                     <BarChart3 className={`w-7 h-7 ${incomeToday >= 0 ? "text-app-success" : "text-app-danger"}`} />
@@ -2325,7 +2319,7 @@ export default function Investments() {
               </HoverCard>
 
               {/* RETURN */}
-              <HoverCard className="bg-app-card rounded-[20px] border border-app-border/60 flex shadow-lg shadow-black/10 overflow-hidden relative cursor-pointer w-full min-h-[100px]">
+              <HoverCard className="bg-app-card rounded-[20px] border border-app-border/60 flex overflow-hidden relative cursor-pointer w-full min-h-[100px]">
                 <div className="flex-1 p-5 border-r border-app-border/60 flex flex-col justify-center relative z-10 min-w-0">
                    <p className="text-app-text/50 text-[11px] font-bold uppercase tracking-widest mb-1">Modal Awal</p>
                    <p className="text-lg font-bold text-app-text-bright font-mono leading-tight truncate">Rp {expenseToday.toLocaleString("id-ID")}</p>
@@ -2342,10 +2336,10 @@ export default function Investments() {
               </HoverCard>
 
               {/* PASAR: IHSG & KURS RUPIAH */}
-              <HoverCard className="bg-app-card rounded-[20px] border border-app-border/60 flex shadow-lg shadow-black/10 overflow-hidden relative cursor-pointer w-full min-h-[100px]">
+              <HoverCard className="bg-app-card rounded-[20px] border border-app-border/60 flex overflow-hidden relative cursor-pointer w-full min-h-[100px]">
                 <div className="flex-1 p-3.5 sm:p-5 border-r border-app-border/60 hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0">
                    <div className="flex justify-between items-center mb-0.5">
-                     <p className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider">IHSG</p>
+                     <p className="text-app-text/60 text-xs font-bold uppercase tracking-wider">IHSG</p>
                      {ihsgChange >= 0 ? (
                        <TrendingUp className="w-3.5 h-3.5 shrink-0 text-app-success" />
                      ) : (
@@ -2355,7 +2349,7 @@ export default function Investments() {
                    <p className="text-base sm:text-lg font-bold text-app-text-bright font-mono leading-tight truncate">
                      {marketData.COMPOSITE?.price?.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "7.245,12"}
                    </p>
-                   <div className={`flex items-center gap-1 mt-1 text-[10px] sm:text-[11px] font-semibold ${ihsgChange >= 0 ? "text-app-success" : "text-app-danger"} font-mono`}>
+                   <div className={`flex items-center gap-1 mt-1 text-xs sm:text-[11px] font-semibold ${ihsgChange >= 0 ? "text-app-success" : "text-app-danger"} font-mono`}>
                      {ihsgChange >= 0 ? "+" : ""}{ihsgChange.toFixed(2)}%
                    </div>
                 </div>
@@ -2366,7 +2360,7 @@ export default function Investments() {
                    className="flex-1 p-3.5 sm:p-5 hover:bg-app-hover transition-colors cursor-pointer flex flex-col justify-center relative z-10 min-w-0"
                 >
                    <div className="flex justify-between items-center mb-0.5">
-                     <p className="text-app-text/60 text-[10px] font-bold uppercase tracking-wider">USD/IDR</p>
+                     <p className="text-app-text/60 text-xs font-bold uppercase tracking-wider">USD/IDR</p>
                      {usdidrChange >= 0 ? (
                        <TrendingUp className="w-3.5 h-3.5 shrink-0 text-app-danger" />
                      ) : (
@@ -2376,7 +2370,7 @@ export default function Investments() {
                    <p className="text-base sm:text-lg font-bold text-app-text-bright font-mono leading-tight truncate">
                      {marketData.USDIDR?.price?.toLocaleString("id-ID") || "16.250"}
                    </p>
-                   <div className={`flex items-center gap-1 mt-1 text-[10px] sm:text-[11px] font-semibold ${usdidrChange >= 0 ? "text-app-danger" : "text-app-success"} font-mono`}>
+                   <div className={`flex items-center gap-1 mt-1 text-xs sm:text-[11px] font-semibold ${usdidrChange >= 0 ? "text-app-danger" : "text-app-success"} font-mono`}>
                      {usdidrChange >= 0 ? "+" : ""}{usdidrChange.toFixed(2)}%
                    </div>
                 </a>
@@ -2389,23 +2383,23 @@ export default function Investments() {
       {/* MAIN SECTIONS */}
       <div className="flex flex-col gap-6 mb-6">
         {/* PERFORMA INVESTASI */}
-        <div className="bg-app-card rounded-[20px] p-6 sm:p-8 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden">
-          
+        <div className="bg-app-card rounded-[20px] p-6 sm:p-8 border border-app-border/60 flex flex-col relative overflow-hidden">
+
           <div className="flex items-center justify-between mb-6 md:mb-8 relative z-10">
             <h2 className="text-app-text-bright text-xl sm:text-2xl font-bold tracking-tight">
               Performa Investasi
             </h2>
             <div className="flex items-center gap-2">
               <div className="bg-app-bg rounded-full p-1 border border-app-border flex">
-                <button
+                <button type="button"
                   onClick={() => setChartPeriod("1W")}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${chartPeriod === "1W" ? "bg-app-accent1 text-app-bg shadow-md" : "bg-app-bg/50 text-app-text/60 hover:bg-app-hover hover:text-app-text-bright"}`}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${chartPeriod === "1W" ? "bg-app-accent1 text-app-bg" : "bg-app-bg/50 text-app-text/60 hover:bg-app-hover hover:text-app-text-bright"}`}
                 >
                   7 Hari
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setChartPeriod("1M")}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${chartPeriod === "1M" ? "bg-app-accent1 text-app-bg shadow-md" : "bg-app-bg/50 text-app-text/60 hover:bg-app-hover hover:text-app-text-bright"}`}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${chartPeriod === "1M" ? "bg-app-accent1 text-app-bg" : "bg-app-bg/50 text-app-text/60 hover:bg-app-hover hover:text-app-text-bright"}`}
                 >
                   30 Hari
                 </button>
@@ -2413,31 +2407,12 @@ export default function Investments() {
             </div>
           </div>
 
-            <div className="bg-app-card p-6 rounded-[20px] border border-app-border/60 shadow-lg shadow-black/10 flex-1 min-h-[350px] w-full">
+            <div className="bg-app-card p-6 rounded-[20px] border border-app-border/60 flex-1 min-h-[350px] w-full">
               <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={chartData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
-                <defs>
-                  <linearGradient id={`colorValue-${chartPeriod}`} x1="0" y1="0" x2="1" y2="0">
-                    {chartData.length <= 1 ? (
-                      <stop offset="100%" stopColor="var(--color-app-success)" />
-                    ) : (
-                      chartData.flatMap((d, i) => {
-                        if (i === 0) return [<stop key="stop-start" offset="0%" stopColor="var(--color-app-success)" />];
-                        const prevOffset = `${((i - 1) / (chartData.length - 1)) * 100}%`;
-                        const currentOffset = `${(i / (chartData.length - 1)) * 100}%`;
-                        const isDown = (d?.value ?? 0) < (chartData[i - 1]?.value ?? 0);
-                        const color = isDown ? "var(--color-app-danger)" : "var(--color-app-success)";
-                        return [
-                          <stop key={`stop-${i}-prev`} offset={prevOffset} stopColor={color} />,
-                          <stop key={`stop-${i}-curr`} offset={currentOffset} stopColor={color} />
-                        ];
-                      })
-                    )}
-                  </linearGradient>
-                </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
                   vertical={false}
@@ -2447,14 +2422,14 @@ export default function Investments() {
                   dataKey="name"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 10, fill: "var(--color-app-text)" }}
+                  tick={{ fontSize: 11, fill: "var(--color-app-text)" }}
                   dy={10}
                   opacity={0.5}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 10, fill: "var(--color-app-text)" }}
+                  tick={{ fontSize: 11, fill: "var(--color-app-text)" }}
                   tickFormatter={(val) => `Rp ${(val / 1000).toLocaleString("id-ID")}k`}
                   opacity={0.5}
                 />
@@ -2479,14 +2454,14 @@ export default function Investments() {
                   type="monotone"
                   dataKey="value"
                   stroke="none"
-                  fill={`url(#colorValue-${chartPeriod})`}
-                  fillOpacity={0.15}
+                  fill="transparent"
+                  fillOpacity={0}
                 />
                 <Line
                   type="monotone"
                   name="Nilai Sekarang"
                   dataKey="value"
-                  stroke={`url(#colorValue-${chartPeriod})`}
+                  stroke="var(--color-app-accent1)"
                   strokeWidth={2}
                   dot={(props: any) => {
                     const { cx, cy, index, payload } = props;
@@ -2538,9 +2513,9 @@ export default function Investments() {
         </div>
 
         {/* PORTOFOLIO */}
-        <div className="bg-app-card rounded-[20px] p-6 sm:p-8 border border-app-border/60 flex flex-col shadow-lg shadow-black/10 relative overflow-hidden">
-          
-          
+        <div className="bg-app-card rounded-[20px] p-6 sm:p-8 border border-app-border/60 flex flex-col relative overflow-hidden">
+
+
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4 md:gap-6 relative z-10">
             <div className="flex flex-col gap-1.5 w-full md:w-auto">
               <h2 className="text-app-text-bright text-xl sm:text-2xl font-bold tracking-tight">
@@ -2552,7 +2527,7 @@ export default function Investments() {
                   onClick={() => setPortfolioViewMode("daftar")}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                     portfolioViewMode === "daftar"
-                      ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
+                      ? "bg-app-card text-app-accent1 border border-app-border"
                       : "text-app-text/60 hover:text-app-text-bright border border-transparent"
                   }`}
                 >
@@ -2563,13 +2538,13 @@ export default function Investments() {
                   onClick={() => setPortfolioViewMode("audit")}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                     portfolioViewMode === "audit"
-                      ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
+                      ? "bg-app-card text-app-accent1 border border-app-border"
                       : "text-app-text/60 hover:text-app-text-bright border border-transparent"
                   }`}
                 >
                   <FileText className="w-3.5 h-3.5" /> Audit Riwayat
                   {auditedHoldings.length > 0 && (
-                    <span className="bg-app-accent1 text-app-bg text-[9px] px-1.5 py-0.5 rounded-full font-semibold">
+                    <span className="bg-app-accent1 text-app-bg text-[11px] px-1.5 py-0.5 rounded-full font-semibold">
                       {auditedHoldings.length}
                     </span>
                   )}
@@ -2579,7 +2554,7 @@ export default function Investments() {
                   onClick={() => setPortfolioViewMode("alokasi")}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                     portfolioViewMode === "alokasi"
-                      ? "bg-app-card text-app-accent1 shadow-sm border border-app-border"
+                      ? "bg-app-card text-app-accent1 border border-app-border"
                       : "text-app-text/60 hover:text-app-text-bright border border-transparent"
                   }`}
                 >
@@ -2597,12 +2572,12 @@ export default function Investments() {
                     { id: "crypto", label: "Crypto" },
                     { id: "emas", label: "Emas" },
                   ].map((f) => (
-                    <button
+                    <button type="button"
                       key={f.id}
                       onClick={() => setFilterCategory(f.id as any)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase transition-all whitespace-nowrap ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase transition-all whitespace-nowrap ${
                         filterCategory === f.id
-                          ? "bg-app-card text-app-text-bright shadow-sm border border-app-border"
+                          ? "bg-app-card text-app-text-bright border border-app-border"
                           : "text-app-text/60 hover:text-app-text-bright border border-transparent"
                       }`}
                     >
@@ -2611,19 +2586,19 @@ export default function Investments() {
                   ))}
                 </div>
               )}
-                
+
                 <div className="relative group">
-                  <button className="flex items-center gap-2 bg-app-bg px-3 py-2 rounded-xl border border-app-border text-[10px] font-semibold uppercase hover:bg-app-card transition-colors">
+                  <button type="button" className="flex items-center gap-2 bg-app-bg px-3 py-2 rounded-xl border border-app-border text-xs font-semibold uppercase hover:bg-app-card transition-colors">
                     <ArrowDownUp className="w-3 h-3" /> Urutkan
                   </button>
-                  <div className="absolute right-0 top-full mt-2 w-32 bg-app-card border border-app-border rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 flex flex-col p-1">
+                  <div className="absolute right-0 top-full mt-2 w-32 bg-app-card border border-app-border rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 flex flex-col p-1">
                     {[
                       { id: "terbaru", label: "Terbaru" },
                       { id: "terlama", label: "Terlama" },
                       { id: "terbesar", label: "Nilai Terbesar" },
                       { id: "terkecil", label: "Nilai Terkecil" },
                     ].map((s) => (
-                      <button
+                      <button type="button"
                         key={s.id}
                         onClick={() => setSortBy(s.id as any)}
                         className={`text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
@@ -2672,37 +2647,37 @@ export default function Investments() {
                   <div className="flex flex-col gap-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
-                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
+                        <p className="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-1">
                           Modal Kepemilikan (Cost Basis)
                         </p>
                         <p className="text-lg font-semibold text-app-text-bright font-mono">
                           Rp {Math.round(totalTxModal).toLocaleString("id-ID")}
                         </p>
-                        <p className="text-[10px] text-app-text/50 mt-1">
+                        <p className="text-xs text-app-text/50 mt-1">
                           Berdasarkan sisa unit & harga beli rata-rata
                         </p>
                       </div>
 
                       <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
-                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
+                        <p className="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-1">
                           Nilai Pasar Saat Ini
                         </p>
                         <p className="text-lg font-semibold text-app-text-bright font-mono">
                           Rp {Math.round(totalTxCurrentValue).toLocaleString("id-ID")}
                         </p>
-                        <p className={`text-[10px] font-semibold mt-1 font-mono ${totalTxProfit >= 0 ? "text-app-success" : "text-app-danger"}`}>
+                        <p className={`text-xs font-semibold mt-1 font-mono ${totalTxProfit >= 0 ? "text-app-success" : "text-app-danger"}`}>
                           {totalTxProfit >= 0 ? "+" : ""}Rp {Math.round(totalTxProfit).toLocaleString("id-ID")} ({totalTxProfit >= 0 ? "+" : ""}{totalTxProfitPct.toFixed(2)}%)
                         </p>
                       </div>
 
                       <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl">
-                        <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
+                        <p className="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-1">
                           Arus Kas Bersih Keluar
                         </p>
                         <p className="text-lg font-semibold text-app-text-bright font-mono">
                           Rp {Math.round(totalActualSpent).toLocaleString("id-ID")}
                         </p>
-                        <p className="text-[10px] text-app-text/50 mt-1">
+                        <p className="text-xs text-app-text/50 mt-1">
                           Total pembelian dikurangi total penjualan
                         </p>
                       </div>
@@ -2711,21 +2686,21 @@ export default function Investments() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl flex flex-col justify-between">
                         <div>
-                          <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
+                          <p className="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-1">
                             Keuntungan Realisasi (Realized Profit/Loss)
                           </p>
                           <p className={`text-lg font-semibold font-mono ${totalRealizedPL >= 0 ? "text-app-success" : "text-app-danger"}`}>
                             {totalRealizedPL >= 0 ? "+" : ""}Rp {Math.round(totalRealizedPL).toLocaleString("id-ID")}
                           </p>
                         </div>
-                        <p className="text-[10px] text-app-text/50 mt-2">
+                        <p className="text-xs text-app-text/50 mt-2">
                           Total keuntungan/kerugian riil dari transaksi penjualan yang telah direalisasikan
                         </p>
                       </div>
 
                       <div className="bg-app-bg/40 border border-app-border p-4 rounded-2xl flex flex-col justify-between">
                         <div>
-                          <p className="text-[10px] font-semibold text-app-text/50 uppercase tracking-wider mb-1">
+                          <p className="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-1">
                             Akurasi Transaksi Jual (Win/Loss Rate)
                           </p>
                           <div className="flex items-baseline gap-2 mt-1">
@@ -2738,8 +2713,8 @@ export default function Investments() {
                           </div>
                         </div>
                         <div className="w-full bg-app-border/30 h-1.5 rounded-full overflow-hidden mt-3 relative">
-                          <div 
-                            className="bg-app-success h-full" 
+                          <div
+                            className="bg-app-success h-full"
                             style={{ width: `${totalTrades > 0 ? winRate : 0}%` }}
                           />
                         </div>
@@ -2754,7 +2729,7 @@ export default function Investments() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs min-w-[850px]">
                     <thead>
-                      <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-semibold uppercase tracking-wider text-[10px]">
+                      <tr className="bg-app-bg border-b border-app-border text-app-text/60 font-semibold uppercase tracking-wider text-xs">
                         <th className="py-4 px-4">Instrumen</th>
                         <th className="py-4 px-4 text-right">Kuantitas</th>
                         <th className="py-4 px-4 text-right">Avg Beli</th>
@@ -2805,11 +2780,11 @@ export default function Investments() {
                               </td>
                               <td className="py-3 px-4 text-center">
                                 {isMatching ? (
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-app-success/15 text-app-success border border-app-success/20">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-app-success/15 text-app-success border border-app-success/20">
                                     Sesuai (Match)
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-500 border border-amber-500/20">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-500 border border-amber-500/20">
                                     Selisih {diffUnits > 0 ? `+${diffUnits}` : diffUnits}
                                   </span>
                                 )}
@@ -2826,21 +2801,21 @@ export default function Investments() {
           ) : portfolioViewMode === "alokasi" ? (
               <div className="flex-1 overflow-y-auto pr-2 flex flex-col">
                 <div className="flex bg-app-card border border-app-border rounded-lg p-1 mb-2 shrink-0 mx-1">
-                  <button
+                  <button type="button"
                     onClick={() => setAllocationViewBy("aset")}
                     className={`flex-1 py-1.5 text-[11px] font-semibold rounded-md transition-colors ${
                       allocationViewBy === "aset"
-                        ? "bg-app-bg text-app-text-bright shadow-sm"
+                        ? "bg-app-bg text-app-text-bright"
                         : "text-app-text/50 hover:text-app-text"
                     }`}
                   >
                     Semua Aset
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => setAllocationViewBy("kategori")}
                     className={`flex-1 py-1.5 text-[11px] font-semibold rounded-md transition-colors ${
                       allocationViewBy === "kategori"
-                        ? "bg-app-bg text-app-text-bright shadow-sm"
+                        ? "bg-app-bg text-app-text-bright"
                         : "text-app-text/50 hover:text-app-text"
                     }`}
                   >
@@ -2890,14 +2865,14 @@ export default function Investments() {
 
                   const totalAllocValue = allocationData.reduce((sum, item) => sum + item.value, 0);
                   const COLORS = [
-                    "#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#EF4444", 
+                    "#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#EF4444",
                     "#14B8A6", "#6366f1", "#EC4899", "#f97316"
                   ];
 
                   if (totalAllocValue === 0) {
                     return (
                       <div className="flex flex-col items-center justify-center text-app-text/50 text-sm py-8 bg-app-card/30 border border-dashed border-app-border rounded-2xl h-full mt-4 mx-1">
-                        <TrendingUp className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
+                        <TrendingUp className="w-8 h-8 text-app-text/30 mb-2" />
                         Belum ada instrumen investasi
                       </div>
                     );
@@ -2955,7 +2930,7 @@ export default function Investments() {
                             <div key={item.id} className="flex flex-col gap-3 group">
                               <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-3">
-                                  <div className="w-10 h-10 rounded-full bg-app-card border border-app-border flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                                  <div className="w-10 h-10 rounded-full bg-app-card border border-app-border flex items-center justify-center shrink-0 overflow-hidden">
                                     <AssetLogo logoid={item.logoid} code={item.name} description={item.description} />
                                   </div>
                                   <div className="flex flex-col">
@@ -2968,8 +2943,8 @@ export default function Investments() {
                                 <span className="font-semibold text-[15px] text-app-text-bright">{percentage.toFixed(2)}%</span>
                               </div>
                               <div className="w-full h-1.5 bg-app-border/30 rounded-full overflow-hidden relative">
-                                <div 
-                                  className="h-full rounded-full transition-all duration-1000 ease-out" 
+                                <div
+                                  className="h-full rounded-full transition-all duration-1000 ease-out"
                                   style={{ width: `${percentage}%`, backgroundColor: color }}
                                 >
                                   <div className="absolute inset-0 bg-white/20 w-full h-full mix-blend-overlay"></div>
@@ -2987,7 +2962,7 @@ export default function Investments() {
               <StaggerContainer className="space-y-4 flex-1 overflow-y-auto pr-2">
                 {filteredAndSortedInvestments.length === 0 ? (
                   <div className="flex flex-col items-center justify-center text-app-text/50 text-sm py-8 bg-app-card/30 border border-dashed border-app-border rounded-2xl">
-                    <TrendingUp className="w-8 h-8 text-app-text/30 mb-2 animate-waggle" />
+                    <TrendingUp className="w-8 h-8 text-app-text/30 mb-2" />
                     Belum ada instrumen investasi
                   </div>
                 ) : (
@@ -3021,7 +2996,7 @@ export default function Investments() {
                               <h3 className="font-semibold text-app-text-bright leading-tight">
                                 {inv.code}
                               </h3>
-                              <span className="text-[10px] text-app-text/50 line-clamp-1">
+                              <span className="text-xs text-app-text/50 line-clamp-1">
                                 {liveData?.description ||
                                   inv.category.toUpperCase()}
                               </span>
@@ -3029,13 +3004,13 @@ export default function Investments() {
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <button
+                            <button type="button"
                               onClick={() => handleEdit(inv)}
                               className="p-1.5 bg-app-card border border-app-border rounded-lg text-app-text/60 hover:text-blue-400 focus:outline-none transition-colors"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
-                            <button
+                            <button type="button"
                               onClick={() => handleDelete(inv.id)}
                               className="p-1.5 bg-app-card border border-app-border rounded-lg text-app-text/60 hover:text-red-400 focus:outline-none transition-colors"
                             >
@@ -3069,11 +3044,11 @@ export default function Investments() {
 
                         <div className="mt-4 pt-4 border-t border-app-border flex justify-between items-center">
                           <div>
-                            <div className="text-[10px] text-app-text/60 font-semibold uppercase tracking-wider mb-1">Modal Awal</div>
+                            <div className="text-xs text-app-text/60 font-semibold uppercase tracking-wider mb-1">Modal Awal</div>
                             <div className="text-sm font-semibold text-app-text-bright">Rp {(inv.price * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-[10px] text-app-text/60 font-semibold uppercase tracking-wider mb-1">Nilai Sekarang</div>
+                            <div className="text-xs text-app-text/60 font-semibold uppercase tracking-wider mb-1">Nilai Sekarang</div>
                             <div className={`text-sm font-semibold ${pl >= 0 ? "text-app-success" : "text-app-danger"}`}>Rp {(livePrice * inv.qty * (inv.category === "saham" ? 100 : 1)).toLocaleString("id-ID")}</div>
                           </div>
                         </div>
@@ -3085,7 +3060,7 @@ export default function Investments() {
               </StaggerContainer>
             )}
 
-          <button
+          <button type="button"
             onClick={openPortfolioModal}
             className="mt-4 flex items-center justify-center p-4 rounded-2xl border border-dashed border-app-border hover:border-app-text/50 transition cursor-pointer text-app-text/70 text-sm font-medium w-full"
           >
@@ -3104,7 +3079,7 @@ export default function Investments() {
       {activeTab === "ai_insights" && (
         <div className="flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-300 mb-8">
           {/* TOP HEADER & RE-ANALYZE BAR */}
-          <div className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg shadow-black/10 relative overflow-hidden">
+          <div className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
             <div className="flex items-start gap-3.5 relative z-10">
               <div className="p-3 rounded-2xl bg-app-accent1/10 text-app-accent1 border border-app-accent1/20 shrink-0">
                 <BrainCircuit className="w-6 h-6" />
@@ -3114,7 +3089,7 @@ export default function Investments() {
                   <h2 className="text-lg font-bold text-app-text-bright">
                     AI Investment Insights & Rekomendasi Saham
                   </h2>
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-app-accent1 text-app-bg uppercase">
+                  <span className="text-xs font-extrabold px-2 py-0.5 rounded-full bg-app-accent1 text-app-bg uppercase">
                     Powered by Gemini
                   </span>
                 </div>
@@ -3128,7 +3103,7 @@ export default function Investments() {
               type="button"
               onClick={() => fetchAiInsights(investStyle)}
               disabled={isAiInsightsLoading}
-              className="px-4 py-2.5 rounded-xl bg-app-accent1 text-app-bg text-xs font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-md shrink-0 disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-app-accent1 text-app-bg text-xs font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all shrink-0 disabled:opacity-50 cursor-pointer"
             >
               <RefreshCw className={`w-4 h-4 ${isAiInsightsLoading ? "animate-spin" : ""}`} />
               <span>{isAiInsightsLoading ? "Menganalisis AI..." : "Analisis Ulang Portofolio"}</span>
@@ -3136,7 +3111,7 @@ export default function Investments() {
           </div>
 
           {/* INVESTMENT STYLE SELECTOR (Gaya Investasi) */}
-          <div className="bg-app-card rounded-[20px] p-6 border border-app-border/60 shadow-lg shadow-black/10 flex flex-col gap-4">
+          <div className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col gap-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
                 <h3 className="text-sm font-bold text-app-text-bright flex items-center gap-2">
@@ -3209,12 +3184,12 @@ export default function Investments() {
                     }}
                     className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between gap-2.5 cursor-pointer relative overflow-hidden ${
                       isSelected
-                        ? "bg-app-accent1/10 border-app-accent1 text-app-text-bright shadow-sm ring-1 ring-app-accent1"
+                        ? "bg-app-accent1/10 border-app-accent1 text-app-text-bright ring-1 ring-app-accent1"
                         : "bg-app-bg/50 border-app-border text-app-text/70 hover:border-app-text/30 hover:bg-app-bg"
                     }`}
                   >
                     {isSelected && (
-                      <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-app-accent1 text-app-bg flex items-center justify-center text-[10px]">
+                      <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-app-accent1 text-app-bg flex items-center justify-center text-xs">
                         <Check className="w-2.5 h-2.5 stroke-[3]" />
                       </div>
                     )}
@@ -3226,7 +3201,7 @@ export default function Investments() {
                         {styleOpt.title}
                       </span>
                     </div>
-                    <p className="text-[10px] text-app-text/60 line-clamp-2 leading-tight">
+                    <p className="text-xs text-app-text/60 line-clamp-2 leading-tight">
                       {styleOpt.desc}
                     </p>
                   </button>
@@ -3237,10 +3212,10 @@ export default function Investments() {
 
           {/* AI LOADING / ERROR STATES */}
           {isAiInsightsLoading && (
-            <div className="bg-app-card rounded-[20px] p-12 border border-app-border/60 shadow-lg shadow-black/10 flex flex-col items-center justify-center gap-4 text-center">
+            <div className="bg-app-card rounded-[20px] p-12 border border-app-border/60 flex flex-col items-center justify-center gap-4 text-center">
               <div className="relative">
                 <div className="w-12 h-12 rounded-full border-2 border-app-accent1/30 border-t-app-accent1 animate-spin" />
-                <BrainCircuit className="w-6 h-6 text-app-accent1 absolute inset-0 m-auto animate-pulse" />
+                <BrainCircuit className="w-6 h-6 text-app-accent1 absolute inset-0 m-auto" />
               </div>
               <div>
                 <h4 className="text-sm font-bold text-app-text-bright mb-1">
@@ -3275,7 +3250,7 @@ export default function Investments() {
               {/* SECTION 1: PORTFOLIO FLOW INSIGHTS */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* HEALTH SCORE GAUGE & SUMMARY */}
-                <div className="lg:col-span-6 bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col gap-4 shadow-lg shadow-black/10">
+                <div className="lg:col-span-6 bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="p-2 rounded-xl bg-app-accent1/10 text-app-accent1">
@@ -3292,11 +3267,11 @@ export default function Investments() {
 
                   <div className="flex items-center gap-4 p-4 rounded-2xl bg-app-bg border border-app-border">
                     <div className="flex flex-col items-center justify-center p-3.5 bg-app-card rounded-xl border border-app-border shrink-0 min-w-[90px]">
-                      <span className="text-[10px] font-bold uppercase text-app-text/60 tracking-wider">Skor AI</span>
+                      <span className="text-xs font-bold uppercase text-app-text/60 tracking-wider">Skor AI</span>
                       <span className="text-2xl font-extrabold font-mono text-app-accent1">
                         {aiInsightsData.portfolioHealth?.score || 78}
                       </span>
-                      <span className="text-[9px] text-app-text/40">/ 100</span>
+                      <span className="text-[11px] text-app-text/40">/ 100</span>
                     </div>
                     <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                       <div className="w-full bg-app-border/50 h-2.5 rounded-full overflow-hidden">
@@ -3326,7 +3301,7 @@ export default function Investments() {
                 </div>
 
                 {/* STRENGTHS & RISKS BREAKDOWN */}
-                <div className="lg:col-span-6 bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col gap-4 shadow-lg shadow-black/10">
+                <div className="lg:col-span-6 bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col gap-4">
                   <h3 className="text-sm font-bold text-app-text-bright flex items-center gap-2">
                     <Info className="w-4 h-4 text-app-accent1" />
                     Diagnostik Alur Investasi
@@ -3401,7 +3376,7 @@ export default function Investments() {
                     return (
                       <div
                         key={idx}
-                        className="bg-app-card rounded-[20px] p-5 border border-app-border/60 hover:border-app-accent1/50 transition-all shadow-lg shadow-black/5 hover:shadow-black/10 flex flex-col justify-between gap-4 group relative overflow-hidden"
+                        className="bg-app-card rounded-[20px] p-5 border border-app-border/60 hover:border-app-accent1/50 transition-all hover:shadow-black/10 flex flex-col justify-between gap-4 group relative overflow-hidden"
                       >
                         <div className="flex flex-col gap-3">
                           {/* CARD HEADER */}
@@ -3411,15 +3386,15 @@ export default function Investments() {
                                 {stock.code}
                               </span>
                               {stock.candidateScore && (
-                                <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-[10px] font-extrabold flex items-center gap-1">
+                                <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-extrabold flex items-center gap-1">
                                   <Award className="w-3 h-3" /> Skor {stock.candidateScore}/100
                                 </span>
                               )}
-                              <span className="text-[10px] font-semibold text-app-text/60 truncate max-w-[100px]">
+                              <span className="text-xs font-semibold text-app-text/60 truncate max-w-[100px]">
                                 {stock.sector}
                               </span>
                             </div>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${riskColor}`}>
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${riskColor}`}>
                               {stock.riskLevel}
                             </span>
                           </div>
@@ -3441,22 +3416,22 @@ export default function Investments() {
                           {/* METRICS ROW */}
                           <div className="grid grid-cols-3 gap-2 p-3 rounded-xl bg-app-bg border border-app-border text-center">
                             <div>
-                              <span className="text-[9px] text-app-text/50 font-semibold block uppercase">Target</span>
+                              <span className="text-[11px] text-app-text/50 font-semibold block uppercase">Target</span>
                               <span className="text-xs font-bold font-mono text-app-text-bright">{stock.targetPrice}</span>
                             </div>
                             <div>
-                              <span className="text-[9px] text-app-text/50 font-semibold block uppercase">Upside</span>
+                              <span className="text-[11px] text-app-text/50 font-semibold block uppercase">Upside</span>
                               <span className="text-xs font-bold font-mono text-app-success">{stock.estimatedUpside}</span>
                             </div>
                             <div>
-                              <span className="text-[9px] text-app-text/50 font-semibold block uppercase">Dividen</span>
+                              <span className="text-[11px] text-app-text/50 font-semibold block uppercase">Dividen</span>
                               <span className="text-xs font-bold font-mono text-app-accent1">{stock.dividendYield || "-"}</span>
                             </div>
                           </div>
 
                           {/* STRENGTHS & RISKS */}
                           {(stock.strengths || stock.risks) && (
-                            <div className="grid grid-cols-1 gap-1.5 p-2.5 rounded-xl bg-app-bg border border-app-border text-[10px]">
+                            <div className="grid grid-cols-1 gap-1.5 p-2.5 rounded-xl bg-app-bg border border-app-border text-xs">
                               {stock.strengths && (
                                 <div className="flex items-start gap-1.5 text-app-success">
                                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-0.5" />
@@ -3474,7 +3449,7 @@ export default function Investments() {
 
                           {/* FIT FOR GOAL & DIVERSIFICATION */}
                           {(stock.fitForGoal || stock.diversificationImpact) && (
-                            <div className="flex flex-col gap-1 p-2.5 rounded-xl bg-app-card/60 border border-app-border/80 text-[10px] text-app-text/80">
+                            <div className="flex flex-col gap-1 p-2.5 rounded-xl bg-app-card/60 border border-app-border/80 text-xs text-app-text/80">
                               {stock.fitForGoal && (
                                 <div>
                                   <strong className="text-app-accent1">Sesuai Tujuan:</strong> {stock.fitForGoal}
@@ -3490,12 +3465,12 @@ export default function Investments() {
 
                           {/* TRADING & EXITS: TP, SL, TRAILING STOP */}
                           <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-app-bg border border-app-border">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-app-text/50 flex items-center gap-1">
+                            <span className="text-xs font-bold uppercase tracking-wider text-app-text/50 flex items-center gap-1">
                               <ShieldCheck className="w-3 h-3 text-app-accent1" /> Target Exit & Proteksi Risiko
                             </span>
                             <div className="flex flex-col gap-1.5">
                               <div className="flex items-center justify-between gap-1 p-1.5 rounded-lg bg-app-success/5 border border-app-success/15">
-                                <span className="text-[10px] font-bold text-app-success flex items-center gap-1">
+                                <span className="text-xs font-bold text-app-success flex items-center gap-1">
                                   <Target className="w-3 h-3" /> TP (Take Profit):
                                 </span>
                                 <span className="font-bold font-mono text-app-success text-[11px]">
@@ -3504,7 +3479,7 @@ export default function Investments() {
                               </div>
 
                               <div className="flex items-center justify-between gap-1 p-1.5 rounded-lg bg-app-danger/5 border border-app-danger/15">
-                                <span className="text-[10px] font-bold text-app-danger flex items-center gap-1">
+                                <span className="text-xs font-bold text-app-danger flex items-center gap-1">
                                   <ShieldAlert className="w-3 h-3" /> SL (Stop Loss):
                                 </span>
                                 <span className="font-bold font-mono text-app-danger text-[11px]">
@@ -3513,10 +3488,10 @@ export default function Investments() {
                               </div>
 
                               <div className="flex items-start justify-between gap-1 p-1.5 rounded-lg bg-app-accent1/5 border border-app-accent1/15">
-                                <span className="text-[10px] font-bold text-app-accent1 flex items-center gap-1 shrink-0 mt-0.5">
+                                <span className="text-xs font-bold text-app-accent1 flex items-center gap-1 shrink-0 mt-0.5">
                                   <Zap className="w-3 h-3" /> TS (Trailing Stop):
                                 </span>
-                                <span className="font-semibold text-app-text/80 text-[10px] text-right line-clamp-2">
+                                <span className="font-semibold text-app-text/80 text-xs text-right line-clamp-2">
                                   {stock.trailingStop || "-"}
                                 </span>
                               </div>
@@ -3525,7 +3500,7 @@ export default function Investments() {
 
                           {/* MATCH REASON */}
                           <div className="p-3 rounded-xl bg-app-accent1/5 border border-app-accent1/15 flex flex-col gap-1">
-                            <span className="text-[10px] font-bold text-app-accent1 uppercase flex items-center gap-1">
+                            <span className="text-xs font-bold text-app-accent1 uppercase flex items-center gap-1">
                               <Sparkles className="w-3 h-3" /> Alasan Cocok:
                             </span>
                             <p className="text-[11px] text-app-text/80 leading-relaxed line-clamp-3">
@@ -3535,7 +3510,7 @@ export default function Investments() {
 
                           {/* ENTRY STRATEGY */}
                           <div className="p-3 rounded-xl bg-app-bg border border-app-border flex flex-col gap-1">
-                            <span className="text-[10px] font-bold text-app-text/60 uppercase flex items-center gap-1">
+                            <span className="text-xs font-bold text-app-text/60 uppercase flex items-center gap-1">
                               <Target className="w-3 h-3 text-app-accent1" /> Area Beli / Strategi:
                             </span>
                             <p className="text-[11px] text-app-text/70 leading-relaxed line-clamp-2">
@@ -3574,15 +3549,16 @@ export default function Investments() {
       {/* Modal Simulasi ARA/ARB */}
       {isSimulatorOpen && (
         <div className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-app-card text-app-text w-full max-w-5xl rounded-[20px] shadow-2xl border border-app-border/60 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+          <div className="bg-app-card text-app-text w-full max-w-5xl rounded-[20px] border border-app-border/60 overflow-hidden animate-in fade-in duration-200 flex flex-col max-h-[90vh]" role="dialog" aria-modal="true" aria-labelledby="investment-simulator-title">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg shrink-0">
-              <h2 className="text-lg font-semibold text-app-text-bright flex items-center gap-2">
+              <h2 id="investment-simulator-title" className="text-lg font-semibold text-app-text-bright flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-app-accent1" />
                 Simulasi ARA & ARB Saham (BEI)
               </h2>
-              <button
+              <button type="button"
                 onClick={() => setIsSimulatorOpen(false)}
                 className="p-2 hover:bg-app-hover rounded-full transition-colors text-app-text/70 hover:text-app-text-bright"
+                aria-label="Tutup simulasi ARA dan ARB"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -3597,14 +3573,15 @@ export default function Investments() {
       {/* Modal Tambah Portofolio */}
       {isPortfolioModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-app-card text-app-text w-full max-w-md rounded-[20px] shadow-2xl border border-app-border/60 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-app-card text-app-text w-full max-w-md rounded-[20px] border border-app-border/60 overflow-hidden animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-labelledby="portfolio-dialog-title">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
-              <h2 className="text-lg font-semibold text-app-text-bright">
+              <h2 id="portfolio-dialog-title" className="text-lg font-semibold text-app-text-bright">
                 {portoEditId ? "Sesuaikan Portofolio" : portoTxType === "beli" ? "Beli Investasi" : "Jual Investasi"}
               </h2>
-              <button
+              <button type="button"
                 onClick={() => setIsPortfolioModalOpen(false)}
                 className="p-2 hover:bg-app-hover rounded-full transition-colors"
+                aria-label="Tutup formulir portofolio"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -3628,7 +3605,7 @@ export default function Investments() {
                     }}
                     className={`flex-1 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
                       portoTxType === "beli"
-                        ? "bg-app-accent1 text-app-bg shadow-sm"
+                        ? "bg-app-accent1 text-app-bg"
                         : "text-app-text hover:bg-app-hover"
                     }`}
                   >
@@ -3653,7 +3630,7 @@ export default function Investments() {
                     }}
                     className={`flex-1 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
                       portoTxType === "jual"
-                        ? "bg-app-accent1 text-app-bg shadow-sm"
+                        ? "bg-app-accent1 text-app-bg"
                         : "text-app-text hover:bg-app-hover"
                     }`}
                   >
@@ -3677,9 +3654,9 @@ export default function Investments() {
                         type="button"
                         disabled={!!portoEditId}
                         onClick={() => setPortoCategory(type.id as any)}
-                        className={`flex-1 py-2 rounded-lg text-[10px] sm:text-xs font-semibold uppercase tracking-wider transition-all disabled:opacity-50 ${
+                        className={`flex-1 py-2 rounded-lg text-xs sm:text-xs font-semibold uppercase tracking-wider transition-all disabled:opacity-50 ${
                           portoCategory === type.id
-                            ? "bg-app-accent1 text-app-bg shadow-sm"
+                            ? "bg-app-accent1 text-app-bg"
                             : "text-app-text hover:bg-app-hover"
                         }`}
                       >
@@ -3691,7 +3668,7 @@ export default function Investments() {
                   {portoCategory === "saham" && (
                     <>
                       <div className="relative">
-                        <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                        <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                           Kode atau Nama Saham
                         </label>
                         <input
@@ -3711,7 +3688,7 @@ export default function Investments() {
                           required
                         />
                         {showDropdown && portoCode.length >= 2 && !portoEditId && (
-                          <div className="absolute z-10 w-full mt-2 bg-app-card border border-app-border rounded-xl shadow-lg max-h-60 overflow-auto">
+                          <div className="absolute z-10 w-full mt-2 bg-app-card border border-app-border rounded-xl max-h-60 overflow-auto">
                             {isSearching ? (
                               <div className="p-3 text-center text-xs text-app-text/60">
                                 Mencari...
@@ -3732,7 +3709,7 @@ export default function Investments() {
                                   >
                                     <span className="font-semibold text-app-text-bright text-sm">
                                       {res.symbol}{" "}
-                                      <span className="text-[10px] text-app-text/50 uppercase ml-1 px-1.5 py-0.5 bg-app-bg rounded-md">
+                                      <span className="text-xs text-app-text/50 uppercase ml-1 px-1.5 py-0.5 bg-app-bg rounded-md">
                                         {res.exchange}
                                       </span>
                                     </span>
@@ -3751,7 +3728,7 @@ export default function Investments() {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                          <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                             Jumlah Lot
                           </label>
                           <input
@@ -3764,7 +3741,7 @@ export default function Investments() {
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                          <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                             {portoEditId ? "Harga Beli Rata-Rata" : "Harga per Lembar (Rp)"}
                           </label>
                           <input
@@ -3784,7 +3761,7 @@ export default function Investments() {
                   {portoCategory === "crypto" && (
                     <>
                       <div className="relative">
-                        <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                        <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                           Kode Koin
                         </label>
                         <input
@@ -3804,7 +3781,7 @@ export default function Investments() {
                           required
                         />
                         {showDropdown && portoCode.length >= 2 && !portoEditId && (
-                          <div className="absolute z-10 w-full mt-2 bg-app-card border border-app-border rounded-xl shadow-lg max-h-60 overflow-auto">
+                          <div className="absolute z-10 w-full mt-2 bg-app-card border border-app-border rounded-xl max-h-60 overflow-auto">
                             {isSearching ? (
                               <div className="p-3 text-center text-xs text-app-text/60">
                                 Mencari...
@@ -3831,7 +3808,7 @@ export default function Investments() {
                                   >
                                     <span className="font-semibold text-app-text-bright text-sm">
                                       {res.symbol}{" "}
-                                      <span className="text-[10px] text-app-text/50 uppercase ml-1 px-1.5 py-0.5 bg-app-bg rounded-md">
+                                      <span className="text-xs text-app-text/50 uppercase ml-1 px-1.5 py-0.5 bg-app-bg rounded-md">
                                         {res.exchange}
                                       </span>
                                     </span>
@@ -3850,7 +3827,7 @@ export default function Investments() {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                          <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                             Jumlah Koin
                           </label>
                           <input
@@ -3864,7 +3841,7 @@ export default function Investments() {
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                          <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                             Harga Beli per Koin (Rp)
                           </label>
                           <input
@@ -3885,7 +3862,7 @@ export default function Investments() {
                     <>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                          <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                             Berat (Gram)
                           </label>
                           <input
@@ -3899,7 +3876,7 @@ export default function Investments() {
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                          <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                             Harga per Gram (Rp)
                           </label>
                           <input
@@ -3922,7 +3899,7 @@ export default function Investments() {
               {portoTxType === "jual" && !portoEditId && (
                 <>
                   <div>
-                    <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                    <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                       Pilih Portofolio
                     </label>
                     <select
@@ -3959,7 +3936,7 @@ export default function Investments() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                      <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                         Jumlah Dijual
                       </label>
                       <input
@@ -3973,7 +3950,7 @@ export default function Investments() {
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                      <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                         Harga Jual per {portoCategory === "saham" ? "Lembar" : portoCategory === "crypto" ? "Koin" : "Gram"} (Rp)
                       </label>
                       <input
@@ -3994,7 +3971,7 @@ export default function Investments() {
               {!portoEditId && (
                 <>
                   <div>
-                    <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                    <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                       {portoTxType === "beli" ? "Bayar dari Rekening" : "Terima di Rekening"}
                     </label>
                     <select
@@ -4029,7 +4006,7 @@ export default function Investments() {
                         }`}
                       >
                         <div
-                          className={`w-4 h-4 bg-app-card rounded-full shadow-md transition-transform ${
+                          className={`w-4 h-4 bg-app-card rounded-full transition-transform ${
                             hasFee ? "translate-x-4" : "translate-x-0"
                           }`}
                         />
@@ -4037,7 +4014,7 @@ export default function Investments() {
                     </div>
                     {hasFee && (
                       <div>
-                        <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                        <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                           Nominal Fee (Rp)
                         </label>
                         <input
@@ -4056,7 +4033,7 @@ export default function Investments() {
               )}
 
               <div>
-                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block">
+                <label className="text-xs uppercase font-semibold tracking-wider mb-2 block">
                   Waktu Transaksi
                 </label>
                 <input
@@ -4083,7 +4060,7 @@ export default function Investments() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-4 rounded-2xl font-semibold text-sm bg-app-accent1 text-app-bg hover:opacity-90 transition-opacity shadow-lg"
+                  className="flex-1 py-4 rounded-2xl font-semibold text-sm bg-app-accent1 text-app-bg hover:opacity-90 transition-opacity"
                 >
                   {portoEditId ? "Simpan Perubahan" : portoTxType === "beli" ? "Simpan Pembelian" : "Simpan Penjualan"}
                 </button>

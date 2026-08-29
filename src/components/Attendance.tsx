@@ -24,7 +24,7 @@ const CurrencyInput = ({ value, onChange }: { value: number, onChange: (val: num
 
   return (
     <div className="relative w-full min-w-[90px]">
-       <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] sm:text-xs text-app-text/50">Rp</span>
+       <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs sm:text-xs text-app-text/50">Rp</span>
        <input
           type="text"
           inputMode="decimal"
@@ -42,22 +42,22 @@ const CurrencyInput = ({ value, onChange }: { value: number, onChange: (val: num
             let val = e.target.value;
             val = val.replace(/[^0-9,.]/g, '');
             val = val.replace(/\./g, ',');
-            
+
             const parts = val.split(',');
             if (parts.length > 2) {
               val = parts[0] + ',' + parts.slice(1).join('');
             }
-            
+
             let [intPart, decPart] = val.split(',');
             if (intPart) {
                intPart = parseInt(intPart.replace(/\D/g, ''), 10).toLocaleString('id-ID');
             } else if (val === ',') {
                intPart = "0";
             }
-            
+
             const formatted = val.includes(',') ? `${intPart},${decPart}` : (intPart || "");
             setLocalValue(formatted);
-            
+
             const parseVal = formatted.replace(/\./g, '').replace(',', '.');
             let num = parseFloat(parseVal);
             if (isNaN(num)) num = 0;
@@ -97,22 +97,22 @@ const FloatInput = ({ value, onChange }: { value: number, onChange: (val: number
         let val = e.target.value;
         val = val.replace(/[^0-9,.]/g, '');
         val = val.replace(/\./g, ',');
-        
+
         const parts = val.split(',');
         if (parts.length > 2) {
           val = parts[0] + ',' + parts.slice(1).join('');
         }
-        
+
         let [intPart, decPart] = val.split(',');
         if (intPart) {
            intPart = parseInt(intPart.replace(/\D/g, ''), 10).toLocaleString('id-ID');
         } else if (val === ',') {
            intPart = "0";
         }
-        
+
         const formatted = val.includes(',') ? `${intPart},${decPart}` : (intPart || "");
         setLocalValue(formatted);
-        
+
         const parseVal = formatted.replace(/\./g, '').replace(',', '.');
         let num = parseFloat(parseVal);
         if (isNaN(num)) num = 0;
@@ -135,7 +135,7 @@ export default function Attendance() {
          return new Date(now.getFullYear(), now.getMonth() - 1, attendancePeriodStart);
      }
   });
-  
+
   // Form states
   const [status, setStatus] = useState<'present' | 'absent' | 'leave' | 'sick'>('present');
   const [notes, setNotes] = useState("");
@@ -151,7 +151,7 @@ export default function Attendance() {
     pendingUpdatesRef.current[field] = value;
     const updated = { ...localSalarySettings, ...pendingUpdatesRef.current };
     setLocalSalarySettings(updated);
-    
+
     if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current);
     updateTimeoutRef.current = setTimeout(async () => {
       if (!user) return;
@@ -164,7 +164,7 @@ export default function Attendance() {
       }
     }, 1000);
   };
-  
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
@@ -184,9 +184,9 @@ export default function Attendance() {
 
   useEffect(() => {
     if (!user) return;
-    
+
     const startOfPeriod = selectedPeriodStart.getTime();
-    
+
     // determine the end date of this period based on attendancePeriodEnd
     const endOfPeriodDate = new Date(selectedPeriodStart);
     if (attendancePeriodEnd < attendancePeriodStart) {
@@ -199,9 +199,9 @@ export default function Attendance() {
        // if we spilled over, go back to last day of target month
        endOfPeriodDate.setDate(0);
     }
-    
+
     endOfPeriodDate.setHours(23, 59, 59, 999);
-    
+
     const endOfPeriod = endOfPeriodDate.getTime();
 
     const q = query(
@@ -210,7 +210,7 @@ export default function Attendance() {
       where("date", "<=", endOfPeriod),
       orderBy("date", "desc")
     );
-    
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const recs: AttendanceRecord[] = [];
       snapshot.forEach((doc) => {
@@ -273,21 +273,21 @@ export default function Attendance() {
     const d = new Date(record.date);
     setModalDate(new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0]);
     setModalStatus(record.status);
-    
+
     const formatTime = (timeMs: number) => {
       const date = new Date(timeMs);
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
       return `${hours}:${minutes}`;
     };
-    
+
     setModalCheckIn(record.checkIn ? formatTime(record.checkIn) : "");
     setModalCheckOut(record.checkOut ? formatTime(record.checkOut) : "");
     setModalNotes(record.notes || "");
     setEditingRecord(record);
     setIsModalOpen(true);
   };
-  
+
   const handleSaveModal = async () => {
     if (!user) return;
     try {
@@ -295,13 +295,13 @@ export default function Attendance() {
       selectedD.setHours(0,0,0,0);
       const dateId = selectedD.getTime().toString();
       const docRef = doc(db, "users", user.uid, "attendance", dateId);
-      
+
       const data: any = {
         date: selectedD.getTime(),
         status: modalStatus,
         notes: modalNotes
       };
-      
+
       if (modalStatus === 'present') {
         if (modalCheckIn) {
           const [h,m] = modalCheckIn.split(':');
@@ -311,7 +311,7 @@ export default function Attendance() {
         } else {
           data.checkIn = null;
         }
-        
+
         if (modalCheckOut) {
           const [h,m] = modalCheckOut.split(':');
           const co = new Date(selectedD);
@@ -324,12 +324,12 @@ export default function Attendance() {
          data.checkIn = null;
          data.checkOut = null;
       }
-      
+
       if (editingRecord && editingRecord.id !== dateId) {
          // Delete old record if date changed
          await deleteDoc(doc(db, "users", user.uid, "attendance", editingRecord.id));
       }
-      
+
       await setDoc(docRef, data, { merge: true });
 
       // Notify device
@@ -337,7 +337,7 @@ export default function Attendance() {
       if (modalStatus === 'present' && salarySettings?.gajiPokok) {
         nominal = salarySettings.gajiPokok;
       }
-      const actionDesc = modalStatus === 'present' 
+      const actionDesc = modalStatus === 'present'
         ? `Kehadiran (Check-In: ${modalCheckIn || '-'}, Check-Out: ${modalCheckOut || '-'})`
         : modalStatus === 'absent' ? 'Alpa / Tidak Hadir'
         : modalStatus === 'leave' ? 'Izin / Cuti'
@@ -369,7 +369,7 @@ export default function Attendance() {
 
   const handleAction = async (action: 'checkIn' | 'checkOut') => {
     if (!user) return;
-    
+
     let location: { lat: number; lng: number } | null = null;
     try {
       if (navigator.geolocation) {
@@ -393,9 +393,9 @@ export default function Attendance() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const dateId = today.getTime().toString();
-      
+
       const docRef = doc(db, "users", user.uid, "attendance", dateId);
-      
+
       if (action === 'checkIn') {
         const data: any = {
           date: today.getTime(),
@@ -492,8 +492,8 @@ export default function Attendance() {
       <div className="space-y-6 md:space-y-8">
 
         {/* Today's Actions */}
-        <HoverCard className="bg-app-card rounded-2xl border border-app-border p-4 sm:p-5 shadow-xs relative overflow-hidden group transition-colors w-full">
-          
+        <HoverCard className="bg-app-card rounded-2xl border border-app-border p-4 sm:p-5 relative overflow-hidden group transition-colors w-full">
+
           <div className="relative z-10">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3.5 gap-2 pb-3 border-b border-app-border/60">
               <h2 className="font-semibold text-app-text-bright text-sm sm:text-base flex items-center gap-2">
@@ -534,13 +534,13 @@ export default function Attendance() {
 
                 {/* Check In / Check Out Cards Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto">
-                  <div className="bg-app-card border border-app-border rounded-xl p-3 shadow-sm flex items-center justify-between">
+                  <div className="bg-app-card border border-app-border rounded-xl p-3 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-lg bg-app-success/15 flex items-center justify-center text-app-success shrink-0">
                         <Clock className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[10px] text-app-text/60 font-medium uppercase tracking-wider">Check In</p>
+                        <p className="text-xs text-app-text/60 font-medium uppercase tracking-wider">Check In</p>
                         <p className="font-bold text-app-text-bright text-base font-mono">
                           {todayRecord.checkIn ? new Date(todayRecord.checkIn).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) : '-'}
                         </p>
@@ -553,13 +553,13 @@ export default function Attendance() {
                     )}
                   </div>
 
-                  <div className="bg-app-card border border-app-border rounded-xl p-3 shadow-sm flex items-center justify-between">
+                  <div className="bg-app-card border border-app-border rounded-xl p-3 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-lg bg-app-danger/15 flex items-center justify-center text-app-danger shrink-0">
                         <Clock className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[10px] text-app-text/60 font-medium uppercase tracking-wider">Check Out</p>
+                        <p className="text-xs text-app-text/60 font-medium uppercase tracking-wider">Check Out</p>
                         <p className="font-bold text-app-text-bright text-base font-mono">
                           {todayRecord.checkOut ? new Date(todayRecord.checkOut).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) : '-'}
                         </p>
@@ -585,7 +585,7 @@ export default function Attendance() {
                           placeholder="Catatan Pulang (Opsional)"
                           className="flex-1 bg-app-card border border-app-border text-app-text-bright text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-app-accent1"
                         />
-                        <button
+                        <button type="button"
                           onClick={() => handleAction('checkOut')}
                           className="px-5 py-2.5 bg-app-danger text-app-bg rounded-xl font-semibold text-xs hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shrink-0"
                         >
@@ -616,7 +616,7 @@ export default function Attendance() {
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
                     {(['present', 'absent', 'leave', 'sick'] as const).map((s) => (
-                      <button
+                      <button type="button"
                         key={s}
                         onClick={() => setStatus(s)}
                         className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl border transition-all ${
@@ -643,7 +643,7 @@ export default function Attendance() {
                   />
                 </div>
 
-                <button
+                <button type="button"
                   onClick={() => handleAction('checkIn')}
                   className="w-full py-3 bg-app-accent1 text-app-bg rounded-xl font-semibold text-xs sm:text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                 >
@@ -660,13 +660,13 @@ export default function Attendance() {
            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
              <div className="flex items-center gap-4">
                <h2 className="font-semibold text-app-text-bright">Riwayat Kehadiran</h2>
-               <button onClick={openAddModal} className="flex items-center gap-1.5 px-3 py-1.5 bg-app-accent1/10 text-app-accent1 rounded-lg hover:bg-app-accent1/20 transition-colors text-xs font-semibold">
+               <button type="button" onClick={openAddModal} className="flex items-center gap-1.5 px-3 py-1.5 bg-app-accent1/10 text-app-accent1 rounded-lg hover:bg-app-accent1/20 transition-colors text-xs font-semibold">
                   <Plus className="w-3.5 h-3.5" />
                   Manual
                </button>
              </div>
              <div className="hidden md:flex items-center gap-2">
-               <button 
+               <button type="button"
                  onClick={() => setSelectedPeriodStart(new Date(selectedPeriodStart.getFullYear(), selectedPeriodStart.getMonth() - 1, attendancePeriodStart))}
                  className="p-1 text-app-text/50 hover:text-app-text-bright transition-colors bg-app-card rounded-md border border-app-border"
                >
@@ -688,7 +688,7 @@ export default function Attendance() {
                    return `${startStr} - ${endStr}`;
                  })()}
                </span>
-               <button 
+               <button type="button"
                  onClick={() => setSelectedPeriodStart(new Date(selectedPeriodStart.getFullYear(), selectedPeriodStart.getMonth() + 1, attendancePeriodStart))}
                  className="p-1 text-app-text/50 hover:text-app-text-bright transition-colors bg-app-card rounded-md border border-app-border"
                >
@@ -700,13 +700,13 @@ export default function Attendance() {
            <div className="bg-app-card p-4 rounded-xl border border-app-border">
              <div className="grid grid-cols-7 gap-1 text-center mb-2">
                {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(d => (
-                 <div key={d} className="text-[10px] font-semibold text-app-text/50 uppercase py-1">{d}</div>
+                 <div key={d} className="text-xs font-semibold text-app-text/50 uppercase py-1">{d}</div>
                ))}
              </div>
              <div className="grid grid-cols-7 gap-1">
                {(() => {
                   const startOfPeriod = new Date(selectedPeriodStart);
-                  
+
                   const endOfPeriodDate = new Date(selectedPeriodStart);
                   if (attendancePeriodEnd < attendancePeriodStart) {
                       endOfPeriodDate.setMonth(endOfPeriodDate.getMonth() + 1);
@@ -716,39 +716,39 @@ export default function Attendance() {
                   if (endOfPeriodDate.getMonth() !== targetMonth) {
                      endOfPeriodDate.setDate(0);
                   }
-                  
+
                   const startDay = startOfPeriod.getDay();
-                  
+
                   const daysCount = Math.round((endOfPeriodDate.getTime() - startOfPeriod.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-                  
+
                   const blanks = Array(startDay).fill(null);
                   const days = Array.from({length: daysCount}, (_, i) => {
                      const d = new Date(startOfPeriod);
                      d.setDate(d.getDate() + i);
                      return d;
                   });
-                  
+
                   const today = new Date();
-                  
+
                   return [...blanks, ...days].map((d, i) => {
                     if (!d) return <div key={`history-blank-${i}`} />;
-                    
+
                     const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
-                    
+
                     const dStart = new Date(d);
                     dStart.setHours(0,0,0,0);
                     const dEnd = new Date(d);
                     dEnd.setHours(23,59,59,999);
                     const hasRecord = records.find(r => r.date >= dStart.getTime() && r.date <= dEnd.getTime());
-                    
+
                     const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                     const dayId = d.getDay().toString();
                     const defaultSchedule = workSchedule?.days?.[dayId] || { isActive: true, start: '08:00', end: '17:00' };
                     const currentSchedule = workSchedule?.overrides?.[dateStr] || defaultSchedule;
-                    
+
                     return (
-                      <div 
-                        key={`history-${i}`} 
+                      <div
+                        key={`history-${i}`}
                         onClick={() => {
                           setSelectedDateActionMenu({ date: d, hasRecord });
                         }}
@@ -761,7 +761,7 @@ export default function Attendance() {
                          <div className="flex flex-col items-end text-right pr-0.5 mt-0.5 w-full overflow-hidden">
                            {hasRecord ? (
                              hasRecord.status === 'present' ? (
-                               <div className="text-[10px] text-app-success leading-tight flex flex-col font-semibold gap-0 w-full">
+                               <div className="text-xs text-app-success leading-tight flex flex-col font-semibold gap-0 w-full">
                                  <span className="truncate block">{hasRecord.checkIn ? new Date(hasRecord.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
                                  <span className="truncate block">{hasRecord.checkOut ? new Date(hasRecord.checkOut).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
                                  {(() => {
@@ -773,24 +773,24 @@ export default function Attendance() {
                                         const diff = actualHours - schedHours;
                                         if (diff >= 0.5) {
                                             const diffStr = parseFloat(diff.toFixed(2)).toString().replace('.', ',');
-                                             return <span className="text-[9px] text-app-warning mt-0.5 bg-app-warning/10 px-1 py-0.2 rounded block truncate w-full text-center">+{diffStr}j</span>;
+                                             return <span className="text-[11px] text-app-warning mt-0.5 bg-app-warning/10 px-1 py-0.2 rounded block truncate w-full text-center">+{diffStr}j</span>;
                                         }
                                     }
                                     return null;
                                  })()}
                                </div>
                              ) : (
-                               <div className={`text-[10px] mt-0.5 leading-tight font-black truncate w-full ${hasRecord.status === 'leave' ? 'text-app-warning' : hasRecord.status === 'sick' ? 'text-app-accent1' : 'text-app-danger'}`}>
+                               <div className={`text-xs mt-0.5 leading-tight font-black truncate w-full ${hasRecord.status === 'leave' ? 'text-app-warning' : hasRecord.status === 'sick' ? 'text-app-accent1' : 'text-app-danger'}`}>
                                  {hasRecord.status === 'leave' ? 'IZIN' : hasRecord.status === 'sick' ? 'SAKIT' : 'ALPHA'}
                                </div>
                              )
                            ) : currentSchedule.isActive ? (
-                             <div className="text-[10px] text-app-text/50 leading-tight flex flex-col font-medium w-full">
+                             <div className="text-xs text-app-text/50 leading-tight flex flex-col font-medium w-full">
                                <span className="truncate block">{currentSchedule.start}</span>
                                <span className="truncate block">{currentSchedule.end}</span>
                              </div>
                            ) : (
-                             <div className="text-[10px] text-app-danger/50 leading-tight font-semibold mt-0.5 truncate w-full">Libur</div>
+                             <div className="text-xs text-app-danger/50 leading-tight font-semibold mt-0.5 truncate w-full">Libur</div>
                            )}
                          </div>
                          {hasRecord && <div className={`w-1 h-1 rounded-full absolute bottom-1 left-1 ${hasRecord.status === 'present' ? 'bg-app-success' : hasRecord.status === 'absent' ? 'bg-app-danger' : hasRecord.status === 'leave' ? 'bg-app-warning' : 'bg-app-accent1'}`} />}
@@ -807,16 +807,16 @@ export default function Attendance() {
 
       {isScheduleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-3xl rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-app-bg w-full max-w-3xl rounded-2xl border border-app-border overflow-hidden flex flex-col max-h-[90vh]" role="dialog" aria-modal="true" aria-labelledby="attendance-schedule-title">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
-              <h2 className="font-semibold text-app-text-bright">Pengaturan Jadwal & Periode</h2>
-              <button onClick={() => setIsScheduleModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
+              <h2 id="attendance-schedule-title" className="font-semibold text-app-text-bright">Pengaturan Jadwal & Periode</h2>
+              <button type="button" onClick={() => setIsScheduleModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card" aria-label="Tutup pengaturan jadwal">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto flex-1 space-y-6">
-              
+
               <div className="bg-app-card p-4 rounded-xl border border-app-border">
                 <h3 className="font-semibold text-app-text-bright mb-4 text-sm flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-app-accent1" />
@@ -824,10 +824,10 @@ export default function Attendance() {
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">Tgl Awal</label>
-                    <input 
-                      type="number" min="1" max="31" 
-                      value={attendancePeriodStart} 
+                    <label className="text-xs uppercase font-semibold tracking-wider mb-2 block text-app-text/70">Tgl Awal</label>
+                    <input
+                      type="number" min="1" max="31"
+                      value={attendancePeriodStart}
                       onChange={async (e) => {
                         let val = parseInt(e.target.value);
                         if (isNaN(val)) val = 1;
@@ -835,15 +835,15 @@ export default function Attendance() {
                         if (val > 31) val = 31;
                         setAttendancePeriodStart(val);
                         if (user) await updateDoc(doc(db, 'users', user.uid), { attendancePeriodStart: val });
-                      }} 
-                      className="w-full bg-app-bg border border-app-border rounded-lg px-3 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright" 
+                      }}
+                      className="w-full bg-app-bg border border-app-border rounded-lg px-3 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] uppercase font-semibold tracking-wider mb-2 block text-app-text/70">Tgl Akhir</label>
-                    <input 
-                      type="number" min="1" max="31" 
-                      value={attendancePeriodEnd} 
+                    <label className="text-xs uppercase font-semibold tracking-wider mb-2 block text-app-text/70">Tgl Akhir</label>
+                    <input
+                      type="number" min="1" max="31"
+                      value={attendancePeriodEnd}
                       onChange={async (e) => {
                         let val = parseInt(e.target.value);
                         if (isNaN(val)) val = 1;
@@ -851,8 +851,8 @@ export default function Attendance() {
                         if (val > 31) val = 31;
                         setAttendancePeriodEnd(val);
                         if (user) await updateDoc(doc(db, 'users', user.uid), { attendancePeriodEnd: val });
-                      }} 
-                      className="w-full bg-app-bg border border-app-border rounded-lg px-3 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright" 
+                      }}
+                      className="w-full bg-app-bg border border-app-border rounded-lg px-3 py-3 text-sm focus:border-app-accent1 outline-none text-app-text-bright"
                     />
                   </div>
                 </div>
@@ -863,7 +863,7 @@ export default function Attendance() {
                  <div className="flex items-center justify-between mb-4">
                    <h3 className="font-semibold text-app-text-bright text-sm">Pratinjau Kalender Periode Ini</h3>
                    <div className="flex items-center gap-2">
-                     <button 
+                     <button type="button"
                        onClick={() => setSelectedPeriodStart(new Date(selectedPeriodStart.getFullYear(), selectedPeriodStart.getMonth() - 1, attendancePeriodStart))}
                        className="p-1 text-app-text/50 hover:text-app-text-bright transition-colors bg-app-bg rounded-md border border-app-border"
                      >
@@ -885,7 +885,7 @@ export default function Attendance() {
                          return `${startStr} - ${endStr}`;
                        })()}
                      </span>
-                     <button 
+                     <button type="button"
                        onClick={() => setSelectedPeriodStart(new Date(selectedPeriodStart.getFullYear(), selectedPeriodStart.getMonth() + 1, attendancePeriodStart))}
                        className="p-1 text-app-text/50 hover:text-app-text-bright transition-colors bg-app-bg rounded-md border border-app-border"
                      >
@@ -895,13 +895,13 @@ export default function Attendance() {
                  </div>
                  <div className="grid grid-cols-7 gap-1 text-center mb-2">
                    {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(d => (
-                     <div key={d} className="text-[10px] font-semibold text-app-text/50 uppercase py-1">{d}</div>
+                     <div key={d} className="text-xs font-semibold text-app-text/50 uppercase py-1">{d}</div>
                    ))}
                  </div>
                  <div className="grid grid-cols-7 gap-1">
                    {(() => {
                       const startOfPeriod = new Date(selectedPeriodStart);
-                      
+
                       const endOfPeriodDate = new Date(selectedPeriodStart);
                       if (attendancePeriodEnd < attendancePeriodStart) {
                           endOfPeriodDate.setMonth(endOfPeriodDate.getMonth() + 1);
@@ -911,40 +911,40 @@ export default function Attendance() {
                       if (endOfPeriodDate.getMonth() !== targetMonth) {
                          endOfPeriodDate.setDate(0);
                       }
-                      
+
                       const startDay = startOfPeriod.getDay();
-                      
+
                       const daysCount = Math.round((endOfPeriodDate.getTime() - startOfPeriod.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-                      
+
                       const blanks = Array(startDay).fill(null);
                       const days = Array.from({length: daysCount}, (_, i) => {
                          const d = new Date(startOfPeriod);
                          d.setDate(d.getDate() + i);
                          return d;
                       });
-                      
+
                       const today = new Date();
-                      
+
                       return [...blanks, ...days].map((d, i) => {
                         if (!d) return <div key={`blank-${i}`} />;
-                        
+
                         const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
-                        
+
                         // Check if there is an attendance record for this day
                         const dStart = new Date(d);
                         dStart.setHours(0,0,0,0);
                         const dEnd = new Date(d);
                         dEnd.setHours(23,59,59,999);
                         const hasRecord = records.find(r => r.date >= dStart.getTime() && r.date <= dEnd.getTime());
-                        
+
                         const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                         const dayId = d.getDay().toString();
                         const defaultSchedule = workSchedule?.days?.[dayId] || { isActive: true, start: '08:00', end: '17:00' };
                         const currentSchedule = workSchedule?.overrides?.[dateStr] || defaultSchedule;
-                        
+
                         return (
-                          <div 
-                            key={i} 
+                          <div
+                            key={i}
                             onClick={() => {
                               setSelectedDateActionMenu({ date: d, hasRecord });
                             }}
@@ -957,7 +957,7 @@ export default function Attendance() {
                              <div className="flex flex-col items-end text-right pr-0.5 mt-0.5 w-full overflow-hidden">
                                {hasRecord ? (
                                  hasRecord.status === 'present' ? (
-                                   <div className="text-[10px] text-app-success leading-tight flex flex-col font-semibold gap-0 w-full">
+                                   <div className="text-xs text-app-success leading-tight flex flex-col font-semibold gap-0 w-full">
                                      <span className="truncate block">{hasRecord.checkIn ? new Date(hasRecord.checkIn).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
                                      <span className="truncate block">{hasRecord.checkOut ? new Date(hasRecord.checkOut).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '-'}</span>
                                      {(() => {
@@ -969,24 +969,24 @@ export default function Attendance() {
                                             const diff = actualHours - schedHours;
                                             if (diff >= 0.5) {
                                                 const diffStr = parseFloat(diff.toFixed(2)).toString().replace('.', ',');
-                                                 return <span className="text-[9px] text-app-warning mt-0.5 bg-app-warning/10 px-1 py-0.2 rounded block truncate w-full text-center">+{diffStr}j</span>;
+                                                 return <span className="text-[11px] text-app-warning mt-0.5 bg-app-warning/10 px-1 py-0.2 rounded block truncate w-full text-center">+{diffStr}j</span>;
                                             }
                                         }
                                         return null;
                                      })()}
                                    </div>
                                  ) : (
-                                   <div className={`text-[10px] mt-0.5 leading-tight font-black truncate w-full ${hasRecord.status === 'leave' ? 'text-app-warning' : hasRecord.status === 'sick' ? 'text-app-accent1' : 'text-app-danger'}`}>
+                                   <div className={`text-xs mt-0.5 leading-tight font-black truncate w-full ${hasRecord.status === 'leave' ? 'text-app-warning' : hasRecord.status === 'sick' ? 'text-app-accent1' : 'text-app-danger'}`}>
                                      {hasRecord.status === 'leave' ? 'IZIN' : hasRecord.status === 'sick' ? 'SAKIT' : 'ALPHA'}
                                    </div>
                                  )
                                ) : currentSchedule.isActive ? (
-                                 <div className="text-[10px] text-app-text/50 leading-tight flex flex-col font-medium w-full">
+                                 <div className="text-xs text-app-text/50 leading-tight flex flex-col font-medium w-full">
                                    <span className="truncate block">{currentSchedule.start}</span>
                                    <span className="truncate block">{currentSchedule.end}</span>
                                  </div>
                                ) : (
-                                 <div className="text-[10px] text-app-danger/50 leading-tight font-semibold mt-0.5 truncate w-full">Libur</div>
+                                 <div className="text-xs text-app-danger/50 leading-tight font-semibold mt-0.5 truncate w-full">Libur</div>
                                )}
                              </div>
                              {hasRecord && <div className={`w-1 h-1 rounded-full absolute bottom-1 left-1 ${hasRecord.status === 'present' ? 'bg-app-success' : hasRecord.status === 'absent' ? 'bg-app-danger' : hasRecord.status === 'leave' ? 'bg-app-warning' : 'bg-app-accent1'}`} />}
@@ -1004,24 +1004,24 @@ export default function Attendance() {
 
       {isSalaryModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-3xl rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-app-bg w-full max-w-3xl rounded-2xl border border-app-border overflow-hidden flex flex-col max-h-[90vh]" role="dialog" aria-modal="true" aria-labelledby="salary-calculation-title">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
-              <h2 className="font-semibold text-app-text-bright">Perhitungan Gaji</h2>
-              <button onClick={() => setIsSalaryModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
+              <h2 id="salary-calculation-title" className="font-semibold text-app-text-bright">Perhitungan Gaji</h2>
+              <button type="button" onClick={() => setIsSalaryModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card" aria-label="Tutup perhitungan gaji">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto flex-1 space-y-6">
               {/* Salary Calculation */}
-               <div className="bg-app-card p-4 rounded-2xl border border-app-border overflow-x-auto shadow-xs">
+               <div className="bg-app-card p-4 rounded-2xl border border-app-border overflow-x-auto">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
                     <h3 className="font-semibold text-app-text-bright text-sm flex items-center gap-2">
                       <Calculator className="w-4 h-4 text-app-accent1" />
                       Perhitungan Gaji
                     </h3>
                     <div className="flex items-center gap-2 self-start sm:self-auto">
-                      <button 
+                      <button type="button"
                         onClick={() => setSelectedPeriodStart(new Date(selectedPeriodStart.getFullYear(), selectedPeriodStart.getMonth() - 1, attendancePeriodStart))}
                         className="p-1 text-app-text/50 hover:text-app-text-bright transition-colors bg-app-bg rounded-md border border-app-border"
                       >
@@ -1043,7 +1043,7 @@ export default function Attendance() {
                           return `${startStr} - ${endStr}`;
                         })()}
                       </span>
-                      <button 
+                      <button type="button"
                         onClick={() => setSelectedPeriodStart(new Date(selectedPeriodStart.getFullYear(), selectedPeriodStart.getMonth() + 1, attendancePeriodStart))}
                         className="p-1 text-app-text/50 hover:text-app-text-bright transition-colors bg-app-bg rounded-md border border-app-border"
                       >
@@ -1055,9 +1055,9 @@ export default function Attendance() {
                     const hariMasuk = records.filter(r => r.status === 'present').length;
                     const tidakMasuk = records.filter(r => r.status !== 'present').length;
                     const s = localSalarySettings || { gajiPokok: 0, uangHarian: 0, uangKerajinan: 0, uangMakan: 0, uangTunjangan: 0, uangLemburPerJam: 0, lemburHours: 0 };
-                    
+
                     let autoLembur = 0;
-                    
+
                     const startOfPeriod = new Date(selectedPeriodStart);
                     const endOfPeriodDate = new Date(selectedPeriodStart);
                     if (attendancePeriodEnd < attendancePeriodStart) {
@@ -1074,7 +1074,7 @@ export default function Attendance() {
                        d.setDate(d.getDate() + i);
                        return d;
                     });
-                    
+
                     let hariKerjaSeharusnya = 0;
                     days.forEach(d => {
                         const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -1093,7 +1093,7 @@ export default function Attendance() {
                             const dayId = d.getDay().toString();
                             const defaultSchedule = workSchedule?.days?.[dayId] || { isActive: true, start: '08:00', end: '17:00' };
                             const currentSchedule = workSchedule?.overrides?.[dateStr] || defaultSchedule;
-                            
+
                             const [sH, sM] = currentSchedule.start.split(':').map(Number);
                             const [eH, eM] = currentSchedule.end.split(':').map(Number);
                             const schedHours = currentSchedule.isActive ? (eH + eM/60) - (sH + sM/60) : 0;
@@ -1104,7 +1104,7 @@ export default function Attendance() {
                             }
                         }
                     });
-                    
+
                     const finalLemburHours = s.lemburHours || autoLembur;
 
                     const totalGajiPokok = s.gajiPokok || 0;
@@ -1113,17 +1113,17 @@ export default function Attendance() {
                     const totalUangMakan = (s.uangMakan || 0) * hariMasuk;
                     const totalUangTunjangan = s.uangTunjangan || 0;
                     const totalLembur = (s.uangLemburPerJam || 0) * finalLemburHours;
-                    
+
                     const total = totalGajiPokok + totalUangHarian + totalUangKerajinan + totalUangMakan + totalUangTunjangan + totalLembur;
-                    
+
                     const formatRp = (num: number) => `Rp${num.toLocaleString('id-ID')}`;
-                    
+
                     return (
                       <>
                       <div className="w-full overflow-x-auto">
                         <table className="w-full min-w-[450px] text-left border-collapse text-xs sm:text-sm">
                           <thead>
-                            <tr className="border-b border-app-border text-app-text/70 uppercase text-[10px] tracking-wider">
+                            <tr className="border-b border-app-border text-app-text/70 uppercase text-xs tracking-wider">
                               <th className="py-2 font-semibold">Komponen</th>
                               <th className="py-2 font-semibold px-2 w-[120px]">Nilai Dasar</th>
                               <th className="py-2 font-semibold px-2 text-center w-[70px]">Faktor</th>
@@ -1190,7 +1190,7 @@ export default function Attendance() {
                               </td>
                               <td className="py-2 px-2 text-center relative group">
                                 <FloatInput value={finalLemburHours} onChange={(val) => handleUpdateSalarySettings('lemburHours', val)} />
-                                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-app-card border border-app-border text-[10px] p-2 rounded shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10 transition-opacity">
+                                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-app-card border border-app-border text-xs p-2 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10 transition-opacity">
                                   <div>Otomatis: {autoLembur.toLocaleString('id-ID', {maximumFractionDigits:5})}j</div>
                                   <div className="text-app-text/50">Ketik manual untuk menimpa</div>
                                 </div>
@@ -1205,7 +1205,7 @@ export default function Attendance() {
                         </table>
                       </div>
                       <div className="mt-6 flex justify-end">
-                        <button 
+                        <button type="button"
                           onClick={() => {
                             // format the total with id-ID locale, but convert it to string that uses dots and commas
                             setSaveSalaryAmount(total.toLocaleString('id-ID', { maximumFractionDigits: 10 }));
@@ -1228,10 +1228,10 @@ export default function Attendance() {
 
       {isSaveSalaryModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-sm rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col">
+          <div className="bg-app-bg w-full max-w-sm rounded-2xl border border-app-border overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="save-salary-title">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
-              <h2 className="font-semibold text-app-text-bright">Simpan Pemasukan</h2>
-              <button onClick={() => setIsSaveSalaryModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
+              <h2 id="save-salary-title" className="font-semibold text-app-text-bright">Simpan Pemasukan</h2>
+              <button type="button" onClick={() => setIsSaveSalaryModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card" aria-label="Tutup simpan pemasukan">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1252,7 +1252,7 @@ export default function Attendance() {
                       if (parts.length > 2) {
                         val = parts[0] + ',' + parts.slice(1).join('');
                       }
-                      
+
                       // Format the integer part with dots
                       if (val) {
                          const hasComma = val.includes(',');
@@ -1286,13 +1286,13 @@ export default function Attendance() {
                 </select>
               </div>
               <div className="pt-4 flex gap-3">
-                <button
+                <button type="button"
                   onClick={() => setIsSaveSalaryModalOpen(false)}
                   className="flex-1 bg-app-card hover:bg-app-border text-app-text-bright py-2 rounded-lg font-medium transition-colors"
                 >
                   Batal
                 </button>
-                <button
+                <button type="button"
                   onClick={async () => {
                     const amountValue = parseFloat(saveSalaryAmount.replace(/\./g, '').replace(',', '.'));
                     if (!user || isNaN(amountValue) || amountValue <= 0 || !saveSalaryAccountId) {
@@ -1301,26 +1301,26 @@ export default function Attendance() {
                     }
                     try {
                       const batch = writeBatch(db);
-                      
+
                       const tsxRef = doc(collection(db, "users", user.uid, "transactions"));
                       const startOfPeriod = new Date(selectedPeriodStart);
-                      
+
                       batch.set(tsxRef, {
                           type: "income",
                           amount: amountValue,
                           date: Date.now(),
                           accountId: saveSalaryAccountId,
                           note: `Gaji periode ${startOfPeriod.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`,
-                          categoryId: "", 
+                          categoryId: "",
                       });
-                      
+
                       const accRef = doc(db, "users", user.uid, "accounts", saveSalaryAccountId);
                       const accDoc = await getDoc(accRef);
                       if (accDoc.exists()) {
                          const currentBal = accDoc.data().balance || 0;
                          batch.update(accRef, { balance: currentBal + amountValue });
                       }
-                      
+
                       await batch.commit();
                       toast.success("Gaji berhasil disimpan sebagai pemasukan!");
                       setIsSaveSalaryModalOpen(false);
@@ -1342,10 +1342,10 @@ export default function Attendance() {
 
       {selectedDateForHours && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-sm rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col">
+          <div className="bg-app-bg w-full max-w-sm rounded-2xl border border-app-border overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="work-hours-title">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
-              <h2 className="font-semibold text-app-text-bright">Jam Kerja ({selectedDateForHours.toLocaleDateString('id-ID')})</h2>
-              <button onClick={() => setSelectedDateForHours(null)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
+              <h2 id="work-hours-title" className="font-semibold text-app-text-bright">Jam Kerja ({selectedDateForHours.toLocaleDateString('id-ID')})</h2>
+              <button type="button" onClick={() => setSelectedDateForHours(null)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card" aria-label="Tutup pengaturan jam kerja">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1356,7 +1356,7 @@ export default function Attendance() {
                  const defaultSchedule = workSchedule?.days?.[dayId] || { isActive: true, start: '08:00', end: '17:00' };
                  const override = workSchedule?.overrides?.[dateStr];
                  const currentSchedule = override || defaultSchedule;
-                 
+
                  return (
                     <div className="space-y-4">
                       <label className="flex items-center gap-3">
@@ -1377,7 +1377,7 @@ export default function Attendance() {
                         />
                         <span className="text-sm font-medium text-app-text-bright">Hari Kerja</span>
                       </label>
-                      
+
                       <div className={`flex flex-col gap-2 ${!currentSchedule.isActive ? 'opacity-50 pointer-events-none' : ''}`}>
                         <div className="flex items-center justify-between bg-app-card border border-app-border rounded-xl p-3">
                           <span className="text-xs font-medium text-app-text/70 uppercase">Jam Masuk</span>
@@ -1416,9 +1416,9 @@ export default function Attendance() {
                           />
                         </div>
                       </div>
-                      
+
                       {override && (
-                         <button 
+                         <button type="button"
                            onClick={async () => {
                              const newSchedule = { ...workSchedule };
                              if (newSchedule.overrides) {
@@ -1442,28 +1442,29 @@ export default function Attendance() {
 
       {selectedDateActionMenu && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-xs rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
+          <div className="bg-app-bg w-full max-w-xs rounded-2xl border border-app-border overflow-hidden flex flex-col animate-in fade-in duration-150" role="dialog" aria-modal="true" aria-labelledby="date-action-title">
             <div className="flex items-center justify-between p-4 border-b border-app-border bg-app-card/30">
-              <h2 className="font-semibold text-app-text-bright text-sm">Pilih Tindakan</h2>
-              <button 
-                onClick={() => setSelectedDateActionMenu(null)} 
+              <h2 id="date-action-title" className="font-semibold text-app-text-bright text-sm">Pilih Tindakan</h2>
+              <button type="button"
+                onClick={() => setSelectedDateActionMenu(null)}
                 className="p-1.5 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card"
+                aria-label="Tutup pilihan tindakan"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="p-4 space-y-3.5">
               <div className="text-center pb-2 border-b border-app-border">
-                <span className="text-[10px] uppercase font-semibold tracking-wider text-app-text/50 block mb-0.5">Tanggal</span>
+                <span className="text-xs uppercase font-semibold tracking-wider text-app-text/50 block mb-0.5">Tanggal</span>
                 <span className="text-sm font-semibold text-app-text-bright">
                   {selectedDateActionMenu.date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                 </span>
               </div>
-              
+
               {(() => {
                 if (selectedDateActionMenu.hasRecord) {
                   const record = selectedDateActionMenu.hasRecord;
-                  
+
                   let diffStr = '';
                   if (record.status === 'present' && record.checkIn && record.checkOut) {
                     const d = selectedDateActionMenu.date;
@@ -1471,13 +1472,13 @@ export default function Attendance() {
                     const dayId = d.getDay().toString();
                     const defaultSchedule = workSchedule?.days?.[dayId] || { isActive: true, start: '08:00', end: '17:00' };
                     const currentSchedule = workSchedule?.overrides?.[dateStr] || defaultSchedule;
-                    
+
                     const [sH, sM] = currentSchedule.start.split(':').map(Number);
                     const [eH, eM] = currentSchedule.end.split(':').map(Number);
                     const schedHours = currentSchedule.isActive ? (eH + eM/60) - (sH + sM/60) : 0;
                     const actualHours = (record.checkOut - record.checkIn) / 3600000;
                     const diff = actualHours - schedHours;
-                    
+
                     if (diff >= 0.5) {
                        diffStr = parseFloat(diff.toFixed(2)).toString().replace('.', ',') + ' Jam';
                     }
@@ -1487,7 +1488,7 @@ export default function Attendance() {
                     <div className="bg-app-card rounded-xl p-3 border border-app-border space-y-2 mb-3">
                        <div className="flex justify-between items-center text-xs">
                          <span className="text-app-text/60">Status</span>
-                         <span className={`font-semibold ${getStatusColor(record.status)} px-2 py-0.5 rounded border text-[10px] uppercase`}>{getStatusLabel(record.status)}</span>
+                         <span className={`font-semibold ${getStatusColor(record.status)} px-2 py-0.5 rounded border text-xs uppercase`}>{getStatusLabel(record.status)}</span>
                        </div>
                        {record.status === 'present' && (
                          <>
@@ -1509,7 +1510,7 @@ export default function Attendance() {
                        )}
                        {record.notes && (
                          <div className="pt-2 border-t border-app-border mt-2">
-                           <span className="block text-[10px] text-app-text/50 uppercase font-semibold mb-1">Catatan</span>
+                           <span className="block text-xs text-app-text/50 uppercase font-semibold mb-1">Catatan</span>
                            <p className="text-xs text-app-text-bright bg-app-bg p-2 rounded-lg border border-app-border">{record.notes}</p>
                          </div>
                        )}
@@ -1520,7 +1521,7 @@ export default function Attendance() {
               })()}
 
               <div className={selectedDateActionMenu.hasRecord ? "grid grid-cols-2 gap-2" : ""}>
-                <button
+                <button type="button"
                   onClick={() => {
                     const { date, hasRecord } = selectedDateActionMenu;
                     setSelectedDateActionMenu(null);
@@ -1530,20 +1531,20 @@ export default function Attendance() {
                       openAddModalForDate(date);
                     }
                   }}
-                  className="w-full py-3 px-4 bg-app-accent1 text-app-bg hover:opacity-90 rounded-2xl font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full py-3 px-4 bg-app-accent1 text-app-bg hover:opacity-90 rounded-2xl font-semibold text-xs transition-all flex items-center justify-center gap-2"
                 >
                   <Calendar className="w-4 h-4" />
                   {selectedDateActionMenu.hasRecord ? 'Edit Absensi' : 'Tambah Absensi'}
                 </button>
-                
+
                 {selectedDateActionMenu.hasRecord && (
-                  <button
+                  <button type="button"
                     onClick={() => {
                       const { hasRecord } = selectedDateActionMenu;
                       setSelectedDateActionMenu(null);
                       handleDelete(hasRecord);
                     }}
-                    className="w-full py-3 px-4 bg-app-danger/10 text-app-danger hover:bg-app-danger/20 rounded-2xl font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
+                    className="w-full py-3 px-4 bg-app-danger/10 text-app-danger hover:bg-app-danger/20 rounded-2xl font-semibold text-xs transition-all flex items-center justify-center gap-2"
                   >
                     <Trash2 className="w-4 h-4" />
                     Hapus
@@ -1551,7 +1552,7 @@ export default function Attendance() {
                 )}
               </div>
 
-              <button
+              <button type="button"
                 onClick={() => {
                   const { date } = selectedDateActionMenu;
                   setSelectedDateActionMenu(null);
@@ -1569,14 +1570,14 @@ export default function Attendance() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-app-bg w-full max-w-md rounded-2xl border border-app-border shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-app-bg w-full max-w-md rounded-2xl border border-app-border overflow-hidden flex flex-col max-h-[90vh]" role="dialog" aria-modal="true" aria-labelledby="attendance-entry-title">
             <div className="flex items-center justify-between p-4 border-b border-app-border">
-              <h2 className="font-semibold text-app-text-bright">{editingRecord ? 'Edit Absensi' : 'Tambah Absensi Manual'}</h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card">
+              <h2 id="attendance-entry-title" className="font-semibold text-app-text-bright">{editingRecord ? 'Edit Absensi' : 'Tambah Absensi Manual'}</h2>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="p-2 text-app-text/50 hover:text-app-text-bright transition-colors rounded-full hover:bg-app-card" aria-label="Tutup formulir absensi">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="p-4 overflow-y-auto flex-1 space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-app-text/70 mb-2 uppercase tracking-wider">Tanggal</label>
@@ -1595,7 +1596,7 @@ export default function Attendance() {
                   className="w-full bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-xs font-semibold text-app-text/70 mb-2 uppercase tracking-wider">Status Kehadiran</label>
                 <div className="grid grid-cols-2 gap-2">
@@ -1616,12 +1617,12 @@ export default function Attendance() {
                       }`}
                     >
                       {getStatusIcon(s)}
-                      <span className="text-[10px] font-semibold">{getStatusLabel(s)}</span>
+                      <span className="text-xs font-semibold">{getStatusLabel(s)}</span>
                     </button>
                   ))}
                 </div>
               </div>
-              
+
               {modalStatus === 'present' && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -1644,7 +1645,7 @@ export default function Attendance() {
                   </div>
                 </div>
               )}
-              
+
               <div>
                 <label className="block text-xs font-semibold text-app-text/70 mb-2 uppercase tracking-wider">Catatan (Opsional)</label>
                 <input
@@ -1656,9 +1657,9 @@ export default function Attendance() {
                 />
               </div>
             </div>
-            
+
             <div className="p-4 border-t border-app-border bg-app-card">
-              <button
+              <button type="button"
                 onClick={handleSaveModal}
                 className="w-full py-3.5 bg-app-accent1 text-app-bg rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
               >

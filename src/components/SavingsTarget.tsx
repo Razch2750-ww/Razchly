@@ -48,9 +48,9 @@ export default function SavingsTarget() {
             const parsedIncomeTargets = incomeTargetInputs.map(t => parseNumberInput(t)).filter(t => t > 0);
             const parsedExpenseLimits = expenseLimitInputs.map(t => parseNumberInput(t)).filter(t => t > 0);
             const parsedMonthlyBudget = parseNumberInput(monthlyBudgetInput);
-            
+
             // Cleanup single target field format from legacy if saving array
-            await updateDoc(doc(db, 'users', user.uid), { 
+            await updateDoc(doc(db, 'users', user.uid), {
                 monthlySavingsTargets: parsedTargets.length > 0 ? parsedTargets : [],
                 dailyIncomeTargets: parsedIncomeTargets.length > 0 ? parsedIncomeTargets : [],
                 dailyExpenseLimits: parsedExpenseLimits.length > 0 ? parsedExpenseLimits : [],
@@ -71,7 +71,7 @@ export default function SavingsTarget() {
   const incomeThisMonth = useMemo(() => transactions
     .filter((t) => t.type === "income" && isSameMonth(parseTxDate(t.date), new Date()))
     .reduce((sum, t) => sum + t.amount, 0), [transactions]);
-    
+
   const expenseThisMonth = useMemo(() => transactions
     .reduce((sum, t) => {
       if (isSameMonth(parseTxDate(t.date), new Date())) {
@@ -80,11 +80,11 @@ export default function SavingsTarget() {
       }
       return sum;
     }, 0), [transactions]);
-    
+
   const incomeToday = useMemo(() => transactions
     .filter((t) => t.type === "income" && isSameDay(parseTxDate(t.date), new Date()))
     .reduce((sum, t) => sum + t.amount, 0), [transactions]);
-    
+
   const expenseToday = useMemo(() => transactions
     .reduce((sum, t) => {
       if (isSameDay(parseTxDate(t.date), new Date())) {
@@ -93,7 +93,7 @@ export default function SavingsTarget() {
       }
       return sum;
     }, 0), [transactions]);
-    
+
   const savingsThisMonth = incomeThisMonth - expenseThisMonth;
 
   const currentDay = useMemo(() => {
@@ -144,12 +144,12 @@ export default function SavingsTarget() {
           </h1>
           <p className="text-app-text/70 text-sm">Kelola dan pantau target keuangan berlapis Anda.</p>
         </div>
-        
+
         <div className="flex items-center gap-4 hidden md:flex">
-          <button onClick={() => setGlobalGrabModalOpen(true)} className="w-10 h-10 rounded-full bg-app-success hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm" title="Transaksi Grab">
+          <button type="button" onClick={() => setGlobalGrabModalOpen(true)} className="w-10 h-10 rounded-full bg-app-success hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity" title="Transaksi Grab">
             <Car className="w-5 h-5" />
           </button>
-          <button onClick={() => setGlobalAddModalOpen(true)} className="w-10 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity shadow-sm" title="Tambah Transaksi">
+          <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="w-10 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity" title="Tambah Transaksi">
             <Plus className="w-5 h-5" />
           </button>
           <Link to="/settings" className="px-4 h-10 rounded-full bg-app-card flex items-center justify-center text-sm font-semibold text-app-text-bright border border-app-border gap-2 hover:bg-app-hover cursor-pointer transition-colors">
@@ -167,7 +167,7 @@ export default function SavingsTarget() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <ScrollReveal className="lg:col-span-2">
-          <div className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col relative overflow-hidden h-full">
+          <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden h-full">
 
           <h2 className="text-app-text-bright font-semibold mb-6 flex items-center gap-2 relative z-10">
             <Target className="w-5 h-5 text-app-accent1" /> Atur Target Finansial
@@ -176,8 +176,8 @@ export default function SavingsTarget() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div className="w-full">
                 <div className="flex items-center justify-between mb-2">
-                    <label className="text-[10px] uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1"><ArrowUp className="w-3 h-3 text-app-success"/> Penghasilan Harian (Berlapis)</label>
-                    <button type="button" onClick={() => setIncomeTargetInputs([...incomeTargetInputs, ''])} className="text-[10px] uppercase font-semibold text-app-success hover:underline bg-app-success/10 px-2 py-1 rounded">
+                    <label className="text-xs uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1"><ArrowUp className="w-3 h-3 text-app-success"/> Penghasilan Harian (Berlapis)</label>
+                    <button type="button" onClick={() => setIncomeTargetInputs([...incomeTargetInputs, ''])} className="text-xs uppercase font-semibold text-app-success hover:underline bg-app-success/10 px-2 py-1 rounded">
                         + Tambah Layer
                     </button>
                 </div>
@@ -205,11 +205,11 @@ export default function SavingsTarget() {
                     ))}
                 </div>
               </div>
-              
+
               <div className="w-full">
                 <div className="flex items-center justify-between mb-2">
-                    <label className="text-[10px] uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1"><ArrowDown className="w-3 h-3 text-app-danger"/> Pengeluaran Harian (Berlapis)</label>
-                    <button type="button" onClick={() => setExpenseLimitInputs([...expenseLimitInputs, ''])} className="text-[10px] uppercase font-semibold text-app-danger hover:underline bg-app-danger/10 px-2 py-1 rounded">
+                    <label className="text-xs uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1"><ArrowDown className="w-3 h-3 text-app-danger"/> Pengeluaran Harian (Berlapis)</label>
+                    <button type="button" onClick={() => setExpenseLimitInputs([...expenseLimitInputs, ''])} className="text-xs uppercase font-semibold text-app-danger hover:underline bg-app-danger/10 px-2 py-1 rounded">
                         + Tambah Layer
                     </button>
                 </div>
@@ -238,13 +238,13 @@ export default function SavingsTarget() {
                 </div>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Tabungan Bulanan (Berlapis) */}
               <div className="w-full">
                 <div className="flex items-center justify-between mb-2">
-                    <label className="text-[10px] uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1"><Star className="w-3 h-3 text-app-accent1"/> Tabungan Bulanan (Berlapis)</label>
-                    <button type="button" onClick={() => setTargetInputs([...targetInputs, ''])} className="text-[10px] uppercase font-semibold text-app-accent1 hover:underline bg-app-accent1/10 px-2 py-1 rounded">
+                    <label className="text-xs uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1"><Star className="w-3 h-3 text-app-accent1"/> Tabungan Bulanan (Berlapis)</label>
+                    <button type="button" onClick={() => setTargetInputs([...targetInputs, ''])} className="text-xs uppercase font-semibold text-app-accent1 hover:underline bg-app-accent1/10 px-2 py-1 rounded">
                         + Tambah Layer Target
                     </button>
                 </div>
@@ -277,7 +277,7 @@ export default function SavingsTarget() {
               <div className="w-full flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                      <label className="text-[10px] uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1">
+                      <label className="text-xs uppercase font-semibold tracking-wider text-app-text/70 flex items-center gap-1">
                         <TrendingDown className="w-3 h-3 text-app-danger"/> Anggaran Pengeluaran Bulanan (PWA Prediktif)
                       </label>
                   </div>
@@ -315,7 +315,7 @@ export default function SavingsTarget() {
         <StaggerContainer className="lg:col-span-1 flex flex-col gap-6">
           {/* Laba Bersih Card */}
           <StaggerItem className="flex-1">
-            <HoverCard className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col justify-center relative overflow-hidden h-full min-h-[140px] w-full">
+            <HoverCard className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col justify-center relative overflow-hidden h-full min-h-[140px] w-full">
 
             <div className="absolute top-0 right-0 p-4 opacity-10">
                <TrendingUp className="w-16 h-16 text-app-success" />
@@ -328,13 +328,13 @@ export default function SavingsTarget() {
 
           {/* Predictive analysis card */}
           <StaggerItem className="flex-1">
-            <HoverCard className={`rounded-2xl p-6 border shadow-xs flex flex-col relative overflow-hidden h-full w-full ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
+            <HoverCard className={`rounded-2xl p-6 border flex flex-col relative overflow-hidden h-full w-full ${monthlyExpenseBudget > 0 ? (isOverBudget ? 'border-app-danger/30 bg-app-danger/5' : 'border-app-success/30 bg-app-success/5') : 'border-app-border bg-app-card/40'}`}>
 
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-3">
                 {monthlyExpenseBudget > 0 ? (
                   isOverBudget ? (
-                    <AlertTriangle className="w-5 h-5 text-app-danger shrink-0 animate-pulse" />
+                    <AlertTriangle className="w-5 h-5 text-app-danger shrink-0" />
                   ) : (
                     <Sparkles className="w-5 h-5 text-app-success shrink-0" />
                   )
@@ -367,8 +367,8 @@ export default function SavingsTarget() {
                     </div>
 
                     <div className="h-1.5 w-full bg-app-bg rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full ${isOverBudget ? 'bg-app-danger animate-pulse' : 'bg-app-success'}`}
+                      <div
+                        className={`h-full ${isOverBudget ? 'bg-app-danger' : 'bg-app-success'}`}
                         style={{ width: `${Math.min(100, (projectedMonthlyExpense / monthlyExpenseBudget) * 100)}%` }}
                       />
                     </div>
@@ -400,12 +400,12 @@ export default function SavingsTarget() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Tabungan Bulanan Berlayer */}
-        <div className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
 
           <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <Star className="w-5 h-5 text-app-accent1" /> Tabungan Layered
           </h2>
-          
+
           <div className="relative z-10 w-full flex-1 flex flex-col gap-6">
             {monthlySavingsTargets && monthlySavingsTargets.length > 0 ? (
               monthlySavingsTargets.map((target, idx) => {
@@ -414,32 +414,32 @@ export default function SavingsTarget() {
                   <div key={idx} className="border-b border-app-border last:border-0 pb-4 last:pb-0">
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-xs font-semibold text-app-text-bright">Layer {idx + 1}</span>
-                      <span className="text-[10px] font-semibold text-app-accent1">
+                      <span className="text-xs font-semibold text-app-accent1">
                         {savingsProgress.toFixed(0)}% Tercapai
                       </span>
                     </div>
 
                     <div className="flex justify-between items-end mb-2">
                       <div>
-                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Tercapai</p>
+                        <p className="text-[11px] text-app-text/70 uppercase tracking-wider">Tercapai</p>
                         <p className="text-sm font-semibold text-app-accent1">Rp {Math.max(savingsThisMonth, 0).toLocaleString('id-ID')}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Target L{idx + 1}</p>
+                        <p className="text-[11px] text-app-text/70 uppercase tracking-wider">Target L{idx + 1}</p>
                         <p className="text-xs font-semibold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
                       </div>
                     </div>
-     
-                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2 shadow-inner">
-                      <div 
+
+                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2">
+                      <div
                         className="h-full bg-app-accent1 transition-all duration-1000 ease-out relative"
                         style={{ width: `${savingsProgress}%` }}
                       >
-                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                        <div className="absolute inset-0 bg-white/20" />
                       </div>
                     </div>
-     
-                    <div className="flex justify-between items-center text-[10px]">
+
+                    <div className="flex justify-between items-center text-xs">
                       <span className="text-app-text/50">Status</span>
                       <span className="font-medium text-app-text/70">
                         {savingsThisMonth >= target ? (
@@ -461,12 +461,12 @@ export default function SavingsTarget() {
         </div>
 
         {/* Penghasilan Harian Berlayer */}
-        <div className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
 
           <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowUp className="w-5 h-5 text-app-success" /> Penghasilan Layered
           </h2>
-          
+
           <div className="relative z-10 w-full flex-1 flex flex-col gap-6">
             {dailyIncomeTargets && dailyIncomeTargets.length > 0 ? (
               dailyIncomeTargets.map((target, idx) => {
@@ -475,32 +475,32 @@ export default function SavingsTarget() {
                   <div key={idx} className="border-b border-app-border last:border-0 pb-4 last:pb-0">
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-xs font-semibold text-app-text-bright">Layer {idx + 1}</span>
-                      <span className="text-[10px] font-semibold text-app-success">
+                      <span className="text-xs font-semibold text-app-success">
                         {incomeProgress.toFixed(0)}% Tercapai
                       </span>
                     </div>
 
                     <div className="flex justify-between items-end mb-2">
                       <div>
-                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Tercapai</p>
+                        <p className="text-[11px] text-app-text/70 uppercase tracking-wider">Tercapai</p>
                         <p className="text-sm font-semibold text-app-success">Rp {Math.max(incomeToday, 0).toLocaleString('id-ID')}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Target L{idx + 1}</p>
+                        <p className="text-[11px] text-app-text/70 uppercase tracking-wider">Target L{idx + 1}</p>
                         <p className="text-xs font-semibold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
                       </div>
                     </div>
-     
-                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2 shadow-inner">
-                      <div 
+
+                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2">
+                      <div
                         className="h-full bg-app-success transition-all duration-1000 ease-out relative"
                         style={{ width: `${incomeProgress}%` }}
                       >
-                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                        <div className="absolute inset-0 bg-white/20" />
                       </div>
                     </div>
-     
-                    <div className="flex justify-between items-center text-[10px]">
+
+                    <div className="flex justify-between items-center text-xs">
                       <span className="text-app-text/50">Status</span>
                       <span className="font-medium text-app-text/70">
                         {incomeToday >= target ? (
@@ -522,12 +522,12 @@ export default function SavingsTarget() {
         </div>
 
         {/* Pengeluaran Harian Berlayer */}
-        <div className="bg-app-card rounded-2xl p-6 border border-app-border shadow-xs flex flex-col relative overflow-hidden">
+        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
 
           <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowDown className="w-5 h-5 text-app-danger" /> Pengeluaran Layered
           </h2>
-          
+
           <div className="relative z-10 w-full flex-1 flex flex-col gap-6">
             {dailyExpenseLimits && dailyExpenseLimits.length > 0 ? (
               dailyExpenseLimits.map((target, idx) => {
@@ -536,32 +536,32 @@ export default function SavingsTarget() {
                   <div key={idx} className="border-b border-app-border last:border-0 pb-4 last:pb-0">
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-xs font-semibold text-app-text-bright">Layer {idx + 1}</span>
-                      <span className="text-[10px] font-semibold text-app-danger">
+                      <span className="text-xs font-semibold text-app-danger">
                         {expenseProgress.toFixed(0)}% Terpakai
                       </span>
                     </div>
 
                     <div className="flex justify-between items-end mb-2">
                       <div>
-                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Terpakai</p>
+                        <p className="text-[11px] text-app-text/70 uppercase tracking-wider">Terpakai</p>
                         <p className="text-sm font-semibold text-app-danger">Rp {Math.max(expenseToday, 0).toLocaleString('id-ID')}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[9px] text-app-text/70 uppercase tracking-wider">Batas L{idx + 1}</p>
+                        <p className="text-[11px] text-app-text/70 uppercase tracking-wider">Batas L{idx + 1}</p>
                         <p className="text-xs font-semibold text-app-text-bright">Rp {target.toLocaleString('id-ID')}</p>
                       </div>
                     </div>
-     
-                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2 shadow-inner">
-                      <div 
+
+                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2">
+                      <div
                         className={`h-full transition-all duration-1000 ease-out relative ${expenseProgress >= 100 ? 'bg-app-danger' : 'bg-app-warning'}`}
                         style={{ width: `${expenseProgress}%` }}
                       >
-                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                        <div className="absolute inset-0 bg-white/20" />
                       </div>
                     </div>
-     
-                    <div className="flex justify-between items-center text-[10px]">
+
+                    <div className="flex justify-between items-center text-xs">
                       <span className="text-app-text/50">Status</span>
                       <span className="font-medium text-app-text/70">
                         {expenseToday > target ? (

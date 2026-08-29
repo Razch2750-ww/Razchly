@@ -15,7 +15,7 @@ function calculateLoanDetails(loan: Loan) {
   const duration = loan.tenorDuration;
   const numAmount = loan.amount;
   let intVal = loan.interestValue || 0;
-  
+
   const interestAmount = loan.hasInterest ? (loan.interestType === 'percentage' ? (numAmount * intVal / 100) : intVal) : 0;
   const totalPay = numAmount + interestAmount;
 
@@ -78,7 +78,7 @@ function generateSchedule(loan: Loan, details: any) {
         nextDate.setDate(loan.paymentDate);
       }
     }
-    
+
     schedule.push({
       id: i + 1,
       date: nextDate,
@@ -95,7 +95,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
   const paidAmount = loan.paidAmount || 0;
   const remaining = details.totalPayment - paidAmount;
   const paidCount = loan.paidPaymentsCount || 0;
-  
+
   const [selectedAccountId, setSelectedAccountId] = useState(accounts[0]?.id || "");
   const [isManualPayment, setIsManualPayment] = useState(false);
   const [manualAmount, setManualAmount] = useState("");
@@ -128,7 +128,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
 
     try {
       const batch = writeBatch(db);
-      
+
       const accRef = doc(db, "users", user.uid, "accounts", selectedAccountId);
       if (isLend) {
         batch.update(accRef, { balance: (acc?.balance || 0) + amount });
@@ -151,7 +151,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       const loanRef = doc(db, "users", user.uid, "loans", loan.id);
       const newPaidAmount = paidAmount + amount;
       const isFullyPaid = newPaidAmount >= details.totalPayment || isPayoff;
-      
+
       batch.update(loanRef, {
         paidAmount: isFullyPaid ? details.totalPayment : newPaidAmount,
         paidPaymentsCount: paidCount + 1,
@@ -175,12 +175,12 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       toast.error(isLend ? "Gagal mencatat penerimaan" : "Gagal melakukan pembayaran");
     }
   };
-  
+
   if (isPaidOff && !isExpanded) {
     return (
-      <div 
+      <div
         onClick={() => setIsExpanded(true)}
-        className="bg-app-card rounded-2xl border border-app-border p-4 shadow-sm flex justify-between items-center opacity-70 group hover:opacity-100 transition-opacity cursor-pointer animate-in fade-in duration-200"
+        className="bg-app-card rounded-2xl border border-app-border p-4 flex justify-between items-center opacity-70 group hover:opacity-100 transition-opacity cursor-pointer animate-in fade-in duration-200"
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-app-success/10 flex items-center justify-center">
@@ -194,15 +194,15 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button 
-            onClick={(e) => { e.stopPropagation(); onEdit(loan); }} 
+          <button type="button"
+            onClick={(e) => { e.stopPropagation(); onEdit(loan); }}
             className="p-2 text-app-accent1 hover:bg-app-accent1/10 rounded-full transition-colors"
             title="Edit"
           >
             <Pencil className="w-4 h-4" />
           </button>
-          <button 
-            onClick={(e) => { e.stopPropagation(); deleteLoan(loan.id); }} 
+          <button type="button"
+            onClick={(e) => { e.stopPropagation(); deleteLoan(loan.id); }}
             className="p-2 text-app-danger hover:bg-app-danger/10 rounded-full transition-colors"
             title="Hapus"
           >
@@ -225,7 +225,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
   const payManualAmountLabel = isLend ? "Nominal Penerimaan Manual" : "Nominal Pembayaran Manual";
 
   return (
-    <HoverCard className={`bg-app-card rounded-2xl border ${isLend ? 'border-app-success/20 hover:border-app-success/40' : 'border-app-accent1/20 hover:border-app-accent1/40'} p-5 shadow-xs flex flex-col relative overflow-hidden group transition-colors w-full`}>
+    <HoverCard className={`bg-app-card rounded-2xl border ${isLend ? 'border-app-success/20 hover:border-app-success/40' : 'border-app-accent1/20 hover:border-app-accent1/40'} p-5 flex flex-col relative overflow-hidden group transition-colors w-full`}>
 
       <div className="flex justify-between items-center mb-4 relative z-10">
         <div className="flex items-center gap-3">
@@ -240,23 +240,23 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
         </div>
         <div className="flex items-center gap-1 relative z-20">
           {isPaidOff && (
-            <button 
-              onClick={() => setIsExpanded(false)} 
+            <button type="button"
+              onClick={() => setIsExpanded(false)}
               className={`p-1.5 text-app-text/70 ${isLend ? 'hover:bg-app-success/10' : 'hover:bg-app-accent1/10'} rounded-full transition-colors`}
               title="Tutup detail"
             >
               <ChevronUp className="w-4 h-4" />
             </button>
           )}
-          <button 
-            onClick={(e) => { e.stopPropagation(); onEdit(loan); }} 
+          <button type="button"
+            onClick={(e) => { e.stopPropagation(); onEdit(loan); }}
             className={`p-1.5 ${isLend ? 'text-app-success hover:bg-app-success/10' : 'text-app-accent1 hover:bg-app-accent1/10'} rounded-full transition-colors`}
             title="Edit"
           >
             <Pencil className="w-4 h-4" />
           </button>
-          <button 
-            onClick={(e) => { e.stopPropagation(); deleteLoan(loan.id); }} 
+          <button type="button"
+            onClick={(e) => { e.stopPropagation(); deleteLoan(loan.id); }}
             className="p-1.5 text-app-danger hover:bg-app-danger/10 rounded-full transition-colors"
             title="Hapus"
           >
@@ -276,7 +276,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
             <p className="font-semibold text-app-text-bright">Rp{details.totalInterest.toLocaleString("id-ID")}</p>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4 pt-3 border-t border-app-border">
           <div>
             <p className="text-xs text-app-text/70 mb-1">{totalPaymentLabel}</p>
@@ -308,10 +308,10 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
             <div className="flex flex-col">
               <p className="text-xs text-app-text/70">Tenor: {loan.tenorDuration} {loan.tenorUnit}</p>
               {loan.paymentMethod === 'mingguan' && loan.paymentDay && (
-                <p className="text-[10px] text-app-text/50">Tiap {loan.paymentDay}</p>
+                <p className="text-xs text-app-text/50">Tiap {loan.paymentDay}</p>
               )}
               {loan.paymentMethod === 'bulanan' && loan.paymentDate && (
-                <p className="text-[10px] text-app-text/50">Tanggal {loan.paymentDate}</p>
+                <p className="text-xs text-app-text/50">Tanggal {loan.paymentDate}</p>
               )}
             </div>
             <p className="text-xs text-app-text/70">{paidCount} / {details.paymentsCount}</p>
@@ -324,9 +324,9 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
         <span className="text-xs font-medium text-app-text-bright">{Math.round(progress)}%</span>
       </div>
       <div className="w-full bg-app-bg rounded-full h-1.5 mb-5 overflow-hidden border border-app-border">
-        <div 
-          className={`${isLend ? 'bg-app-success' : 'bg-app-accent1'} h-1.5 rounded-full transition-all duration-500`} 
-          style={{ width: `${Math.min(100, Math.max(0, progress))}%` }} 
+        <div
+          className={`${isLend ? 'bg-app-success' : 'bg-app-accent1'} h-1.5 rounded-full transition-all duration-500`}
+          style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
         />
       </div>
 
@@ -347,7 +347,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
             nextDateNoTime.setHours(0, 0, 0, 0);
             const diffTime = nextDateNoTime.getTime() - todayDate.getTime();
             const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-            
+
             if (diffDays === 0) {
               return (
                 <span className="text-xs font-medium bg-app-warning/20 text-app-warning px-2 py-1 rounded-md">
@@ -375,13 +375,13 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
         <label className="block text-xs text-app-text/70 mb-1">{selectAccountLabel}</label>
         <div className={`flex items-center gap-2 bg-app-bg border ${isLend ? 'border-app-success/20 focus-within:border-app-success/50' : 'border-app-accent1/20 focus-within:border-app-accent1/50'} rounded-xl px-3 py-2`}>
           <Wallet className="w-4 h-4 text-app-text/50" />
-          <select 
+          <select
             value={selectedAccountId}
             onChange={(e) => setSelectedAccountId(e.target.value)}
             className="bg-transparent border-none outline-none text-sm text-app-text-bright w-full"
           >
             {accounts.map(acc => (
-              <option key={acc.id} value={acc.id} className="bg-[#1C1C1E] text-white">
+              <option key={acc.id} value={acc.id} className="bg-app-card text-app-text">
                 {acc.name} - Rp{acc.balance.toLocaleString('id-ID')}
               </option>
             ))}
@@ -393,14 +393,14 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
         <div className="mb-4 bg-app-bg p-3 rounded-xl border border-app-border">
           <label className="block text-xs text-app-text/70 mb-1">{payManualAmountLabel}</label>
           <div className="flex gap-2">
-            <input 
+            <input
               type="number"
               value={manualAmount}
               onChange={(e) => setManualAmount(e.target.value)}
               placeholder="Contoh: 100000"
               className={`flex-1 bg-transparent border border-app-border rounded-lg px-3 py-2 text-sm text-app-text-bright outline-none ${isLend ? 'focus:border-app-success' : 'focus:border-app-accent1'}`}
             />
-            <button 
+            <button type="button"
               onClick={() => handlePay(Number(manualAmount))}
               disabled={!manualAmount || Number(manualAmount) <= 0}
               className={`${isLend ? 'bg-app-success' : 'bg-app-accent1'} text-app-bg px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50`}
@@ -408,7 +408,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
               {isLend ? "Terima" : "Bayar"}
             </button>
           </div>
-          <p className="text-[10px] text-app-text/50 mt-1">Sisa yang harus {isLend ? "diterima" : "dibayar"}: Rp{remaining.toLocaleString('id-ID')}</p>
+          <p className="text-xs text-app-text/50 mt-1">Sisa yang harus {isLend ? "diterima" : "dibayar"}: Rp{remaining.toLocaleString('id-ID')}</p>
         </div>
       )}
 
@@ -420,28 +420,28 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       ) : (
         <div className="grid grid-cols-2 gap-2">
           {loan.hasTenor !== false && (
-            <button 
+            <button type="button"
               onClick={() => handlePay(Math.round(details.installment))}
               className="flex items-center justify-center gap-2 py-2.5 bg-app-success text-app-bg rounded-xl font-medium text-sm hover:opacity-90 transition-opacity"
             >
               <Wallet className="w-4 h-4" /> {payBtnLabel}
             </button>
           )}
-          <button 
+          <button type="button"
             onClick={() => setIsManualPayment(!isManualPayment)}
             className={`flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-sm transition-colors border ${isManualPayment ? 'bg-app-hover border-app-border text-app-text-bright' : 'bg-app-bg border-app-border text-app-text-bright hover:bg-app-hover'}`}
           >
             <Calculator className="w-4 h-4" /> {payManualLabel}
           </button>
           {loan.hasTenor !== false && (
-            <button 
+            <button type="button"
               onClick={() => setIsScheduleOpen(true)}
               className="flex items-center justify-center gap-2 py-2.5 bg-app-bg border border-app-border text-app-text-bright rounded-xl font-medium text-sm hover:bg-app-hover transition-colors"
             >
               <Eye className="w-4 h-4" /> Lihat Jadwal
             </button>
           )}
-          <button 
+          <button type="button"
             onClick={() => handlePay(remaining, true)}
             className="flex items-center justify-center gap-2 py-2.5 bg-app-bg border border-app-danger/50 text-app-danger rounded-xl font-medium text-sm hover:bg-app-danger/10 transition-colors"
           >
@@ -452,10 +452,10 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
 
       {isScheduleOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1C1C1E] border border-app-border rounded-[18px] w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
+          <div className="bg-app-card border border-app-border rounded-[18px] w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]" role="dialog" aria-modal="true" aria-labelledby="loan-schedule-title">
             <div className="p-4 border-b border-app-border flex justify-between items-center">
-              <h3 className="font-semibold text-app-text-bright">Jadwal Pembayaran</h3>
-              <button onClick={() => setIsScheduleOpen(false)} className="text-app-text/50 hover:text-app-text-bright">
+              <h3 id="loan-schedule-title" className="font-semibold text-app-text-bright">Jadwal Pembayaran</h3>
+              <button type="button" onClick={() => setIsScheduleOpen(false)} className="text-app-text/50 hover:text-app-text-bright" aria-label="Tutup jadwal pembayaran">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
               </button>
             </div>
@@ -502,7 +502,7 @@ export default function Loans() {
   const [hasInterest, setHasInterest] = useState(false);
   const [interestType, setInterestType] = useState<"percentage" | "nominal">("percentage");
   const [interestValue, setInterestValue] = useState("");
-  
+
   const [hasTenor, setHasTenor] = useState(true);
   const [tenorUnit, setTenorUnit] = useState<"hari" | "minggu" | "bulan">("hari");
   const [tenorDuration, setTenorDuration] = useState("");
@@ -536,7 +536,7 @@ export default function Loans() {
 
   useEffect(() => {
     if (!user) return;
-    
+
     // Fetch Accounts
     const accUnsub = onSnapshot(collection(db, "users", user.uid, "accounts"), (snap) => {
       const accts: Account[] = [];
@@ -594,21 +594,21 @@ export default function Loans() {
     setHasInterest(loan.hasInterest || false);
     setInterestType(loan.interestType || "percentage");
     setInterestValue(loan.interestValue ? (loan.interestType === "nominal" ? formatNumberInput(String(loan.interestValue)) : String(loan.interestValue)) : "");
-    
+
     setHasTenor(loan.hasTenor !== false);
     setTenorUnit(loan.tenorUnit || "hari");
     setTenorDuration(loan.tenorDuration ? String(loan.tenorDuration) : "");
     setPaymentMethod(loan.paymentMethod || "harian");
     setPaymentDay(loan.paymentDay || "Senin");
     setPaymentDate(loan.paymentDate || 1);
-    
+
     setDepositToAccount(loan.depositToAccount || false);
     setDeductFromAccount(loan.deductFromAccount || false);
     setAccountId(loan.accountId || (localStorage.getItem('lastAccountId_loans') || accounts[0]?.id || ""));
-    
+
     setAutoDebit(loan.autoDebit || false);
     setAutoDebitAccountId(loan.autoDebitAccountId || (localStorage.getItem('lastAccountId_loans_autodebit') || accounts[0]?.id || ""));
-    
+
     setDueDateEnabled(!!loan.dueDate);
     setDueDateVal(loan.dueDate ? new Date(loan.dueDate).toISOString().split('T')[0] : "");
 
@@ -704,10 +704,10 @@ export default function Loans() {
     }
 
     const isEdit = !!editingLoan;
-    const loanRef = isEdit 
+    const loanRef = isEdit
       ? doc(db, "users", user.uid, "loans", editingLoan.id)
       : doc(collection(db, "users", user.uid, "loans"));
-    
+
     const loanData: any = {
       name: name || (type === 'lend' ? "Pemberian Pinjaman" : "Pinjaman"),
       amount: numAmount,
@@ -774,7 +774,7 @@ export default function Loans() {
     } else {
       loanData.accountId = "";
     }
-    
+
     if (type === 'borrow' && autoDebit) {
       if (!autoDebitAccountId) {
         toast.error("Pilih rekening potongan");
@@ -787,7 +787,7 @@ export default function Loans() {
 
     try {
       const batch = writeBatch(db);
-      
+
       if (isEdit) {
         batch.set(loanRef, loanData, { merge: true });
       } else {
@@ -914,10 +914,10 @@ export default function Loans() {
               const bPaid = bRemaining <= 0;
               if (aPaid && !bPaid) return 1;
               if (!aPaid && bPaid) return -1;
-              
+
               const aNextPayment = getNextPaymentDate(a);
               const bNextPayment = getNextPaymentDate(b);
-              
+
               if (aNextPayment && bNextPayment) {
                 return aNextPayment.getTime() - bNextPayment.getTime();
               } else if (aNextPayment) {
@@ -925,7 +925,7 @@ export default function Loans() {
               } else if (bNextPayment) {
                 return 1;
               }
-              
+
               return b.createdAt - a.createdAt;
             })
             .map(loan => (
@@ -938,19 +938,20 @@ export default function Loans() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto pt-20">
-          <div className="bg-app-card text-app-text w-full max-w-md rounded-2xl shadow-2xl border border-app-border overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
+          <div className="bg-app-card text-app-text w-full max-w-md rounded-2xl border border-app-border overflow-hidden animate-in fade-in duration-200 my-auto" role="dialog" aria-modal="true" aria-labelledby="loan-entry-title">
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
-              <h2 className="text-lg font-semibold text-app-text-bright">
+              <h2 id="loan-entry-title" className="text-lg font-semibold text-app-text-bright">
                 {editingLoan ? (type === 'lend' ? "Edit Piutang" : "Edit Pinjaman") : (type === 'lend' ? "Tambah Piutang" : "Tambah Pinjaman")}
               </h2>
-              <button
+              <button type="button"
                 onClick={closeAddModal}
                 className="p-2 hover:bg-app-hover rounded-full transition-colors"
+                aria-label="Tutup formulir pinjaman"
               >
                 ✕
               </button>
             </div>
-            
+
             <form onSubmit={saveLoan} className="p-6 space-y-5 max-h-[70vh] overflow-y-auto no-scrollbar">
               {/* Tipe Selector */}
               {!editingLoan && (
@@ -963,7 +964,7 @@ export default function Loans() {
                       setDepositToAccount(false);
                       setDeductFromAccount(false);
                     }}
-                    className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all ${type === "borrow" ? "bg-app-accent1 text-app-bg shadow-sm" : "text-app-text hover:text-app-text-bright"}`}
+                    className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all ${type === "borrow" ? "bg-app-accent1 text-app-bg" : "text-app-text hover:text-app-text-bright"}`}
                   >
                     Saya Pinjam (Hutang)
                   </button>
@@ -975,7 +976,7 @@ export default function Loans() {
                       setDepositToAccount(false);
                       setDeductFromAccount(false);
                     }}
-                    className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all ${type === "lend" ? "bg-app-success text-app-bg shadow-sm" : "text-app-text hover:text-app-text-bright"}`}
+                    className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all ${type === "lend" ? "bg-app-success text-app-bg" : "text-app-text hover:text-app-text-bright"}`}
                   >
                     Saya Pinjamkan (Piutang)
                   </button>
@@ -1022,7 +1023,7 @@ export default function Loans() {
                     <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${hasInterest ? 'translate-x-6' : 'translate-x-0.5'}`} />
                   </button>
                 </div>
-                
+
                 {hasInterest && (
                   <div className="space-y-3 pt-3 border-t border-app-border">
                     <div className="flex gap-2">
@@ -1129,7 +1130,7 @@ export default function Loans() {
                           className="w-full bg-app-bg border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                         >
                           {["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"].map((day) => (
-                            <option key={day} value={day} className="bg-[#1C1C1E] text-white">{day}</option>
+                            <option key={day} value={day} className="bg-app-card text-app-text">{day}</option>
                           ))}
                         </select>
                       </div>
@@ -1142,7 +1143,7 @@ export default function Loans() {
                           className="w-full bg-app-bg border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                         >
                           {Array.from({ length: 31 }, (_, i) => i + 1).map((date) => (
-                            <option key={date} value={date} className="bg-[#1C1C1E] text-white">Tanggal {date}</option>
+                            <option key={date} value={date} className="bg-app-card text-app-text">Tanggal {date}</option>
                           ))}
                         </select>
                       </div>
@@ -1158,8 +1159,8 @@ export default function Loans() {
                     <label className="text-sm font-semibold text-app-text-bright block">Tanggal Pembayaran (Jatuh Tempo)</label>
                     <span className="text-xs text-app-text/60">Bisa diisi atau dikosongkan jika tidak ada jatuh tempo</span>
                   </div>
-                  
-                  <input 
+
+                  <input
                     type="date"
                     value={dueDateVal}
                     onChange={(e) => setDueDateVal(e.target.value)}
@@ -1184,7 +1185,7 @@ export default function Loans() {
                       <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${depositToAccount ? 'translate-x-6' : 'translate-x-0.5'}`} />
                     </button>
                   </div>
-                  
+
                   {depositToAccount && (
                     <select
                       value={accountId}
@@ -1194,9 +1195,9 @@ export default function Loans() {
                     }}
                       className="w-full mt-2 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                     >
-                      <option value="" disabled className="bg-[#1C1C1E] text-white">Pilih Rekening Tujuan</option>
+                      <option value="" disabled className="bg-app-card text-app-text">Pilih Rekening Tujuan</option>
                       {accounts.map(acc => (
-                        <option key={acc.id} value={acc.id} className="bg-[#1C1C1E] text-white">{acc.name} (Rp {acc.balance.toLocaleString('id-ID')})</option>
+                        <option key={acc.id} value={acc.id} className="bg-app-card text-app-text">{acc.name} (Rp {acc.balance.toLocaleString('id-ID')})</option>
                       ))}
                     </select>
                   )}
@@ -1219,7 +1220,7 @@ export default function Loans() {
                       <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${deductFromAccount ? 'translate-x-6' : 'translate-x-0.5'}`} />
                     </button>
                   </div>
-                  
+
                   {deductFromAccount && (
                     <select
                       value={accountId}
@@ -1229,9 +1230,9 @@ export default function Loans() {
                     }}
                       className="w-full mt-2 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                     >
-                      <option value="" disabled className="bg-[#1C1C1E] text-white">Pilih Rekening Sumber</option>
+                      <option value="" disabled className="bg-app-card text-app-text">Pilih Rekening Sumber</option>
                       {accounts.map(acc => (
-                        <option key={acc.id} value={acc.id} className="bg-[#1C1C1E] text-white">{acc.name} (Rp {acc.balance.toLocaleString('id-ID')})</option>
+                        <option key={acc.id} value={acc.id} className="bg-app-card text-app-text">{acc.name} (Rp {acc.balance.toLocaleString('id-ID')})</option>
                       ))}
                     </select>
                   )}
@@ -1254,7 +1255,7 @@ export default function Loans() {
                       <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${autoDebit ? 'translate-x-6' : 'translate-x-0.5'}`} />
                     </button>
                   </div>
-                  
+
                   {autoDebit && (
                     <select
                       value={autoDebitAccountId}
@@ -1264,9 +1265,9 @@ export default function Loans() {
                     }}
                       className="w-full mt-2 bg-app-card border border-app-border text-app-text-bright text-sm rounded-xl px-4 py-3 outline-none focus:border-app-accent1"
                     >
-                      <option value="" disabled className="bg-[#1C1C1E] text-white">Pilih Rekening Potongan</option>
+                      <option value="" disabled className="bg-app-card text-app-text">Pilih Rekening Potongan</option>
                       {accounts.map(acc => (
-                        <option key={acc.id} value={acc.id} className="bg-[#1C1C1E] text-white">{acc.name} (Rp {acc.balance.toLocaleString("id-ID")})</option>
+                        <option key={acc.id} value={acc.id} className="bg-app-card text-app-text">{acc.name} (Rp {acc.balance.toLocaleString("id-ID")})</option>
                       ))}
                     </select>
                   )}

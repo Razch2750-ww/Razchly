@@ -26,7 +26,7 @@ export default function ImageAnalysis() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState<string>('');
@@ -38,7 +38,7 @@ export default function ImageAnalysis() {
       snap.forEach(doc => cats.push({ id: doc.id, ...doc.data() } as Category));
       setCategories(cats);
     });
-    
+
     const accUnsub = onSnapshot(collection(db, 'users', user.uid, 'accounts'), (snap) => {
       const accs: Account[] = [];
       snap.forEach(doc => accs.push({ id: doc.id, ...doc.data() } as Account));
@@ -57,13 +57,13 @@ export default function ImageAnalysis() {
     if (files.length === 0) return;
 
     const newImages: { url: string, type: string }[] = [];
-    
+
     for (const file of files) {
       if (file.size > 5 * 1024 * 1024) {
         toast.error(`File ${file.name} terlalu besar. Maksimal 5MB.`);
         continue;
       }
-      
+
       const dataUrl = await new Promise<string>((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -100,7 +100,7 @@ export default function ImageAnalysis() {
         };
         reader.readAsDataURL(file);
       });
-      
+
       newImages.push({ url: dataUrl, type: file.type });
     }
 
@@ -108,7 +108,7 @@ export default function ImageAnalysis() {
       setSelectedImages(prev => [...prev, ...newImages]);
       setExtractedData([]);
     }
-    
+
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -149,7 +149,7 @@ export default function ImageAnalysis() {
          setIsAnalyzing(false);
          return;
       }
-      
+
       if (Array.isArray(parsed) && parsed.length > 0) {
          setExtractedData(parsed);
          setSelectedRows(new Set(parsed.map((_, i) => i)));
@@ -224,8 +224,8 @@ export default function ImageAnalysis() {
         <h1 className="text-2xl font-semibold text-app-text-bright mb-6">
           <TextReveal text="Analisis Mutasi Rekening / Struk (AI)" />
         </h1>
-        
-        <div className="bg-app-card rounded-[18px] p-6 border border-app-border shadow-xl">
+
+        <div className="bg-app-card rounded-[18px] p-6 border border-app-border">
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-1 w-full flex flex-col items-center justify-center p-8 border-2 border-dashed border-app-border rounded-2xl bg-app-bg transition-colors hover:border-app-accent1/50 relative overflow-hidden min-h-[300px]">
                     {selectedImages.length > 0 ? (
@@ -234,31 +234,31 @@ export default function ImageAnalysis() {
                                 {selectedImages.map((img, idx) => (
                                     <div key={idx} className="relative w-32 h-32 md:w-40 md:h-40 flex flex-col items-center justify-center bg-app-card border border-app-border rounded-xl">
                                         {img.type.startsWith('image/') ? (
-                                           <img src={img.url} alt="Preview" className="w-full h-full object-cover rounded-xl shadow-md" />
+                                           <img src={img.url} alt="Preview" className="w-full h-full object-cover rounded-xl" />
                                         ) : (
                                            <div className="flex flex-col items-center justify-center w-full h-full">
                                               <FileText className="w-8 h-8 text-app-accent1 mb-2" />
                                               <span className="font-semibold text-xs text-center px-2 truncate w-full">Dokumen {idx + 1}</span>
                                            </div>
                                         )}
-                                        <button 
+                                        <button type="button"
                                             onClick={() => {
                                                 const newImages = [...selectedImages];
                                                 newImages.splice(idx, 1);
                                                 setSelectedImages(newImages);
                                                 if (newImages.length === 0) setExtractedData([]);
                                             }}
-                                            className="absolute -top-2 -right-2 bg-app-danger text-app-bg p-1.5 rounded-full hover:bg-app-danger/80 transition shadow-lg"
+                                            className="absolute -top-2 -right-2 bg-app-danger text-app-bg p-1.5 rounded-full hover:bg-app-danger/80 transition"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                                         </button>
                                     </div>
                                 ))}
-                                <button 
+                                <button type="button"
                                     onClick={() => fileInputRef.current?.click()}
                                     className="w-32 h-32 md:w-40 md:h-40 flex flex-col items-center justify-center bg-app-bg border-2 border-dashed border-app-border hover:border-app-accent1/50 rounded-xl transition text-app-text/50 hover:text-app-accent1 group"
                                 >
-                                    <Plus className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
+                                    <Plus className="mb-2 h-8 w-8" />
                                     <span className="text-xs font-semibold">Tambah File</span>
                                 </button>
                             </div>
@@ -268,21 +268,21 @@ export default function ImageAnalysis() {
                             <ImageIcon className="w-12 h-12 text-app-text/30 mx-auto mb-4" />
                             <h3 className="text-sm font-semibold text-app-text-bright mb-1">Unggah Struk atau Screenshot Mutasi</h3>
                             <p className="text-xs text-app-text/60 mb-4">PNG, JPG, PDF, up to 5MB. Bisa unggah beberapa file sekaligus.</p>
-                            <button 
+                            <button type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="bg-app-accent1 hover:bg-app-accent1/90 text-app-bg px-6 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-app-accent1/20 flex items-center gap-2 mx-auto"
+                                className="bg-app-accent1 hover:bg-app-accent1/90 text-app-bg px-6 py-2.5 rounded-xl font-medium text-sm transition flex items-center gap-2 mx-auto"
                             >
                                 <Upload className="w-4 h-4" />
                                 Pilih File
                             </button>
                         </div>
                     )}
-                    <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        onChange={handleImageUpload} 
-                        accept="image/png, image/jpeg, image/webp, application/pdf" 
-                        className="hidden" 
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                        accept="image/png, image/jpeg, image/webp, application/pdf"
+                        className="hidden"
                         multiple
                     />
                 </div>
@@ -290,10 +290,10 @@ export default function ImageAnalysis() {
 
             {selectedImages.length > 0 && extractedData.length === 0 && (
                 <div className="mt-6 flex justify-end">
-                    <button 
-                        onClick={handleAnalyze} 
+                    <button type="button"
+                        onClick={handleAnalyze}
                         disabled={isAnalyzing}
-                        className="bg-app-accent1 text-app-bg px-6 py-3 rounded-xl font-semibold flex items-center gap-2 hover:bg-app-accent1/90 transition disabled:opacity-50 shadow-lg shadow-app-accent1/20"
+                        className="bg-app-accent1 text-app-bg px-6 py-3 rounded-xl font-semibold flex items-center gap-2 hover:bg-app-accent1/90 transition disabled:opacity-50"
                     >
                         {isAnalyzing ? (
                             <>
@@ -317,10 +317,10 @@ export default function ImageAnalysis() {
                            <Check className="w-5 h-5 text-app-success" />
                            Berhasil Mengekstrak {extractedData.length} Transaksi
                         </h3>
-                        
+
                         <div className="flex items-center gap-3 w-full md:w-auto bg-app-bg p-2 pl-4 rounded-xl border border-app-border">
                            <span className="text-xs font-semibold text-app-text/70 uppercase tracking-wider">Simpan Ke Rekening:</span>
-                           <select 
+                           <select
                               value={selectedAccountId}
                               onChange={(e) => setSelectedAccountId(e.target.value)}
                               className="bg-transparent text-sm font-semibold text-app-text-bright focus:outline-none"
@@ -331,15 +331,15 @@ export default function ImageAnalysis() {
                            </select>
                         </div>
                     </div>
-                    
+
                     <div className="bg-app-bg border border-app-border rounded-2xl overflow-hidden mb-6">
                         <div className="overflow-x-auto">
                            <table className="w-full text-left border-collapse">
                               <thead>
                                  <tr className="bg-app-card border-b border-app-border text-xs uppercase tracking-wider text-app-text/70">
                                     <th className="p-4 w-12 text-center">
-                                       <input 
-                                          type="checkbox" 
+                                       <input
+                                          type="checkbox"
                                           checked={selectedRows.size === extractedData.length && extractedData.length > 0}
                                           onChange={(e) => {
                                              if (e.target.checked) {
@@ -360,8 +360,8 @@ export default function ImageAnalysis() {
                                  {extractedData.map((trx, idx) => (
                                     <tr key={idx} className="border-b border-app-border last:border-0 hover:bg-app-card/50 transition">
                                        <td className="p-4 text-center">
-                                          <input 
-                                             type="checkbox" 
+                                          <input
+                                             type="checkbox"
                                              checked={selectedRows.has(idx)}
                                              onChange={(e) => {
                                                 const newSet = new Set(selectedRows);
@@ -402,10 +402,10 @@ export default function ImageAnalysis() {
                     </div>
 
                     <div className="flex justify-end mt-4">
-                       <button 
+                       <button type="button"
                           onClick={handleSaveTransactions}
                           disabled={isSaving || !selectedAccountId || selectedRows.size === 0}
-                          className="bg-app-success text-app-bg px-8 py-3.5 rounded-xl font-semibold flex items-center gap-2 hover:bg-app-success/90 transition disabled:opacity-50 shadow-xl shadow-app-success/20"
+                          className="bg-app-success text-app-bg px-8 py-3.5 rounded-xl font-semibold flex items-center gap-2 hover:bg-app-success/90 transition disabled:opacity-50"
                        >
                           {isSaving ? (
                              <>
@@ -427,4 +427,3 @@ export default function ImageAnalysis() {
     </div>
   );
 }
-

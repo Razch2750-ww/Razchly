@@ -30,13 +30,13 @@ export function CategoryModal({ isOpen, onClose, category, type }: CategoryModal
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    
+
     setIsSubmitting(true);
     try {
       if (!auth.currentUser) throw new Error("User not authenticated");
-      
+
       const categoriesRef = collection(db, 'users', auth.currentUser.uid, 'categories');
-      
+
       if (category) {
         await updateDoc(doc(categoriesRef, category.id), {
           name,
@@ -62,15 +62,16 @@ export function CategoryModal({ isOpen, onClose, category, type }: CategoryModal
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-      <div className="bg-app-card w-full max-w-md rounded-2xl p-6 relative border border-app-border shadow-xl">
-        <button
+      <div className="bg-app-card w-full max-w-md rounded-2xl p-6 relative border border-app-border" role="dialog" aria-modal="true" aria-labelledby="category-dialog-title">
+        <button type="button"
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-app-text hover:text-app-text-bright transition-colors"
+          aria-label="Tutup formulir kategori"
         >
           <X className="w-6 h-6" />
         </button>
 
-        <h2 className="text-xl font-semibold text-app-text-bright mb-6">
+        <h2 id="category-dialog-title" className="text-xl font-semibold text-app-text-bright mb-6">
           {category ? 'Edit Kategori' : `Tambah Kategori ${type === 'income' ? 'Pemasukan' : 'Pengeluaran'}`}
         </h2>
 
@@ -100,9 +101,11 @@ export function CategoryModal({ isOpen, onClose, category, type }: CategoryModal
                   type="button"
                   onClick={() => setIcon(iconItem.id)}
                   title={iconItem.name}
+                  aria-label={`Pilih ikon ${iconItem.name}`}
+                  aria-pressed={icon === iconItem.id}
                   className={`aspect-square rounded-xl flex items-center justify-center transition-all ${
                     icon === iconItem.id
-                      ? 'bg-app-accent1 text-app-bg shadow-md'
+                      ? 'bg-app-accent1 text-app-bg'
                       : 'bg-app-bg text-app-text hover:bg-app-hover border border-app-border'
                   }`}
                 >

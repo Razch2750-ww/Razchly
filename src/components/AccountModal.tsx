@@ -110,23 +110,27 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.94, opacity: 0, y: 15 }}
             transition={{ type: "spring", damping: 20, stiffness: 200 }}
-            className="bg-app-card text-app-text w-full max-w-md rounded-2xl shadow-xl border border-app-border overflow-hidden"
+            className="bg-app-card text-app-text w-full max-w-md rounded-2xl border border-app-border overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="account-dialog-title"
           >
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg/50">
-              <h2 className="text-lg font-semibold text-app-text-bright">
+              <h2 id="account-dialog-title" className="text-lg font-semibold text-app-text-bright">
                 {account ? "Edit Rekening" : "Tambah Rekening"}
               </h2>
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-app-hover rounded-full transition-colors text-app-text/70 hover:text-app-text-bright cursor-pointer"
                 type="button"
+                aria-label="Tutup formulir rekening"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={saveAccount} className="p-6 space-y-5">
               <div>
-                <label className="text-[10px] uppercase font-semibold tracking-wider mb-2.5 block text-app-text/70">
+                <label className="text-xs uppercase font-semibold tracking-wider mb-2.5 block text-app-text/70">
                   Ikon Rekening
                 </label>
                 <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
@@ -134,12 +138,12 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
                     <motion.button
                       key={iconItem.id}
                       type="button"
-                      whileHover={{ scale: 1.08 }}
-                      whileTap={{ scale: 0.92 }}
                       onClick={() => setIcon(iconItem.id)}
+                      aria-label={`Pilih ikon ${iconItem.name}`}
+                      aria-pressed={icon === iconItem.id}
                       className={`flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl border transition-all cursor-pointer ${
                         icon === iconItem.id
-                          ? "border-app-accent1 bg-app-accent1/15 shadow-sm text-app-accent1"
+                          ? "border-app-accent1 bg-app-accent1/15 text-app-accent1"
                           : "border-app-border bg-app-bg/30 text-app-text/60 hover:text-app-text-bright hover:bg-app-hover"
                       }`}
                     >
@@ -190,6 +194,7 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
+                      aria-label="Aktifkan perhitungan bunga otomatis"
                       checked={interestEnabled}
                       onChange={(e) => setInterestEnabled(e.target.checked)}
                       className="sr-only peer"
@@ -206,11 +211,12 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
                     className="space-y-4 pt-2 border-t border-app-border/50"
                   >
                     <div>
-                      <label className="text-[10px] uppercase font-semibold tracking-wider mb-1.5 block text-app-text/70">
+                      <label htmlFor="account-interest-rate" className="text-xs font-medium mb-1.5 block text-app-text/70">
                         Bunga Tahunan (% p.a.)
                       </label>
                       <div className="relative">
                         <input
+                          id="account-interest-rate"
                           type="text"
                           inputMode="decimal"
                           value={interestRate}
@@ -226,10 +232,11 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
                     </div>
 
                     <div>
-                      <label className="text-[10px] uppercase font-semibold tracking-wider mb-1.5 block text-app-text/70">
+                      <label htmlFor="account-interest-method" className="text-xs font-medium mb-1.5 block text-app-text/70">
                         Metode Bunga
                       </label>
                       <select
+                        id="account-interest-method"
                         value={interestMethod}
                         onChange={(e) => setInterestMethod(e.target.value as any)}
                         className="w-full bg-app-card border border-app-border rounded-xl px-3.5 py-2.5 text-sm font-semibold text-app-text-bright focus:border-app-accent1 outline-none transition-colors appearance-none cursor-pointer"
@@ -253,8 +260,6 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
               <div className="pt-4 flex gap-3">
                 <motion.button
                   type="button"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                   onClick={onClose}
                   disabled={isSaving}
                   className="flex-1 py-3.5 rounded-xl font-semibold text-sm bg-app-hover hover:bg-app-border/50 text-app-text transition-colors disabled:opacity-50 cursor-pointer"
@@ -263,10 +268,8 @@ export function AccountModal({ isOpen, onClose, account }: AccountModalProps) {
                 </motion.button>
                 <motion.button
                   type="submit"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                   disabled={isSaving}
-                  className="flex-1 py-3.5 rounded-xl font-semibold text-sm bg-app-accent1 text-app-bg hover:opacity-95 transition-all shadow-lg shadow-app-accent1/10 disabled:opacity-50 cursor-pointer"
+                  className="flex-1 py-3.5 rounded-xl font-semibold text-sm bg-app-accent1 text-app-bg hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {isSaving ? "Menyimpan..." : "Simpan"}
                 </motion.button>

@@ -43,14 +43,15 @@ The application is an **Operate** surface. Motion is reserved for route hierarch
 ### Dashboard Surfaces
 - Use open layout and dividers first. Add a bordered surface only when it groups a real task or dataset.
 - Never nest cards inside cards for decoration.
-- Hover states use a 1px translate and color shift, without glow.
+- Desktop summary uses a gapless 12-column ledger: `3 + 5 + 4`.
+- Hover states use color and border shifts only—no generic lift, tilt, spotlight, or glow.
 
 ### Data Tables
 - Clean borders without heavy vertical lines.
 - Sticky headers and monospace formatting for numerical columns to ease scanning.
 
 ### Interactive Charts
-- Recharts use flat strokes and restrained area fills.
+- Recharts use flat strokes without decorative gradient fills.
 - Green and red are semantic data colors only. Gold remains the brand/action color.
 
 ### Navigation
@@ -63,7 +64,7 @@ The application is an **Operate** surface. Motion is reserved for route hierarch
 ## 5. Motion & Micro-Animations
 - Powered by **Motion** (Framer Motion).
 - **Page Transitions:** 10px fade-up using an exponential ease-out.
-- **Button Clicks:** Scale down to `0.98` on tap.
+- **Controls:** state changes use color and opacity; no generic motion is attached to every control.
 - **Sheets:** Rise from the bottom and retain clear spatial continuity.
 - **Accessibility:** all motion collapses under `prefers-reduced-motion`; focus rings remain visible; touch targets are at least 44px.
 
@@ -73,6 +74,7 @@ The application is an **Operate** surface. Motion is reserved for route hierarch
 - Mobile reference width: 360-430px.
 - Multi-column dashboard layouts collapse to one column below 768px.
 - Financial values use tabular numerals and must never be truncated without an accessible full value.
+- Heavy feature routes and export libraries load on demand; the loading shell mirrors the `3 + 5 + 4` ledger.
 
 ## Anti-patterns
 

@@ -126,7 +126,7 @@ export const AccountIcon = ({ iconId, className }: { iconId?: string, className?
 
   if (iconInfo.type === 'cash') {
     return (
-      <div className={`flex items-center justify-center rounded-full border border-app-border bg-app-card shadow-sm text-app-success ${className}`}>
+      <div className={`flex items-center justify-center rounded-full border border-app-border bg-app-card text-app-success ${className}`}>
         <Banknote className="w-[60%] h-[60%]" strokeWidth={2} />
       </div>
     );
@@ -134,14 +134,14 @@ export const AccountIcon = ({ iconId, className }: { iconId?: string, className?
 
   if (iconInfo.type === 'bank' || iconInfo.type === 'ewallet') {
     return (
-      <div className={`flex items-center justify-center rounded-full border border-app-border bg-app-card shadow-sm overflow-hidden ${className}`}>
+      <div className={`flex items-center justify-center rounded-full border border-app-border bg-app-card overflow-hidden ${className}`}>
         <CustomSvgIcon iconId={iconInfo.id} color={iconInfo.color || '#000'} />
       </div>
     );
   }
 
   return (
-    <div className={`flex items-center justify-center rounded-full border border-app-border bg-app-card shadow-sm text-app-accent1 ${className}`}>
+    <div className={`flex items-center justify-center rounded-full border border-app-border bg-app-card text-app-accent1 ${className}`}>
       <Wallet className="w-[60%] h-[60%]" strokeWidth={2} />
     </div>
   );

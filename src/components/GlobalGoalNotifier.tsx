@@ -186,26 +186,26 @@ export default function GlobalGoalNotifier() {
     if (monthlyExpenseBudget && monthlyExpenseBudget > 0) {
       const currentDay = new Date().getDate();
       const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-      
+
       if (currentDay >= 1) {
         const dailySpendingRate = expenseThisMonth / currentDay;
         const projectedMonthlyExpense = dailySpendingRate * daysInMonth;
-        
+
         if (projectedMonthlyExpense > monthlyExpenseBudget) {
           const key = `warned_predictive_budget_${currentMonthStr}_${currentDayStr}`;
           if (!localStorage.getItem(key)) {
             localStorage.setItem(key, "true");
-            
+
             const daysUntilRunOut = Math.max(0, Math.floor(monthlyExpenseBudget / dailySpendingRate) - currentDay);
             const runOutDay = Math.floor(monthlyExpenseBudget / dailySpendingRate);
-            
+
             const title = "Peringatan Anggaran PWA! ⚠️";
             const message = `Rata-rata belanja Rp ${Math.round(dailySpendingRate).toLocaleString('id-ID')}/hari diproyeksikan menghabiskan Rp ${Math.round(projectedMonthlyExpense).toLocaleString('id-ID')} bulan ini, melebihi anggaran Rp ${monthlyExpenseBudget.toLocaleString('id-ID')}. Sisa dana diproyeksikan habis dalam ${daysUntilRunOut} hari (pada tanggal ${runOutDay}).`;
-            
+
             setTimeout(() => {
               toast.error(message, { duration: 10000 });
               sendDeviceNotification(title, message);
-              
+
               // Notify other tabs
               localStorage.setItem('goal_warn_event', JSON.stringify({
                 type: 'predictive_budget_alert',
