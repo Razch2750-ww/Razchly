@@ -4,7 +4,7 @@
 
 | Name | Range | Composition |
 |---|---|---|
-| Mobile | 360-767px | Single-column, bottom dock, sheets |
+| Mobile | 320-767px | Single-column, bottom dock, sheets |
 | Tablet | 768-1023px | Collapsed rail, simplified desktop content |
 | Desktop | 1024-1439px | Full workbench with compact spacing |
 | Wide | 1440-1600px | Full 8 + 4 statements and comfortable data density |
@@ -13,6 +13,8 @@
 ## Global rules
 
 - Start with mobile task order, then enhance composition at `md` and `lg`.
+- Use fluid gutters from 12px on very narrow phones to 20px on larger phones.
+- Use `clamp()` for display type, major financial values, dock height, and repeated control sizing; body copy remains 14-16px.
 - Never hide a primary action only because space is limited.
 - Avoid horizontal page overflow.
 - Use safe-area insets for the mobile dock and sheets.
@@ -72,6 +74,7 @@ Do not squeeze a desktop table until labels overlap.
 
 Minimum manual widths:
 
+- 320 by 568
 - 360 by 800
 - 390 by 844
 - 768 by 1024

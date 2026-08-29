@@ -249,6 +249,10 @@ export default function GrabDetails() {
           </p>
         </div>
 
+        <button type="button" onClick={() => setGlobalGrabModalOpen(true)} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-app-accent1 px-4 text-sm font-semibold text-app-bg md:hidden" title="Transaksi Grab">
+          <Car className="h-4 w-4" /> Catat Grab
+        </button>
+
         <div className="workbench-hero-actions hidden items-center gap-2 md:flex">
           <button type="button" onClick={() => setGlobalGrabModalOpen(true)} className="inline-flex h-11 items-center gap-2 rounded-lg bg-app-accent1 px-4 text-sm font-semibold text-app-bg" title="Transaksi Grab">
             <Car className="w-4 h-4" /> Catat Grab

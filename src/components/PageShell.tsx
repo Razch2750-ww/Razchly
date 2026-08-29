@@ -44,7 +44,7 @@ export function PageHeader({ title, subtitle, actions, mobileActions }: PageHead
       <div className="page-heading-copy min-w-0 flex-1">
         <p className="page-kicker" aria-hidden="true">
           <span>RZ</span>
-          Private register
+          <span className="page-kicker-copy">Private register</span>
         </p>
         <h1 className="page-display-title text-2xl font-normal leading-tight text-app-text-bright md:text-[2.35rem]">
           {title}

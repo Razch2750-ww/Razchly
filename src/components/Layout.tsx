@@ -222,7 +222,7 @@ export default function Layout() {
         </div>
       </aside>
 
-      <main inert={isCommandOpen || isActionSheetOpen ? true : undefined} id="main-content" className="relative flex min-w-0 max-w-full flex-1 flex-col overflow-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
+      <main inert={isCommandOpen || isActionSheetOpen ? true : undefined} id="main-content" className="app-shell-main relative flex min-w-0 max-w-full flex-1 flex-col overflow-hidden md:pb-0">
         <header className="app-command-bar hidden h-[78px] shrink-0 grid-cols-[minmax(0,1fr)_minmax(260px,420px)_auto] items-center gap-6 px-7 md:grid">
           <div className="min-w-0">
             <p className="font-ledger truncate text-[20px] text-[#e2bd68]">{t(currentItem.labelKey)}</p>
@@ -333,7 +333,7 @@ export default function Layout() {
         {isActionSheetOpen && (
           <>
             <motion.button type="button" aria-label="Tutup menu tambah" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }} className="fixed inset-0 z-40 bg-black/75 md:hidden" onClick={() => closeActionSheet()} />
-            <motion.section id="quick-action-sheet" ref={actionDialogRef} tabIndex={-1} initial={reduceMotion ? false : { y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ duration: reduceMotion ? 0 : 0.34, ease: [0.16, 1, 0.3, 1] }} className="app-action-sheet fixed inset-x-0 bottom-0 z-50 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-3 md:hidden" role="dialog" aria-modal="true" aria-labelledby="quick-action-title">
+            <motion.section id="quick-action-sheet" ref={actionDialogRef} tabIndex={-1} initial={reduceMotion ? false : { y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ duration: reduceMotion ? 0 : 0.34, ease: [0.16, 1, 0.3, 1] }} className="app-action-sheet mobile-quick-sheet fixed inset-x-0 bottom-0 z-50 px-4 pt-3 md:hidden" role="dialog" aria-modal="true" aria-labelledby="quick-action-title">
               <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-app-text/25" />
               <div className="mb-4 flex items-center justify-between">
                 <h2 id="quick-action-title" className="text-lg font-semibold tracking-tight text-app-text-bright">Tambah aktivitas</h2>
@@ -359,11 +359,14 @@ export default function Layout() {
         )}
       </AnimatePresence>
 
-      <div inert={isActionSheetOpen ? true : undefined} className="fixed inset-x-0 bottom-0 z-40 md:hidden">
-        <nav className="app-mobile-dock relative grid h-[72px] grid-cols-5 items-center px-1 pb-[env(safe-area-inset-bottom)]" aria-label="Navigasi mobile">
+      <div inert={isActionSheetOpen ? true : undefined} className="app-mobile-dock-wrap fixed inset-x-0 bottom-0 z-40 md:hidden">
+        <nav className="app-mobile-dock mobile-dock-grid relative grid grid-cols-5 items-center px-1" aria-label="Navigasi mobile">
           {mobileNavItems.slice(0, 2).map((item) => <MobileNavItem key={item.path} item={item} label={t(item.labelKey)} />)}
-          <button ref={actionTriggerRef} type="button" onClick={() => isActionSheetOpen ? closeActionSheet() : setActionSheetOpen(true)} className="mx-auto flex h-12 w-12 items-center justify-center rounded-[14px] bg-[#d7b669] text-[#11120f]" aria-label="Tambah" aria-expanded={isActionSheetOpen} aria-controls="quick-action-sheet">
-            <Plus className={`h-6 w-6 transition-transform duration-300 ${isActionSheetOpen ? "rotate-45" : ""}`} strokeWidth={2.2} />
+          <button ref={actionTriggerRef} type="button" onClick={() => isActionSheetOpen ? closeActionSheet() : setActionSheetOpen(true)} className="mobile-dock-add mx-auto flex h-full min-w-0 flex-col items-center justify-center gap-1 text-[#e5c477]" aria-label="Tambah" aria-expanded={isActionSheetOpen} aria-controls="quick-action-sheet">
+            <span className="mobile-dock-add-icon flex items-center justify-center rounded-[14px] bg-[#d7b669] text-[#11120f]">
+              <Plus className={`h-6 w-6 transition-transform duration-300 ${isActionSheetOpen ? "rotate-45" : ""}`} strokeWidth={2.2} />
+            </span>
+            <span className="mobile-dock-label">Tambah</span>
           </button>
           {mobileNavItems.slice(2, 4).map((item) => <MobileNavItem key={item.path} item={item} label={t(item.labelKey)} />)}
         </nav>
@@ -374,8 +377,8 @@ export default function Layout() {
 
 function MobileNavItem({ item, label }: { item: (typeof NAV_ITEMS)[number]; label: string }) {
   return (
-    <NavLink to={item.path} end={item.path === "/"} aria-label={label} className={({ isActive }) => `relative flex h-full min-w-0 flex-col items-center justify-center gap-1 px-0.5 text-[10px] transition-colors ${isActive ? "text-[#e5c477]" : "text-white/48"}`}>
-      {({ isActive }) => <><item.icon className="h-5 w-5" strokeWidth={isActive ? 2 : 1.45} /><span className="max-w-full truncate">{label}</span></>}
+    <NavLink to={item.path} end={item.path === "/"} aria-label={label} className={({ isActive }) => `mobile-dock-item relative flex h-full min-w-0 flex-col items-center justify-center gap-1 px-0.5 transition-colors ${isActive ? "text-[#e5c477]" : "text-white/55"}`}>
+      {({ isActive }) => <><item.icon className="mobile-dock-icon" strokeWidth={isActive ? 2 : 1.45} /><span className="mobile-dock-label max-w-full truncate">{label}</span></>}
     </NavLink>
   );
 }

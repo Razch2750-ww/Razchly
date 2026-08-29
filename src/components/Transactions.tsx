@@ -1218,9 +1218,9 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       {!modalOnly && (
         <div className="route-transactions transaction-workspace flex h-full w-full flex-1 flex-col overflow-y-auto p-0 text-app-text">
           {/* MOBILE LAYOUT */}
-          <div className="transaction-mobile flex min-h-[100dvh] w-full flex-col px-4 pb-32 pt-5 md:hidden">
+          <div className="transaction-mobile flex min-h-0 w-full flex-col px-4 pb-32 pt-5 md:hidden">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="mobile-transaction-header mb-4 flex items-center justify-between">
           <button type="button" onClick={() => navigate(-1)} className="flex h-11 w-11 items-center justify-center rounded-xl border border-app-border/40 bg-app-card/60 text-app-text hover:text-app-text-bright" aria-label="Kembali">
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -1233,7 +1233,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         </div>
 
         {/* Period Tabs */}
-        <div className="mb-3 flex items-center justify-between gap-1 rounded-xl border border-app-border/60 bg-app-card/80 p-1">
+        <div className="mobile-period-tabs mb-3 flex items-center justify-between gap-1 border-y border-app-border/60">
           {["Harian", "Mingguan", "Bulanan", "Custom"].map((p) => (
             <button
               key={p}
@@ -1243,7 +1243,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 setMobileTab(p as any);
                 setMobileCurrentDate(new Date());
               }}
-              className={`min-h-11 flex-1 rounded-lg px-2 text-xs font-semibold transition-colors ${mobileTab === p ? "bg-app-accent1 text-app-bg" : "text-app-text/60 hover:bg-app-hover hover:text-app-text-bright"}`}
+              className={`min-h-11 flex-1 border-b-2 border-transparent px-1 text-xs font-semibold transition-colors ${mobileTab === p ? "border-app-accent1 text-app-accent1" : "text-app-text/60 hover:bg-app-hover hover:text-app-text-bright"}`}
             >
               {p}
             </button>
@@ -1252,7 +1252,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
         {/* Date Navigator */}
         {mobileTab === "Custom" ? (
-          <div className="flex items-center gap-2 mb-4 p-2 rounded-xl bg-app-card/40 border border-app-border/30">
+          <div className="mobile-date-range mb-4 flex items-center gap-2 border-b border-app-border/60 py-2">
             <input
               type="date"
               aria-label="Tanggal mulai"
@@ -1270,7 +1270,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             />
           </div>
         ) : (
-          <div className="flex items-center justify-between mb-4 px-3 py-1.5 rounded-xl bg-app-card/40 border border-app-border/30">
+          <div className="mobile-period-nav mb-4 flex items-center justify-between border-b border-app-border/60 py-1.5">
             <button type="button" onClick={handleMobilePrev} className="flex h-11 w-11 items-center justify-center rounded-lg border border-app-border/50 bg-app-card text-app-accent1" aria-label="Periode sebelumnya">
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -1284,11 +1284,12 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         )}
 
         {/* Filters Group */}
-        <details className="mb-5 border-y border-app-border/60">
+        <details className="mobile-filter-panel mb-5 border-y border-app-border/60">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between py-2 text-sm font-medium text-app-text-bright">
             <span>Filter transaksi</span>
-            <span className="text-xs text-app-text/55">
+            <span className="flex items-center gap-1.5 text-xs text-app-text/55">
               {[mobileAccountFilter, mobileIncomeFilter, mobileExpenseFilter].filter((value) => value !== "Semua").length || "Semua"}
+              <ChevronDown className="h-4 w-4" aria-hidden="true" />
             </span>
           </summary>
           <div className="space-y-3 pb-3">
@@ -1387,11 +1388,15 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           </div>
         </details>
 
-        {/* Chart Section */}
-        <h3 className="mb-3 text-base font-semibold text-app-text-bright">
-          Tren arus kas
-        </h3>
-        <div className="relative mb-6 border-y border-app-border py-4">
+        {/* The chart stays available without pushing the ledger below the first viewport. */}
+        <details className="mobile-cashflow-disclosure mb-5 border-y border-app-border">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between py-2 text-sm font-semibold text-app-text-bright">
+            <span>Tren arus kas</span>
+            <span className="flex items-center gap-1.5 text-xs font-medium text-app-text/55">
+              Lihat grafik <ChevronDown className="h-4 w-4" />
+            </span>
+          </summary>
+        <div className="relative border-t border-app-border py-4">
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
@@ -1459,8 +1464,9 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             </ResponsiveContainer>
           </div>
         </div>
+        </details>
 
-        <dl className="mb-8 grid grid-cols-3 divide-x divide-app-border border-y border-app-border">
+        <dl className="mobile-summary-strip mb-7 grid grid-cols-3 divide-x divide-app-border border-y border-app-border">
           <div className="py-5 pr-3">
             <dt className="text-xs text-app-text/50">Pemasukan</dt>
             <dd className="mt-1 font-mono text-sm font-semibold text-app-success">
@@ -1481,7 +1487,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
           </div>
         </dl>
 
-        <section>
+        <section className="mobile-transaction-list">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-base font-semibold text-app-text-bright">Daftar transaksi</h3>
             <span className="text-xs text-app-text/50">{mobileFilteredTransactions.length} catatan</span>
@@ -1499,82 +1505,81 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
               className="divide-y divide-app-border border-y border-app-border"
             >
               {mobileFilteredTransactions.map((t) => (
-                <StaggerItem key={t.id} className="flex items-center gap-3 py-4">
-                  <div
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${
-                      t.type === "income"
-                        ? "border-app-success/20 bg-app-success/10 text-app-success"
-                        : t.type === "expense"
-                          ? "border-app-danger/20 bg-app-danger/10 text-app-danger"
-                          : "border-app-accent1/20 bg-app-accent1/10 text-app-accent1"
-                    }`}
-                  >
-                    <AccountIcon
-                      iconId={getAccountIcon(t.type === "transfer" ? t.fromAccountId : t.accountId)}
-                      className="h-5 w-5"
-                    />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-app-text-bright">
-                      {t.note || (t.type === "income" ? "Pemasukan" : t.type === "expense" ? "Pengeluaran" : "Transfer")}
-                    </p>
-                    <div className="mt-1 flex min-w-0 items-center gap-1.5 text-[11px] text-app-text/55">
-                      {t.categoryId && (
-                        <CategoryIcon iconId={t.categoryIcon || "dollar-sign"} className="h-3 w-3 shrink-0" />
-                      )}
-                      <span className="truncate">
-                        {t.type === "transfer"
-                          ? `${getAccountName(t.fromAccountId)} → ${getAccountName(t.toAccountId)}`
-                          : [t.categoryName, getAccountName(t.accountId)].filter(Boolean).join(" · ")}
+                <StaggerItem key={t.id} className="mobile-transaction-entry py-0">
+                  <details>
+                    <summary className="grid min-h-[68px] cursor-pointer list-none grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-3 py-3">
+                      <span
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center ${
+                          t.type === "income"
+                            ? "text-app-success"
+                            : t.type === "expense"
+                              ? "text-app-danger"
+                              : "text-app-accent1"
+                        }`}
+                      >
+                        <AccountIcon
+                          iconId={getAccountIcon(t.type === "transfer" ? t.fromAccountId : t.accountId)}
+                          className="h-[18px] w-[18px]"
+                        />
                       </span>
-                      <span aria-hidden="true">·</span>
-                      <time className="shrink-0">{safeFormatDate(t.date, "dd MMM, HH:mm", { locale: currentLocale })}</time>
-                    </div>
-                  </div>
 
-                  <div className="shrink-0 text-right">
-                    <p
-                      className={`whitespace-nowrap font-mono text-xs font-semibold ${
-                        t.type === "income"
-                          ? "text-app-success"
-                          : t.type === "expense"
-                            ? "text-app-danger"
-                            : "text-app-text-bright"
-                      }`}
-                    >
-                      {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""} Rp {t.amount.toLocaleString("id-ID")}
-                    </p>
-                    {Boolean(t.adminFee) && (
-                      <p className="mt-1 text-[11px] font-medium text-app-danger">
-                        Fee −Rp {t.adminFee.toLocaleString("id-ID")}
-                      </p>
-                    )}
-                    <div className="mt-1 flex justify-end">
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-medium text-app-text-bright">
+                          {t.note || (t.type === "income" ? "Pemasukan" : t.type === "expense" ? "Pengeluaran" : "Transfer")}
+                        </span>
+                        <span className="mt-1 flex min-w-0 items-center gap-1.5 text-[11px] text-app-text/55">
+                          {t.categoryId && (
+                            <CategoryIcon iconId={t.categoryIcon || "dollar-sign"} className="h-3 w-3 shrink-0" />
+                          )}
+                          <span className="truncate">
+                            {t.type === "transfer"
+                              ? `${getAccountName(t.fromAccountId)} → ${getAccountName(t.toAccountId)}`
+                              : [t.categoryName, getAccountName(t.accountId)].filter(Boolean).join(" · ")}
+                          </span>
+                          <span aria-hidden="true">·</span>
+                          <time className="shrink-0">{safeFormatDate(t.date, "dd MMM, HH:mm", { locale: currentLocale })}</time>
+                        </span>
+                      </span>
+
+                      <span className="flex items-center gap-1.5 text-right">
+                        <span>
+                          <span
+                            className={`block whitespace-nowrap font-mono text-xs font-semibold ${
+                              t.type === "income"
+                                ? "text-app-success"
+                                : t.type === "expense"
+                                  ? "text-app-danger"
+                                  : "text-app-text-bright"
+                            }`}
+                          >
+                            {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""} Rp {t.amount.toLocaleString("id-ID")}
+                          </span>
+                          {Boolean(t.adminFee) && (
+                            <span className="mt-1 block text-[11px] font-medium text-app-danger">
+                              Fee −Rp {t.adminFee.toLocaleString("id-ID")}
+                            </span>
+                          )}
+                        </span>
+                        <MoreHorizontal className="h-4 w-4 shrink-0 text-app-text/40" aria-hidden="true" />
+                      </span>
+                    </summary>
+                    <div className="flex justify-end gap-2 border-t border-app-border/60 pb-3 pt-2">
                       <button
                         type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          openEditModal(t);
-                        }}
-                        className="flex h-11 w-11 items-center justify-center rounded-xl text-app-accent1 hover:bg-app-accent1/10"
-                        aria-label={`Edit transaksi ${t.note || ""}`}
+                        onClick={() => openEditModal(t)}
+                        className="flex min-h-11 items-center gap-2 px-3 text-xs font-semibold text-app-accent1 hover:bg-app-accent1/10"
                       >
-                        <Edit2 className="h-4 w-4" />
+                        <Edit2 className="h-4 w-4" /> Edit
                       </button>
                       <button
                         type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setTsxToDelete(t);
-                        }}
-                        className="flex h-11 w-11 items-center justify-center rounded-xl text-app-danger hover:bg-app-danger/10"
-                        aria-label={`Hapus transaksi ${t.note || ""}`}
+                        onClick={() => setTsxToDelete(t)}
+                        className="flex min-h-11 items-center gap-2 px-3 text-xs font-semibold text-app-danger hover:bg-app-danger/10"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" /> Hapus
                       </button>
                     </div>
-                  </div>
+                  </details>
                 </StaggerItem>
               ))}
             </StaggerContainer>
