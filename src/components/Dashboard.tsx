@@ -487,17 +487,17 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
+    <div className="dashboard-ledger flex h-full w-full flex-1 flex-col overflow-y-auto pb-32 text-app-text md:pb-10">
       {/* DESKTOP HEADER */}
-      <header className="hidden md:flex items-start justify-between mb-6 gap-6">
+      <header className="dashboard-toolbar hidden items-center justify-between gap-6 border-b px-7 py-4 md:flex">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-[32px] leading-[1.1] font-semibold text-app-text-bright tracking-[-0.022em]">
+            <h1 className="text-base font-semibold tracking-[-0.02em] text-app-text-bright">
               <TextReveal key={`${user?.displayName}-${getGreeting()}`} text={`${getGreeting()}, ${user?.displayName || "USER"}`} />
             </h1>
           </div>
-          <p className="text-app-text/60 text-[15px] font-normal tracking-[-0.02em]">
-            {format(new Date(), "EEEE, d MMMM yyyy", { locale: localeId })} — Ringkasan aktivitas & kesehatan keuangan Anda
+          <p className="text-app-text/60 text-xs font-normal">
+            {format(new Date(), "EEEE, d MMMM yyyy", { locale: localeId })} · Posisi keuangan terbaru
           </p>
         </div>
 
@@ -536,12 +536,16 @@ export default function Dashboard() {
       </header>
 
       {/* MOBILE HEADER */}
-      <header className="md:hidden flex items-center justify-between mb-4 px-1">
+      <header className="mobile-ledger-header flex items-center justify-between px-5 pb-5 pt-6 md:hidden">
+        <div>
+          <p className="font-ledger text-[28px] leading-none text-[#d7b669]">Razchly</p>
+          <p className="mt-2 text-[11px] text-white/48">{format(new Date(), "EEEE, d MMM yyyy", { locale: localeId })}</p>
+        </div>
         <div className="flex items-center gap-3">
           <Link
             to="/settings"
             state={{ expandSection: 'profile' }}
-            className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-app-border bg-app-card"
+            className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#d7b669]/50 bg-[#d7b669]/10"
             aria-label="Buka pengaturan profil"
           >
             {user?.photoURL ? (
@@ -552,21 +556,11 @@ export default function Dashboard() {
               </div>
             )}
           </Link>
-          <div>
-             <div className="flex items-center gap-1.5">
-               <h1 className="text-base font-bold text-app-text-bright tracking-tight leading-snug">
-                 {getGreeting()}, {user?.displayName?.split(' ')[0] || "User"}
-               </h1>
-             </div>
-             <p className="text-app-text/60 text-[11px] font-medium">
-               {format(new Date(), "EEEE, d MMM yyyy", { locale: localeId })}
-             </p>
-          </div>
         </div>
       </header>
 
       {/* QUICK SHORTCUTS RIBBON (ALL DEVICES) */}
-      <ScrollReveal className="mb-5 md:hidden">
+      <ScrollReveal className="hidden">
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
           <button type="button"
             onClick={() => setGlobalAddModalOpen(true)}
@@ -607,7 +601,7 @@ export default function Dashboard() {
       </ScrollReveal>
 
       {/* MOBILE LEDGER */}
-      <section className="mb-7 border-y border-app-border py-5 md:hidden">
+      <section className="mobile-statement mx-4 mb-4 rounded-[16px] px-5 py-6 md:hidden">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Wallet className="h-4 w-4 text-app-accent1" strokeWidth={1.7} />
@@ -622,7 +616,7 @@ export default function Dashboard() {
             {hideBalances ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
           </button>
         </div>
-        <p className="break-words font-mono text-[30px] font-semibold leading-tight tracking-[-0.035em] text-app-text-bright">
+        <p className="font-ledger break-words text-[clamp(2.35rem,11vw,3.2rem)] leading-[1.02] tracking-[-0.03em] text-app-text-bright">
           {formatRp(totalBalance)}
         </p>
         <div className="mt-2 flex items-center justify-between gap-3 text-xs">
@@ -648,7 +642,7 @@ export default function Dashboard() {
         </dl>
       </section>
 
-      <section className="mb-8 md:hidden">
+      <section className="mobile-position mx-4 mb-7 rounded-[16px] px-5 py-4 md:hidden">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-base font-semibold text-app-text-bright">{language === 'en' ? 'Other positions' : 'Posisi lainnya'}</h2>
           <button type="button" onClick={() => navigate("/transactions")} className="flex h-11 items-center gap-1 px-2 text-xs font-semibold text-app-accent1">
@@ -686,116 +680,99 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* DESKTOP LEDGER — 3 + 5 + 4 columns, no nested cards */}
-      <section className="mb-8 hidden grid-cols-12 border-y border-app-border md:grid">
-        <div className="col-span-3 flex min-h-[248px] flex-col justify-between p-6">
-          <div>
-            <div className="mb-6 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <Wallet className="h-4 w-4 text-app-accent1" strokeWidth={1.7} />
-                <h2 className="text-sm font-semibold text-app-text-bright">{t('dashboard.totalBalance')}</h2>
-              </div>
-              <button
-                type="button"
-                onClick={toggleHideBalances}
-                className="flex h-11 w-11 items-center justify-center rounded-xl text-app-text/60 hover:bg-app-hover hover:text-app-text-bright"
-                aria-label={hideBalances ? (language === 'en' ? "Show balances" : "Tampilkan saldo") : (language === 'en' ? "Hide balances" : "Sembunyikan saldo")}
-              >
-                {hideBalances ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            </div>
-            <p className="break-words font-mono text-[30px] font-semibold leading-[1.08] tracking-[-0.035em] text-app-text-bright">
-              {formatRp(totalBalance)}
-            </p>
-            <p className="mt-2 text-xs text-app-text/55">
-              {accounts.length} {t('dashboard.allWallets')} · {format(new Date(), "MMMM yyyy", { locale: currentLocale })}
-            </p>
-          </div>
-          <div className="flex items-center justify-between border-t border-app-border pt-4">
-            <span className={`flex items-center gap-2 text-xs font-medium ${financialHealthStatus.color}`}>
-              <ShieldCheck className="h-4 w-4" />
-              {financialHealthStatus.label}
-            </span>
-            <Link to="/settings" state={{ expandSection: "accounts" }} className="text-xs font-semibold text-app-accent1 hover:text-app-text-bright">
-              Kelola
-            </Link>
-          </div>
-        </div>
-
-        <div className="col-span-5 flex min-h-[248px] flex-col justify-between border-l border-app-border p-6">
-          <div className="mb-6 flex items-center justify-between">
+      {/* DESKTOP STATEMENT — one financial surface + one operational side ledger */}
+      <section className="dashboard-statement mx-7 mb-7 hidden grid-cols-12 overflow-hidden md:grid">
+        <article className="statement-sheet col-span-8 p-7 xl:p-9">
+          <div className="flex items-start justify-between gap-5">
             <div>
-              <h2 className="text-sm font-semibold text-app-text-bright">{language === 'en' ? 'Monthly cash flow' : 'Arus kas bulan ini'}</h2>
-              <p className="mt-1 text-xs text-app-text/50">{language === 'en' ? 'Income, expense, and net position' : 'Pemasukan, pengeluaran, dan posisi bersih'}</p>
+              <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t('dashboard.totalBalance')}</h2>
+              <p className="font-ledger mt-3 break-words text-[clamp(3.2rem,5vw,5.8rem)] leading-[0.92] tracking-[-0.035em]">
+                {formatRp(totalBalance)}
+              </p>
+              <p className="mt-4 text-xs text-black/55">
+                {accounts.length} {t('dashboard.allWallets')} · {format(new Date(), "MMMM yyyy", { locale: currentLocale })}
+              </p>
             </div>
             <button
               type="button"
-              onClick={() => navigate("/transactions")}
-              className="flex h-11 items-center gap-2 rounded-xl px-3 text-xs font-semibold text-app-accent1 hover:bg-app-hover"
+              onClick={toggleHideBalances}
+              className="flex h-11 w-11 items-center justify-center text-black/55 hover:bg-black/[0.04] hover:text-black"
+              aria-label={hideBalances ? (language === 'en' ? "Show balances" : "Tampilkan saldo") : (language === 'en' ? "Hide balances" : "Sembunyikan saldo")}
             >
-              Detail
-              <ArrowRight className="h-4 w-4" />
+              {hideBalances ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
-          <dl className="grid grid-cols-3 divide-x divide-app-border border-y border-app-border">
-            <div className="py-5 pr-4">
-              <dt className="mb-2 text-xs text-app-text/55">{language === 'en' ? 'Income' : 'Masuk'}</dt>
-              <dd className="font-mono text-base font-semibold text-app-success">{formatRp(incomeThisMonth)}</dd>
-            </div>
-            <div className="px-4 py-5">
-              <dt className="mb-2 text-xs text-app-text/55">{language === 'en' ? 'Expense' : 'Keluar'}</dt>
-              <dd className="font-mono text-base font-semibold text-app-danger">{formatRp(expenseThisMonth)}</dd>
-            </div>
-            <div className="py-5 pl-4">
-              <dt className="mb-2 text-xs text-app-text/55">Net</dt>
-              <dd className={`font-mono text-base font-semibold ${savingsThisMonth >= 0 ? "text-app-accent1" : "text-app-danger"}`}>
-                {formatRp(savingsThisMonth, { showSign: true })}
-              </dd>
-            </div>
-          </dl>
-          <div className="mt-4 flex items-center justify-between text-xs">
-            <span className="text-app-text/50">{language === 'en' ? 'Today' : 'Hari ini'}</span>
-            <span className="font-mono text-app-text-bright">
-              <span className="text-app-success">+{formatRp(incomeToday, { noRp: true })}</span>
-              <span className="mx-2 text-app-text/30">/</span>
-              <span className="text-app-danger">-{formatRp(expenseToday, { noRp: true })}</span>
-            </span>
-          </div>
-        </div>
 
-        <div className="col-span-4 min-h-[248px] border-l border-app-border p-6">
-          <div className="mb-3">
-            <h2 className="text-sm font-semibold text-app-text-bright">{language === 'en' ? 'Other positions' : 'Posisi lainnya'}</h2>
-            <p className="mt-1 text-xs text-app-text/50">{language === 'en' ? 'Investments and outstanding loans' : 'Investasi serta pinjaman berjalan'}</p>
+          <div className="mt-8 grid grid-cols-2 border-y border-black/20">
+            <div className="py-6 pr-7">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.06em]">Ringkasan rekening</h3>
+                <Link to="/settings" state={{ expandSection: "accounts" }} className="text-xs font-semibold text-[#8c6826] hover:text-black">Kelola</Link>
+              </div>
+              <div className="divide-y divide-black/12 border-t border-black/20">
+                {sortedAccounts.slice(0, 4).map((account) => (
+                  <button key={account.id} type="button" onClick={() => { setEditingAccount(account); setIsAccountModalOpen(true); }} className="grid min-h-11 w-full grid-cols-[1fr_auto] items-center gap-4 text-left text-xs hover:bg-black/[0.025]">
+                    <span className="truncate text-black/66">{account.name}</span>
+                    <span className="font-mono font-semibold text-black">{formatRp(account.balance)}</span>
+                  </button>
+                ))}
+                {sortedAccounts.length === 0 && <p className="py-8 text-center text-xs text-black/60">Belum ada rekening aktif.</p>}
+              </div>
+            </div>
+
+            <div className="border-l border-black/20 py-6 pl-7">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.06em]">Arus kas</h3>
+                <select value={selectedChartAccount} onChange={(event) => setSelectedChartAccount(event.target.value)} className="h-9 max-w-36 border-0 border-b border-black/25 bg-transparent px-1 text-xs text-black outline-none">
+                  <option value="all">Semua rekening</option>
+                  {accounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
+                </select>
+              </div>
+              <div className="h-[178px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData} margin={{ top: 8, right: 6, left: -28, bottom: 0 }}>
+                    <CartesianGrid vertical={false} stroke="rgba(19,19,15,.14)" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "rgba(19,19,15,.52)" }} minTickGap={30} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "rgba(19,19,15,.52)" }} tickFormatter={(value) => `${Math.round(value / 1000)}k`} />
+                    <Tooltip formatter={(value: number) => hideBalances ? "Rp ••••••" : formatRp(value)} contentStyle={{ background: "#f4efe3", border: "1px solid rgba(19,19,15,.2)", borderRadius: 8, fontSize: 11 }} />
+                    <Line type="monotone" dataKey="income" stroke="#287658" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="expense" stroke="#b1433e" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={() => navigate("/investments")}
-            className="flex min-h-[76px] w-full items-center justify-between border-t border-app-border py-4 text-left hover:text-app-text-bright"
-          >
-            <span>
-              <span className="block text-xs text-app-text/55">{t('dashboard.investments')}</span>
-              <span className="mt-1 block font-mono text-base font-semibold text-app-text-bright">{formatRp(totalInvestmentValue)}</span>
-            </span>
-            <span className={`font-mono text-xs font-semibold ${totalInvestmentReturn >= 0 ? "text-app-success" : "text-app-danger"}`}>
-              {formatRp(totalInvestmentReturn, { showSign: true })}
-            </span>
+
+          <dl className="grid grid-cols-3 divide-x divide-black/20 border-b border-black/20">
+            <div className="py-5 pr-5"><dt className="text-[11px] text-black/60">Pemasukan</dt><dd className="font-ledger mt-1 text-xl text-[#236b50]">{formatRp(incomeThisMonth)}</dd></div>
+            <div className="px-5 py-5"><dt className="text-[11px] text-black/60">Pengeluaran</dt><dd className="font-ledger mt-1 text-xl text-[#a63b37]">{formatRp(expenseThisMonth)}</dd></div>
+            <div className="py-5 pl-5"><dt className="text-[11px] text-black/60">Surplus</dt><dd className={`font-ledger mt-1 text-xl ${savingsThisMonth >= 0 ? "text-[#8c6826]" : "text-[#a63b37]"}`}>{formatRp(savingsThisMonth, { showSign: true })}</dd></div>
+          </dl>
+        </article>
+
+        <aside className="statement-side col-span-4 flex flex-col">
+          <div className="statement-side-row">
+            <div className="flex items-center justify-between"><h3>Likuiditas</h3><Link to="/settings" state={{ expandSection: "accounts" }}>Rincian</Link></div>
+            <p className="font-ledger mt-3 text-[30px] text-white">{formatRp(totalBalance)}</p>
+            <span>{financialHealthStatus.label}</span>
+          </div>
+          <div className="statement-side-row">
+            <div className="flex items-center justify-between"><h3>Pengeluaran bulan ini</h3><button type="button" onClick={() => navigate('/transactions')}>Rincian</button></div>
+            <p className="font-ledger mt-3 text-[30px] text-white">{formatRp(expenseThisMonth)}</p>
+            <span>Hari ini {formatRp(expenseToday)}</span>
+          </div>
+          <div className="statement-side-row">
+            <div className="flex items-center justify-between"><h3>Target tabungan</h3><button type="button" onClick={() => navigate('/savings')}>Rincian</button></div>
+            <p className="font-ledger mt-3 text-[26px] text-white">{formatRp(savingsThisMonth)} <small>/ {formatRp(savingsTarget)}</small></p>
+            <div className="mt-3 h-1.5 overflow-hidden bg-white/10"><div className="h-full bg-[#d7b669]" style={{ width: `${savingsProgress}%` }} /></div>
+          </div>
+          <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="statement-add mt-auto flex min-h-14 items-center justify-center gap-2 border border-[#d7b669]/70 text-sm font-semibold text-[#e5c477] hover:bg-[#d7b669] hover:text-[#11120f]">
+            <Plus className="h-4 w-4" /> Tambah transaksi
           </button>
-          <button
-            type="button"
-            onClick={() => navigate("/loans")}
-            className="flex min-h-[76px] w-full items-center justify-between border-y border-app-border py-4 text-left hover:text-app-text-bright"
-          >
-            <span>
-              <span className="block text-xs text-app-text/55">{t('dashboard.loans')}</span>
-              <span className="mt-1 block font-mono text-base font-semibold text-app-text-bright">{formatRp(loanStats.totalPiutang - loanStats.totalHutang)}</span>
-            </span>
-            <ArrowRight className="h-4 w-4 text-app-text/40" />
-          </button>
-        </div>
+        </aside>
       </section>
       {/* INTEREST OVERVIEW CARD */}
-      <ScrollReveal className="mb-6 w-full">
+      <ScrollReveal className="dashboard-interest mx-4 mb-6 md:mx-7">
         <InterestCard
           accounts={accounts}
           transactions={recentTransactions}
@@ -804,7 +781,7 @@ export default function Dashboard() {
       </ScrollReveal>
 
       {/* MOBILE WALLET LIST */}
-      <section className="mb-8 md:hidden">
+      <section className="mobile-wallets mx-4 mb-8 md:hidden">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-base font-semibold text-app-text-bright">{t('dashboard.myWallets')}</h2>
           <Link to="/settings" state={{ expandSection: "accounts" }} className="flex min-h-11 items-center px-2 text-xs font-semibold text-app-accent1">
@@ -852,9 +829,9 @@ export default function Dashboard() {
       </section>
 
       {/* DESKTOP MIDDLE SECTION */}
-      <div className="hidden md:grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div className="dashboard-workbench mx-7 mb-7 hidden grid-cols-1 lg:grid-cols-3 md:grid">
         {/* DOMPET SAYA */}
-        <ScrollReveal className="lg:col-span-1 bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
+        <ScrollReveal className="dashboard-wallet-panel relative flex flex-col overflow-hidden border border-app-border bg-app-card p-6 lg:col-span-1">
           <div className="flex justify-between items-center mb-5 relative z-10">
             <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">{t('dashboard.myWallets')}</h2>
             <div className="relative">
@@ -957,7 +934,7 @@ export default function Dashboard() {
         </ScrollReveal>
 
         {/* ALUR KAS (CHART) */}
-        <ScrollReveal delay={0.1} className="lg:col-span-2 bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
+        <ScrollReveal delay={0.1} className="dashboard-cashflow-panel relative flex flex-col overflow-hidden border border-app-border bg-app-card p-6 lg:col-span-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3 relative z-10">
             <div>
               <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">{t('dashboard.cashflowTitle')}</h2>
@@ -1084,7 +1061,7 @@ export default function Dashboard() {
       </div>
 
       {/* DESKTOP & MOBILE VISUAL ANALYTICS (PIE CHARTS) */}
-      <ScrollReveal className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <ScrollReveal className="dashboard-analytics mx-4 mb-7 grid grid-cols-1 lg:grid-cols-2 md:mx-7">
         {/* PIE CHART 1: ALOKASI SALDO DOMPET */}
         <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
           <div className="flex items-center justify-between mb-4 relative z-10">
@@ -1206,7 +1183,7 @@ export default function Dashboard() {
       </ScrollReveal>
 
       {/* MOBILE BOTTOM SECTION - TRANSACTIONS */}
-      <div className="md:hidden pb-12">
+      <div className="mobile-recent px-4 pb-12 md:hidden">
         <div className="flex justify-between items-center mb-6 px-1">
             <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">Transaksi Terbaru</h2>
             <Link to="/transactions" state={{ tab: "Semua" }} className="text-app-accent1 text-[13px] font-medium">Lihat Semua</Link>
@@ -1270,7 +1247,7 @@ export default function Dashboard() {
       </div>
 
       {/* DESKTOP BOTTOM SECTION - TRANSACTIONS */}
-      <ScrollReveal className="hidden md:flex bg-app-card rounded-2xl p-6 border border-app-border flex-col shrink-0 overflow-hidden relative">
+      <ScrollReveal className="dashboard-recent mx-7 hidden shrink-0 flex-col overflow-hidden border border-app-border bg-app-card p-6 md:flex">
         <div className="flex items-center justify-between mb-5 relative z-10">
           <div>
             <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">{t('dashboard.recentTransactions')}</h2>

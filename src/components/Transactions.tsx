@@ -1216,16 +1216,16 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
   return (
     <>
       {!modalOnly && (
-        <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-0 md:p-8 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
+        <div className="transaction-workspace flex h-full w-full flex-1 flex-col overflow-y-auto p-0 text-app-text">
           {/* MOBILE LAYOUT */}
-          <div className="md:hidden flex flex-col w-full min-h-[100dvh] px-4 pt-4 pb-32">
+          <div className="transaction-mobile flex min-h-[100dvh] w-full flex-col px-4 pb-32 pt-5 md:hidden">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <button type="button" onClick={() => navigate(-1)} className="flex h-11 w-11 items-center justify-center rounded-xl border border-app-border/40 bg-app-card/60 text-app-text hover:text-app-text-bright" aria-label="Kembali">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-lg font-bold text-app-text-bright">
-            <TextReveal text={language === 'en' ? "Financial Report" : "Laporan Keuangan"} />
+            <TextReveal text={language === 'en' ? "Transactions" : "Transaksi"} />
           </h1>
           <button type="button" onClick={exportToPDF} className="flex h-11 w-11 items-center justify-center rounded-xl border border-app-border/40 bg-app-card/60 text-app-text/80 hover:text-app-text-bright" aria-label="Ekspor laporan sebagai PDF" title="Ekspor PDF">
             <Share2 className="w-4.5 h-4.5" />
@@ -1582,16 +1582,16 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         </section>
       </div>
       {/* DESKTOP LAYOUT */}
-      <div className="hidden md:flex flex-col w-full h-full gap-6">
+      <div className="transaction-desktop hidden h-full w-full flex-col gap-0 md:flex">
         {/* HEADER SECTION (Like Dashboard) */}
         {/* HEADER SECTION */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+        <header className="transaction-header flex shrink-0 flex-col justify-between gap-4 px-7 py-6 md:flex-row md:items-center">
           <div>
             <h1 className="text-2xl md:text-[1.75rem] font-semibold text-app-text-bright tracking-tight leading-tight">
-              <TextReveal text={language === "en" ? "Financial Report" : "Laporan Keuangan"} />
+              <TextReveal text={language === "en" ? "Transactions" : "Transaksi"} />
             </h1>
             <p className="text-app-text/60 text-sm mt-1">
-              {language === "en" ? "Download and analyze your monthly financial reports." : "Unduh dan analisis laporan keuangan bulanan Anda."}
+              {language === "en" ? "Review, filter, and reconcile every movement of money." : "Tinjau, filter, dan cocokkan setiap pergerakan uang."}
             </p>
           </div>
 
@@ -1632,16 +1632,13 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         </header>
 
         {/* FILTER & EXPORT BAR */}
-        <ScrollReveal>
+        <ScrollReveal className="transaction-filter-block">
           <div className="bg-app-card border border-app-border rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shrink-0 relative overflow-hidden">
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-1">
                 <h2 className="text-app-text-bright text-[20px] font-semibold tracking-tight">
-                  {language === "en" ? "Financial Report" : "Laporan Keuangan"}
+                  {language === "en" ? "Transaction period" : "Periode transaksi"}
                 </h2>
-                <span className="text-xs font-medium bg-app-accent1/10 text-app-accent1 border border-app-accent1/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> AI Analytics
-                </span>
               </div>
               <p className="text-app-text/60 text-xs">
                 {language === "en" ? "Period:" : "Periode:"} <span className="font-medium text-app-text-bright">{getPeriodText()}</span>
@@ -1715,7 +1712,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         </ScrollReveal>
 
         {/* STATS & AI INSIGHT GRID */}
-        <ScrollReveal>
+        <ScrollReveal className="transaction-statement-block">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
             {/* TOTAL KEUNTUNGAN BERSIH */}
             <div className="lg:col-span-2 bg-app-card rounded-2xl p-6 border border-app-border flex flex-col justify-between relative overflow-hidden">
@@ -1832,7 +1829,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         </ScrollReveal>
 
         {/* VISUAL CHARTS SECTION */}
-        <ScrollReveal>
+        <ScrollReveal className="transaction-charts-block">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
             {/* CASH FLOW TREND CHART */}
             <div className="lg:col-span-2 bg-app-card border border-app-border rounded-2xl p-6 flex flex-col">
@@ -1957,7 +1954,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         </ScrollReveal>
 
         {/* SUMBER & ALOKASI SUMMARY CARDS */}
-        <ScrollReveal>
+        <ScrollReveal className="transaction-secondary-block">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
             <div>
               <div className="flex items-center justify-between mb-3">
@@ -2046,10 +2043,10 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
         {/* DETAIL TRANSAKSI */}
         <div
           ref={detailRef}
-          className="flex-1 flex flex-col shrink-0 min-h-[400px]"
+          className="transaction-ledger-block flex min-h-[400px] flex-1 shrink-0 flex-col"
         >
           {/* SEARCH & TYPE FILTER BAR */}
-          <div className="bg-app-card border border-app-border rounded-2xl p-6 flex flex-col space-y-4">
+          <div className="transaction-ledger-surface flex flex-col space-y-4 border border-app-border bg-app-card p-6">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <h3 className="text-lg font-semibold text-app-text-bright">
@@ -2139,7 +2136,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 {groupedTransactions.map((group) => (
                   <div key={group.dateStr} className="space-y-2">
                     {/* DATE GROUP HEADER */}
-                    <div className="flex items-center justify-between py-1.5 px-3 bg-app-bg/60 border border-app-border/40 rounded-xl text-xs font-semibold text-app-text/70 sticky top-0 z-20 backdrop-blur-md">
+                    <div className="ledger-date-row sticky top-0 z-20 flex items-center justify-between border border-app-border/40 bg-app-bg/95 px-3 py-2 text-xs font-semibold text-app-text/70">
                       <span className="flex items-center gap-2">
                         <Calendar className="w-3.5 h-3.5 text-app-accent1" />
                         <span>{group.dateStr}</span>
@@ -2159,7 +2156,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                       {group.items.map((t) => (
                         <div
                           key={t.id}
-                          className="flex items-center justify-between p-3.5 bg-app-bg hover:bg-app-hover rounded-xl transition-all border border-app-border/60 hover:border-app-accent1/30 cursor-pointer group"
+                          className="ledger-entry-row group flex cursor-pointer items-center justify-between border-b border-app-border/60 bg-app-bg px-3.5 py-3.5 hover:bg-app-hover"
                         >
                           <div className="flex items-center gap-3.5">
                             <div
@@ -2266,16 +2263,16 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
       {/* End of DESKTOP LAYOUT */}
       {/* Modal Add */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 z-[60] flex flex-col justify-end md:items-center md:justify-center backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex flex-col justify-end bg-black/72 md:items-center md:justify-center">
           <div
-            className="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-[18px] border border-app-border bg-app-card text-app-text md:max-w-xl md:rounded-[18px]"
+            className="transaction-sheet flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-[18px] border text-app-text md:max-w-xl md:rounded-[18px]"
             role="dialog"
             aria-modal="true"
             aria-labelledby="transaction-modal-title"
           >
             <div className="px-6 py-5 border-b border-app-border flex justify-between items-center bg-app-bg">
               <h2 id="transaction-modal-title" className="text-lg font-semibold text-app-text-bright">
-                {editingTransaction ? "Edit Transaksi" : "Catat Transaksi"}
+                {editingTransaction ? "Edit transaksi" : "Tambah transaksi"}
               </h2>
               <button
                 type="button"
@@ -2316,7 +2313,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
 
             <form
               onSubmit={saveTransaction}
-              className="p-6 pb-12 md:pb-6 space-y-6 overflow-y-auto bg-app-card"
+              className="transaction-form space-y-6 overflow-y-auto bg-app-card p-6 pb-12 md:pb-6"
             >
               {/* Type specific fields */}
               {(type === "income" || type === "expense") && (
@@ -2394,7 +2391,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
                 </div>
               )}
 
-              <div>
+              <div className="transaction-amount-field">
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-medium text-app-text/70 m-0">
                     Nominal (Rp)

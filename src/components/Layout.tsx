@@ -26,7 +26,7 @@ const NAV_ITEMS = [
 ];
 
 export default function Layout() {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isActionSheetOpen, setActionSheetOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,6 +41,13 @@ export default function Layout() {
   const visibleNavItems = NAV_ITEMS.filter((item) => !hiddenTabs.includes(item.path));
   const mobileNavItems = visibleNavItems.filter((item) =>
     ["/", "/transactions", "/investments", "/loans"].includes(item.path));
+  const currentItem = NAV_ITEMS.find((item) => item.path === location.pathname) || NAV_ITEMS[0];
+  const todayLabel = new Intl.DateTimeFormat("id-ID", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date());
 
   const openAction = (action: "transaction" | "grab" | "scan" | "attendance") => {
     setActionSheetOpen(false);
@@ -53,18 +60,16 @@ export default function Layout() {
   const firstName = user?.displayName?.split(" ")[0] || "User";
 
   return (
-    <div className="relative flex h-[100dvh] w-full overflow-hidden bg-app-bg font-sans text-app-text">
+    <div className="razchly-shell relative flex h-[100dvh] w-full overflow-hidden font-sans">
       <a href="#main-content" className="fixed left-4 top-4 z-[60] -translate-y-24 rounded-lg bg-app-accent1 px-4 py-2 text-sm font-semibold text-app-bg focus:translate-y-0">
         Lewati ke konten
       </a>
 
-      <aside className={`app-shell-rail hidden shrink-0 flex-col border-r transition-[width] duration-300 md:flex ${isSidebarOpen ? "w-[236px]" : "w-[84px]"}`}>
-        <div className={`flex h-[76px] shrink-0 items-center ${isSidebarOpen ? "px-6" : "justify-center"}`}>
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-app-accent1/10">
-              <img src="/icon.svg" alt="" className="h-6 w-6 object-contain" />
-            </div>
-            {isSidebarOpen && <span className="text-[18px] font-semibold tracking-[-0.03em] text-app-text-bright">Razchly</span>}
+      <aside className={`app-shell-rail hidden shrink-0 flex-col transition-[width] duration-300 md:flex ${isSidebarOpen ? "w-[224px]" : "w-[82px]"}`}>
+        <div className={`flex h-[78px] shrink-0 items-center border-b border-white/10 ${isSidebarOpen ? "px-5" : "justify-center"}`}>
+          <div className="flex items-center gap-3 text-[#d7b669]">
+            <span className="font-ledger flex h-10 w-10 shrink-0 items-center justify-center text-[28px] leading-none" aria-hidden="true">R</span>
+            {isSidebarOpen && <span className="font-ledger text-[22px] tracking-[-0.02em]">Razchly</span>}
           </div>
         </div>
 
@@ -75,12 +80,12 @@ export default function Layout() {
               to={item.path}
               end={item.path === "/"}
               aria-label={t(item.labelKey)}
-              className={({ isActive }) => `app-nav-item relative flex min-h-11 items-center rounded-xl transition-colors ${isSidebarOpen ? "gap-3 px-3.5" : "justify-center px-0"} ${isActive ? "bg-app-hover text-app-text-bright" : "text-app-text/62 hover:bg-app-hover/55 hover:text-app-text-bright"}`}
+              className={({ isActive }) => `app-nav-item relative flex min-h-12 items-center transition-colors ${isSidebarOpen ? "gap-3 px-3.5" : "justify-center px-0"} ${isActive ? "bg-white/[0.055] text-[#e5c477]" : "text-white/52 hover:bg-white/[0.035] hover:text-white"}`}
               title={!isSidebarOpen ? t(item.labelKey) : undefined}
             >
               {({ isActive }) => (
                 <>
-                  <item.icon className={`h-[19px] w-[19px] shrink-0 ${isActive ? "text-app-accent1" : ""}`} strokeWidth={1.6} />
+                  <item.icon className="h-[19px] w-[19px] shrink-0" strokeWidth={isActive ? 1.9 : 1.45} />
                   {isSidebarOpen && <span className="truncate text-[13px] font-medium">{t(item.labelKey)}</span>}
                 </>
               )}
@@ -88,26 +93,42 @@ export default function Layout() {
           ))}
         </nav>
 
-        <div className="border-t border-app-border p-3">
-          <NavLink to="/settings" aria-label="Buka pengaturan profil" className={`mb-1 flex min-h-11 items-center rounded-xl text-app-text/70 hover:bg-app-hover hover:text-app-text-bright ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-app-accent1/12 text-xs font-semibold text-app-accent1">
+        <div className="border-t border-white/10 p-3">
+          <NavLink to="/settings" aria-label="Buka pengaturan profil" className={`mb-1 flex min-h-11 items-center text-white/68 hover:bg-white/[0.04] hover:text-white ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#d7b669]/50 bg-[#d7b669]/10 text-xs font-semibold text-[#e5c477]">
               {user?.photoURL ? <img src={user.photoURL} alt="" className="h-full w-full object-cover" /> : firstName[0]}
             </div>
             {isSidebarOpen && <span className="min-w-0 flex-1 truncate text-sm font-medium">{firstName}</span>}
           </NavLink>
-          <button type="button" onClick={() => signOut(auth)} aria-label={t("nav.logout")} className={`flex min-h-11 w-full items-center rounded-xl text-app-text/55 hover:bg-app-danger/10 hover:text-app-danger ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
+          <button type="button" onClick={() => signOut(auth)} aria-label={t("nav.logout")} className={`flex min-h-11 w-full items-center text-white/52 hover:bg-red-500/10 hover:text-red-300 ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
             <LogOut className="h-[18px] w-[18px]" strokeWidth={1.6} />
             {isSidebarOpen && <span className="text-[13px] font-medium">{t("nav.logout")}</span>}
           </button>
-          <button type="button" onClick={() => setSidebarOpen((value) => !value)} className={`mt-2 flex min-h-9 w-full items-center rounded-xl text-app-text/45 hover:bg-app-hover hover:text-app-text ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`} aria-label={isSidebarOpen ? t("nav.collapse") : "Buka menu"}>
+          <button type="button" onClick={() => setSidebarOpen((value) => !value)} className={`mt-2 flex min-h-9 w-full items-center text-white/52 hover:bg-white/[0.04] hover:text-white/75 ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`} aria-label={isSidebarOpen ? t("nav.collapse") : "Buka menu"}>
             {isSidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             {isSidebarOpen && <span className="text-xs">{t("nav.collapse")}</span>}
           </button>
         </div>
       </aside>
 
-      <main id="main-content" className="relative flex min-w-0 max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto bg-app-bg pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
-        <motion.div key={location.pathname} initial={reduceMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduceMotion ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }} className="flex min-h-full w-full flex-1 flex-col">
+      <main id="main-content" className="relative flex min-w-0 max-w-full flex-1 flex-col overflow-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
+        <header className="app-command-bar hidden h-[78px] shrink-0 items-center justify-between px-7 md:flex">
+          <div className="min-w-0">
+            <p className="font-ledger truncate text-[20px] text-[#e2bd68]">{t(currentItem.labelKey)}</p>
+            <p className="mt-0.5 truncate text-[11px] text-white/52">Ruang kerja finansial pribadi</p>
+          </div>
+          <div className="flex items-center divide-x divide-white/10 text-xs text-white/58">
+            <time className="px-5 tabular-nums">{todayLabel}</time>
+            <span className="flex items-center gap-2 px-5"><span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" /> Sinkron</span>
+            <NavLink to="/settings" className="ml-5 flex items-center gap-2.5 text-white/76 hover:text-white" aria-label="Buka profil">
+              <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[#d7b669] text-xs font-semibold text-[#11120f]">
+                {user?.photoURL ? <img src={user.photoURL} alt="" className="h-full w-full object-cover" /> : firstName[0]}
+              </span>
+              <span className="max-w-28 truncate">{firstName}</span>
+            </NavLink>
+          </div>
+        </header>
+        <motion.div key={location.pathname} initial={reduceMotion ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduceMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }} className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
           <Outlet />
         </motion.div>
         {(isGlobalAddModalOpen || isGlobalGrabModalOpen) && (
@@ -129,15 +150,15 @@ export default function Layout() {
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 divide-y divide-black/10 border-y border-black/10">
                 {[
                   { id: "transaction" as const, label: t("common.add"), detail: t("nav.transactions"), icon: ArrowLeftRight },
                   { id: "grab" as const, label: t("nav.grab"), detail: "Catat penghasilan", icon: Car },
                   { id: "scan" as const, label: t("nav.analyze"), detail: "Baca struk", icon: Scan },
                   { id: "attendance" as const, label: t("nav.attendance"), detail: "Catat jam kerja", icon: CalendarCheck },
                 ].map((action) => (
-                  <button type="button" key={action.id} onClick={() => openAction(action.id)} className="flex min-h-[76px] items-center gap-3 rounded-2xl border border-app-border bg-app-bg/50 p-3 text-left hover:border-app-accent1/40 hover:bg-app-hover">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-app-accent1/12 text-app-accent1"><action.icon className="h-5 w-5" strokeWidth={1.7} /></span>
+                  <button type="button" key={action.id} onClick={() => openAction(action.id)} className="flex min-h-[68px] items-center gap-3 px-1 text-left text-[#161713] hover:bg-black/[0.035]">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#9b7429]"><action.icon className="h-5 w-5" strokeWidth={1.7} /></span>
                     <span className="min-w-0"><span className="block truncate text-sm font-semibold text-app-text-bright">{action.label}</span><span className="block truncate text-[11px] text-app-text/55">{action.detail}</span></span>
                   </button>
                 ))}
@@ -148,9 +169,9 @@ export default function Layout() {
       </AnimatePresence>
 
       <div className="fixed inset-x-0 bottom-0 z-40 md:hidden">
-        <nav className="relative grid h-[68px] grid-cols-5 items-center border-t border-app-border bg-app-card px-1 pb-[env(safe-area-inset-bottom)]" aria-label="Navigasi mobile">
+        <nav className="app-mobile-dock relative grid h-[72px] grid-cols-5 items-center px-1 pb-[env(safe-area-inset-bottom)]" aria-label="Navigasi mobile">
           {mobileNavItems.slice(0, 2).map((item) => <MobileNavItem key={item.path} item={item} label={t(item.labelKey)} />)}
-          <button type="button" onClick={() => setActionSheetOpen((value) => !value)} className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-app-accent1 text-app-bg" aria-label="Tambah" aria-expanded={isActionSheetOpen}>
+          <button type="button" onClick={() => setActionSheetOpen((value) => !value)} className="mx-auto flex h-12 w-12 items-center justify-center rounded-[14px] bg-[#d7b669] text-[#11120f]" aria-label="Tambah" aria-expanded={isActionSheetOpen}>
             <Plus className={`h-6 w-6 transition-transform duration-300 ${isActionSheetOpen ? "rotate-45" : ""}`} strokeWidth={2.2} />
           </button>
           {mobileNavItems.slice(2, 4).map((item) => <MobileNavItem key={item.path} item={item} label={t(item.labelKey)} />)}
@@ -162,8 +183,8 @@ export default function Layout() {
 
 function MobileNavItem({ item, label }: { item: (typeof NAV_ITEMS)[number]; label: string }) {
   return (
-    <NavLink to={item.path} end={item.path === "/"} aria-label={label} className={({ isActive }) => `relative flex h-full min-w-0 flex-col items-center justify-center gap-1 px-0.5 text-[11px] transition-colors ${isActive ? "text-app-accent1" : "text-app-text/58"}`}>
-      {({ isActive }) => <><item.icon className="h-5 w-5" strokeWidth={isActive ? 2 : 1.55} /><span className="max-w-full truncate">{label}</span>{isActive && <span className="absolute bottom-0 h-0.5 w-6 rounded-full bg-app-accent1" />}</>}
+    <NavLink to={item.path} end={item.path === "/"} aria-label={label} className={({ isActive }) => `relative flex h-full min-w-0 flex-col items-center justify-center gap-1 px-0.5 text-[10px] transition-colors ${isActive ? "text-[#e5c477]" : "text-white/48"}`}>
+      {({ isActive }) => <><item.icon className="h-5 w-5" strokeWidth={isActive ? 2 : 1.45} /><span className="max-w-full truncate">{label}</span></>}
     </NavLink>
   );
 }

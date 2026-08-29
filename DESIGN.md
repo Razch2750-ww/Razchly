@@ -1,82 +1,71 @@
 # Razchly Design System
 
-## 1. Design Philosophy
-Razchly uses a premium utilitarian fintech language named **Kinpaku Slate**. The interface is optimized for frequent financial tasks: numbers lead, controls stay quiet, and hierarchy comes from typography, spacing, and fine dividers rather than stacked decorative cards. The visual world is charcoal with one muted-gold brand accent.
+## Obsidian Ledger
 
-The application is an **Operate** surface. Motion is reserved for route hierarchy, sheets, and direct interaction feedback. Marketing-style scroll effects do not belong inside the authenticated product.
+Razchly uses **Obsidian Ledger**, a two-material visual system inspired by a bound financial statement: an obsidian command frame surrounds a warm paper workspace. This is an **Operate** product. The interface is designed for fast financial decisions, dense scanning, and repeated daily use—not for marketing-page spectacle.
 
----
+The redesign is intentionally independent of a user's saved legacy theme for its core composition. Theme choices may still color supporting routes and charts; the product frame, primary statement, transaction ledger, and entry sheet retain Razchly's signature identity so the interface never falls back to a generic dashboard.
 
-## 2. Visual Palette (Design Tokens)
+## Materials and tokens
 
-### Theme Ground
-- **Page Background:** `#0D0E0C` (Charcoal)
-- **Card/Surface Background:** derived by mixing the canvas with 6% white
-- **Hover Surface:** derived by mixing the canvas with 10% white
-- **Border Stroke:** derived by mixing the canvas with 12% white
+| Role | Token | Value |
+|---|---|---|
+| Command frame | `--ledger-frame` | `#10120F` |
+| Raised frame | `--ledger-frame-soft` | `#171915` |
+| Statement paper | `--ledger-paper` | `#F3EEE3` |
+| Raised paper | `--ledger-paper-raised` | `#F8F4EA` |
+| Ink | `--ledger-ink` | `#161713` |
+| Gold action | `--ledger-gold` | `#D7B669` |
+| Positive data | `--success-color` | `#287658` |
+| Negative data | `--danger-color` | `#B1433E` |
 
-### Accent Anchors
-- **Primary Accent (Kinpaku Gold):** `#C7A55B`
-- **Accent Highlight:** `#E1CE9C`
-- **Success Green:** `#10b981` (Emerald)
-- **Destructive Red:** `#ef4444` (Coral Red)
+Gold identifies brand, current navigation, and the most important action. Green and red only communicate financial meaning. There are no gradients, neon halos, or decorative glass surfaces.
 
-### Typography Colors
-- **Headings & Bold Text:** `#f1f5f9` (Champagne Near-White)
-- **Body Text:** `#cbd5e1` (Warm Grey)
-- **Muted Text / Metadata:** `#64748b` (Slate Muted)
+## Typography
 
----
+- **Statement/display:** DM Serif Display. Used for route titles, balances, and statement numerals.
+- **Interface/body:** Outfit. Used for navigation, labels, controls, and long-form UI copy.
+- **Tabular data:** JetBrains Mono. Used in dense ledgers, compact amounts, timestamps, and chart axes.
+- Display tracking never passes `-0.04em`; body text remains comfortably readable and no operational label is smaller than 11px.
 
-## 3. Typography & Spacing
-- **Font Stack:**
-  - **Headings:** Outfit / Avenir Next / system sans-serif.
-  - **Body:** Outfit / Avenir Next / system sans-serif.
-  - **Monospace (for numbers & tickers):** JetBrains Mono, Fira Code, monospace.
-- **Base Spacing Scale:** 4px grid (4px, 8px, 12px, 16px, 24px, 32px, 48px).
-- **Border Radius:** `12px` controls, `14px` surfaces, `18px` mobile sheets. Pills are reserved for compact semantic indicators.
+## Composition
 
----
+### Global shell
 
-## 4. UI Elements & Components Guidelines
+- Desktop uses an L-frame: an 82px collapsed command rail plus a 78px status bar. Expansion is optional and does not change route behavior.
+- Mobile uses a dark bottom dock with four destinations and a centered add control aligned inside the bar.
+- Profile, date, sync state, route identity, and navigation live in the frame instead of being repeated as dashboard cards.
 
-### Dashboard Surfaces
-- Use open layout and dividers first. Add a bordered surface only when it groups a real task or dataset.
-- Never nest cards inside cards for decoration.
-- Desktop summary uses a gapless 12-column ledger: `3 + 5 + 4`.
-- Hover states use color and border shifts only—no generic lift, tilt, spotlight, or glow.
+### Dashboard
 
-### Data Tables
-- Clean borders without heavy vertical lines.
-- Sticky headers and monospace formatting for numerical columns to ease scanning.
+- The desktop first viewport is an asymmetric `8 + 4` statement.
+- The 8-column paper surface combines net worth, account rows, cashflow, and monthly totals as one document.
+- The 4-column dark ledger holds liquidity, monthly spending, savings progress, and the primary add action.
+- Supporting charts and accounts use shared ruled planes rather than a grid of independent rounded cards.
+- Mobile begins with a paper balance statement, followed by a dark rhythm block and ruled transaction rows.
 
-### Interactive Charts
-- Recharts use flat strokes without decorative gradient fills.
-- Green and red are semantic data colors only. Gold remains the brand/action color.
+### Transactions
 
-### Navigation
-- Desktop uses a collapsible left rail with one active gold marker.
-- Mobile uses four persistent destinations plus a centered add control aligned within the bar.
-- The add control opens a native-feeling bottom action sheet. It never expands into floating radial buttons.
+- The transaction ledger is the dominant workspace.
+- Order is header → integrated period/filter band → monthly statement → ledger → deeper analysis.
+- Entry uses a native bottom sheet on mobile. Nominal is the dominant first field; account, category, note, and time follow.
+- Export and AI strategy remain available but do not compete with transaction entry.
 
----
+## Shape, depth, and motion
 
-## 5. Motion & Micro-Animations
-- Powered by **Motion** (Framer Motion).
-- **Page Transitions:** 10px fade-up using an exponential ease-out.
-- **Controls:** state changes use color and opacity; no generic motion is attached to every control.
-- **Sheets:** Rise from the bottom and retain clear spatial continuity.
-- **Accessibility:** all motion collapses under `prefers-reduced-motion`; focus rings remain visible; touch targets are at least 44px.
+- Structural radii are 12–16px. Ledger rows and data planes generally use square edges and hairline rules.
+- Depth is reserved for a raised paper sheet over the dark frame. No card combines a border with a generic floating shadow.
+- The authored moment is the financial statement reveal. Route changes use one short ease-out; controls use color and opacity.
+- `prefers-reduced-motion` disables reveals and transitions without hiding content.
 
-## Responsive Commitments
+## Accessibility and responsive floor
 
-- Desktop reference width: 1440-1680px.
-- Mobile reference width: 360-430px.
-- Multi-column dashboard layouts collapse to one column below 768px.
-- Financial values use tabular numerals and must never be truncated without an accessible full value.
-- Heavy feature routes and export libraries load on demand; the loading shell mirrors the `3 + 5 + 4` ledger.
+- Touch targets are at least 44px.
+- Keyboard focus uses a visible gold-derived ring with offset.
+- Body and placeholder contrast target WCAG AA; red and green are never the only identifier in controls.
+- Financial values use tabular numerals and wrap instead of truncating.
+- Desktop reference: 1440–1680px. Mobile reference: 360–430px. The layout becomes a single-column, thumb-first workflow below 768px.
 
-## Anti-patterns
+## Refusals
 
-- No gradient text, neon glow, purple-blue AI gradients, oversized pills, decorative badges, floating radial menus, generic three-card rows, or motion without task meaning.
-- No route, field name, business logic, or Firebase data shape changes as part of visual redesign work.
+No gradient text, glow, nested cards, icon-card repetition, decorative badges, radial FAB menus, marketing scroll hijacks, invented financial claims, placeholder controls, or visual changes to Firebase data shapes and route behavior.

@@ -22,7 +22,7 @@ interface PageShellProps {
 
 export function PageShell({ title, subtitle, actions, mobileActions, children, className = "" }: PageShellProps) {
   return (
-    <div className={`flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text ${className}`}>
+    <div className={`app-page-shell flex h-full w-full flex-1 flex-col overflow-y-auto p-4 pb-32 text-app-text md:p-7 md:pb-8 ${className}`}>
       <PageHeader title={title} subtitle={subtitle} actions={actions} mobileActions={mobileActions} />
       {children}
     </div>
@@ -42,7 +42,7 @@ export function PageHeader({ title, subtitle, actions, mobileActions }: PageHead
   return (
     <header className="flex items-start justify-between mb-6 md:mb-8 gap-4">
       <div className="min-w-0 flex-1">
-        <h1 className="text-2xl md:text-[1.75rem] font-semibold text-app-text-bright tracking-tight leading-tight">
+        <h1 className="page-display-title text-2xl font-normal leading-tight text-app-text-bright md:text-[2.35rem]">
           {title}
         </h1>
         {subtitle && <p className="text-app-text/60 text-sm mt-1">{subtitle}</p>}

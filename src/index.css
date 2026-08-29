@@ -5,6 +5,7 @@
 @theme {
   --font-sans: "Outfit", "Avenir Next", "SF Pro Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-ledger: "DM Serif Display", "Iowan Old Style", Georgia, serif;
 
   --color-app-bg: var(--bg-color);
   --color-app-card: var(--card-bg);
@@ -106,6 +107,13 @@
   :root {
     font-synthesis: none;
     text-rendering: optimizeLegibility;
+    --ledger-frame: #10120f;
+    --ledger-frame-soft: #171915;
+    --ledger-paper: #f3eee3;
+    --ledger-paper-raised: #f8f4ea;
+    --ledger-ink: #161713;
+    --ledger-rule: rgba(22, 23, 19, 0.18);
+    --ledger-gold: #d7b669;
   }
 
   html {
@@ -189,15 +197,36 @@
 
 @layer components {
   .app-shell-rail {
-    background: color-mix(in srgb, var(--bg-color) 97%, white);
-    border-color: var(--border-color);
+    background: var(--ledger-frame);
+    border-right: 1px solid rgba(255,255,255,.1);
+    color: white;
+  }
+
+  .app-command-bar {
+    background: var(--ledger-frame);
+    border-bottom: 1px solid rgba(255,255,255,.1);
+    color: white;
+  }
+
+  .app-mobile-dock {
+    background: color-mix(in srgb, var(--ledger-frame) 96%, transparent);
+    border-top: 1px solid rgba(255,255,255,.12);
+    color: white;
   }
 
   .app-action-sheet {
-    background: color-mix(in srgb, var(--card-bg) 98%, transparent);
-    border: 1px solid var(--border-color);
+    --bg-color: var(--ledger-paper);
+    --card-bg: var(--ledger-paper-raised);
+    --border-color: var(--ledger-rule);
+    --hover-bg: rgba(22,23,19,.05);
+    --text-color: #3f403a;
+    --text-bright: var(--ledger-ink);
+    --accent1-color: #8c6826;
+    background: var(--ledger-paper);
+    border: 1px solid var(--ledger-rule);
     border-bottom: 0;
     border-radius: 18px 18px 0 0;
+    color: var(--ledger-ink);
   }
 
   .app-nav-item::before {
@@ -220,7 +249,366 @@
   }
 }
 
+/* Obsidian Ledger — signature shell and financial surfaces. */
+.razchly-shell {
+  background: var(--ledger-frame);
+  color: rgba(255,255,255,.72);
+}
+
+.page-display-title,
+.font-ledger {
+  font-family: var(--font-ledger);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+.app-page-shell {
+  max-width: 1600px;
+  margin-inline: auto;
+  background: var(--bg-color);
+}
+
+.dashboard-ledger,
+.transaction-workspace {
+  --bg-color: var(--ledger-paper);
+  --card-bg: var(--ledger-paper-raised);
+  --border-color: var(--ledger-rule);
+  --hover-bg: rgba(22,23,19,.05);
+  --text-color: #3f403a;
+  --text-bright: var(--ledger-ink);
+  --accent1-color: #8c6826;
+  --success-color: #287658;
+  --danger-color: #b1433e;
+  background: var(--ledger-paper);
+  color: var(--ledger-ink);
+}
+
+.dashboard-toolbar,
+.transaction-header {
+  border-color: var(--ledger-rule);
+  background: var(--ledger-paper);
+}
+
+.dashboard-statement {
+  border: 1px solid rgba(22,23,19,.24);
+  background: var(--ledger-paper);
+}
+
+.statement-sheet {
+  background: var(--ledger-paper-raised);
+  color: var(--ledger-ink);
+}
+
+.statement-side {
+  background: var(--ledger-frame-soft);
+  border-left: 1px solid rgba(22,23,19,.45);
+  color: rgba(255,255,255,.68);
+}
+
+.statement-side-row {
+  padding: 1.4rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+
+.statement-side-row h3 {
+  color: rgba(255,255,255,.72);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.statement-side-row a,
+.statement-side-row button {
+  color: var(--ledger-gold);
+  font-size: .68rem;
+  font-weight: 600;
+}
+
+.statement-side-row > span {
+  display: block;
+  margin-top: .45rem;
+  color: rgba(255,255,255,.55);
+  font-size: .72rem;
+}
+
+.statement-side-row small {
+  color: rgba(255,255,255,.48);
+  font-family: "Outfit", sans-serif;
+  font-size: .7rem;
+}
+
+.statement-add {
+  margin: 1.25rem 1.5rem 1.5rem;
+}
+
+.dashboard-workbench,
+.dashboard-analytics {
+  gap: 0;
+  border-block: 1px solid var(--ledger-rule);
+}
+
+.dashboard-wallet-panel,
+.dashboard-cashflow-panel,
+.dashboard-analytics > div,
+.dashboard-recent {
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.dashboard-cashflow-panel,
+.dashboard-analytics > div + div {
+  border-left: 1px solid var(--ledger-rule);
+}
+
+.dashboard-wallet-panel button.rounded-xl,
+.dashboard-recent [class*="rounded-2xl"],
+.dashboard-analytics [class*="rounded-xl"] {
+  border-radius: 6px !important;
+}
+
+.transaction-desktop > .transaction-header { order: 1; }
+.transaction-desktop > .transaction-filter-block { order: 2; }
+.transaction-desktop > .transaction-statement-block { order: 3; }
+.transaction-desktop > .transaction-ledger-block { order: 4; }
+.transaction-desktop > .transaction-charts-block { order: 5; }
+.transaction-desktop > .transaction-secondary-block { order: 6; }
+
+.transaction-header h1 {
+  font-family: var(--font-ledger);
+  font-size: clamp(2.7rem, 4vw, 4.2rem);
+  font-weight: 400;
+  line-height: .95;
+  letter-spacing: -.03em;
+}
+
+.transaction-filter-block > div {
+  margin: 0 1.75rem;
+  padding: 1.15rem 0;
+  border: 0;
+  border-block: 1px solid var(--ledger-rule);
+  border-radius: 0;
+  background: transparent;
+}
+
+.transaction-statement-block > div {
+  gap: 0;
+  margin: 0 1.75rem;
+  border-bottom: 1px solid var(--ledger-rule);
+}
+
+.transaction-statement-block > div > div {
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.transaction-statement-block > div > div + div {
+  border-left: 1px solid var(--ledger-rule);
+}
+
+.transaction-statement-block h2 {
+  font-family: var(--font-ledger);
+  font-size: clamp(2.6rem, 4vw, 4.6rem);
+  font-weight: 400;
+  letter-spacing: -.03em;
+}
+
+.transaction-ledger-block,
+.transaction-charts-block,
+.transaction-secondary-block {
+  margin: 1.75rem;
+}
+
+.transaction-ledger-surface {
+  border-radius: 0;
+  background: transparent !important;
+}
+
+.ledger-date-row {
+  border-inline: 0;
+  border-radius: 0;
+}
+
+.ledger-entry-row {
+  border-radius: 0;
+}
+
+.transaction-charts-block > div,
+.transaction-secondary-block > div {
+  gap: 0;
+}
+
+.transaction-charts-block > div > div,
+.transaction-secondary-block [class*="rounded-2xl"] {
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.transaction-charts-block > div > div + div {
+  border-left: 1px solid var(--ledger-rule);
+}
+
+.transaction-sheet {
+  --bg-color: var(--ledger-paper);
+  --card-bg: var(--ledger-paper-raised);
+  --border-color: var(--ledger-rule);
+  --hover-bg: rgba(22,23,19,.05);
+  --text-color: #3f403a;
+  --text-bright: var(--ledger-ink);
+  --accent1-color: #8c6826;
+  --success-color: #287658;
+  --danger-color: #b1433e;
+  border-color: var(--ledger-rule);
+  background: var(--ledger-paper-raised);
+  color: var(--ledger-ink);
+}
+
+.transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.transaction-form > * {
+  margin-top: 0 !important;
+}
+
+.transaction-amount-field {
+  order: -1;
+  padding-block: .35rem .85rem;
+  border-bottom: 1px solid var(--ledger-rule);
+}
+
+.transaction-amount-field input[aria-label="Nominal transaksi"] {
+  height: 5rem;
+  padding-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none !important;
+  font-family: var(--font-ledger);
+  font-size: clamp(2.8rem, 10vw, 4.2rem);
+  font-weight: 400;
+  letter-spacing: -.03em;
+}
+
+.login-ledger {
+  background: var(--ledger-frame);
+  color: white;
+}
+
+.login-ledger > section:first-child {
+  background: var(--ledger-frame);
+}
+
+.login-ledger h1 {
+  font-family: var(--font-ledger);
+}
+
+.login-sheet,
+.login-statement {
+  background: var(--ledger-paper-raised);
+  color: var(--ledger-ink);
+}
+
+.login-statement {
+  border: 1px solid rgba(22,23,19,.24);
+  border-radius: 14px;
+  box-shadow: 0 22px 52px rgba(0,0,0,.28);
+}
+
+.login-sheet {
+  border-left: 1px solid rgba(255,255,255,.12);
+}
+
 @media (max-width: 767px) {
+  .dashboard-ledger,
+  .transaction-workspace {
+    --bg-color: var(--ledger-frame);
+    --card-bg: var(--ledger-frame-soft);
+    --border-color: rgba(255,255,255,.12);
+    --hover-bg: rgba(255,255,255,.06);
+    --text-color: rgba(255,255,255,.68);
+    --text-bright: #f4efe5;
+    --accent1-color: var(--ledger-gold);
+    --success-color: #5fb58c;
+    --danger-color: #e06b64;
+    background: var(--ledger-frame);
+    color: rgba(255,255,255,.7);
+  }
+
+  .mobile-statement {
+    --bg-color: var(--ledger-paper);
+    --card-bg: var(--ledger-paper-raised);
+    --border-color: var(--ledger-rule);
+    --text-color: #3f403a;
+    --text-bright: var(--ledger-ink);
+    --accent1-color: #8c6826;
+    --success-color: #287658;
+    --danger-color: #b1433e;
+    position: relative;
+    background: var(--ledger-paper-raised);
+    color: var(--ledger-ink);
+    box-shadow: 0 18px 40px rgba(0,0,0,.24);
+  }
+
+  .mobile-statement::after {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(155,116,41,.22);
+    border-radius: 11px;
+    pointer-events: none;
+  }
+
+  .mobile-position {
+    border: 1px solid rgba(215,182,105,.48);
+    background: var(--ledger-frame-soft);
+  }
+
+  .mobile-wallets,
+  .mobile-recent {
+    color: rgba(255,255,255,.72);
+  }
+
+  .dashboard-analytics {
+    border-color: rgba(255,255,255,.12);
+  }
+
+  .dashboard-analytics > div {
+    border-color: rgba(255,255,255,.12) !important;
+    background: transparent !important;
+  }
+
+  .mobile-recent button {
+    border-radius: 0 !important;
+    border-inline: 0 !important;
+    background: transparent !important;
+  }
+
+  .transaction-mobile > div:first-child h1 {
+    font-family: var(--font-ledger);
+    font-size: 2rem;
+    font-weight: 400;
+  }
+
+  .transaction-mobile details,
+  .transaction-mobile section > div[class*="border-y"] {
+    border-color: rgba(255,255,255,.12);
+  }
+
+  .transaction-sheet {
+    max-height: 82vh;
+  }
+
+  .login-ledger {
+    background: var(--ledger-paper-raised);
+  }
+
+  .login-sheet {
+    border-left: 0;
+  }
+
   .bg-app-card {
     border-radius: 14px;
   }
