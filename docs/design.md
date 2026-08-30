@@ -15,16 +15,31 @@ These are the default `Kinpaku Slate` values. The existing theme picker may reco
 | Role | Token | Value |
 |---|---|---|
 | Command frame | `--ledger-frame` | `#10120F` |
-| Raised frame | `--ledger-frame-soft` | `#171915` |
+| Raised frame | `--ledger-frame-soft` | Derived from frame and frame text |
 | Statement paper | `--ledger-paper` | `#F3EEE3` |
 | Raised paper | `--ledger-paper-raised` | `#F8F4EA` |
 | Ink | `--ledger-ink` | `#161713` |
-| Rule | `--ledger-rule` | `rgba(22, 23, 19, 0.18)` |
-| Antique gold | `--ledger-gold` | `#D7B669` |
-| Positive | `--success-color` | `#287658` |
-| Negative | `--danger-color` | `#B1433E` |
+| Rule | `--ledger-rule` | `#B8B2A4` |
+| Paper action | `--ledger-gold` | `#765519` |
+| Frame action | `--ledger-accent-frame` | `#D7B669` |
+| Positive | `--success-paper` | `#21654C` |
+| Negative | `--danger-paper` | `#9D3F3C` |
 
 Gold is the single brand accent. Green and red are semantic data colors only. Do not add gradients, neon, or unrelated accent colors.
+
+## Theme architecture
+
+Every preset maps the same semantic roles instead of supplying unrelated accent swatches:
+
+- canvas, raised surface, primary text, secondary text, and rule;
+- command frame, frame text, and a contrast-safe frame accent;
+- paper accent plus its explicit foreground color;
+- success, danger, and warning variants for paper and frame contexts;
+- four chart colors that remain secondary to the active action color.
+
+`ThemeApplicator` publishes these roles to both the legacy `--app-*` compatibility tokens and the Obsidian Ledger tokens. Route CSS must consume semantic variables and must not special-case a theme ID. The existing 30 IDs remain stable so saved user preferences continue to load.
+
+Light themes still use a dark command frame. Dark and AMOLED themes compose their own canvas and elevations instead of mechanically inverting a light palette. Kinpaku Slate remains the default two-material theme: warm statement paper inside a charcoal frame.
 
 ## Typography
 

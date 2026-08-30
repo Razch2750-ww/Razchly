@@ -43,17 +43,17 @@ export default function Login() {
   return (
     <main className="route-login login-ledger relative grid min-h-[100dvh] overflow-hidden lg:grid-cols-[1.16fr_0.84fr]">
       <section className="relative hidden min-h-[100dvh] flex-col justify-between px-12 py-10 lg:flex xl:px-16 xl:py-12">
-        <div className="flex items-center justify-between border-b border-white/10 pb-6">
-          <span className="font-ledger text-[28px] text-[#d7b669]">Razchly</span>
-          <span className="text-xs text-white/52">Personal finance ledger</span>
+        <div className="flex items-center justify-between border-b border-app-border pb-6">
+          <span className="font-ledger text-[28px] text-app-accent1">Razchly</span>
+          <span className="text-xs text-app-text">Personal finance ledger</span>
         </div>
 
         <div className="grid grid-cols-[1.1fr_.9fr] items-end gap-10 py-10 xl:gap-16">
           <div>
-          <h1 className="max-w-[620px] text-balance text-[clamp(3.4rem,5.4vw,6rem)] font-normal leading-[0.91] tracking-[-0.035em] text-white">
+          <h1 className="max-w-[620px] text-balance text-[clamp(3.4rem,5.4vw,6rem)] font-normal leading-[0.91] tracking-[-0.035em] text-app-text-bright">
             Keputusan uang dimulai dari angka yang jernih.
           </h1>
-          <p className="mt-7 max-w-[50ch] text-sm leading-7 text-white/55">{t('login.subtitle')}</p>
+          <p className="mt-7 max-w-[50ch] text-sm leading-7 text-app-text">{t('login.subtitle')}</p>
           </div>
 
           <motion.div
@@ -62,22 +62,22 @@ export default function Login() {
             transition={{ duration: reduceMotion ? 0 : 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="login-statement p-6"
           >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-black/55">Ritme bulan ini</p>
-            <p className="font-ledger mt-3 text-[34px] leading-none text-black">+Rp 4.820.000</p>
-            <dl className="mt-6 divide-y divide-black/15 border-y border-black/20 text-xs">
-              <div className="flex justify-between py-3"><dt className="text-black/55">Pemasukan</dt><dd className="font-mono font-semibold text-[#236b50]">Rp 12.500.000</dd></div>
-              <div className="flex justify-between py-3"><dt className="text-black/55">Pengeluaran</dt><dd className="font-mono font-semibold text-[#a63b37]">Rp 7.680.000</dd></div>
-              <div className="flex justify-between py-3"><dt className="text-black/55">Target</dt><dd className="font-mono font-semibold text-black">68% tercapai</dd></div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-app-text">Ritme bulan ini</p>
+            <p className="font-ledger mt-3 text-[34px] leading-none text-app-text-bright">+Rp 4.820.000</p>
+            <dl className="mt-6 divide-y divide-app-border border-y border-app-border text-xs">
+              <div className="flex justify-between py-3"><dt className="text-app-text">Pemasukan</dt><dd className="font-mono font-semibold text-app-success">Rp 12.500.000</dd></div>
+              <div className="flex justify-between py-3"><dt className="text-app-text">Pengeluaran</dt><dd className="font-mono font-semibold text-app-danger">Rp 7.680.000</dd></div>
+              <div className="flex justify-between py-3"><dt className="text-app-text">Target</dt><dd className="font-mono font-semibold text-app-text-bright">68% tercapai</dd></div>
             </dl>
-            <p className="mt-4 text-[11px] leading-5 text-black/60">Contoh tampilan. Data aktual hanya muncul setelah Anda masuk.</p>
+            <p className="mt-4 text-[11px] leading-5 text-app-text">Contoh tampilan. Data aktual hanya muncul setelah Anda masuk.</p>
           </motion.div>
         </div>
 
-        <div className="grid max-w-[900px] grid-cols-3 divide-x divide-white/10 border-t border-white/10 pt-6">
+        <div className="grid max-w-[900px] grid-cols-3 divide-x divide-app-border border-t border-app-border pt-6">
           {capabilities.map((item) => (
             <div key={item.text} className="space-y-3 px-5 first:pl-0 last:pr-0">
-              <item.icon className="h-5 w-5 text-[#d7b669]" strokeWidth={1.45} />
-              <p className="text-xs leading-5 text-white/52">{item.text}</p>
+              <item.icon className="h-5 w-5 text-app-accent1" strokeWidth={1.45} />
+              <p className="text-xs leading-5 text-app-text">{item.text}</p>
             </div>
           ))}
         </div>
@@ -85,27 +85,27 @@ export default function Login() {
 
       <section className="login-sheet flex min-h-[100dvh] items-center justify-center px-5 py-10 sm:px-10 lg:px-14">
         <div className="w-full max-w-[420px]">
-          <div className="mb-14 flex items-center justify-between border-b border-black/15 pb-5 lg:hidden">
-            <span className="font-ledger text-[28px] text-[#8c6826]">Razchly</span>
-            <span className="text-[11px] text-black/60">Keuangan pribadi</span>
+          <div className="mb-14 flex items-center justify-between border-b border-app-border pb-5 lg:hidden">
+            <span className="font-ledger text-[28px] text-app-accent1">Razchly</span>
+            <span className="text-[11px] text-app-text">Keuangan pribadi</span>
           </div>
 
-          <h2 className="font-ledger max-w-[12ch] text-[clamp(2.5rem,8vw,4rem)] leading-[0.98] tracking-[-0.025em] text-black">Masuk ke ledger Anda.</h2>
-          <p className="mt-5 max-w-[38ch] text-sm leading-6 text-black/55">Gunakan Google untuk sinkronisasi lintas perangkat, atau masuk sebagai tamu untuk mencoba.</p>
+          <h2 className="font-ledger max-w-[12ch] text-[clamp(2.5rem,8vw,4rem)] leading-[0.98] tracking-[-0.025em] text-app-text-bright">Masuk ke ledger Anda.</h2>
+          <p className="mt-5 max-w-[38ch] text-sm leading-6 text-app-text">Gunakan Google untuk sinkronisasi lintas perangkat, atau masuk sebagai tamu untuk mencoba.</p>
 
           <div className="mt-8 space-y-3">
-            <button type="button" onClick={handleGoogle} disabled={loading} className="group flex h-[52px] w-full items-center justify-between rounded-[12px] bg-[#11120f] px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
+            <button type="button" onClick={handleGoogle} disabled={loading} className="group flex h-[52px] w-full items-center justify-between rounded-[12px] bg-app-accent1 px-4 text-sm font-semibold text-app-on-accent disabled:cursor-not-allowed disabled:opacity-50">
               <span className="flex items-center gap-2.5">{loading && <Loader2 className="h-4 w-4 animate-spin" />} {t('login.googleBtn')}</span>
               {!loading && <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />}
             </button>
-            <button type="button" onClick={handleAnon} disabled={loading} className="flex h-[52px] w-full items-center justify-center rounded-[12px] border border-black/20 bg-transparent text-sm font-medium text-black hover:bg-black/[0.04] disabled:cursor-not-allowed disabled:opacity-50">
+            <button type="button" onClick={handleAnon} disabled={loading} className="flex h-[52px] w-full items-center justify-center rounded-[12px] border border-app-border bg-transparent text-sm font-medium text-app-text-bright hover:bg-app-hover disabled:cursor-not-allowed disabled:opacity-50">
               {t('login.guestBtn')}
             </button>
           </div>
 
-          {error && <div role="alert" className="mt-5 w-full rounded-xl border border-red-800/25 bg-red-700/10 p-3 text-left text-xs leading-relaxed text-red-800">{error}</div>}
+          {error && <div role="alert" className="mt-5 w-full rounded-xl border border-app-danger/30 bg-app-danger/10 p-3 text-left text-xs leading-relaxed text-app-danger">{error}</div>}
 
-          <p className="mt-7 border-t border-black/15 pt-5 text-xs leading-5 text-black/60">Data tamu tersimpan pada sesi perangkat ini. Masuk dengan Google untuk menggunakan akun Anda kembali di perangkat lain.</p>
+          <p className="mt-7 border-t border-app-border pt-5 text-xs leading-5 text-app-text">Data tamu tersimpan pada sesi perangkat ini. Masuk dengan Google untuk menggunakan akun Anda kembali di perangkat lain.</p>
         </div>
       </section>
     </main>

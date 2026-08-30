@@ -175,11 +175,11 @@ export default function Dashboard() {
       "var(--color-app-danger)",
       "var(--color-app-accent1)",
       "var(--color-app-success)",
-      "#F59E0B",
-      "#8B5CF6",
-      "#EC4899",
-      "#3B82F6",
-      "#10B981"
+      "var(--chart-1)",
+      "var(--chart-2)",
+      "var(--chart-3)",
+      "var(--chart-4)",
+      "var(--warning-color)"
     ];
     let colorIdx = 0;
     expenseTransactions.forEach(t => {
@@ -543,14 +543,14 @@ export default function Dashboard() {
       {/* MOBILE HEADER */}
       <header className="mobile-ledger-header flex items-center justify-between px-5 pb-5 pt-6 md:hidden">
         <div>
-          <p className="font-ledger text-[28px] leading-none text-[#d7b669]">Razchly</p>
-          <p className="mt-2 text-[11px] text-white/48">{format(new Date(), "EEEE, d MMM yyyy", { locale: localeId })}</p>
+          <p className="font-ledger text-[28px] leading-none text-app-accent1">Razchly</p>
+          <p className="mt-2 text-[11px] text-app-text">{format(new Date(), "EEEE, d MMM yyyy", { locale: localeId })}</p>
         </div>
         <div className="flex items-center gap-3">
           <Link
             to="/settings"
             state={{ expandSection: 'profile' }}
-            className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#d7b669]/50 bg-[#d7b669]/10"
+            className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-app-accent1/50 bg-app-accent1/10"
             aria-label="Buka pengaturan profil"
           >
             {user?.photoURL ? (
@@ -704,41 +704,41 @@ export default function Dashboard() {
               <p className="font-ledger mt-3 break-words text-[clamp(3.2rem,5vw,5.8rem)] leading-[0.92] tracking-[-0.035em]">
                 {formatRp(totalBalance)}
               </p>
-              <p className="mt-4 text-xs text-black/55">
+              <p className="mt-4 text-xs text-app-text">
                 {accounts.length} {t('dashboard.allWallets')} · {format(new Date(), "MMMM yyyy", { locale: currentLocale })}
               </p>
             </div>
             <button
               type="button"
               onClick={toggleHideBalances}
-              className="flex h-11 w-11 items-center justify-center text-black/55 hover:bg-black/[0.04] hover:text-black"
+              className="flex h-11 w-11 items-center justify-center text-app-text hover:bg-app-hover hover:text-app-text-bright"
               aria-label={hideBalances ? (language === 'en' ? "Show balances" : "Tampilkan saldo") : (language === 'en' ? "Hide balances" : "Sembunyikan saldo")}
             >
               {hideBalances ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
 
-          <div className="mt-8 grid grid-cols-2 border-y border-black/20">
+          <div className="mt-8 grid grid-cols-2 border-y border-app-border">
             <div className="py-6 pr-7">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-xs font-semibold uppercase tracking-[0.06em]">Ringkasan rekening</h3>
-                <Link to="/settings" state={{ expandSection: "accounts" }} className="text-xs font-semibold text-[#8c6826] hover:text-black">Kelola</Link>
+                <Link to="/settings" state={{ expandSection: "accounts" }} className="text-xs font-semibold text-app-accent1 hover:text-app-text-bright">Kelola</Link>
               </div>
-              <div className="divide-y divide-black/12 border-t border-black/20">
+              <div className="divide-y divide-app-border border-t border-app-border">
                 {sortedAccounts.slice(0, 4).map((account) => (
-                  <button key={account.id} type="button" onClick={() => { setEditingAccount(account); setIsAccountModalOpen(true); }} className="grid min-h-11 w-full grid-cols-[1fr_auto] items-center gap-4 text-left text-xs hover:bg-black/[0.025]">
-                    <span className="truncate text-black/66">{account.name}</span>
-                    <span className="font-mono font-semibold text-black">{formatRp(account.balance)}</span>
+                  <button key={account.id} type="button" onClick={() => { setEditingAccount(account); setIsAccountModalOpen(true); }} className="grid min-h-11 w-full grid-cols-[1fr_auto] items-center gap-4 text-left text-xs hover:bg-app-hover">
+                    <span className="truncate text-app-text">{account.name}</span>
+                    <span className="font-mono font-semibold text-app-text-bright">{formatRp(account.balance)}</span>
                   </button>
                 ))}
-                {sortedAccounts.length === 0 && <p className="py-8 text-center text-xs text-black/60">Belum ada rekening aktif.</p>}
+                {sortedAccounts.length === 0 && <p className="py-8 text-center text-xs text-app-text">Belum ada rekening aktif.</p>}
               </div>
             </div>
 
-            <div className="border-l border-black/20 py-6 pl-7">
+            <div className="border-l border-app-border py-6 pl-7">
               <div className="mb-4 flex items-center justify-between gap-4">
                 <h3 className="text-xs font-semibold uppercase tracking-[0.06em]">Arus kas</h3>
-                <select value={selectedChartAccount} onChange={(event) => setSelectedChartAccount(event.target.value)} className="h-9 max-w-36 border-0 border-b border-black/25 bg-transparent px-1 text-xs text-black outline-none">
+                <select value={selectedChartAccount} onChange={(event) => setSelectedChartAccount(event.target.value)} className="h-9 max-w-36 border-0 border-b border-app-border bg-transparent px-1 text-xs text-app-text-bright outline-none">
                   <option value="all">Semua rekening</option>
                   {accounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
                 </select>
@@ -746,34 +746,34 @@ export default function Dashboard() {
               <div className="h-[178px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 8, right: 6, left: -28, bottom: 0 }}>
-                    <CartesianGrid vertical={false} stroke="rgba(19,19,15,.14)" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "rgba(19,19,15,.52)" }} minTickGap={30} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "rgba(19,19,15,.52)" }} tickFormatter={(value) => `${Math.round(value / 1000)}k`} />
-                    <Tooltip formatter={(value: number) => hideBalances ? "Rp ••••••" : formatRp(value)} contentStyle={{ background: "#f4efe3", border: "1px solid rgba(19,19,15,.2)", borderRadius: 8, fontSize: 11 }} />
-                    <Line type="monotone" dataKey="income" stroke="#287658" strokeWidth={2} dot={false} />
-                    <Line type="monotone" dataKey="expense" stroke="#b1433e" strokeWidth={2} dot={false} />
+                    <CartesianGrid vertical={false} stroke="var(--ledger-rule)" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "var(--ledger-muted)" }} minTickGap={30} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "var(--ledger-muted)" }} tickFormatter={(value) => `${Math.round(value / 1000)}k`} />
+                    <Tooltip formatter={(value: number) => hideBalances ? "Rp ••••••" : formatRp(value)} contentStyle={{ background: "var(--ledger-paper-raised)", border: "1px solid var(--ledger-rule)", borderRadius: 8, color: "var(--ledger-ink)", fontSize: 11 }} />
+                    <Line type="monotone" dataKey="income" stroke="var(--success-color)" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="expense" stroke="var(--danger-color)" strokeWidth={2} dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </div>
           </div>
 
-          <dl className="grid grid-cols-3 divide-x divide-black/20 border-b border-black/20">
-            <div className="py-5 pr-5"><dt className="text-[11px] text-black/60">Pemasukan</dt><dd className="font-ledger mt-1 text-xl text-[#236b50]">{formatRp(incomeThisMonth)}</dd></div>
-            <div className="px-5 py-5"><dt className="text-[11px] text-black/60">Pengeluaran</dt><dd className="font-ledger mt-1 text-xl text-[#a63b37]">{formatRp(expenseThisMonth)}</dd></div>
-            <div className="py-5 pl-5"><dt className="text-[11px] text-black/60">Surplus</dt><dd className={`font-ledger mt-1 text-xl ${savingsThisMonth >= 0 ? "text-[#8c6826]" : "text-[#a63b37]"}`}>{formatRp(savingsThisMonth, { showSign: true })}</dd></div>
+          <dl className="grid grid-cols-3 divide-x divide-app-border border-b border-app-border">
+            <div className="py-5 pr-5"><dt className="text-[11px] text-app-text">Pemasukan</dt><dd className="font-ledger mt-1 text-xl text-app-success">{formatRp(incomeThisMonth)}</dd></div>
+            <div className="px-5 py-5"><dt className="text-[11px] text-app-text">Pengeluaran</dt><dd className="font-ledger mt-1 text-xl text-app-danger">{formatRp(expenseThisMonth)}</dd></div>
+            <div className="py-5 pl-5"><dt className="text-[11px] text-app-text">Surplus</dt><dd className={`font-ledger mt-1 text-xl ${savingsThisMonth >= 0 ? "text-app-accent1" : "text-app-danger"}`}>{formatRp(savingsThisMonth, { showSign: true })}</dd></div>
           </dl>
         </article>
 
         <aside className="statement-side col-span-4 flex flex-col">
           <div className="statement-side-row">
             <div className="flex items-center justify-between"><h3>Kondisi bulan ini</h3><button type="button" onClick={() => navigate('/transactions')}>Analisis</button></div>
-            <p className={`font-ledger mt-3 text-[30px] ${savingsThisMonth >= 0 ? "text-[#e5c477]" : "text-[#e77971]"}`}>{financialHealthStatus.label}</p>
+            <p className={`font-ledger mt-3 text-[30px] ${savingsThisMonth >= 0 ? "text-app-accent1" : "text-app-danger"}`}>{financialHealthStatus.label}</p>
             <span>{savingsThisMonth >= 0 ? `Surplus ${formatRp(savingsThisMonth)}` : `Defisit ${formatRp(Math.abs(savingsThisMonth))}`}</span>
           </div>
           <div className="statement-side-row">
             <div className="flex items-center justify-between"><h3>Pengeluaran bulan ini</h3><button type="button" onClick={() => navigate('/transactions')}>Rincian</button></div>
-            <p className="font-ledger mt-3 text-[30px] text-white">{formatRp(expenseThisMonth)}</p>
+            <p className="font-ledger mt-3 text-[30px] text-app-text-bright">{formatRp(expenseThisMonth)}</p>
             <span>Hari ini {formatRp(expenseToday)}</span>
           </div>
           <div className="statement-side-row">
@@ -781,22 +781,22 @@ export default function Dashboard() {
             {savingsTarget > 0 ? (
               <>
                 <div className="mt-3 flex items-end justify-between gap-4">
-                  <p className="font-ledger text-[30px] text-white">{Math.round(savingsProgress)}%</p>
-                  <span className="mb-1 text-[11px] text-white/52">tercapai</span>
+                  <p className="font-ledger text-[30px] text-app-text-bright">{Math.round(savingsProgress)}%</p>
+                  <span className="mb-1 text-[11px] text-app-text">tercapai</span>
                 </div>
-                <dl className="mt-3 grid grid-cols-2 gap-4 border-t border-white/12 pt-3">
-                  <div><dt className="text-[10px] text-white/48">Terkumpul</dt><dd className="mt-1 font-mono text-[11px] text-white/78">{formatRp(Math.max(savingsThisMonth, 0))}</dd></div>
-                  <div><dt className="text-[10px] text-white/48">Masih perlu</dt><dd className="mt-1 font-mono text-[11px] text-[#e5c477]">{formatRp(savingsRemaining)}</dd></div>
+                <dl className="mt-3 grid grid-cols-2 gap-4 border-t border-app-border pt-3">
+                  <div><dt className="text-[10px] text-app-text">Terkumpul</dt><dd className="mt-1 font-mono text-[11px] text-app-text-bright">{formatRp(Math.max(savingsThisMonth, 0))}</dd></div>
+                  <div><dt className="text-[10px] text-app-text">Masih perlu</dt><dd className="mt-1 font-mono text-[11px] text-app-accent1">{formatRp(savingsRemaining)}</dd></div>
                 </dl>
               </>
             ) : (
               <>
-                <p className="font-ledger mt-3 text-[26px] text-white">Belum ditetapkan</p>
+                <p className="font-ledger mt-3 text-[26px] text-app-text-bright">Belum ditetapkan</p>
                 <span>Tentukan target bulanan agar progres dapat dihitung.</span>
               </>
             )}
           </div>
-          <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="statement-add mt-auto flex min-h-14 items-center justify-center gap-2 border border-[#d7b669]/70 text-sm font-semibold text-[#e5c477] hover:bg-[#d7b669] hover:text-[#11120f]">
+          <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="statement-add mt-auto flex min-h-14 items-center justify-center gap-2 border border-app-accent1/70 text-sm font-semibold text-app-accent1 hover:bg-app-accent1 hover:text-app-on-accent">
             <Plus className="h-4 w-4" /> Tambah transaksi
           </button>
         </aside>

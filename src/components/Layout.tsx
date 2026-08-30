@@ -177,8 +177,8 @@ export default function Layout() {
       </a>
 
       <aside inert={isCommandOpen || isActionSheetOpen ? true : undefined} className={`app-shell-rail hidden shrink-0 flex-col transition-[width] duration-300 md:flex ${isSidebarOpen ? "w-[224px]" : "w-[82px]"}`}>
-        <div className={`flex h-[78px] shrink-0 items-center border-b border-white/10 ${isSidebarOpen ? "px-5" : "justify-center"}`}>
-          <div className="flex items-center gap-3 text-[#d7b669]">
+        <div className={`flex h-[78px] shrink-0 items-center border-b border-app-border ${isSidebarOpen ? "px-5" : "justify-center"}`}>
+          <div className="flex items-center gap-3 text-app-accent1">
             <span className="font-ledger flex h-10 w-10 shrink-0 items-center justify-center text-[28px] leading-none" aria-hidden="true">R</span>
             {isSidebarOpen && <span className="font-ledger text-[22px] tracking-[-0.02em]">Razchly</span>}
           </div>
@@ -191,7 +191,7 @@ export default function Layout() {
               to={item.path}
               end={item.path === "/"}
               aria-label={t(item.labelKey)}
-              className={({ isActive }) => `app-nav-item relative flex min-h-12 items-center transition-colors ${isSidebarOpen ? "gap-3 px-3.5" : "justify-center px-0"} ${isActive ? "bg-white/[0.055] text-[#e5c477]" : "text-white/52 hover:bg-white/[0.035] hover:text-white"}`}
+              className={({ isActive }) => `app-nav-item relative flex min-h-12 items-center transition-colors ${isSidebarOpen ? "gap-3 px-3.5" : "justify-center px-0"} ${isActive ? "bg-app-hover text-app-accent1" : "text-app-text hover:bg-app-hover hover:text-app-text-bright"}`}
               title={!isSidebarOpen ? t(item.labelKey) : undefined}
             >
               {({ isActive }) => (
@@ -204,18 +204,18 @@ export default function Layout() {
           ))}
         </nav>
 
-        <div className="border-t border-white/10 p-3">
-          <NavLink to="/settings" aria-label="Buka pengaturan profil" className={`mb-1 flex min-h-11 items-center text-white/68 hover:bg-white/[0.04] hover:text-white ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#d7b669]/50 bg-[#d7b669]/10 text-xs font-semibold text-[#e5c477]">
+        <div className="border-t border-app-border p-3">
+          <NavLink to="/settings" aria-label="Buka pengaturan profil" className={`mb-1 flex min-h-11 items-center text-app-text hover:bg-app-hover hover:text-app-text-bright ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-app-accent1/50 bg-app-accent1/10 text-xs font-semibold text-app-accent1">
               {user?.photoURL ? <img src={user.photoURL} alt="" className="h-full w-full object-cover" /> : firstName[0]}
             </div>
             {isSidebarOpen && <span className="min-w-0 flex-1 truncate text-sm font-medium">{firstName}</span>}
           </NavLink>
-          <button type="button" onClick={() => signOut(auth)} aria-label={t("nav.logout")} className={`flex min-h-11 w-full items-center text-white/52 hover:bg-red-500/10 hover:text-red-300 ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
+          <button type="button" onClick={() => signOut(auth)} aria-label={t("nav.logout")} className={`flex min-h-11 w-full items-center text-app-text hover:bg-app-danger/10 hover:text-app-danger ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`}>
             <LogOut className="h-[18px] w-[18px]" strokeWidth={1.6} />
             {isSidebarOpen && <span className="text-[13px] font-medium">{t("nav.logout")}</span>}
           </button>
-          <button type="button" onClick={() => setSidebarOpen((value) => !value)} className={`mt-2 flex min-h-9 w-full items-center text-white/52 hover:bg-white/[0.04] hover:text-white/75 ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`} aria-label={isSidebarOpen ? t("nav.collapse") : "Buka menu"}>
+          <button type="button" onClick={() => setSidebarOpen((value) => !value)} className={`mt-2 flex min-h-9 w-full items-center text-app-text hover:bg-app-hover hover:text-app-text-bright ${isSidebarOpen ? "gap-3 px-3" : "justify-center"}`} aria-label={isSidebarOpen ? t("nav.collapse") : "Buka menu"}>
             {isSidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             {isSidebarOpen && <span className="text-xs">{t("nav.collapse")}</span>}
           </button>
@@ -225,25 +225,25 @@ export default function Layout() {
       <main inert={isCommandOpen || isActionSheetOpen ? true : undefined} id="main-content" className="app-shell-main relative flex min-w-0 max-w-full flex-1 flex-col overflow-hidden md:pb-0">
         <header className="app-command-bar hidden h-[78px] shrink-0 grid-cols-[minmax(0,1fr)_minmax(260px,420px)_auto] items-center gap-6 px-7 md:grid">
           <div className="min-w-0">
-            <p className="font-ledger truncate text-[20px] text-[#e2bd68]">{t(currentItem.labelKey)}</p>
-            <p className="mt-0.5 truncate text-[11px] text-white/52">Ruang kerja finansial pribadi</p>
+            <p className="font-ledger truncate text-[20px] text-app-accent1">{t(currentItem.labelKey)}</p>
+            <p className="mt-0.5 truncate text-[11px] text-app-text">Ruang kerja finansial pribadi</p>
           </div>
           <button
             type="button"
             onClick={openCommandPalette}
-            className="command-trigger flex h-10 min-w-0 items-center gap-3 px-3 text-left text-white/58 hover:text-white"
+            className="command-trigger flex h-10 min-w-0 items-center gap-3 px-3 text-left text-app-text hover:text-app-text-bright"
             aria-label="Buka pencarian dan perintah"
             aria-haspopup="dialog"
           >
             <Search className="h-4 w-4 shrink-0" strokeWidth={1.6} />
             <span className="min-w-0 flex-1 truncate text-xs">Cari halaman atau tindakan</span>
-            <kbd className="shrink-0 text-[10px] text-white/42">Ctrl K</kbd>
+            <kbd className="shrink-0 text-[10px] text-app-text/70">Ctrl K</kbd>
           </button>
-          <div className="flex items-center divide-x divide-white/10 text-xs text-white/58">
+          <div className="flex items-center divide-x divide-app-border text-xs text-app-text">
             <time className="px-5 tabular-nums">{todayLabel}</time>
-            <span className="flex items-center gap-2 px-5"><span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" /> Sinkron</span>
-            <NavLink to="/settings" className="ml-5 flex items-center gap-2.5 text-white/76 hover:text-white" aria-label="Buka profil">
-              <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[#d7b669] text-xs font-semibold text-[#11120f]">
+            <span className="flex items-center gap-2 px-5"><span className="h-2 w-2 rounded-full bg-app-success" aria-hidden="true" /> Sinkron</span>
+            <NavLink to="/settings" className="ml-5 flex items-center gap-2.5 text-app-text hover:text-app-text-bright" aria-label="Buka profil">
+              <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-app-accent1 text-xs font-semibold text-app-on-accent">
                 {user?.photoURL ? <img src={user.photoURL} alt="" className="h-full w-full object-cover" /> : firstName[0]}
               </span>
               <span className="max-w-28 truncate">{firstName}</span>
@@ -269,7 +269,7 @@ export default function Layout() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-[#080907]/82"
+              className="app-overlay absolute inset-0"
               onClick={() => closeCommandPalette()}
             />
             <motion.section
@@ -341,15 +341,15 @@ export default function Layout() {
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <div className="grid grid-cols-1 divide-y divide-black/10 border-y border-black/10">
+              <div className="grid grid-cols-1 divide-y divide-app-border border-y border-app-border">
                 {[
                   { id: "transaction" as const, label: t("common.add"), detail: t("nav.transactions"), icon: ArrowLeftRight },
                   { id: "grab" as const, label: t("nav.grab"), detail: "Catat penghasilan", icon: Car },
                   { id: "scan" as const, label: t("nav.analyze"), detail: "Baca struk", icon: Scan },
                   { id: "attendance" as const, label: t("nav.attendance"), detail: "Catat jam kerja", icon: CalendarCheck },
                 ].map((action) => (
-                  <button type="button" key={action.id} onClick={() => openAction(action.id)} className="flex min-h-[68px] items-center gap-3 px-1 text-left text-[#161713] hover:bg-black/[0.035]">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#9b7429]"><action.icon className="h-5 w-5" strokeWidth={1.7} /></span>
+                  <button type="button" key={action.id} onClick={() => openAction(action.id)} className="flex min-h-[68px] items-center gap-3 px-1 text-left text-app-text-bright hover:bg-app-hover">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center text-app-accent1"><action.icon className="h-5 w-5" strokeWidth={1.7} /></span>
                     <span className="min-w-0"><span className="block truncate text-sm font-semibold text-app-text-bright">{action.label}</span><span className="block truncate text-[11px] text-app-text/55">{action.detail}</span></span>
                   </button>
                 ))}
@@ -362,8 +362,8 @@ export default function Layout() {
       <div inert={isActionSheetOpen ? true : undefined} className="app-mobile-dock-wrap fixed inset-x-0 bottom-0 z-40 md:hidden">
         <nav className="app-mobile-dock mobile-dock-grid relative grid grid-cols-5 items-center px-1" aria-label="Navigasi mobile">
           {mobileNavItems.slice(0, 2).map((item) => <MobileNavItem key={item.path} item={item} label={t(item.labelKey)} />)}
-          <button ref={actionTriggerRef} type="button" onClick={() => isActionSheetOpen ? closeActionSheet() : setActionSheetOpen(true)} className="mobile-dock-add mx-auto flex h-full min-w-0 flex-col items-center justify-center gap-1 text-[#e5c477]" aria-label="Tambah" aria-expanded={isActionSheetOpen} aria-controls="quick-action-sheet">
-            <span className="mobile-dock-add-icon flex items-center justify-center rounded-[14px] bg-[#d7b669] text-[#11120f]">
+          <button ref={actionTriggerRef} type="button" onClick={() => isActionSheetOpen ? closeActionSheet() : setActionSheetOpen(true)} className="mobile-dock-add mx-auto flex h-full min-w-0 flex-col items-center justify-center gap-1 text-app-accent1" aria-label="Tambah" aria-expanded={isActionSheetOpen} aria-controls="quick-action-sheet">
+            <span className="mobile-dock-add-icon flex items-center justify-center rounded-[14px] bg-app-accent1 text-app-on-accent">
               <Plus className={`h-6 w-6 transition-transform duration-300 ${isActionSheetOpen ? "rotate-45" : ""}`} strokeWidth={2.2} />
             </span>
             <span className="mobile-dock-label">Tambah</span>
@@ -377,7 +377,7 @@ export default function Layout() {
 
 function MobileNavItem({ item, label }: { item: (typeof NAV_ITEMS)[number]; label: string }) {
   return (
-    <NavLink to={item.path} end={item.path === "/"} aria-label={label} className={({ isActive }) => `mobile-dock-item relative flex h-full min-w-0 flex-col items-center justify-center gap-1 px-0.5 transition-colors ${isActive ? "text-[#e5c477]" : "text-white/55"}`}>
+    <NavLink to={item.path} end={item.path === "/"} aria-label={label} className={({ isActive }) => `mobile-dock-item relative flex h-full min-w-0 flex-col items-center justify-center gap-1 px-0.5 transition-colors ${isActive ? "text-app-accent1" : "text-app-text"}`}>
       {({ isActive }) => <><item.icon className="mobile-dock-icon" strokeWidth={isActive ? 2 : 1.45} /><span className="mobile-dock-label max-w-full truncate">{label}</span></>}
     </NavLink>
   );

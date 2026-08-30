@@ -14,6 +14,17 @@ Provides consistent route header, actions, content width, and scroll behavior fo
 
 Provides bounded reveal and state-transition primitives. It must honor reduced motion and must not wrap every static element by default.
 
+### `ThemeApplicator`
+
+Maps one saved theme ID to semantic browser and Ledger tokens. It owns `color-scheme`, PWA `theme-color`, native-control treatment, frame and paper accents, semantic status colors, and chart colors. Components must not inspect theme IDs or theme categories directly.
+
+### Theme picker
+
+- Uses category controls for Light, Dark, and AMOLED instead of rendering all presets as one long mobile list.
+- Each option previews command frame, canvas, raised surface, text hierarchy, rule, and action color.
+- Selection uses `aria-pressed`, a check icon, focus treatment, and a stable border without scale-induced layout movement.
+- Preset IDs remain stable because they are persisted in the user document.
+
 ## Financial display primitives
 
 ### Statement value

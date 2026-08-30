@@ -593,14 +593,14 @@ export default function TradingViewChart({
                   const reversedLower = lowerPath.split(" ").reverse().join(" ");
                   return `${upperPath} L ${reversedLower.replace("M", "L")} Z`;
                 })()}
-                fill="rgba(6, 182, 212, 0.04)"
+                fill="color-mix(in srgb, var(--chart-2) 4%, transparent)"
               />
               {/* Upper band */}
-              <path d={getLinePath("bbUpper")} stroke="#22d3ee" strokeWidth={1.2} fill="none" strokeDasharray="3 1" />
+              <path d={getLinePath("bbUpper")} stroke="var(--chart-2)" strokeWidth={1.2} fill="none" strokeDasharray="3 1" />
               {/* Middle band */}
-              <path d={getLinePath("bbMiddle")} stroke="#0891b2" strokeWidth={1} fill="none" opacity={0.6} />
+              <path d={getLinePath("bbMiddle")} stroke="var(--chart-2)" strokeWidth={1} fill="none" opacity={0.6} />
               {/* Lower band */}
-              <path d={getLinePath("bbLower")} stroke="#22d3ee" strokeWidth={1.2} fill="none" strokeDasharray="3 1" />
+              <path d={getLinePath("bbLower")} stroke="var(--chart-2)" strokeWidth={1.2} fill="none" strokeDasharray="3 1" />
             </g>
           )}
 
@@ -608,7 +608,7 @@ export default function TradingViewChart({
           {showSma && (
             <path
               d={getLinePath("sma20")}
-              stroke="#a855f7"
+              stroke="var(--chart-3)"
               strokeWidth={1.8}
               fill="none"
               opacity={0.9}
@@ -651,7 +651,8 @@ export default function TradingViewChart({
                       y={Math.min(oY, cY)}
                       width={widthPct}
                       height={Math.max(1.5, Math.abs(oY - cY))}
-                      fill={isBullish ? "rgba(16, 185, 129, 0.9)" : "rgba(239, 68, 68, 0.9)"}
+                      fill={isBullish ? "var(--success-color)" : "var(--danger-color)"}
+                      opacity={0.9}
                       stroke={color}
                       strokeWidth={0.5}
                     />
@@ -723,14 +724,14 @@ export default function TradingViewChart({
                       width={36}
                       height={12}
                       rx={2}
-                      fill={isBuy ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)"}
-                      stroke={isBuy ? "rgba(16, 185, 129, 0.4)" : "rgba(239, 68, 68, 0.4)"}
+                      fill={isBuy ? "color-mix(in srgb, var(--success-color) 20%, transparent)" : "color-mix(in srgb, var(--danger-color) 20%, transparent)"}
+                      stroke={isBuy ? "color-mix(in srgb, var(--success-color) 40%, transparent)" : "color-mix(in srgb, var(--danger-color) 40%, transparent)"}
                       strokeWidth={0.5}
                     />
                     <text
                       x={x}
                       y={isBuy ? y + 17 : y - 11}
-                      fill={isBuy ? "rgba(16, 185, 129, 1)" : "rgba(239, 68, 68, 1)"}
+                      fill={isBuy ? "var(--success-color)" : "var(--danger-color)"}
                       fontSize={7.5}
                       fontFamily="monospace"
                       fontWeight="bold"
@@ -792,7 +793,7 @@ export default function TradingViewChart({
                 y1={getPriceY(price)}
                 x2={usableWidth}
                 y2={getPriceY(price)}
-                stroke="#f59e0b"
+                stroke="var(--chart-4)"
                 strokeWidth={1}
                 strokeDasharray="3 3"
                 opacity={0.8}
@@ -804,13 +805,13 @@ export default function TradingViewChart({
                 width={rightMargin - 4}
                 height={16}
                 rx={3}
-                fill="#f59e0b"
+                fill="var(--chart-4)"
                 opacity={0.9}
               />
               <text
                 x={usableWidth + rightMargin/2}
                 y={getPriceY(price) + 3}
-                fill="#000"
+                fill="var(--bg-color)"
                 fontSize={8}
                 fontFamily="monospace"
                 fontWeight="bold"
@@ -823,7 +824,8 @@ export default function TradingViewChart({
                 cx={20}
                 cy={getPriceY(price)}
                 r={6}
-                fill="rgba(239, 68, 68, 0.9)"
+                fill="var(--danger-color)"
+                opacity={0.9}
                 className="cursor-pointer hover:scale-125 transition-transform"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -832,7 +834,7 @@ export default function TradingViewChart({
               >
                 <title>Hapus Garis S/R ini</title>
               </circle>
-              <text x={20} y={getPriceY(price) + 2.5} fill="#fff" fontSize={8} textAnchor="middle" pointerEvents="none">×</text>
+              <text x={20} y={getPriceY(price) + 2.5} fill="var(--text-bright)" fontSize={8} textAnchor="middle" pointerEvents="none">×</text>
             </g>
           ))}
 
@@ -867,12 +869,12 @@ export default function TradingViewChart({
                 y1={getRsiY(30)}
                 x2={usableWidth}
                 y2={getRsiY(30)}
-                stroke="#ef4444"
+                stroke="var(--danger-color)"
                 strokeWidth={0.8}
                 strokeDasharray="4 4"
                 opacity={0.4}
               />
-              <text x={usableWidth + 4} y={getRsiY(30) + 3} fill="#ef4444" fontSize={7.5} fontFamily="monospace" opacity={0.5}>30</text>
+              <text x={usableWidth + 4} y={getRsiY(30) + 3} fill="var(--danger-color)" fontSize={7.5} fontFamily="monospace" opacity={0.5}>30</text>
 
               {/* Mid boundary 50 */}
               <line
@@ -892,12 +894,12 @@ export default function TradingViewChart({
                 y1={getRsiY(70)}
                 x2={usableWidth}
                 y2={getRsiY(70)}
-                stroke="#10b981"
+                stroke="var(--success-color)"
                 strokeWidth={0.8}
                 strokeDasharray="4 4"
                 opacity={0.4}
               />
-              <text x={usableWidth + 4} y={getRsiY(70) + 3} fill="#10b981" fontSize={7.5} fontFamily="monospace" opacity={0.5}>70</text>
+              <text x={usableWidth + 4} y={getRsiY(70) + 3} fill="var(--success-color)" fontSize={7.5} fontFamily="monospace" opacity={0.5}>70</text>
 
               {/* RSI Line path */}
               <path
@@ -913,7 +915,7 @@ export default function TradingViewChart({
                   });
                   return path;
                 })()}
-                stroke="#ec4899"
+                stroke="var(--chart-3)"
                 strokeWidth={1.4}
                 fill="none"
               />

@@ -340,7 +340,7 @@ export default function GrabDetails() {
         <HoverCard className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col justify-center relative overflow-hidden w-full">
 
              <div className="absolute top-0 right-0 p-4 opacity-10">
-               <Receipt className="w-16 h-16 text-blue-500" />
+               <Receipt className="w-16 h-16 text-app-accent1" />
              </div>
              <p className="text-app-text/70 text-xs md:text-xs font-medium uppercase tracking-wider mb-2 relative z-10">
                 Total Orderan

@@ -28,6 +28,8 @@ Razchly targets WCAG 2.2 AA for core authenticated flows and login.
 - Placeholder and helper text remain readable
 - Green and red never carry meaning without a label, sign, or context
 - Disabled controls remain identifiable without appearing active
+- Every theme validates text, secondary text, action, action foreground, frame text, frame action, success, danger, and warning pairs at 4.5:1 or better.
+- Run `npm run check:themes` after changing a theme palette.
 
 ## Forms
 
@@ -84,3 +86,4 @@ Razchly targets WCAG 2.2 AA for core authenticated flows and login.
 - Reduced-motion pass
 - Automated TypeScript and build pass
 - Manual contrast check for new token combinations
+- Automated color-pair validation for all saved theme IDs

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../store/useStore';
-import { themes } from '../themes';
+import { getThemeById, themes, type ThemeCategory } from '../themes';
 import { doc, updateDoc, collection, onSnapshot, query, where, getDocs, writeBatch, getDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Palette, Globe, Check, Car, User as UserIcon, ChevronDown, ChevronUp, Plus, Edit2, Trash2, Wallet, X, Type, Star, Eye, EyeOff, LayoutGrid, Sparkles, Calendar, ArrowLeftRight, TrendingUp, Cpu, HandCoins, CalendarCheck, Target, Scan } from 'lucide-react';
@@ -42,6 +42,7 @@ export default function Settings() {
     font: false,
     navigasi: false
   });
+  const [themeCategory, setThemeCategory] = useState<ThemeCategory>(() => getThemeById(themeId).category);
 
   useEffect(() => {
     const expandSection = (location.state as any)?.expandSection;
@@ -53,6 +54,10 @@ export default function Settings() {
       setSections(prev => ({ ...prev, kategori: true }));
     }
   }, [location.state]);
+
+  useEffect(() => {
+    setThemeCategory(getThemeById(themeId).category);
+  }, [themeId]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
@@ -393,11 +398,13 @@ export default function Settings() {
     }
   };
 
-  const groupedThemes = themes.reduce((acc, theme) => {
-    acc[theme.category] = acc[theme.category] || [];
-    acc[theme.category].push(theme);
-    return acc;
-  }, {} as Record<string, typeof themes>);
+  const currentTheme = getThemeById(themeId);
+  const visibleThemes = themes.filter((theme) => theme.category === themeCategory);
+  const themeCategories: { id: ThemeCategory; label: string }[] = [
+    { id: 'light', label: t('settings.tema.light') },
+    { id: 'dark', label: t('settings.tema.dark') },
+    { id: 'amoled', label: 'AMOLED' },
+  ];
 
   const getInitials = (name: string) => name.substring(0, 2).toUpperCase() || 'US';
 
@@ -764,37 +771,82 @@ export default function Settings() {
           </button>
 
           {sections.tema && (
-          <div className="space-y-8 animate-in slide-in-from-top-2 duration-200">
-            {(Object.entries(groupedThemes) as [string, typeof themes][]).map(([category, catThemes]) => (
-              <div key={category}>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-app-text mb-4">
-                  {category === 'light' ? t('settings.tema.light') : category === 'dark' ? t('settings.tema.dark') : 'Amoled'}
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {catThemes.map(theme => (
-                    <button type="button"
-                      key={theme.id}
-                      onClick={() => handleThemeChange(theme.id)}
-                      className={`p-1 rounded-2xl border-2 transition-all ${themeId === theme.id ? 'border-app-accent1 scale-105' : 'border-app-border hover:scale-105 hover:border-app-accent1/50'}`}
-                    >
-                      <div
-                        className="w-full h-24 rounded-xl flex flex-col p-3 relative overflow-hidden"
-                        style={{ backgroundColor: theme.colors.bg, color: theme.colors.text }}
-                      >
-                        <span className="text-sm font-semibold truncate z-10 text-left">{theme.name}</span>
-                        <div className="flex-1"></div>
-                        <div className="flex gap-2 z-10 w-full">
-                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: theme.colors.accent1 }}></div>
-                          {theme.colors.accent2 && (
-                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: theme.colors.accent2 }}></div>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+          <div className="theme-picker animate-in slide-in-from-top-2 duration-200">
+            <div className="theme-picker-summary" aria-live="polite">
+              <div>
+                <span>{language === 'id' ? 'Tema aktif' : 'Active theme'}</span>
+                <strong>{currentTheme.name}</strong>
               </div>
-            ))}
+              <Check aria-hidden="true" />
+            </div>
+
+            <div className="theme-category-switcher" aria-label={language === 'id' ? 'Kategori tema' : 'Theme category'}>
+              {themeCategories.map((category) => {
+                const count = themes.filter((theme) => theme.category === category.id).length;
+                return (
+                  <button
+                    type="button"
+                    key={category.id}
+                    aria-pressed={themeCategory === category.id}
+                    onClick={() => setThemeCategory(category.id)}
+                  >
+                    <span>{category.label}</span>
+                    <small>{count}</small>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="theme-choice-grid">
+              {visibleThemes.map((theme) => {
+                const selected = themeId === theme.id;
+                return (
+                  <button
+                    type="button"
+                    key={theme.id}
+                    aria-label={`${theme.name}${selected ? (language === 'id' ? ', tema aktif' : ', active theme') : ''}`}
+                    aria-pressed={selected}
+                    onClick={() => handleThemeChange(theme.id)}
+                    className="theme-choice"
+                    style={{
+                      '--preview-canvas': theme.colors.canvas,
+                      '--preview-surface': theme.colors.surface,
+                      '--preview-text': theme.colors.text,
+                      '--preview-muted': theme.colors.muted,
+                      '--preview-border': theme.colors.border,
+                      '--preview-frame': theme.colors.frame,
+                      '--preview-frame-text': theme.colors.frameText,
+                      '--preview-accent': theme.colors.accent,
+                      '--preview-frame-accent': theme.colors.frameAccent,
+                    } as React.CSSProperties}
+                  >
+                    <span className="theme-choice-preview" aria-hidden="true">
+                      <span className="theme-choice-frame">
+                        <i />
+                        <b />
+                        <em />
+                      </span>
+                      <span className="theme-choice-canvas">
+                        <span className="theme-choice-statement">
+                          <i />
+                          <b />
+                          <em />
+                        </span>
+                        <span className="theme-choice-register">
+                          <i />
+                          <b />
+                          <em />
+                        </span>
+                      </span>
+                    </span>
+                    <span className="theme-choice-meta">
+                      <span>{theme.name}</span>
+                      {selected && <Check aria-hidden="true" />}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
           )}
         </section>
@@ -945,7 +997,7 @@ export default function Settings() {
 
       {/* Confirm Delete Category Modal */}
       {categoryToDelete && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div className="app-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="bg-app-card text-app-text w-full max-w-sm rounded-[18px] border border-app-border p-6 animate-in fade-in duration-200" role="alertdialog" aria-modal="true" aria-labelledby="category-delete-title">
             <h3 id="category-delete-title" className="text-lg font-semibold text-app-text-bright mb-2">
               {language === 'en' ? 'Delete Category?' : 'Hapus Kategori?'}
@@ -973,7 +1025,7 @@ export default function Settings() {
 
       {/* Confirm Delete Account Modal */}
       {accountToDelete && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div className="app-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="bg-app-card text-app-text w-full max-w-sm rounded-[18px] border border-app-border p-6 animate-in fade-in duration-200" role="alertdialog" aria-modal="true" aria-labelledby="account-delete-title">
             <h3 id="account-delete-title" className="text-lg font-semibold text-app-text-bright mb-2">
               {language === 'en' ? 'Delete Account?' : 'Hapus Rekening?'}

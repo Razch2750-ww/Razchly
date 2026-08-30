@@ -294,7 +294,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
             onClick={() => setDirection("ara")}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold uppercase transition-all flex items-center gap-1.5 ${
               direction === "ara"
-                ? "bg-app-success text-white font-semibold"
+                ? "bg-app-success text-app-bg font-semibold"
                 : "text-app-text/60 hover:text-app-text-bright font-semibold"
             }`}
           >
@@ -305,7 +305,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
             onClick={() => setDirection("arb")}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold uppercase transition-all flex items-center gap-1.5 ${
               direction === "arb"
-                ? "bg-app-danger text-white font-semibold"
+                ? "bg-app-danger text-app-bg font-semibold"
                 : "text-app-text/60 hover:text-app-text-bright font-semibold"
             }`}
           >
@@ -1568,8 +1568,8 @@ export default function Investments() {
   }, [activeInvestments, filterCategory, sortBy, quotes]);
 
   const COLORS = useMemo(() => [
-    "#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#EF4444",
-    "#14B8A6", "#6366f1", "#EC4899", "#f97316"
+    "var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)",
+    "var(--success-color)", "var(--danger-color)", "var(--warning-color)", "var(--accent1-color)"
   ], []);
 
   const formatYAxis = (val: number) => {
@@ -1961,7 +1961,7 @@ export default function Investments() {
                         type="monotone"
                         dataKey="ihsgReturn"
                         name="ihsgReturn"
-                        stroke="#8B5CF6"
+                        stroke="var(--chart-3)"
                         strokeWidth={2}
                         dot={false}
                         activeDot={{ r: 4 }}
@@ -2505,7 +2505,7 @@ export default function Investments() {
                   type="monotone"
                   name="Modal Awal"
                   dataKey="modal"
-                  stroke="#ffffff"
+                  stroke="var(--text-bright)"
                   strokeWidth={2}
                   dot={false}
                   activeDot={{ r: 3 }}
@@ -2868,8 +2868,8 @@ export default function Investments() {
 
                   const totalAllocValue = allocationData.reduce((sum, item) => sum + item.value, 0);
                   const COLORS = [
-                    "#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#EF4444",
-                    "#14B8A6", "#6366f1", "#EC4899", "#f97316"
+                    "var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)",
+                    "var(--success-color)", "var(--danger-color)", "var(--warning-color)", "var(--accent1-color)"
                   ];
 
                   if (totalAllocValue === 0) {
@@ -3240,7 +3240,7 @@ export default function Investments() {
               <button
                 type="button"
                 onClick={() => fetchAiInsights(investStyle)}
-                className="px-3 py-1 rounded-lg bg-app-danger text-white text-xs font-semibold cursor-pointer"
+                className="px-3 py-1 rounded-lg bg-app-danger text-app-bg text-xs font-semibold cursor-pointer"
               >
                 Coba Lagi
               </button>

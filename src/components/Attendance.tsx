@@ -1213,7 +1213,7 @@ export default function Attendance() {
                             setSaveSalaryDate(new Date().toISOString().split('T')[0]);
                             setIsSaveSalaryModalOpen(true);
                           }}
-                          className="bg-app-accent1 hover:bg-app-accent2 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                          className="bg-app-accent1 hover:bg-app-accent2 text-app-on-accent px-4 py-2 rounded-lg font-medium transition-colors"
                         >
                           Simpan sebagai Pemasukan
                         </button>
@@ -1331,7 +1331,7 @@ export default function Attendance() {
                       toast.error("Gagal menyimpan gaji");
                     }
                   }}
-                  className="flex-1 bg-app-accent1 hover:bg-app-accent2 text-white py-2 rounded-lg font-medium transition-colors"
+                  className="flex-1 bg-app-accent1 hover:bg-app-accent2 text-app-on-accent py-2 rounded-lg font-medium transition-colors"
                 >
                   Simpan
                 </button>

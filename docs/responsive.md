@@ -53,6 +53,8 @@
 
 - Mobile: section list and active editor stack vertically
 - Desktop: persistent section navigation plus active form surface
+- Theme categories remain in one three-part control at all widths.
+- Theme previews use one column on narrow phones, expand with available width, and never shrink below a readable miniature statement.
 
 ## Tables and long rows
 

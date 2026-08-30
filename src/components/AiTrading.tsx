@@ -2040,8 +2040,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             <div className="lg:col-span-2 space-y-6">
 
               {/* Live Terminal Log Console */}
-              <div className="bg-black text-emerald-400 font-mono text-xs rounded-2xl p-5 border border-app-border space-y-3">
-                <div className="flex items-center justify-between border-b border-gray-900 pb-3 text-gray-500">
+              <div className="bg-app-bg text-app-success font-mono text-xs rounded-2xl p-5 border border-app-border space-y-3">
+                <div className="flex items-center justify-between border-b border-app-border pb-3 text-app-text">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
