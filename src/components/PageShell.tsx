@@ -22,7 +22,7 @@ interface PageShellProps {
 
 export function PageShell({ title, subtitle, actions, mobileActions, children, className = "" }: PageShellProps) {
   return (
-    <div className={`route-workbench app-page-shell flex h-full w-full flex-1 flex-col overflow-y-auto p-4 pb-32 text-app-text md:p-7 md:pb-8 ${className}`}>
+    <div className={`route-workbench page-register app-page-shell flex h-full w-full flex-1 flex-col overflow-y-auto p-4 pb-32 text-app-text md:p-7 md:pb-8 ${className}`}>
       <PageHeader title={title} subtitle={subtitle} actions={actions} mobileActions={mobileActions} />
       {children}
     </div>

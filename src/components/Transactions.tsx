@@ -1216,7 +1216,7 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
   return (
     <>
       {!modalOnly && (
-        <div className="route-transactions transaction-workspace flex h-full w-full flex-1 flex-col overflow-y-auto p-0 text-app-text">
+        <div className="route-transactions page-register transaction-workspace flex h-full w-full flex-1 flex-col overflow-y-auto p-0 text-app-text">
           {/* MOBILE LAYOUT */}
           <div className="transaction-mobile flex min-h-0 w-full flex-col px-4 pb-32 pt-5 md:hidden">
         {/* Header */}

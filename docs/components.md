@@ -25,6 +25,8 @@ Maps one saved theme ID to semantic browser and Ledger tokens. It owns `color-sc
 - Selection uses `aria-pressed`, a check icon, focus treatment, and a stable border without scale-induced layout movement.
 - Preset IDs remain stable because they are persisted in the user document.
 
+The Theme Atlas adds a live visual stage, a tone label, and a four-color chart strip for each preset. Previews are CSS-only and use the same semantic roles as the application (`canvas`, `surface`, `wash`, `frame`, `frameSurface`, text, rule, and accents); they never hard-code a theme ID or replace real product data.
+
 ## Financial display primitives
 
 ### Statement value

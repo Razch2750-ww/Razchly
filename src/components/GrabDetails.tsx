@@ -236,7 +236,7 @@ export default function GrabDetails() {
   }, [filteredOrders]);
 
   return (
-    <div className="route-workbench route-grab mx-auto flex h-full w-full max-w-7xl flex-1 flex-col overflow-y-auto bg-app-bg p-4 pb-32 text-app-text md:p-8 md:pb-8">
+    <div className="route-workbench page-register route-grab mx-auto flex h-full w-full max-w-7xl flex-1 flex-col overflow-y-auto bg-app-bg p-4 pb-32 text-app-text md:p-8 md:pb-8">
       {/* HEADER */}
       <header className="workbench-hero mb-6 flex shrink-0 flex-col justify-between gap-6 md:flex-row md:items-end">
         <div className="workbench-hero-copy">

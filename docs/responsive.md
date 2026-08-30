@@ -56,6 +56,10 @@
 - Theme categories remain in one three-part control at all widths.
 - Theme previews use one column on narrow phones, expand with available width, and never shrink below a readable miniature statement.
 
+### Route Atlas
+
+All routes carry the `page-register` rhythm. At desktop, the route-specific dominant surface keeps its intended asymmetry (statement, ledger, analysis desk, or editor rail). At mobile, the same surface becomes the first section and supporting sections are separated by a single rule and the shared `--mobile-section-gap`; no route relies on a fixed desktop card width.
+
 ## Tables and long rows
 
 At mobile widths, use one of two explicit modes:

@@ -9,6 +9,7 @@
 
   --color-app-bg: var(--bg-color);
   --color-app-card: var(--card-bg);
+  --color-app-wash: var(--wash-bg);
   --color-app-border: var(--border-color);
   --color-app-hover: var(--hover-bg);
   --color-app-text: var(--text-color);
@@ -113,9 +114,10 @@
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     --bg-color: #f3eee3;
-    --card-bg: #f8f4ea;
-    --border-color: #b8b2a4;
-    --hover-bg: #e8e3d8;
+    --card-bg: #fbf7ed;
+    --wash-bg: #ddd3be;
+    --border-color: #ada796;
+    --hover-bg: #ddd3be;
     --text-color: #595b52;
     --text-bright: #161713;
     --accent1-color: #765519;
@@ -135,15 +137,16 @@
     --chart-3: #4c648a;
     --chart-4: #9a4944;
     --ledger-frame: #10120f;
-    --ledger-frame-soft: #171915;
+    --ledger-frame-soft: #1d211a;
     --ledger-frame-text: #f3efe6;
-    --ledger-frame-muted: #aaa79f;
+    --ledger-frame-muted: #c2bdb2;
     --ledger-accent-frame: #d7b669;
     --ledger-paper: #f3eee3;
-    --ledger-paper-raised: #f8f4ea;
+    --ledger-paper-raised: #fbf7ed;
+    --ledger-paper-wash: #ddd3be;
     --ledger-ink: #161713;
     --ledger-muted: #595b52;
-    --ledger-rule: #b8b2a4;
+    --ledger-rule: #ada796;
     --ledger-gold: #765519;
     --ledger-on-accent: #fff9ea;
     --native-icon-filter: none;
@@ -277,6 +280,7 @@
   .app-mobile-dock {
     --bg-color: var(--ledger-frame);
     --card-bg: var(--ledger-frame-soft);
+    --wash-bg: var(--ledger-frame-soft);
     --border-color: color-mix(in srgb, var(--ledger-frame-text) 16%, transparent);
     --hover-bg: color-mix(in srgb, var(--ledger-frame-text) 8%, transparent);
     --text-color: var(--ledger-frame-muted);
@@ -309,6 +313,7 @@
   .app-action-sheet {
     --bg-color: var(--ledger-paper);
     --card-bg: var(--ledger-paper-raised);
+    --wash-bg: var(--ledger-paper-wash);
     --border-color: var(--ledger-rule);
     --hover-bg: color-mix(in srgb, var(--ledger-ink) 7%, transparent);
     --text-color: var(--ledger-muted);
@@ -340,6 +345,7 @@
   .command-palette {
     --bg-color: var(--ledger-paper);
     --card-bg: var(--ledger-paper-raised);
+    --wash-bg: var(--ledger-paper-wash);
     --border-color: var(--ledger-rule);
     --hover-bg: color-mix(in srgb, var(--ledger-ink) 7%, transparent);
     --text-color: var(--ledger-muted);
@@ -426,6 +432,7 @@
 .route-workbench {
   --bg-color: var(--ledger-paper);
   --card-bg: var(--ledger-paper-raised);
+  --wash-bg: var(--ledger-paper-wash);
   --border-color: var(--ledger-rule);
   --hover-bg: color-mix(in srgb, var(--ledger-ink) 7%, transparent);
   --text-color: var(--ledger-muted);
@@ -582,6 +589,7 @@
 .market-tape {
   --bg-color: var(--ledger-frame);
   --card-bg: var(--ledger-frame-soft);
+  --wash-bg: var(--ledger-frame-soft);
   --border-color: color-mix(in srgb, var(--ledger-frame-text) 16%, transparent);
   --hover-bg: color-mix(in srgb, var(--ledger-frame-text) 7%, transparent);
   --text-color: var(--ledger-frame-muted);
@@ -1025,6 +1033,601 @@
   stroke-width: 2.2;
 }
 
+/* Theme Atlas — indexed settings on desktop, one continuous document on mobile. */
+.settings-layout {
+  min-width: 0;
+}
+
+.settings-index {
+  display: none;
+}
+
+.theme-picker-summary {
+  align-items: flex-end;
+  padding: 0 0 1rem;
+}
+
+.theme-picker-summary > div:first-child {
+  gap: .18rem;
+}
+
+.theme-picker-summary strong {
+  font-family: var(--font-ledger);
+  font-size: clamp(1.55rem, 4vw, 2.2rem);
+  font-weight: 400;
+  letter-spacing: -.025em;
+  line-height: 1;
+}
+
+.theme-picker-summary small {
+  color: var(--text-color);
+  font-size: .76rem;
+}
+
+.theme-active-palette {
+  display: flex !important;
+  align-items: center;
+  gap: 3px !important;
+}
+
+.theme-active-palette i {
+  width: clamp(.78rem, 3vw, 1rem);
+  height: 2.25rem;
+  border: 1px solid color-mix(in srgb, var(--text-bright) 16%, transparent);
+}
+
+.theme-category-switcher {
+  background: var(--wash-bg);
+}
+
+.theme-studio-layout {
+  display: grid;
+  min-width: 0;
+  gap: 1.25rem;
+}
+
+.theme-stage {
+  min-width: 0;
+  padding: .55rem;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: var(--card-bg);
+}
+
+.theme-stage-window {
+  display: grid;
+  min-height: clamp(15rem, 62vw, 22rem);
+  overflow: hidden;
+  grid-template-rows: 2.75rem 1fr;
+  border: 1px solid var(--preview-border);
+  border-radius: 9px;
+  background: var(--preview-canvas);
+}
+
+.theme-stage-command {
+  display: grid;
+  grid-template-columns: 1.2rem minmax(4rem, 9rem) 1.45rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+  padding-inline: .9rem;
+  background: var(--preview-frame);
+}
+
+.theme-stage-brand,
+.theme-stage-avatar,
+.theme-stage-search,
+.theme-stage-rail > i,
+.theme-stage-statement > i,
+.theme-stage-statement > b,
+.theme-stage-statement > em,
+.theme-stage-side > i,
+.theme-stage-side > b,
+.theme-stage-lines i,
+.theme-stage-bars i {
+  display: block;
+  border-radius: 2px;
+}
+
+.theme-stage-brand {
+  width: 1.05rem;
+  height: 1.05rem;
+  background: var(--preview-frame-accent);
+}
+
+.theme-stage-search {
+  width: 100%;
+  height: 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--preview-frame-text) 28%, transparent);
+  background: var(--preview-frame-surface);
+}
+
+.theme-stage-avatar {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  background: var(--preview-frame-accent);
+}
+
+.theme-stage-workspace {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: clamp(2.5rem, 9vw, 3.5rem) 1fr;
+}
+
+.theme-stage-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  padding-top: 1rem;
+  background: var(--preview-frame-surface);
+}
+
+.theme-stage-rail > i {
+  width: .85rem;
+  height: .85rem;
+  border: 1px solid var(--preview-frame-muted);
+  opacity: .72;
+}
+
+.theme-stage-rail > i:first-child {
+  border-color: var(--preview-frame-accent);
+  background: var(--preview-frame-accent);
+  opacity: 1;
+}
+
+.theme-stage-canvas {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1.55fr) minmax(5.5rem, .75fr);
+  gap: clamp(.55rem, 2vw, 1rem);
+  padding: clamp(.7rem, 3vw, 1.3rem);
+  background: var(--preview-canvas);
+}
+
+.theme-stage-statement,
+.theme-stage-side {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: clamp(.7rem, 3vw, 1.1rem);
+}
+
+.theme-stage-statement {
+  justify-content: flex-end;
+  background: var(--preview-surface);
+}
+
+.theme-stage-statement > i {
+  width: 29%;
+  height: 4px;
+  margin-bottom: auto;
+  background: var(--preview-accent);
+}
+
+.theme-stage-statement > b {
+  width: 76%;
+  height: clamp(1.25rem, 5vw, 2rem);
+  margin-bottom: .65rem;
+  background: var(--preview-text);
+}
+
+.theme-stage-statement > em {
+  width: 42%;
+  height: 4px;
+  margin-bottom: 1rem;
+  background: var(--preview-muted);
+}
+
+.theme-stage-lines {
+  display: grid;
+  gap: .45rem;
+}
+
+.theme-stage-lines i {
+  height: 3px;
+  background: var(--preview-border);
+}
+
+.theme-stage-lines i:nth-child(2) {
+  width: 84%;
+}
+
+.theme-stage-lines i:nth-child(3) {
+  width: 68%;
+}
+
+.theme-stage-side {
+  background: var(--preview-wash);
+}
+
+.theme-stage-side > i {
+  width: 48%;
+  height: 4px;
+  background: var(--preview-muted);
+}
+
+.theme-stage-side > b {
+  width: 82%;
+  height: 1.1rem;
+  margin-top: .7rem;
+  background: var(--preview-text);
+}
+
+.theme-stage-bars {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  gap: clamp(.2rem, 1vw, .4rem);
+  padding-top: 1rem;
+}
+
+.theme-stage-bars i {
+  width: 25%;
+  min-height: 26%;
+  background: var(--preview-chart-1);
+}
+
+.theme-stage-bars i:nth-child(2) {
+  height: 72%;
+  background: var(--preview-chart-2);
+}
+
+.theme-stage-bars i:nth-child(3) {
+  height: 48%;
+  background: var(--preview-chart-3);
+}
+
+.theme-stage-bars i:nth-child(4) {
+  height: 88%;
+  background: var(--preview-chart-4);
+}
+
+.theme-stage-caption {
+  display: flex;
+  min-height: 4.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .85rem .35rem .2rem;
+}
+
+.theme-stage-caption > div {
+  display: grid;
+  min-width: 0;
+  gap: .1rem;
+}
+
+.theme-stage-caption strong {
+  color: var(--text-bright);
+  font-size: .95rem;
+}
+
+.theme-stage-caption > div span {
+  overflow: hidden;
+  color: var(--text-color);
+  font-size: .72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.theme-stage-caption > span {
+  flex: none;
+  padding: .35rem .55rem;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  color: var(--text-color);
+  font-size: .67rem;
+  font-weight: 600;
+}
+
+.theme-library {
+  min-width: 0;
+  border-block: 1px solid var(--border-color);
+}
+
+.theme-library-header {
+  display: flex;
+  min-height: 3.15rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.theme-library-header strong {
+  color: var(--text-bright);
+  font-size: .83rem;
+}
+
+.theme-library-header span {
+  color: var(--text-color);
+  font-family: var(--font-mono);
+  font-size: .67rem;
+}
+
+.theme-choice-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.theme-choice {
+  display: grid;
+  min-height: 5.5rem;
+  grid-template-columns: 5.7rem minmax(0, 1fr) 1.5rem;
+  align-items: center;
+  gap: .8rem;
+  padding: .7rem .35rem;
+  border: 0;
+  border-top: 1px solid var(--border-color);
+  border-radius: 0;
+  background: transparent;
+}
+
+.theme-choice:hover {
+  border-color: var(--border-color);
+  background: var(--wash-bg);
+}
+
+.theme-choice[aria-pressed="true"] {
+  border-color: var(--border-color);
+  background: var(--wash-bg);
+  box-shadow: inset 2px 0 0 var(--accent1-color);
+}
+
+.theme-choice-preview {
+  width: 5.7rem;
+  height: 4rem;
+  grid-template-rows: 1.05rem 1fr;
+  border-radius: 6px;
+}
+
+.theme-choice-frame {
+  grid-template-columns: .35rem 1fr .8rem;
+  gap: .25rem;
+  padding-inline: .35rem;
+}
+
+.theme-choice-frame i {
+  width: .35rem;
+  height: .35rem;
+}
+
+.theme-choice-frame b {
+  height: 2px;
+}
+
+.theme-choice-frame em {
+  height: .42rem;
+}
+
+.theme-choice-canvas {
+  grid-template-columns: minmax(0, 1.2fr) minmax(1.7rem, .8fr);
+  gap: .22rem;
+  padding: .28rem;
+}
+
+.theme-choice-statement,
+.theme-choice-register {
+  gap: .2rem;
+  padding: .25rem;
+}
+
+.theme-choice-statement {
+  background: var(--preview-surface);
+}
+
+.theme-choice-register {
+  background: var(--preview-wash);
+}
+
+.theme-choice-statement b {
+  height: .42rem;
+}
+
+.theme-choice-register b {
+  height: .72rem;
+  background: var(--preview-chart-2);
+}
+
+.theme-choice-meta {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  justify-content: stretch;
+  gap: .12rem;
+  padding: 0;
+}
+
+.theme-choice-meta strong,
+.theme-choice-meta small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.theme-choice-meta strong {
+  color: var(--text-bright);
+  font-size: .79rem;
+  font-weight: 600;
+}
+
+.theme-choice-meta small {
+  color: var(--text-color);
+  font-size: .66rem;
+}
+
+.theme-choice-palette {
+  display: flex;
+  width: auto !important;
+  height: auto !important;
+  gap: 2px;
+  margin-top: .25rem;
+}
+
+.theme-choice-palette i {
+  width: 1rem;
+  height: 3px;
+  border-radius: 0;
+}
+
+.theme-choice-check {
+  display: flex;
+  width: 1.35rem;
+  height: 1.35rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+}
+
+.theme-choice-check svg {
+  width: .8rem;
+  height: .8rem;
+  color: var(--accent1-color);
+  stroke-width: 2.4;
+}
+
+@media (min-width: 1024px) {
+  .settings-layout {
+    display: grid;
+    grid-template-columns: minmax(12.5rem, 14rem) minmax(0, 1fr);
+    align-items: start;
+    gap: clamp(1.5rem, 3vw, 3rem);
+  }
+
+  .settings-index {
+    display: block;
+    position: sticky;
+    top: 1.25rem;
+    border-block: 1px solid var(--ledger-rule);
+  }
+
+  .settings-index nav {
+    display: grid;
+  }
+
+  .settings-index button {
+    display: grid;
+    min-height: 48px;
+    grid-template-columns: 1.1rem minmax(0, 1fr) 4px;
+    align-items: center;
+    gap: .75rem;
+    padding: .3rem .15rem .3rem .65rem;
+    border-bottom: 1px solid var(--ledger-rule);
+    color: var(--text-color);
+    text-align: left;
+  }
+
+  .settings-index button:last-child {
+    border-bottom: 0;
+  }
+
+  .settings-index button:hover {
+    background: var(--ledger-paper-wash);
+    color: var(--text-bright);
+  }
+
+  .settings-index button[aria-current="page"] {
+    background: var(--ledger-paper-wash);
+    color: var(--text-bright);
+  }
+
+  .settings-index button svg {
+    width: 1rem;
+    height: 1rem;
+    stroke-width: 1.55;
+  }
+
+  .settings-index button span {
+    overflow: hidden;
+    font-size: .78rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .settings-index button i {
+    width: 3px;
+    height: 1.2rem;
+    background: transparent;
+  }
+
+  .settings-index button[aria-current="page"] i {
+    background: var(--accent1-color);
+  }
+
+  .settings-register {
+    border-top: 0;
+  }
+
+  .settings-register > section:not(.is-active) {
+    display: none;
+  }
+
+  .settings-register > section {
+    padding-top: 0 !important;
+    border-top: 0 !important;
+  }
+
+  .settings-register > section > button:first-child {
+    pointer-events: none;
+  }
+
+  .settings-register > section > button:first-child > svg {
+    display: none;
+  }
+
+  .theme-studio-layout {
+    grid-template-columns: minmax(0, 1.25fr) minmax(17rem, .75fr);
+    align-items: start;
+  }
+
+  .theme-stage {
+    position: sticky;
+    top: 1.25rem;
+  }
+
+  .theme-stage-window {
+    min-height: clamp(20rem, 31vw, 26rem);
+  }
+
+  .theme-choice-grid {
+    max-height: min(62vh, 42rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+}
+
+@media (min-width: 480px) and (max-width: 767px) {
+  .theme-choice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: .75rem;
+  }
+}
+
+@media (max-width: 399px) {
+  .theme-category-switcher button {
+    gap: .25rem;
+    font-size: .7rem;
+  }
+
+  .theme-stage-canvas {
+    grid-template-columns: minmax(0, 1.35fr) minmax(4.25rem, .65fr);
+  }
+
+  .theme-choice {
+    grid-template-columns: 5.1rem minmax(0, 1fr) 1.35rem;
+    gap: .65rem;
+  }
+
+  .theme-choice-preview {
+    width: 5.1rem;
+  }
+}
+
 @media (min-width: 1024px) {
   .savings-plan-sheet > :last-child {
     border-left: 1px solid var(--ledger-rule) !important;
@@ -1035,6 +1638,7 @@
 .transaction-workspace {
   --bg-color: var(--ledger-paper);
   --card-bg: var(--ledger-paper-raised);
+  --wash-bg: var(--ledger-paper-wash);
   --border-color: var(--ledger-rule);
   --hover-bg: color-mix(in srgb, var(--ledger-ink) 7%, transparent);
   --text-color: var(--ledger-muted);
@@ -1068,6 +1672,7 @@
 .statement-side {
   --bg-color: var(--ledger-frame);
   --card-bg: var(--ledger-frame-soft);
+  --wash-bg: var(--ledger-frame-soft);
   --border-color: color-mix(in srgb, var(--ledger-frame-text) 15%, transparent);
   --hover-bg: color-mix(in srgb, var(--ledger-frame-text) 7%, transparent);
   --text-color: var(--ledger-frame-muted);
@@ -1259,6 +1864,7 @@
 .transaction-sheet {
   --bg-color: var(--ledger-paper);
   --card-bg: var(--ledger-paper-raised);
+  --wash-bg: var(--ledger-paper-wash);
   --border-color: var(--ledger-rule);
   --hover-bg: color-mix(in srgb, var(--ledger-ink) 7%, transparent);
   --text-color: var(--ledger-muted);
@@ -1311,6 +1917,7 @@
 .login-ledger > section:first-child {
   --bg-color: var(--ledger-frame);
   --card-bg: var(--ledger-frame-soft);
+  --wash-bg: var(--ledger-frame-soft);
   --border-color: color-mix(in srgb, var(--ledger-frame-text) 15%, transparent);
   --hover-bg: color-mix(in srgb, var(--ledger-frame-text) 7%, transparent);
   --text-color: var(--ledger-frame-muted);
@@ -1332,6 +1939,7 @@
 .login-statement {
   --bg-color: var(--ledger-paper);
   --card-bg: var(--ledger-paper-raised);
+  --wash-bg: var(--ledger-paper-wash);
   --border-color: var(--ledger-rule);
   --hover-bg: color-mix(in srgb, var(--ledger-ink) 7%, transparent);
   --text-color: var(--ledger-muted);
@@ -1362,6 +1970,7 @@
   .route-workbench {
     --bg-color: var(--ledger-frame);
     --card-bg: var(--ledger-frame-soft);
+    --wash-bg: var(--ledger-frame-soft);
     --border-color: color-mix(in srgb, var(--ledger-frame-text) 15%, transparent);
     --hover-bg: color-mix(in srgb, var(--ledger-frame-text) 7%, transparent);
     --text-color: var(--ledger-frame-muted);
@@ -1458,6 +2067,7 @@
   .mobile-statement {
     --bg-color: var(--ledger-paper);
     --card-bg: var(--ledger-paper-raised);
+    --wash-bg: var(--ledger-paper-wash);
     --border-color: var(--ledger-rule);
     --hover-bg: color-mix(in srgb, var(--ledger-ink) 7%, transparent);
     --text-color: var(--ledger-muted);
@@ -2014,6 +2624,7 @@
   .transaction-sheet {
     --bg-color: var(--ledger-paper);
     --card-bg: var(--ledger-paper-raised);
+    --wash-bg: var(--ledger-paper-wash);
     --border-color: var(--ledger-rule);
     --hover-bg: color-mix(in srgb, var(--ledger-ink) 7%, transparent);
     --text-color: var(--ledger-muted);
@@ -2145,6 +2756,583 @@
   }
   .hide-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
+  }
+}
+
+/* Route Atlas — a shared rhythm with a different composition for each job. */
+.page-register {
+  --route-rule: var(--ledger-rule);
+  --route-wash: var(--ledger-paper-wash);
+  --route-surface: var(--ledger-paper-raised);
+  --route-frame: var(--ledger-frame-soft);
+  --route-gap: clamp(1.25rem, 2.6vw, 2.25rem);
+  min-width: 0;
+}
+
+.page-register > :not(.fixed),
+.page-register > .scroll-reveal,
+.page-register .workbench-hero,
+.page-register .page-shell-header {
+  min-width: 0;
+}
+
+.page-register .page-shell-header,
+.page-register .workbench-hero {
+  isolation: isolate;
+}
+
+.page-register .page-shell-header::after,
+.page-register .workbench-hero::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  background: var(--route-rule);
+  content: "";
+  opacity: .72;
+  pointer-events: none;
+}
+
+.page-register .section-ledger-heading {
+  margin-bottom: 0;
+  padding-block: .95rem;
+}
+
+.page-register .section-ledger-heading h2 {
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+}
+
+/* Dashboard: a statement first, then a clean two-column workbench. */
+.route-dashboard .dashboard-statement,
+.route-dashboard .dashboard-workbench,
+.route-dashboard .dashboard-analytics,
+.route-dashboard .dashboard-recent {
+  border-radius: 0 !important;
+}
+
+.route-dashboard .dashboard-statement {
+  margin-inline: clamp(1rem, 2.2vw, 2rem);
+  border-color: var(--route-rule);
+}
+
+.route-dashboard .dashboard-workbench {
+  grid-template-columns: minmax(14rem, .78fr) minmax(0, 1.22fr);
+  margin-inline: clamp(1rem, 2.2vw, 2rem);
+  border-color: var(--route-rule);
+}
+
+.route-dashboard .dashboard-wallet-panel,
+.route-dashboard .dashboard-cashflow-panel {
+  min-width: 0;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.route-dashboard .dashboard-wallet-panel {
+  background: var(--route-wash) !important;
+}
+
+.route-dashboard .dashboard-cashflow-panel {
+  background: var(--route-surface) !important;
+}
+
+.route-dashboard .dashboard-analytics,
+.route-dashboard .dashboard-recent {
+  margin-inline: clamp(1rem, 2.2vw, 2rem);
+  border-color: var(--route-rule);
+}
+
+.route-dashboard .dashboard-analytics {
+  grid-template-columns: minmax(0, 1.3fr) minmax(15rem, .7fr);
+}
+
+.route-dashboard .dashboard-analytics > div:first-child {
+  background: var(--route-surface) !important;
+}
+
+.route-dashboard .dashboard-analytics > div:last-child {
+  background: var(--route-wash) !important;
+}
+
+/* Transactions: controls read as a filter band above one dominant ledger. */
+.route-transactions .transaction-desktop {
+  gap: 0;
+}
+
+.route-transactions .transaction-filter-block,
+.route-transactions .transaction-statement-block,
+.route-transactions .transaction-ledger-block,
+.route-transactions .transaction-charts-block,
+.route-transactions .transaction-secondary-block {
+  min-width: 0;
+}
+
+.route-transactions .transaction-filter-block > div {
+  background: var(--route-wash);
+}
+
+.route-transactions .transaction-statement-block > div {
+  background: var(--route-surface);
+}
+
+.route-transactions .transaction-ledger-block {
+  padding-top: .5rem;
+  border-top: 2px solid var(--accent1-color);
+}
+
+.route-transactions .transaction-ledger-surface {
+  border-block: 1px solid var(--route-rule);
+}
+
+.route-transactions .transaction-charts-block,
+.route-transactions .transaction-secondary-block {
+  border-top: 1px solid var(--route-rule);
+  background: var(--route-wash);
+}
+
+/* Investments: keep the intentional 5/3/4 hierarchy visible as one register. */
+.route-investments .investment-layout {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0;
+  border-block: 1px solid var(--route-rule);
+}
+
+.route-investments .investment-layout > div {
+  min-width: 0;
+  padding: 0 clamp(.75rem, 1.6vw, 1.35rem);
+}
+
+.route-investments .investment-layout > div:first-child {
+  grid-column: span 5;
+  padding-left: 0;
+}
+
+.route-investments .investment-layout > div:nth-child(2) {
+  grid-column: span 3;
+  border-left: 1px solid var(--route-rule);
+}
+
+.route-investments .investment-layout > div:nth-child(3) {
+  grid-column: span 4;
+  border-left: 1px solid var(--route-rule);
+  padding-right: 0;
+}
+
+.route-investments .investment-layout > div > * {
+  height: 100%;
+}
+
+.route-investments .investment-hero-register {
+  min-height: 450px;
+}
+
+.route-investments .investment-layout > div:nth-child(2) > *,
+.route-investments .investment-layout > div:nth-child(3) > * {
+  border-color: var(--route-rule) !important;
+}
+
+.route-investments .investment-secondary-widgets {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr) minmax(0, 1fr);
+  gap: 0;
+  border-block: 1px solid var(--route-rule);
+}
+
+.route-investments .investment-secondary-widgets > * {
+  min-width: 0;
+  border-radius: 0 !important;
+  border-inline: 0 !important;
+  background: var(--route-surface) !important;
+}
+
+.route-investments .investment-secondary-widgets > * + * {
+  border-left: 1px solid var(--route-rule) !important;
+}
+
+.route-investments .investment-secondary-widgets > :nth-child(2) {
+  background: var(--route-wash) !important;
+}
+
+.route-investments .investment-secondary-content {
+  gap: 0;
+  border-block: 1px solid var(--route-rule);
+}
+
+.route-investments .investment-secondary-content > * {
+  border-radius: 0 !important;
+  border-inline: 0 !important;
+  background: var(--route-surface) !important;
+}
+
+.route-investments .investment-secondary-content > * + * {
+  border-top: 1px solid var(--route-rule) !important;
+}
+
+.route-investments .investment-ai-view {
+  gap: 0;
+  border-block: 1px solid var(--route-rule);
+}
+
+.route-investments .investment-ai-view > * {
+  border-radius: 0 !important;
+  border-inline: 0 !important;
+}
+
+.route-investments .investment-ai-view > *:first-child {
+  background: var(--route-wash) !important;
+}
+
+/* Loans: cards become two folios with a visible due-state rail. */
+.route-loans .loan-register {
+  grid-template-columns: minmax(0, 1.18fr) minmax(0, .82fr);
+  gap: 0;
+  border-color: var(--route-rule);
+}
+
+.route-loans .loan-register > * {
+  min-width: 0;
+  padding: 0 clamp(.75rem, 1.8vw, 1.5rem) clamp(1.25rem, 2.4vw, 2rem);
+}
+
+.route-loans .loan-register > *:nth-child(even) {
+  border-left: 1px solid var(--route-rule);
+}
+
+.route-loans .loan-register > *:nth-child(3n) {
+  background: var(--route-wash);
+}
+
+/* Attendance: live action gets the frame; history stays a quiet calendar. */
+.route-attendance > .space-y-6 {
+  display: grid;
+  gap: 0;
+}
+
+.route-attendance .attendance-clock {
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.route-attendance > .space-y-6 > :nth-child(2) {
+  padding-top: clamp(1.1rem, 2vw, 1.75rem);
+  border-top: 1px solid var(--route-rule);
+}
+
+.route-attendance > .space-y-6 > :nth-child(n+3) {
+  padding-top: clamp(1.1rem, 2vw, 1.75rem);
+  border-top: 1px solid var(--route-rule);
+}
+
+.route-attendance .attendance-clock + * {
+  min-width: 0;
+}
+
+.route-attendance .attendance-clock + * > div:last-child,
+.route-attendance .attendance-clock + * .bg-app-card {
+  background: var(--route-surface);
+}
+
+/* Grab: the four summary values form a register, chart carries the emphasis. */
+.route-grab .metric-register {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-block: 1px solid var(--route-rule);
+}
+
+.route-grab .metric-register > * {
+  min-height: 8.25rem;
+  padding: 1.25rem clamp(.7rem, 1.7vw, 1.5rem);
+}
+
+.route-grab .metric-register > *:nth-child(odd) {
+  background: var(--route-wash) !important;
+}
+
+.route-grab .category-register {
+  border-color: var(--route-rule);
+}
+
+.route-grab .category-register > * {
+  background: var(--route-surface) !important;
+}
+
+.route-grab .grab-cashflow-ledger {
+  margin-bottom: 0;
+}
+
+/* Savings: editing occupies the wide column, decisions form a narrow rail. */
+.route-savings .savings-plan-sheet {
+  grid-template-columns: minmax(0, 1.34fr) minmax(17rem, .66fr);
+  gap: 0;
+  border-color: var(--route-rule);
+}
+
+.route-savings .savings-plan-sheet > :first-child {
+  min-width: 0;
+  padding-right: clamp(.75rem, 2.1vw, 2rem);
+}
+
+.route-savings .savings-plan-sheet > :last-child {
+  min-width: 0;
+  padding-left: clamp(.75rem, 2.1vw, 2rem);
+}
+
+.route-savings .savings-goal-register > *:nth-child(odd) {
+  background: var(--route-wash) !important;
+}
+
+/* Analyze: source intake and extraction results remain two explicit stages. */
+.route-analyze .analysis-workspace {
+  display: grid;
+  gap: var(--route-gap);
+  padding: clamp(1rem, 2.5vw, 2rem);
+  border-block: 1px solid var(--route-rule);
+}
+
+.route-analyze .analysis-workspace > :first-child {
+  min-width: 0;
+}
+
+.route-analyze .analysis-dropzone {
+  min-height: clamp(19rem, 38vw, 30rem);
+}
+
+.route-analyze .analysis-workspace table {
+  background: var(--route-surface);
+}
+
+/* AI trading: one analysis canvas, then tabs, then the selected engine. */
+.route-ai-trading #selected-asset-indicator {
+  align-self: stretch;
+  background: var(--route-frame) !important;
+}
+
+.route-ai-trading #asset-selector-panel,
+.route-ai-trading #tradingview-simulator-container {
+  border-color: var(--route-rule);
+  border-radius: 0 !important;
+}
+
+.route-ai-trading #asset-selector-panel {
+  background: var(--route-wash);
+}
+
+.route-ai-trading #tradingview-simulator-container {
+  margin-top: var(--route-gap);
+  padding: clamp(1rem, 2.2vw, 1.6rem);
+  background: var(--route-surface);
+}
+
+.route-ai-trading #ai-trading-tabs {
+  margin-top: var(--route-gap);
+  border-block: 1px solid var(--route-rule);
+}
+
+.route-ai-trading #tab-contents-container {
+  padding-top: var(--route-gap);
+}
+
+.route-ai-trading #tab-contents-container > div,
+.route-ai-trading #tab-contents-container > section {
+  min-width: 0;
+}
+
+.route-ai-trading #tab-signals,
+.route-ai-trading #tab-autotrade,
+.route-ai-trading #tab-backtest,
+.route-ai-trading #tab-mql5 {
+  gap: 0;
+  border-block: 1px solid var(--route-rule);
+}
+
+.route-ai-trading #tab-signals > *,
+.route-ai-trading #tab-autotrade > *,
+.route-ai-trading #tab-backtest > *,
+.route-ai-trading #tab-mql5 > * {
+  min-width: 0;
+  border-radius: 0 !important;
+}
+
+.route-ai-trading #tab-signals > :first-child,
+.route-ai-trading #tab-autotrade > :first-child,
+.route-ai-trading #tab-backtest > :first-child,
+.route-ai-trading #tab-mql5 > :first-child {
+  background: var(--route-wash) !important;
+}
+
+/* Mobile keeps one task per view and lets the theme's frame/surface contrast do the work. */
+@media (max-width: 767px) {
+  html[data-theme-category="light"] .route-workbench,
+  html[data-theme-category="light"] .dashboard-ledger,
+  html[data-theme-category="light"] .transaction-workspace {
+    --bg-color: var(--ledger-paper);
+    --card-bg: var(--ledger-paper-raised);
+    --wash-bg: var(--ledger-paper-wash);
+    --border-color: var(--ledger-rule);
+    --hover-bg: color-mix(in srgb, var(--ledger-ink) 7%, transparent);
+    --text-color: var(--ledger-muted);
+    --text-bright: var(--ledger-ink);
+    --accent1-color: var(--ledger-gold);
+    --accent2-color: color-mix(in srgb, var(--ledger-gold) 82%, var(--ledger-ink));
+    --accent-on-color: var(--ledger-on-accent);
+    --success-color: var(--success-paper);
+    --danger-color: var(--danger-paper);
+    --warning-color: var(--warning-paper);
+    background: var(--ledger-paper);
+    color: var(--ledger-ink);
+  }
+
+  html[data-theme-category="light"] .route-workbench .page-shell-header,
+  html[data-theme-category="light"] .route-workbench > header:first-child {
+    border-color: var(--ledger-rule);
+  }
+
+  .page-register .page-shell-header::after,
+  .page-register .workbench-hero::after {
+    opacity: .5;
+  }
+
+  .route-dashboard .dashboard-statement,
+  .route-dashboard .dashboard-workbench,
+  .route-dashboard .dashboard-analytics,
+  .route-dashboard .dashboard-recent {
+    margin-inline: var(--mobile-gutter);
+  }
+
+  .route-dashboard .dashboard-workbench,
+  .route-dashboard .dashboard-analytics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .route-dashboard .dashboard-cashflow-panel,
+  .route-dashboard .dashboard-analytics > div + div {
+    border-top: 1px solid var(--route-rule);
+    border-left: 0;
+  }
+
+  .route-investments .investment-layout {
+    display: block;
+    border-block: 0;
+  }
+
+  .route-investments .investment-layout > div,
+  .route-investments .investment-layout > div:first-child,
+  .route-investments .investment-layout > div:nth-child(2),
+  .route-investments .investment-layout > div:nth-child(3) {
+    display: block;
+    padding: 0;
+    border-left: 0;
+  }
+
+  .route-investments .investment-layout > div + div {
+    margin-top: var(--mobile-section-gap);
+    padding-top: var(--mobile-section-gap);
+    border-top: 1px solid var(--route-rule);
+  }
+
+  .route-investments .investment-secondary-widgets {
+    display: flex;
+    gap: 0;
+    border-block: 0;
+  }
+
+  .route-investments .investment-secondary-widgets > * + * {
+    margin-top: .5rem;
+    border-top: 1px solid var(--route-rule) !important;
+    border-left: 0 !important;
+  }
+
+  .route-investments .investment-secondary-content,
+  .route-investments .investment-ai-view {
+    border-block: 0;
+  }
+
+  .route-investments .investment-secondary-content > * + *,
+  .route-investments .investment-ai-view > * + * {
+    margin-top: var(--mobile-section-gap);
+    padding-top: var(--mobile-section-gap);
+  }
+
+  .route-loans .loan-register,
+  .route-grab .metric-register,
+  .route-savings .savings-plan-sheet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .route-loans .loan-register > *,
+  .route-loans .loan-register > *:nth-child(even),
+  .route-savings .savings-plan-sheet > :first-child,
+  .route-savings .savings-plan-sheet > :last-child {
+    padding-inline: 0;
+    border-left: 0;
+  }
+
+  .route-loans .loan-register > * + *,
+  .route-savings .savings-plan-sheet > :last-child {
+    margin-top: var(--mobile-section-gap);
+    padding-top: var(--mobile-section-gap);
+    border-top: 1px solid var(--route-rule);
+  }
+
+  .route-grab .metric-register > * {
+    min-height: 6.5rem;
+    padding-inline: .75rem;
+  }
+
+  .route-grab .metric-register > *:nth-child(odd) {
+    background: transparent !important;
+  }
+
+  .route-analyze .analysis-workspace {
+    gap: var(--mobile-section-gap);
+    padding-inline: 0;
+    border-inline: 0;
+  }
+
+  .route-ai-trading #tradingview-simulator-container {
+    margin-top: var(--mobile-section-gap);
+  }
+
+  .route-ai-trading #ai-trading-tabs {
+    margin-top: var(--mobile-section-gap);
+  }
+
+  .route-ai-trading #tab-contents-container {
+    padding-top: var(--mobile-section-gap);
+  }
+
+  .route-ai-trading #tab-signals,
+  .route-ai-trading #tab-autotrade,
+  .route-ai-trading #tab-backtest,
+  .route-ai-trading #tab-mql5 {
+    display: block;
+    border-block: 0;
+  }
+
+  .route-ai-trading #tab-signals > * + *,
+  .route-ai-trading #tab-autotrade > * + *,
+  .route-ai-trading #tab-backtest > * + *,
+  .route-ai-trading #tab-mql5 > * + * {
+    margin-top: var(--mobile-section-gap);
+    padding-top: var(--mobile-section-gap);
+    border-top: 1px solid var(--route-rule);
+  }
+}
+
+@media (min-width: 1024px) {
+  .route-workbench.page-register,
+  .route-dashboard.page-register,
+  .route-transactions.page-register {
+    padding-inline: clamp(1.25rem, 2.3vw, 2.5rem);
+  }
+
+  .route-dashboard.page-register,
+  .route-transactions.page-register {
+    padding-inline: 0;
+  }
+
+  .route-attendance > .space-y-6,
+  .route-loans .loan-register,
+  .route-savings .savings-plan-sheet,
+  .route-analyze .analysis-workspace {
+    max-width: 100%;
   }
 }
 

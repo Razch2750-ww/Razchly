@@ -219,7 +219,7 @@ export default function ImageAnalysis() {
   };
 
   return (
-    <div className="route-workbench route-analyze mx-auto flex h-full w-full max-w-5xl flex-1 flex-col overflow-y-auto bg-app-bg p-4 pb-32 text-app-text md:p-8 md:pb-8">
+    <div className="route-workbench page-register route-analyze mx-auto flex h-full w-full max-w-5xl flex-1 flex-col overflow-y-auto bg-app-bg p-4 pb-32 text-app-text md:p-8 md:pb-8">
       <ScrollReveal className="w-full flex flex-col">
         <header className="workbench-hero mb-6 border-b border-app-border pb-6">
           <p className="page-kicker" aria-hidden="true"><span>AI</span> Extraction desk</p>

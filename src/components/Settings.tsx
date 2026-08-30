@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../store/useStore';
-import { getThemeById, themes, type ThemeCategory } from '../themes';
+import { getThemeById, themes, type ThemeCategory, type ThemeDef } from '../themes';
 import { doc, updateDoc, collection, onSnapshot, query, where, getDocs, writeBatch, getDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Palette, Globe, Check, Car, User as UserIcon, ChevronDown, ChevronUp, Plus, Edit2, Trash2, Wallet, X, Type, Star, Eye, EyeOff, LayoutGrid, Sparkles, Calendar, ArrowLeftRight, TrendingUp, Cpu, HandCoins, CalendarCheck, Target, Scan } from 'lucide-react';
@@ -19,6 +19,20 @@ import { PageShell, ActionBtn } from "./PageShell";
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '../utils/translations';
 
+type SettingsSection = 'profil' | 'rekening' | 'kategori' | 'grab' | 'jadwal' | 'bahasa' | 'tema' | 'navigasi' | 'font';
+
+const createSectionState = (active: SettingsSection) => ({
+  profil: active === 'profil',
+  rekening: active === 'rekening',
+  kategori: active === 'kategori',
+  grab: active === 'grab',
+  jadwal: active === 'jadwal',
+  bahasa: active === 'bahasa',
+  tema: active === 'tema',
+  navigasi: active === 'navigasi',
+  font: active === 'font',
+});
+
 export default function Settings() {
   const { user, themeId, setThemeId, language, setLanguage, grabCashAccount, grabDompetAccount, grabHematAccount, setGrabAccounts, setGlobalAddModalOpen, setGlobalGrabModalOpen, customFontName, setCustomFont, workSchedule, setWorkSchedule, attendancePeriodStart, setAttendancePeriodStart, attendancePeriodEnd, setAttendancePeriodEnd, hiddenTabs, setHiddenTabs } = useStore();
   const { t } = useTranslation();
@@ -30,28 +44,17 @@ export default function Settings() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [sections, setSections] = useState({
-    profil: false,
-    rekening: false,
-    kategori: false,
-    tabungan: false,
-    grab: false,
-    jadwal: false,
-    bahasa: false,
-    tema: false,
-    font: false,
-    navigasi: false
-  });
+  const [sections, setSections] = useState(() => createSectionState('profil'));
   const [themeCategory, setThemeCategory] = useState<ThemeCategory>(() => getThemeById(themeId).category);
 
   useEffect(() => {
     const expandSection = (location.state as any)?.expandSection;
     if (expandSection === 'profile') {
-      setSections(prev => ({ ...prev, profil: true }));
+      setSections(createSectionState('profil'));
     } else if (expandSection === 'accounts') {
-      setSections(prev => ({ ...prev, rekening: true }));
+      setSections(createSectionState('rekening'));
     } else if (expandSection === 'categories') {
-      setSections(prev => ({ ...prev, kategori: true }));
+      setSections(createSectionState('kategori'));
     }
   }, [location.state]);
 
@@ -67,23 +70,8 @@ export default function Settings() {
   const [categoryModalType, setCategoryModalType] = useState<'income' | 'expense'>('expense');
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
 
-  const toggleSection = (section: keyof typeof sections) => {
-    setSections(prev => {
-      const isCurrentlyOpen = prev[section];
-      return {
-        profil: false,
-        rekening: false,
-        kategori: false,
-        tabungan: false,
-        grab: false,
-        jadwal: false,
-        bahasa: false,
-        tema: false,
-        font: false,
-        navigasi: false,
-        [section]: !isCurrentlyOpen
-      };
-    });
+  const toggleSection = (section: SettingsSection) => {
+    setSections(createSectionState(section));
   };
 
   const openAddModal = (e: React.MouseEvent) => {
@@ -405,15 +393,67 @@ export default function Settings() {
     { id: 'dark', label: t('settings.tema.dark') },
     { id: 'amoled', label: 'AMOLED' },
   ];
+  const settingsNavigation: { id: SettingsSection; label: string; icon: typeof Palette }[] = [
+    { id: 'profil', label: t('settings.profil.title'), icon: UserIcon },
+    { id: 'rekening', label: t('settings.rekening.title'), icon: Wallet },
+    { id: 'kategori', label: t('settings.kategori.title'), icon: Sparkles },
+    { id: 'grab', label: t('settings.grab.title'), icon: Car },
+    { id: 'jadwal', label: t('settings.jadwal.title'), icon: Calendar },
+    { id: 'bahasa', label: t('settings.bahasa.title'), icon: Globe },
+    { id: 'tema', label: t('settings.tema.title'), icon: Palette },
+    { id: 'navigasi', label: t('settings.navigasi.title'), icon: LayoutGrid },
+    { id: 'font', label: t('settings.font.title'), icon: Type },
+  ];
+  const activeCategoryLabel = themeCategories.find((category) => category.id === currentTheme.category)?.label ?? currentTheme.category;
+  const themePreviewStyle = (theme: ThemeDef) => ({
+    '--preview-canvas': theme.colors.canvas,
+    '--preview-surface': theme.colors.surface,
+    '--preview-wash': theme.colors.wash,
+    '--preview-text': theme.colors.text,
+    '--preview-muted': theme.colors.muted,
+    '--preview-border': theme.colors.border,
+    '--preview-frame': theme.colors.frame,
+    '--preview-frame-surface': theme.colors.frameSurface,
+    '--preview-frame-text': theme.colors.frameText,
+    '--preview-frame-muted': theme.colors.frameMuted,
+    '--preview-accent': theme.colors.accent,
+    '--preview-frame-accent': theme.colors.frameAccent,
+    '--preview-chart-1': theme.colors.chart[0],
+    '--preview-chart-2': theme.colors.chart[1],
+    '--preview-chart-3': theme.colors.chart[2],
+    '--preview-chart-4': theme.colors.chart[3],
+  } as React.CSSProperties);
 
   const getInitials = (name: string) => name.substring(0, 2).toUpperCase() || 'US';
 
   return (
     <PageShell className="route-settings" title={t('settings.title')} subtitle={t('settings.subtitle')}>
 
-      <ScrollReveal className="settings-register flex-1 space-y-0 pb-10">
+      <ScrollReveal className="settings-layout flex-1 pb-10">
+        <aside className="settings-index" aria-label={language === 'id' ? 'Bagian pengaturan' : 'Settings sections'}>
+          <nav>
+            {settingsNavigation.map((item) => {
+              const Icon = item.icon;
+              const active = sections[item.id];
+              return (
+                <button
+                  type="button"
+                  key={item.id}
+                  aria-current={active ? 'page' : undefined}
+                  onClick={() => toggleSection(item.id)}
+                >
+                  <Icon aria-hidden="true" />
+                  <span>{item.label}</span>
+                  <i aria-hidden="true" />
+                </button>
+              );
+            })}
+          </nav>
+        </aside>
 
-        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden">
+        <div className="settings-register min-w-0 space-y-0">
+
+        <section className={`settings-section ${sections.profil ? 'is-active' : ''} bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden`}>
 
           <button type="button" onClick={() => toggleSection('profil')} className={`relative z-10 w-full flex items-center justify-between ${sections.profil ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -442,7 +482,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden">
+        <section className={`settings-section ${sections.rekening ? 'is-active' : ''} bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden`}>
           <button type="button" onClick={() => toggleSection('rekening')} className={`relative z-10 w-full flex items-center justify-between ${sections.rekening ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
               <Wallet className="w-6 h-6 text-app-accent1" />
@@ -523,7 +563,7 @@ export default function Settings() {
         </section>
 
         {/* SECTION: DAFTAR KATEGORI */}
-        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden">
+        <section className={`settings-section ${sections.kategori ? 'is-active' : ''} bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden`}>
 
           <button type="button" onClick={() => toggleSection('kategori')} className={`relative z-10 w-full flex items-center justify-between ${sections.kategori ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -622,7 +662,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden">
+        <section className={`settings-section ${sections.grab ? 'is-active' : ''} bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden`}>
 
           <button type="button" onClick={() => toggleSection('grab')} className={`relative z-10 w-full flex items-center justify-between ${sections.grab ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -663,7 +703,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden">
+        <section className={`settings-section ${sections.jadwal ? 'is-active' : ''} bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden`}>
 
           <button type="button" onClick={() => toggleSection('jadwal')} className={`relative z-10 w-full flex items-center justify-between ${sections.jadwal ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -732,7 +772,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden">
+        <section className={`settings-section ${sections.bahasa ? 'is-active' : ''} bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden`}>
 
           <button type="button" onClick={() => toggleSection('bahasa')} className={`relative z-10 w-full flex items-center justify-between ${sections.bahasa ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -760,7 +800,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden">
+        <section className={`settings-section settings-theme-section ${sections.tema ? 'is-active' : ''} bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden`}>
 
           <button type="button" onClick={() => toggleSection('tema')} className={`relative z-10 w-full flex items-center justify-between ${sections.tema ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -776,8 +816,13 @@ export default function Settings() {
               <div>
                 <span>{language === 'id' ? 'Tema aktif' : 'Active theme'}</span>
                 <strong>{currentTheme.name}</strong>
+                <small>{currentTheme.tone[language === 'en' ? 'en' : 'id']}</small>
               </div>
-              <Check aria-hidden="true" />
+              <div className="theme-active-palette" aria-label={language === 'id' ? 'Palet tema aktif' : 'Active theme palette'}>
+                {[currentTheme.colors.frame, currentTheme.colors.surface, currentTheme.colors.accent, ...currentTheme.colors.chart.slice(1)].map((color, index) => (
+                  <i key={`${color}-${index}`} style={{ backgroundColor: color }} />
+                ))}
+              </div>
             </div>
 
             <div className="theme-category-switcher" aria-label={language === 'id' ? 'Kategori tema' : 'Theme category'}>
@@ -797,61 +842,108 @@ export default function Settings() {
               })}
             </div>
 
-            <div className="theme-choice-grid">
-              {visibleThemes.map((theme) => {
-                const selected = themeId === theme.id;
-                return (
-                  <button
-                    type="button"
-                    key={theme.id}
-                    aria-label={`${theme.name}${selected ? (language === 'id' ? ', tema aktif' : ', active theme') : ''}`}
-                    aria-pressed={selected}
-                    onClick={() => handleThemeChange(theme.id)}
-                    className="theme-choice"
-                    style={{
-                      '--preview-canvas': theme.colors.canvas,
-                      '--preview-surface': theme.colors.surface,
-                      '--preview-text': theme.colors.text,
-                      '--preview-muted': theme.colors.muted,
-                      '--preview-border': theme.colors.border,
-                      '--preview-frame': theme.colors.frame,
-                      '--preview-frame-text': theme.colors.frameText,
-                      '--preview-accent': theme.colors.accent,
-                      '--preview-frame-accent': theme.colors.frameAccent,
-                    } as React.CSSProperties}
-                  >
-                    <span className="theme-choice-preview" aria-hidden="true">
-                      <span className="theme-choice-frame">
+            <div className="theme-studio-layout">
+              <article className="theme-stage" style={themePreviewStyle(currentTheme)}>
+                <div className="theme-stage-window" aria-hidden="true">
+                  <div className="theme-stage-command">
+                    <span className="theme-stage-brand" />
+                    <span className="theme-stage-search" />
+                    <span className="theme-stage-avatar" />
+                  </div>
+                  <div className="theme-stage-workspace">
+                    <span className="theme-stage-rail">
+                      <i />
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    <span className="theme-stage-canvas">
+                      <span className="theme-stage-statement">
                         <i />
                         <b />
                         <em />
+                        <span className="theme-stage-lines"><i /><i /><i /></span>
                       </span>
-                      <span className="theme-choice-canvas">
-                        <span className="theme-choice-statement">
+                      <span className="theme-stage-side">
+                        <i />
+                        <b />
+                        <span className="theme-stage-bars">
                           <i />
-                          <b />
-                          <em />
-                        </span>
-                        <span className="theme-choice-register">
                           <i />
-                          <b />
-                          <em />
+                          <i />
+                          <i />
                         </span>
                       </span>
                     </span>
-                    <span className="theme-choice-meta">
-                      <span>{theme.name}</span>
-                      {selected && <Check aria-hidden="true" />}
-                    </span>
-                  </button>
-                );
-              })}
+                  </div>
+                </div>
+                <footer className="theme-stage-caption">
+                  <div>
+                    <strong>{currentTheme.name}</strong>
+                    <span>{currentTheme.tone[language === 'en' ? 'en' : 'id']}</span>
+                  </div>
+                  <span>{activeCategoryLabel}</span>
+                </footer>
+              </article>
+
+              <div className="theme-library">
+                <header className="theme-library-header">
+                  <strong>{themeCategories.find((category) => category.id === themeCategory)?.label}</strong>
+                  <span>{visibleThemes.length} {language === 'id' ? 'pilihan' : 'options'}</span>
+                </header>
+                <div className="theme-choice-grid">
+                  {visibleThemes.map((theme) => {
+                    const selected = themeId === theme.id;
+                    return (
+                      <button
+                        type="button"
+                        key={theme.id}
+                        aria-label={`${theme.name}, ${theme.tone[language === 'en' ? 'en' : 'id']}${selected ? (language === 'id' ? ', tema aktif' : ', active theme') : ''}`}
+                        aria-pressed={selected}
+                        onClick={() => handleThemeChange(theme.id)}
+                        className="theme-choice"
+                        style={themePreviewStyle(theme)}
+                      >
+                        <span className="theme-choice-preview" aria-hidden="true">
+                          <span className="theme-choice-frame">
+                            <i />
+                            <b />
+                            <em />
+                          </span>
+                          <span className="theme-choice-canvas">
+                            <span className="theme-choice-statement">
+                              <i />
+                              <b />
+                              <em />
+                            </span>
+                            <span className="theme-choice-register">
+                              <i />
+                              <b />
+                              <em />
+                            </span>
+                          </span>
+                        </span>
+                        <span className="theme-choice-meta">
+                          <strong>{theme.name}</strong>
+                          <small>{theme.tone[language === 'en' ? 'en' : 'id']}</small>
+                          <span className="theme-choice-palette" aria-hidden="true">
+                            {theme.colors.chart.map((color, index) => <i key={`${color}-${index}`} style={{ backgroundColor: color }} />)}
+                          </span>
+                        </span>
+                        <span className="theme-choice-check" aria-hidden="true">
+                          {selected && <Check />}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
           )}
         </section>
 
-        <section className="bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden">
+        <section className={`settings-section ${sections.navigasi ? 'is-active' : ''} bg-app-card p-6 md:p-8 rounded-2xl border border-app-border transition-all duration-300 relative overflow-hidden`}>
 
           <button type="button" onClick={() => toggleSection('navigasi')} className={`relative z-10 w-full flex items-center justify-between ${sections.navigasi ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -915,7 +1007,7 @@ export default function Settings() {
           )}
         </section>
 
-        <section className="relative overflow-hidden rounded-2xl border border-app-border/60 bg-app-card p-8 transition-colors">
+        <section className={`settings-section ${sections.font ? 'is-active' : ''} relative overflow-hidden rounded-2xl border border-app-border/60 bg-app-card p-8 transition-colors`}>
 
           <button type="button" onClick={() => toggleSection('font')} className={`relative z-10 w-full flex items-center justify-between ${sections.font ? 'mb-8 border-b border-app-border/50 pb-6' : ''}`}>
             <div className="flex items-center gap-3">
@@ -978,6 +1070,7 @@ export default function Settings() {
           </div>
           )}
         </section>
+        </div>
       </ScrollReveal>
 
       {/* Modal Rekening */}

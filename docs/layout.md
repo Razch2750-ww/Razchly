@@ -92,3 +92,9 @@ Avoid arbitrary z-index values outside this scale.
 - Shared headings and controls use optical, not merely mathematical, centering.
 - Use grid for page structure and flex for small control groups.
 - Avoid nested containers whose only purpose is another rounded background.
+
+## Route Atlas rhythm
+
+The `page-register` marker applies one shared rhythm to every route: a low-noise header rule, fluid gutters, tabular numeric alignment, and alternating paper/wash planes. The route classes then choose the composition that matches the job. This keeps the visual language recognizable while avoiding a repeated wall of equal cards.
+
+Desktop compositions use a dominant plane plus a supporting rail or register. On mobile, the same planes stack in task order; supporting panels become rule-separated sections rather than compressed multi-column cards. Theme `wash` and `frameSurface` tokens are used for those secondary planes so all 30 themes retain a distinct sense of depth.

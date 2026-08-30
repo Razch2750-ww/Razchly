@@ -492,7 +492,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="route-dashboard dashboard-ledger flex h-full w-full flex-1 flex-col overflow-y-auto pb-32 text-app-text md:pb-10">
+    <div className="route-dashboard page-register dashboard-ledger flex h-full w-full flex-1 flex-col overflow-y-auto pb-32 text-app-text md:pb-10">
       {/* DESKTOP HEADER */}
       <header className="dashboard-toolbar hidden items-center justify-between gap-6 border-b px-7 py-4 md:flex">
         <div>

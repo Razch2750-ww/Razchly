@@ -2291,7 +2291,7 @@ export default function Investments() {
         return (
           <>
             {/* WIDGETS (STACK ON MOBILE, GRID ON DESKTOP) */}
-            <div className="flex flex-col gap-3.5 mb-6 md:grid md:grid-cols-3 md:gap-5 md:mb-8">
+            <div className="investment-secondary-widgets flex flex-col gap-3.5 mb-6 md:grid md:grid-cols-3 md:gap-5 md:mb-8">
               {/* TOTAL INVESTASI */}
               <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex items-center justify-between relative overflow-hidden cursor-pointer w-full min-h-[100px]">
                 <div className="flex items-center gap-5 relative z-10 w-full min-w-0">
@@ -2384,7 +2384,7 @@ export default function Investments() {
       })()}
 
       {/* MAIN SECTIONS */}
-      <div className="flex flex-col gap-6 mb-6">
+      <div className="investment-secondary-content flex flex-col gap-6 mb-6">
         {/* PERFORMA INVESTASI */}
         <div className="bg-app-card rounded-[20px] p-6 sm:p-8 border border-app-border/60 flex flex-col relative overflow-hidden">
 
@@ -3080,7 +3080,7 @@ export default function Investments() {
 
       {/* AI INSIGHTS & STOCK RECOMMENDATIONS VIEW */}
       {activeTab === "ai_insights" && (
-        <div className="flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-300 mb-8">
+        <div className="investment-ai-view flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-300 mb-8">
           {/* TOP HEADER & RE-ANALYZE BAR */}
           <div className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
             <div className="flex items-start gap-3.5 relative z-10">

@@ -10,16 +10,17 @@ Razchly must not resemble a crypto exchange, generic admin template, glass dashb
 
 ## Core palette
 
-These are the default `Kinpaku Slate` values. The existing theme picker may recolor paper, ink, rule, frame, and accent tokens while preserving the same hierarchy, geometry, and semantic color rules.
+These are the default `Kinpaku Slate` values. The theme picker may recolor paper, wash, ink, rule, frame, frame surface, and both action accents while preserving the same hierarchy, geometry, and semantic color rules.
 
 | Role | Token | Value |
 |---|---|---|
 | Command frame | `--ledger-frame` | `#10120F` |
-| Raised frame | `--ledger-frame-soft` | Derived from frame and frame text |
+| Raised frame | `--ledger-frame-soft` | `#1D211A` |
 | Statement paper | `--ledger-paper` | `#F3EEE3` |
-| Raised paper | `--ledger-paper-raised` | `#F8F4EA` |
+| Raised paper | `--ledger-paper-raised` | `#FBF7ED` |
+| Paper wash | `--ledger-paper-wash` | `#DDD3BE` |
 | Ink | `--ledger-ink` | `#161713` |
-| Rule | `--ledger-rule` | `#B8B2A4` |
+| Rule | `--ledger-rule` | `#ADA796` |
 | Paper action | `--ledger-gold` | `#765519` |
 | Frame action | `--ledger-accent-frame` | `#D7B669` |
 | Positive | `--success-paper` | `#21654C` |
@@ -32,10 +33,12 @@ Gold is the single brand accent. Green and red are semantic data colors only. Do
 Every preset maps the same semantic roles instead of supplying unrelated accent swatches:
 
 - canvas, raised surface, primary text, secondary text, and rule;
-- command frame, frame text, and a contrast-safe frame accent;
+- command frame, frame surface, frame text, frame-muted text, and a contrast-safe frame accent;
 - paper accent plus its explicit foreground color;
 - success, danger, and warning variants for paper and frame contexts;
 - four chart colors that remain secondary to the active action color.
+
+The 30 presets are intentionally grouped by temperature and material instead of being minor shade variants: warm paper, ice/cobalt, botanical, rose, violet, navy, plum, forest, cocoa, and true-black AMOLED families. Every choice also carries a tone label and a miniature frame/paper/chart preview in the Theme Atlas.
 
 `ThemeApplicator` publishes these roles to both the legacy `--app-*` compatibility tokens and the Obsidian Ledger tokens. Route CSS must consume semantic variables and must not special-case a theme ID. The existing 30 IDs remain stable so saved user preferences continue to load.
 
@@ -98,6 +101,19 @@ Tracking never goes below `-0.04em`. Body copy uses balanced or pretty wrapping 
 | Savings | Goal folios showing remaining amount and next decision, not decorative rings |
 | Analyze | Camera or upload workbench with explicit extraction states |
 | Settings | Quiet indexed configuration document |
+
+## Route Atlas relayout
+
+All authenticated routes share the same header rhythm, rule weight, control sizing, and semantic tokens through `page-register`. Their composition changes with the task so the product is consistent without becoming repetitive:
+
+- Dashboard uses a statement-ledger opening, then a 1/3 wallet-to-cashflow workbench and a 13/7 analysis split.
+- Transactions gives the reconciliable ledger a full-width accent rule, with filters and charts treated as bands instead of card rows.
+- Investments preserves the 5/3/4 portfolio hierarchy and separates the analysis desk from the holdings register.
+- Loans and Grab use folio/register geometry; Attendance puts the live shift first; Savings gives the editor a wide column and decisions a narrow rail.
+- Analyze keeps intake and extraction as two explicit stages; AI Trading keeps the market canvas dominant and tabs secondary.
+- Settings uses an index plus one active editor on desktop, and a compact single-column document on mobile.
+
+At mobile widths every route collapses to one task per view, retains 44px controls, and uses the theme's frame/surface contrast without introducing horizontal page overflow.
 
 ## Browser surfaces
 
