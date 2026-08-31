@@ -26,7 +26,7 @@
 ### Dashboard
 
 - Mobile: header, raised balance statement, positions, wallets, analysis, daybook
-- Desktop: toolbar, 8 + 4 statement, account and cashflow workbench, analysis, transaction ledger
+- Desktop: toolbar and full-width statement, then a wide wallet/cashflow lane paired with an interest/daybook rail
 
 ### Transactions
 
@@ -36,18 +36,23 @@
 ### Investments and AI trading
 
 - Mobile: asset or engine selector before chart, compact metrics below
-- Desktop: selector and holdings register alongside one dominant analysis area
+- Tablet investments: chart deck spans both columns; return and allocation share the following row
+- Desktop investments: chart deck stays dominant while return and allocation stack in a narrow rail
+- Desktop AI trading: asset search remains in a narrow rail beside the market canvas; engine tabs follow below
 - Never compress chart labels below readable size; reduce tick count instead
 
 ### Loans, Attendance, Grab, Savings
 
 - Mobile: primary action within the first viewport, summary followed by chronological rows
-- Desktop: summary and primary action share the header region, register follows
+- Loans: obligation and receivable folios stack on mobile and remain separate columns on desktop
+- Attendance: live clock precedes history on mobile and becomes a sticky companion to the calendar on desktop
+- Grab: period, metrics, categories, then chart on mobile; settlement chart becomes the dominant desktop canvas
+- Savings: editor precedes forecast and goal status on mobile; forecast becomes a sticky desktop rail
 
 ### Analyze
 
 - Mobile: upload or camera action first, preview second, extracted form third
-- Desktop: source and preview may sit beside extracted fields
+- Desktop: the empty intake is centered; once extraction succeeds, source and review become a `5 + 7` verification desk
 
 ### Settings
 

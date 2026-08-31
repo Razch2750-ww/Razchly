@@ -42,7 +42,7 @@ export default function Login() {
 
   return (
     <main className="route-login page-register login-ledger relative grid min-h-[100dvh] overflow-hidden lg:grid-cols-[1.16fr_0.84fr]">
-      <section className="relative hidden min-h-[100dvh] flex-col justify-between px-12 py-10 lg:flex xl:px-16 xl:py-12">
+      <section className="login-narrative relative hidden min-h-[100dvh] flex-col justify-between px-12 py-10 lg:flex xl:px-16 xl:py-12">
         <div className="flex items-center justify-between border-b border-app-border pb-6">
           <span className="font-ledger text-[28px] text-app-accent1">Razchly</span>
           <span className="text-xs text-app-text">Personal finance ledger</span>

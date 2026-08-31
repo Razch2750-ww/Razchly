@@ -1271,6 +1271,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
         </div>
       </header>
 
+      <div className="ai-market-workspace">
+
       {/* Asset Search & Selector panel */}
       <div className="market-search-register border border-app-border bg-app-card p-4" id="asset-selector-panel">
         <div className="flex flex-col md:flex-row gap-4">
@@ -1323,6 +1325,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
         usdToIdrRate={usdToIdrRate}
         formatCurrencyVal={formatCurrencyVal}
       />
+
+      </div>
 
       {/* Tabs Menu Navigation */}
       <div className="flex border-b border-app-border overflow-x-auto whitespace-nowrap w-full max-w-full shrink-0" id="ai-trading-tabs">

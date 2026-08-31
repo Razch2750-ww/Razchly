@@ -219,14 +219,15 @@ export default function ImageAnalysis() {
   };
 
   return (
-    <div className="route-workbench page-register route-analyze mx-auto flex h-full w-full max-w-5xl flex-1 flex-col overflow-y-auto bg-app-bg p-4 pb-32 text-app-text md:p-8 md:pb-8">
+    <div className="route-workbench page-register route-analyze mx-auto flex h-full w-full max-w-7xl flex-1 flex-col overflow-y-auto bg-app-bg p-4 pb-32 text-app-text md:p-8 md:pb-8">
       <ScrollReveal className="w-full flex flex-col">
         <header className="workbench-hero mb-6 border-b border-app-border pb-6">
           <h1 className="text-2xl text-app-text-bright md:text-3xl"><TextReveal text="Ekstraksi mutasi dan struk" /></h1>
           <p className="mt-2 max-w-[62ch] text-sm leading-relaxed text-app-text/65">Unggah bukti transaksi, periksa hasil pembacaan, lalu pilih data yang benar sebelum menyimpannya.</p>
         </header>
 
-        <div className="analysis-workspace border border-app-border bg-app-card p-4 md:p-6">
+        <div className={`analysis-workspace border border-app-border bg-app-card p-4 md:p-6 ${extractedData.length > 0 ? "has-results" : ""}`}>
+          <section className="analysis-source-stage">
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="analysis-dropzone relative flex min-h-[320px] w-full flex-1 flex-col items-center justify-center overflow-hidden border border-dashed border-app-border bg-app-bg p-8 transition-colors hover:border-app-accent1/60">
                     {selectedImages.length > 0 ? (
@@ -291,7 +292,7 @@ export default function ImageAnalysis() {
             </div>
 
             {selectedImages.length > 0 && extractedData.length === 0 && (
-                <div className="mt-6 flex justify-end">
+                <div className="analysis-source-action mt-6 flex justify-end">
                     <button type="button"
                         onClick={handleAnalyze}
                         disabled={isAnalyzing}
@@ -311,9 +312,10 @@ export default function ImageAnalysis() {
                     </button>
                 </div>
             )}
+          </section>
 
             {extractedData.length > 0 && (
-                <div className="mt-8 animate-in slide-in-from-bottom-4 duration-300">
+                <section className="analysis-review-stage animate-in slide-in-from-bottom-4 duration-300">
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
                         <h3 className="text-lg font-semibold text-app-text-bright flex items-center gap-2">
                            <Check className="w-5 h-5 text-app-success" />
@@ -422,7 +424,7 @@ export default function ImageAnalysis() {
                           )}
                        </button>
                     </div>
-                </div>
+                </section>
             )}
         </div>
       </ScrollReveal>

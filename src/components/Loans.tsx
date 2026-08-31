@@ -884,6 +884,39 @@ export default function Loans() {
     </ActionBtn>
   );
 
+  const orderedLoans = [...loans].sort((a, b) => {
+    const aRemaining = calculateLoanDetails(a).totalPayment - (a.paidAmount || 0);
+    const bRemaining = calculateLoanDetails(b).totalPayment - (b.paidAmount || 0);
+    const aPaid = aRemaining <= 0;
+    const bPaid = bRemaining <= 0;
+    if (aPaid && !bPaid) return 1;
+    if (!aPaid && bPaid) return -1;
+
+    const aNextPayment = getNextPaymentDate(a);
+    const bNextPayment = getNextPaymentDate(b);
+    if (aNextPayment && bNextPayment) return aNextPayment.getTime() - bNextPayment.getTime();
+    if (aNextPayment) return -1;
+    if (bNextPayment) return 1;
+    return b.createdAt - a.createdAt;
+  });
+
+  const loanGroups = [
+    {
+      id: "borrow",
+      title: "Kewajiban",
+      description: "Pinjaman yang perlu Anda bayar",
+      empty: "Tidak ada kewajiban tercatat.",
+      loans: orderedLoans.filter((loan) => loan.type !== "lend"),
+    },
+    {
+      id: "lend",
+      title: "Piutang",
+      description: "Dana yang perlu Anda terima",
+      empty: "Tidak ada piutang tercatat.",
+      loans: orderedLoans.filter((loan) => loan.type === "lend"),
+    },
+  ];
+
   return (
     <PageShell
       className="route-loans"
@@ -901,35 +934,41 @@ export default function Loans() {
           action={<ActionBtn variant="primary" icon={<Plus className="w-4 h-4" />} onClick={openAddModal}>Tambah Pinjaman</ActionBtn>}
         />
       ) : (
-        <StaggerContainer className="loan-register grid w-full grid-cols-1 gap-5 xl:grid-cols-2">
-          {[...loans]
-            .sort((a, b) => {
-              const aRemaining = calculateLoanDetails(a).totalPayment - (a.paidAmount || 0);
-              const bRemaining = calculateLoanDetails(b).totalPayment - (b.paidAmount || 0);
-              const aPaid = aRemaining <= 0;
-              const bPaid = bRemaining <= 0;
-              if (aPaid && !bPaid) return 1;
-              if (!aPaid && bPaid) return -1;
+        <div className="loan-register grid w-full grid-cols-1 xl:grid-cols-2">
+          {loanGroups.map((group) => {
+            const remainingTotal = group.loans.reduce((total, loan) => {
+              const details = calculateLoanDetails(loan);
+              return total + Math.max(details.totalPayment - (loan.paidAmount || 0), 0);
+            }, 0);
 
-              const aNextPayment = getNextPaymentDate(a);
-              const bNextPayment = getNextPaymentDate(b);
+            return (
+              <section key={group.id} className={`loan-group loan-group--${group.id}`}>
+                <header className="loan-group-header">
+                  <div>
+                    <h2>{group.title}</h2>
+                    <p>{group.description}</p>
+                  </div>
+                  <div className="loan-group-total">
+                    <span>{group.loans.length} catatan</span>
+                    <strong>Rp {remainingTotal.toLocaleString("id-ID")}</strong>
+                  </div>
+                </header>
 
-              if (aNextPayment && bNextPayment) {
-                return aNextPayment.getTime() - bNextPayment.getTime();
-              } else if (aNextPayment) {
-                return -1;
-              } else if (bNextPayment) {
-                return 1;
-              }
-
-              return b.createdAt - a.createdAt;
-            })
-            .map(loan => (
-              <StaggerItem key={loan.id} className="w-full">
-                <LoanCard loan={loan} deleteLoan={deleteLoan} onEdit={openEditModal} accounts={accounts} />
-              </StaggerItem>
-            ))}
-        </StaggerContainer>
+                {group.loans.length > 0 ? (
+                  <StaggerContainer className="loan-folio-list flex flex-col gap-5">
+                    {group.loans.map((loan) => (
+                      <StaggerItem key={loan.id} className="w-full">
+                        <LoanCard loan={loan} deleteLoan={deleteLoan} onEdit={openEditModal} accounts={accounts} />
+                      </StaggerItem>
+                    ))}
+                  </StaggerContainer>
+                ) : (
+                  <div className="loan-group-empty">{group.empty}</div>
+                )}
+              </section>
+            );
+          })}
+        </div>
       )}
 
       {isModalOpen && (

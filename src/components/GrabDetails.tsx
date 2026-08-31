@@ -261,8 +261,10 @@ export default function GrabDetails() {
         </div>
       </header>
 
+      <div className="grab-settlement-workspace">
+
       {/* Filter */}
-      <div className="bg-app-card rounded-xl p-1 flex items-center justify-between mb-6 border border-app-border w-full shrink-0">
+      <div className="grab-period-tabs bg-app-card rounded-xl p-1 flex items-center justify-between mb-6 border border-app-border w-full shrink-0">
         {["hari_ini", "7_hari", "bulanan", "custom"].map((ft) => (
           <button type="button"
             key={ft}
@@ -279,7 +281,7 @@ export default function GrabDetails() {
 
       {/* Date Navigator / Custom Range */}
       {filterType === "custom" ? (
-        <div className="flex items-center gap-2 mb-6 px-2 shrink-0 animate-in fade-in duration-200">
+        <div className="grab-period-navigation flex items-center gap-2 mb-6 px-2 shrink-0 animate-in fade-in duration-200">
           <input
             type="date"
             value={customStartDate}
@@ -295,7 +297,7 @@ export default function GrabDetails() {
           />
         </div>
       ) : (
-        <div className="flex items-center justify-between mb-6 px-2 shrink-0">
+        <div className="grab-period-navigation flex items-center justify-between mb-6 px-2 shrink-0">
           <button type="button" onClick={handlePrev} className="p-1 hover:bg-app-hover rounded-full transition-colors cursor-pointer" aria-label="Periode sebelumnya">
             <ChevronLeft className="w-5 h-5 text-app-accent1" />
           </button>
@@ -368,7 +370,7 @@ export default function GrabDetails() {
       </div>
 
       {/* TOTAL PER KATEGORI */}
-      <h3 className="text-xl font-semibold text-app-text-bright mb-4 flex items-center gap-2">
+      <h3 className="grab-category-title text-xl font-semibold text-app-text-bright mb-4 flex items-center gap-2">
         <Car className="w-5 h-5 text-app-accent1" /> Total per Kategori
       </h3>
       <div className="category-register mb-8 grid grid-cols-2 gap-0 border-y border-app-border md:grid-cols-4">
@@ -444,6 +446,8 @@ export default function GrabDetails() {
               </LineChart>
             </ResponsiveContainer>
         </div>
+      </div>
+
       </div>
 
     </div>

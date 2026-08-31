@@ -154,7 +154,7 @@ export default function SavingsTarget() {
       </header>
 
       <div className="savings-plan-sheet mb-8 grid grid-cols-1 gap-0 border border-app-border lg:grid-cols-3">
-        <ScrollReveal className="lg:col-span-2">
+        <ScrollReveal className="savings-plan-editor lg:col-span-2">
           <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden h-full">
 
           <h2 className="text-app-text-bright font-semibold mb-6 flex items-center gap-2 relative z-10">
@@ -300,7 +300,7 @@ export default function SavingsTarget() {
         </div>
         </ScrollReveal>
 
-        <StaggerContainer className="lg:col-span-1 flex flex-col gap-6">
+        <StaggerContainer className="savings-plan-forecast lg:col-span-1 flex flex-col gap-6">
           {/* Laba Bersih Card */}
           <StaggerItem className="flex-1">
             <HoverCard className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col justify-center relative overflow-hidden h-full min-h-[140px] w-full">
@@ -388,7 +388,7 @@ export default function SavingsTarget() {
       </div>
       <div className="savings-goal-register mb-8 grid grid-cols-1 gap-0 border-y border-app-border md:grid-cols-2 lg:grid-cols-3">
         {/* Tabungan Bulanan Berlayer */}
-        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
+        <div className="savings-goal-primary bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
 
           <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <Star className="w-5 h-5 text-app-accent1" /> Tabungan Layered
@@ -440,7 +440,7 @@ export default function SavingsTarget() {
         </div>
 
         {/* Penghasilan Harian Berlayer */}
-        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
+        <div className="savings-goal-income bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
 
           <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowUp className="w-5 h-5 text-app-success" /> Penghasilan Layered
@@ -492,7 +492,7 @@ export default function SavingsTarget() {
         </div>
 
         {/* Pengeluaran Harian Berlayer */}
-        <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
+        <div className="savings-goal-expense bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
 
           <h2 className="text-app-text-bright font-semibold mb-6 text-center text-lg relative z-10 flex items-center justify-center gap-2">
              <ArrowDown className="w-5 h-5 text-app-danger" /> Pengeluaran Layered

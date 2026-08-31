@@ -49,15 +49,23 @@ Used by Dashboard and Transactions.
 
 Transactions uses a desktop reconciliation desk instead of the Dashboard split: a compact analysis rail supports one dominant sticky ledger. At narrower widths the rail and ledger return to a single column.
 
-### Workbench template
+### Workbench family
 
-Used by Investments, Loans, Attendance, Grab, Savings, Analyze, and AI Trading.
+Workbench routes share spacing and tokens, but they do not share one page scaffold. Each job owns a distinct desktop topology:
 
-- Route header and actions
-- One dominant work surface
-- Supporting metrics grouped by meaning, not equal-size card rows
-- Detail list or chart follows the dominant surface
-- Secondary analysis appears after the task flow, not before it
+| Route | Dominant plane | Supporting plane |
+|---|---|---|
+| Dashboard | Full-width financial statement, then wallet/cashflow desk | Interest note and compact daybook rail |
+| Investments | Portfolio chart deck | Stacked return and allocation rail |
+| Loans | Obligation folio | Receivable folio |
+| Attendance | Sticky live time clock | Period calendar and history |
+| Grab | Large settlement chart | Period, metrics, and category rail |
+| Savings | Goal editor | Sticky forecast rail and asymmetric goal register |
+| Analyze | Source intake | Extracted transaction review |
+| AI Trading | Chart canvas | Asset search rail, followed by the selected engine |
+| Settings | Persistent document index | One active configuration editor |
+
+Supporting metrics stay grouped by meaning rather than becoming interchangeable equal-size cards. The mobile source order remains the operational order even when desktop places sections side by side.
 
 ### Settings template
 
@@ -99,4 +107,4 @@ Avoid arbitrary z-index values outside this scale.
 
 The `page-register` marker applies one shared rhythm to every route: a low-noise header rule, fluid gutters, tabular numeric alignment, and alternating paper/wash planes. The route classes then choose the composition that matches the job. This keeps the visual language recognizable while avoiding a repeated wall of equal cards.
 
-Desktop compositions use a dominant plane plus a supporting rail or register. On mobile, the same planes stack in task order; supporting panels become rule-separated sections rather than compressed multi-column cards. Theme `wash` and `frameSurface` tokens are used for those secondary planes so all 30 themes retain a distinct sense of depth.
+Desktop compositions use a dominant plane plus a supporting rail or register. On mobile, the same planes stack in task order; supporting panels become rule-separated sections rather than compressed multi-column cards. Theme `wash` and `frameSurface` tokens are used for those secondary planes so all 30 themes retain a distinct sense of depth. Route geometry must never depend on a specific palette, which keeps every topology usable across all light and dark themes.

@@ -490,7 +490,7 @@ export default function Attendance() {
       actions={attendanceActions}
       mobileActions={attendanceActions}
     >
-      <div className="space-y-6 md:space-y-8">
+      <div className="attendance-workspace space-y-6 md:space-y-8">
 
         {/* Today's Actions */}
         <HoverCard className="attendance-clock relative w-full overflow-hidden border border-app-border bg-app-card p-4 transition-colors sm:p-5">
@@ -657,7 +657,7 @@ export default function Attendance() {
         </HoverCard>
 
         {/* History */}
-        <div>
+        <section className="attendance-history">
            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
              <div className="flex items-center gap-4">
                <h2 className="font-semibold text-app-text-bright">Riwayat Kehadiran</h2>
@@ -801,7 +801,7 @@ export default function Attendance() {
                })()}
              </div>
            </div>
-        </div>
+        </section>
 
 
       </div>

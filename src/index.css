@@ -2798,6 +2798,65 @@
   background: var(--route-wash) !important;
 }
 
+@media (min-width: 1280px) {
+  .route-dashboard.page-register {
+    --dashboard-gutter: clamp(1.75rem, 3vw, 3.25rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1.46fr) minmax(24rem, .54fr);
+    align-content: start;
+    align-items: start;
+    gap: var(--route-gap);
+    padding: 0 var(--dashboard-gutter) clamp(3rem, 5vw, 5rem);
+  }
+
+  .route-dashboard > .dashboard-toolbar {
+    grid-column: 1 / -1;
+    width: auto;
+    margin-inline: calc(var(--dashboard-gutter) * -1);
+    padding-inline: var(--dashboard-gutter);
+  }
+
+  .route-dashboard .dashboard-statement {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+
+  .route-dashboard .dashboard-workbench {
+    grid-column: 1;
+    margin: 0;
+  }
+
+  .route-dashboard .dashboard-interest {
+    grid-column: 2;
+    margin: 0;
+  }
+
+  .route-dashboard .dashboard-analytics {
+    grid-column: 1;
+    grid-template-columns: minmax(0, 1.25fr) minmax(17rem, .75fr);
+    margin: 0;
+  }
+
+  .route-dashboard .dashboard-recent {
+    position: sticky;
+    top: 1.25rem;
+    grid-column: 2;
+    align-self: start;
+    margin: 0;
+  }
+
+  .route-dashboard .dashboard-recent > div:first-child {
+    align-items: flex-start;
+  }
+
+  .route-dashboard .dashboard-daybook-table th:nth-child(2),
+  .route-dashboard .dashboard-daybook-table th:nth-child(3),
+  .route-dashboard .dashboard-daybook-table td:nth-child(2),
+  .route-dashboard .dashboard-daybook-table td:nth-child(3) {
+    display: none;
+  }
+}
+
 /* Transactions: one reconciliation desk, not another vertical dashboard stack. */
 .route-transactions .transaction-desktop {
   gap: 0;
@@ -2957,35 +3016,17 @@
   }
 }
 
-/* Investments: keep the intentional 5/3/4 hierarchy visible as one register. */
+/* Investments: a portfolio canvas with a compact return/allocation rail. */
 .route-investments .investment-layout {
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 0;
-  border-block: 1px solid var(--route-rule);
+  min-width: 0;
 }
 
 .route-investments .investment-layout > div {
   min-width: 0;
-  padding: 0 clamp(.75rem, 1.6vw, 1.35rem);
 }
 
-.route-investments .investment-layout > div:first-child {
-  grid-column: span 5;
-  padding-left: 0;
-}
-
-.route-investments .investment-layout > div:nth-child(2) {
-  grid-column: span 3;
-  border-left: 1px solid var(--route-rule);
-}
-
-.route-investments .investment-layout > div:nth-child(3) {
-  grid-column: span 4;
-  border-left: 1px solid var(--route-rule);
-  padding-right: 0;
-}
-
-.route-investments .investment-layout > div > * {
+.route-investments .investment-return-rail > *,
+.route-investments .investment-allocation-rail > * {
   height: 100%;
 }
 
@@ -2993,13 +3034,12 @@
   min-height: 450px;
 }
 
-.route-investments .investment-layout > div:nth-child(2) > *,
-.route-investments .investment-layout > div:nth-child(3) > * {
+.route-investments .investment-return-rail > *,
+.route-investments .investment-allocation-rail > * {
   border-color: var(--route-rule) !important;
 }
 
 .route-investments .investment-secondary-widgets {
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr) minmax(0, 1fr);
   gap: 0;
   border-block: 1px solid var(--route-rule);
 }
@@ -3048,58 +3088,195 @@
   background: var(--route-wash) !important;
 }
 
-/* Loans: cards become two folios with a visible due-state rail. */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .route-investments .investment-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--route-gap);
+    border: 0;
+  }
+
+  .route-investments .investment-chart-deck {
+    grid-column: 1 / -1;
+  }
+
+  .route-investments .investment-return-rail,
+  .route-investments .investment-allocation-rail {
+    grid-column: span 1;
+  }
+}
+
+@media (min-width: 1200px) {
+  .route-investments .investment-layout {
+    grid-template-columns: minmax(0, 1.42fr) minmax(21rem, .58fr);
+    grid-template-rows: auto auto;
+    align-items: stretch;
+    gap: var(--route-gap);
+    border: 0;
+  }
+
+  .route-investments .investment-chart-deck {
+    grid-row: 1 / span 2;
+    grid-column: 1;
+  }
+
+  .route-investments .investment-return-rail {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .route-investments .investment-allocation-rail {
+    grid-row: 2;
+    grid-column: 2;
+  }
+
+  .route-investments .investment-return-rail > * {
+    height: clamp(20rem, 27vw, 25rem) !important;
+  }
+
+  .route-investments .investment-allocation-rail > * {
+    min-height: clamp(20rem, 27vw, 25rem) !important;
+  }
+
+  .route-investments .investment-secondary-widgets {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(20rem, .65fr);
+    grid-template-rows: auto auto;
+  }
+
+  .route-investments .investment-secondary-widgets > :first-child {
+    grid-row: 1 / span 2;
+    grid-column: 1;
+  }
+
+  .route-investments .investment-secondary-widgets > :nth-child(2),
+  .route-investments .investment-secondary-widgets > :nth-child(3) {
+    grid-column: 2;
+    border-left: 1px solid var(--route-rule) !important;
+  }
+
+  .route-investments .investment-secondary-widgets > :nth-child(3) {
+    border-top: 1px solid var(--route-rule) !important;
+  }
+}
+
+/* Loans: two explicit folios keep obligations and receivables apart. */
 .route-loans .loan-register {
-  grid-template-columns: minmax(0, 1.18fr) minmax(0, .82fr);
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
   gap: 0;
-  border-color: var(--route-rule);
+  border-block: 1px solid var(--route-rule);
 }
 
-.route-loans .loan-register > * {
+.route-loans .loan-group {
   min-width: 0;
-  padding: 0 clamp(.75rem, 1.8vw, 1.5rem) clamp(1.25rem, 2.4vw, 2rem);
+  padding: clamp(1rem, 2vw, 1.5rem);
 }
 
-.route-loans .loan-register > *:nth-child(even) {
+.route-loans .loan-group + .loan-group {
   border-left: 1px solid var(--route-rule);
 }
 
-.route-loans .loan-register > *:nth-child(3n) {
+.route-loans .loan-group--lend {
   background: var(--route-wash);
 }
 
-/* Attendance: live action gets the frame; history stays a quiet calendar. */
-.route-attendance > .space-y-6 {
+.route-loans .loan-group-header {
+  display: flex;
+  min-height: 5.5rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--route-rule);
+}
+
+.route-loans .loan-group-header h2 {
+  font-family: var(--font-ledger);
+  font-size: clamp(1.65rem, 3vw, 2.35rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.route-loans .loan-group-header p,
+.route-loans .loan-group-total span {
+  margin-top: .35rem;
+  color: var(--text-color);
+  font-size: .72rem;
+}
+
+.route-loans .loan-group-total {
+  flex: none;
+  text-align: right;
+}
+
+.route-loans .loan-group-total strong {
+  display: block;
+  margin-top: .3rem;
+  color: var(--text-bright);
+  font-family: var(--font-mono);
+  font-size: .82rem;
+}
+
+.route-loans .loan-group-empty {
+  min-height: 10rem;
   display: grid;
-  gap: 0;
+  place-items: center;
+  border-block: 1px solid var(--route-rule);
+  color: var(--text-color);
+  font-size: .8rem;
+  text-align: center;
+}
+
+/* Attendance: live action gets the frame; history stays a quiet calendar. */
+.route-attendance .attendance-workspace {
+  display: grid;
+  gap: var(--route-gap);
 }
 
 .route-attendance .attendance-clock {
-  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  margin: 0;
 }
 
-.route-attendance > .space-y-6 > :nth-child(2) {
-  padding-top: clamp(1.1rem, 2vw, 1.75rem);
-  border-top: 1px solid var(--route-rule);
+.route-attendance .attendance-workspace > * {
+  margin-top: 0 !important;
 }
 
-.route-attendance > .space-y-6 > :nth-child(n+3) {
-  padding-top: clamp(1.1rem, 2vw, 1.75rem);
-  border-top: 1px solid var(--route-rule);
-}
-
-.route-attendance .attendance-clock + * {
+.route-attendance .attendance-history {
   min-width: 0;
 }
 
-.route-attendance .attendance-clock + * > div:last-child,
-.route-attendance .attendance-clock + * .bg-app-card {
+.route-attendance .attendance-history > div:last-child {
   background: var(--route-surface);
 }
 
-/* Grab: the four summary values form a register, chart carries the emphasis. */
+@media (min-width: 1024px) {
+  .route-attendance .attendance-workspace {
+    grid-template-columns: minmax(19rem, .68fr) minmax(0, 1.32fr);
+    align-items: start;
+  }
+
+  .route-attendance .attendance-clock {
+    position: sticky;
+    top: 1.25rem;
+  }
+
+  .route-attendance .attendance-clock [class*="md:grid-cols-4"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .route-attendance .attendance-history {
+    padding-left: var(--route-gap);
+    border-left: 1px solid var(--route-rule);
+  }
+}
+
+/* Grab: a settlement canvas with the period and category registers as a rail. */
+.route-grab .grab-settlement-workspace {
+  min-width: 0;
+}
+
 .route-grab .metric-register {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   border-block: 1px solid var(--route-rule);
 }
 
@@ -3113,6 +3290,7 @@
 }
 
 .route-grab .category-register {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   border-color: var(--route-rule);
 }
 
@@ -3122,6 +3300,67 @@
 
 .route-grab .grab-cashflow-ledger {
   margin-bottom: 0;
+}
+
+@media (min-width: 1024px) {
+  .route-grab .grab-settlement-workspace {
+    display: grid;
+    grid-template-areas:
+      "period navigation"
+      "chart metrics"
+      "chart category-title"
+      "chart categories";
+    grid-template-columns: minmax(0, 1.42fr) minmax(20rem, .58fr);
+    grid-template-rows: auto auto auto 1fr;
+    align-items: start;
+    gap: var(--route-gap);
+  }
+
+  .route-grab .grab-period-tabs {
+    grid-area: period;
+    margin: 0;
+  }
+
+  .route-grab .grab-period-navigation {
+    grid-area: navigation;
+    min-height: 46px;
+    margin: 0;
+    padding-inline: 0;
+  }
+
+  .route-grab .metric-register {
+    grid-area: metrics;
+    margin: 0;
+  }
+
+  .route-grab .metric-register h3 {
+    overflow-wrap: anywhere;
+    font-size: clamp(1.1rem, 1.6vw, 1.55rem);
+  }
+
+  .route-grab .grab-category-title {
+    grid-area: category-title;
+    margin: .25rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--route-rule);
+  }
+
+  .route-grab .category-register {
+    grid-area: categories;
+    align-self: stretch;
+    margin: 0;
+  }
+
+  .route-grab .grab-cashflow-ledger {
+    position: sticky;
+    top: 1.25rem;
+    grid-area: chart;
+    align-self: start;
+  }
+
+  .route-grab .grab-cashflow-ledger > div:last-child {
+    height: clamp(28rem, 48vw, 38rem);
+  }
 }
 
 /* Savings: editing occupies the wide column, decisions form a narrow rail. */
@@ -3145,6 +3384,35 @@
   background: var(--route-wash) !important;
 }
 
+@media (min-width: 1024px) {
+  .route-savings .savings-plan-forecast {
+    position: sticky;
+    top: 1.25rem;
+    align-self: start;
+  }
+
+  .route-savings .savings-goal-register {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(20rem, .82fr);
+    grid-template-rows: auto auto;
+  }
+
+  .route-savings .savings-goal-primary {
+    grid-row: 1 / span 2;
+    grid-column: 1;
+  }
+
+  .route-savings .savings-goal-income,
+  .route-savings .savings-goal-expense {
+    grid-column: 2;
+    border-left: 1px solid var(--route-rule) !important;
+  }
+
+  .route-savings .savings-goal-expense {
+    border-top: 1px solid var(--route-rule) !important;
+  }
+}
+
 /* Analyze: source intake and extraction results remain two explicit stages. */
 .route-analyze .analysis-workspace {
   display: grid;
@@ -3153,7 +3421,8 @@
   border-block: 1px solid var(--route-rule);
 }
 
-.route-analyze .analysis-workspace > :first-child {
+.route-analyze .analysis-source-stage,
+.route-analyze .analysis-review-stage {
   min-width: 0;
 }
 
@@ -3163,6 +3432,28 @@
 
 .route-analyze .analysis-workspace table {
   background: var(--route-surface);
+}
+
+.route-analyze .analysis-workspace:not(.has-results) {
+  width: min(100%, 48rem);
+  margin-inline: auto;
+}
+
+@media (min-width: 1024px) {
+  .route-analyze .analysis-workspace.has-results {
+    grid-template-columns: minmax(18rem, .72fr) minmax(0, 1.28fr);
+    align-items: start;
+  }
+
+  .route-analyze .analysis-workspace.has-results .analysis-source-stage {
+    position: sticky;
+    top: 1.25rem;
+  }
+
+  .route-analyze .analysis-review-stage {
+    padding-left: var(--route-gap);
+    border-left: 1px solid var(--route-rule);
+  }
 }
 
 /* AI trading: one analysis canvas, then tabs, then the selected engine. */
@@ -3182,9 +3473,12 @@
 }
 
 .route-ai-trading #tradingview-simulator-container {
-  margin-top: var(--route-gap);
   padding: clamp(1rem, 2.2vw, 1.6rem);
   background: var(--route-surface);
+}
+
+.route-ai-trading .ai-market-workspace {
+  min-width: 0;
 }
 
 .route-ai-trading #ai-trading-tabs {
@@ -3222,6 +3516,48 @@
 .route-ai-trading #tab-backtest > :first-child,
 .route-ai-trading #tab-mql5 > :first-child {
   background: var(--route-wash) !important;
+}
+
+@media (min-width: 1024px) {
+  .route-ai-trading .ai-market-workspace {
+    display: grid;
+    grid-template-columns: minmax(18rem, .58fr) minmax(0, 1.42fr);
+    align-items: start;
+    gap: var(--route-gap);
+  }
+
+  .route-ai-trading #asset-selector-panel {
+    position: sticky;
+    top: 1.25rem;
+  }
+
+  .route-ai-trading #asset-selector-panel > div:first-child {
+    flex-direction: column;
+  }
+
+  .route-ai-trading #asset-selector-panel > div:first-child > button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .route-ai-trading #search-results-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .route-ai-trading #tradingview-simulator-container {
+    margin-top: 0;
+  }
+}
+
+/* Login: a wide narrative ledger with a restrained access sheet. */
+@media (min-width: 1024px) {
+  .route-login {
+    grid-template-columns: minmax(0, 1.34fr) minmax(23rem, .66fr) !important;
+  }
+
+  .route-login .login-narrative {
+    border-right: 1px solid var(--route-rule);
+  }
 }
 
 /* Mobile keeps one task per view and lets the theme's frame/surface contrast do the work. */
@@ -3318,22 +3654,31 @@
   }
 
   .route-loans .loan-register,
-  .route-grab .metric-register,
   .route-savings .savings-plan-sheet {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .route-loans .loan-register > *,
-  .route-loans .loan-register > *:nth-child(even),
+  .route-loans .loan-group,
   .route-savings .savings-plan-sheet > :first-child,
   .route-savings .savings-plan-sheet > :last-child {
     padding-inline: 0;
     border-left: 0;
   }
 
-  .route-loans .loan-register > * + *,
+  .route-loans .loan-group + .loan-group,
   .route-savings .savings-plan-sheet > :last-child {
     margin-top: var(--mobile-section-gap);
+    padding-top: var(--mobile-section-gap);
+    border-top: 1px solid var(--route-rule);
+  }
+
+  .route-loans .loan-group-header {
+    min-height: 0;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .route-attendance .attendance-history {
     padding-top: var(--mobile-section-gap);
     border-top: 1px solid var(--route-rule);
   }
@@ -3351,6 +3696,11 @@
     gap: var(--mobile-section-gap);
     padding-inline: 0;
     border-inline: 0;
+  }
+
+  .route-analyze .analysis-review-stage {
+    padding-top: var(--mobile-section-gap);
+    border-top: 1px solid var(--route-rule);
   }
 
   .route-ai-trading #tradingview-simulator-container {
@@ -3395,7 +3745,7 @@
     padding-inline: 0;
   }
 
-  .route-attendance > .space-y-6,
+  .route-attendance .attendance-workspace,
   .route-loans .loan-register,
   .route-savings .savings-plan-sheet,
   .route-analyze .analysis-workspace {

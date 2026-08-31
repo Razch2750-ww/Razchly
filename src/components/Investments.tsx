@@ -1772,7 +1772,7 @@ export default function Investments() {
         <div className="investment-layout grid w-full grid-cols-1 items-start gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 lg:grid-cols-12 mb-6">
 
           {/* COLUMN 1: LEFT PANEL (lg:col-span-5) */}
-          <div className="lg:col-span-5 flex flex-col gap-6 w-full">
+          <div className="investment-chart-deck lg:col-span-5 flex flex-col gap-6 w-full">
 
             {/* UNIFIED HERO CHART CARD */}
             <HoverCard className="investment-hero-register relative flex w-full flex-col overflow-hidden border border-app-border bg-app-card p-6">
@@ -2026,7 +2026,7 @@ export default function Investments() {
           </div>
 
           {/* COLUMN 2: MIDDLE PANEL - TOTAL EQUITY RETURN (lg:col-span-3) */}
-          <div className="lg:col-span-3 w-full">
+          <div className="investment-return-rail lg:col-span-3 w-full">
             <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col relative overflow-hidden w-full h-[620px]">
 
 
@@ -2140,7 +2140,7 @@ export default function Investments() {
           </div>
 
           {/* COLUMN 3: RIGHT PANEL - PORTFOLIO ALLOCATION (lg:col-span-4) */}
-          <div className="lg:col-span-4 w-full">
+          <div className="investment-allocation-rail lg:col-span-4 w-full">
             <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col relative overflow-hidden w-full min-h-[620px]">
 
 
