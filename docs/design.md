@@ -107,7 +107,7 @@ Tracking never goes below `-0.04em`. Body copy uses balanced or pretty wrapping 
 All authenticated routes share the same header rhythm, rule weight, control sizing, and semantic tokens through `page-register`. Their composition changes with the task so the product is consistent without becoming repetitive:
 
 - Dashboard uses a statement-ledger opening, then a 1/3 wallet-to-cashflow workbench and a 13/7 analysis split.
-- Transactions gives the reconciliable ledger a full-width accent rule, with filters and charts treated as bands instead of card rows.
+- Transactions removes the duplicated shell title and becomes a reconciliation desk: one dark filter band, a narrow analysis rail, and one dominant ledger surface.
 - Investments preserves the 5/3/4 portfolio hierarchy and separates the analysis desk from the holdings register.
 - Loans and Grab use folio/register geometry; Attendance puts the live shift first; Savings gives the editor a wide column and decisions a narrow rail.
 - Analyze keeps intake and extraction as two explicit stages; AI Trading keeps the market canvas dominant and tabs secondary.

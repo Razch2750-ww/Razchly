@@ -73,7 +73,7 @@ import {
 } from "date-fns";
 import { id as localeId, enUS as localeEn } from "date-fns/locale";
 import { useTranslation } from "../utils/translations";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { sendDeviceNotification } from "../utils/notification";
 import { AccountIcon } from "./AccountIcon";
 import { CategoryIcon, getCategoryIconDetails } from "./CategoryIcon";
@@ -739,9 +739,6 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
   const toggleTheme = () => {
     setThemeId(themeId === "dark" ? "light" : "dark");
   };
-
-  const getInitials = (name: string) =>
-    name.substring(0, 2).toUpperCase() || "US";
 
   const filteredByAccountTransactions = useMemo(() => {
     if (selectedReportAccount === "all") return transactions;
@@ -1615,24 +1612,6 @@ export default function Transactions({ modalOnly = false }: { modalOnly?: boolea
             >
               {language === "en" ? "Add" : "Tambah"}
             </ActionBtn>
-            <Link
-              to="/settings"
-              state={{ expandSection: 'profile' }}
-              className="flex items-center gap-2.5 h-9 px-3 rounded-xl bg-app-card border border-app-border text-sm font-medium text-app-text-bright hover:bg-app-hover transition-colors cursor-pointer"
-            >
-              <div className="w-6 h-6 rounded-full bg-app-accent1 text-[11px] font-semibold flex items-center justify-center text-app-bg overflow-hidden shrink-0">
-                {user?.photoURL ? (
-                  <img
-                    src={user?.photoURL}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  getInitials(user?.displayName || "USER")
-                )}
-              </div>
-              <span className="text-app-text/70">{user?.displayName?.split(' ')[0] || "User"}</span>
-            </Link>
           </div>
         </header>
 

@@ -47,13 +47,6 @@ export default function Layout() {
   const visibleNavItems = NAV_ITEMS.filter((item) => !hiddenTabs.includes(item.path));
   const mobileNavItems = visibleNavItems.filter((item) =>
     ["/", "/transactions", "/investments", "/loans"].includes(item.path));
-  const currentItem = NAV_ITEMS.find((item) => item.path === location.pathname) || NAV_ITEMS[0];
-  const todayLabel = new Intl.DateTimeFormat("id-ID", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date());
 
   const openAction = (action: "transaction" | "grab" | "scan" | "attendance") => {
     setActionSheetOpen(false);
@@ -184,6 +177,25 @@ export default function Layout() {
           </div>
         </div>
 
+        <div className="border-b border-app-border px-3 py-3">
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            className={`app-rail-command flex min-h-11 w-full items-center text-app-text hover:bg-app-hover hover:text-app-text-bright ${isSidebarOpen ? "gap-3 px-3" : "justify-center px-0"}`}
+            aria-label="Buka pencarian dan perintah"
+            aria-haspopup="dialog"
+            title={!isSidebarOpen ? "Cari atau jalankan perintah" : undefined}
+          >
+            <Search className="h-[18px] w-[18px] shrink-0" strokeWidth={1.6} />
+            {isSidebarOpen && (
+              <>
+                <span className="min-w-0 flex-1 truncate text-left text-[13px] font-medium">Cari atau buka</span>
+                <kbd className="shrink-0 text-[10px] text-app-text/55">Ctrl K</kbd>
+              </>
+            )}
+          </button>
+        </div>
+
         <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-3" aria-label="Navigasi utama">
           {visibleNavItems.map((item) => (
             <NavLink
@@ -223,33 +235,6 @@ export default function Layout() {
       </aside>
 
       <main inert={isCommandOpen || isActionSheetOpen ? true : undefined} id="main-content" className="app-shell-main relative flex min-w-0 max-w-full flex-1 flex-col overflow-hidden md:pb-0">
-        <header className="app-command-bar hidden h-[78px] shrink-0 grid-cols-[minmax(0,1fr)_minmax(260px,420px)_auto] items-center gap-6 px-7 md:grid">
-          <div className="min-w-0">
-            <p className="font-ledger truncate text-[20px] text-app-accent1">{t(currentItem.labelKey)}</p>
-            <p className="mt-0.5 truncate text-[11px] text-app-text">Ruang kerja finansial pribadi</p>
-          </div>
-          <button
-            type="button"
-            onClick={openCommandPalette}
-            className="command-trigger flex h-10 min-w-0 items-center gap-3 px-3 text-left text-app-text hover:text-app-text-bright"
-            aria-label="Buka pencarian dan perintah"
-            aria-haspopup="dialog"
-          >
-            <Search className="h-4 w-4 shrink-0" strokeWidth={1.6} />
-            <span className="min-w-0 flex-1 truncate text-xs">Cari halaman atau tindakan</span>
-            <kbd className="shrink-0 text-[10px] text-app-text/70">Ctrl K</kbd>
-          </button>
-          <div className="flex items-center divide-x divide-app-border text-xs text-app-text">
-            <time className="px-5 tabular-nums">{todayLabel}</time>
-            <span className="flex items-center gap-2 px-5"><span className="h-2 w-2 rounded-full bg-app-success" aria-hidden="true" /> Sinkron</span>
-            <NavLink to="/settings" className="ml-5 flex items-center gap-2.5 text-app-text hover:text-app-text-bright" aria-label="Buka profil">
-              <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-app-accent1 text-xs font-semibold text-app-on-accent">
-                {user?.photoURL ? <img src={user.photoURL} alt="" className="h-full w-full object-cover" /> : firstName[0]}
-              </span>
-              <span className="max-w-28 truncate">{firstName}</span>
-            </NavLink>
-          </div>
-        </header>
         <motion.div key={location.pathname} initial={reduceMotion ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduceMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }} className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
           <Outlet />
         </motion.div>

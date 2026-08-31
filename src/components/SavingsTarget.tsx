@@ -3,7 +3,6 @@ import { useStore } from '../store/useStore';
 import { doc, updateDoc, collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { toast } from 'react-hot-toast';
-import { Link } from 'react-router-dom';
 import { Star, TrendingUp, Target, ArrowUp, ArrowDown, Plus, Car, AlertTriangle, Sparkles, TrendingDown } from 'lucide-react';
 
 import { formatNumberInput, parseNumberInput } from '../utils/numberFormat';
@@ -138,7 +137,6 @@ export default function SavingsTarget() {
       {/* HEADER */}
       <header className="workbench-hero mb-6 flex shrink-0 flex-col justify-between gap-6 md:flex-row md:items-end">
         <div className="workbench-hero-copy">
-          <p className="page-kicker" aria-hidden="true"><span>SV</span> Goal folio</p>
           <h1 className="text-2xl text-app-text-bright md:text-3xl">
             <TextReveal text="Target Tabungan" />
           </h1>
@@ -152,16 +150,6 @@ export default function SavingsTarget() {
           <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="inline-flex h-11 items-center gap-2 rounded-lg bg-app-accent1 px-4 text-sm font-semibold text-app-bg" title="Tambah Transaksi">
             <Plus className="w-4 h-4" /> Transaksi
           </button>
-          <Link to="/settings" className="flex h-11 items-center justify-center gap-2 rounded-lg border border-app-border px-3 text-sm font-semibold text-app-text-bright hover:bg-app-hover">
-            <span>Profil</span>
-            <div className="w-6 h-6 rounded-full bg-app-accent1 text-xs font-semibold flex items-center justify-center text-app-bg overflow-hidden flex-shrink-0">
-               {user?.photoURL ? (
-                 <img src={user?.photoURL} alt="" className="w-full h-full object-cover" />
-               ) : (
-                 user?.displayName?.substring(0, 2).toUpperCase() || "US"
-               )}
-            </div>
-          </Link>
         </div>
       </header>
 

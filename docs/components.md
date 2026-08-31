@@ -4,7 +4,7 @@
 
 ### `Layout`
 
-Owns desktop rail, command bar, mobile dock, global quick actions, route transition, profile entry, and command palette. It must not own route-specific data calculations.
+Owns the desktop rail, rail-based command search, mobile dock, global quick actions, route transition, profile entry, and command palette. Route components own the only visible page title. `Layout` must not own route-specific data calculations.
 
 ### `PageShell`
 

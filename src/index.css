@@ -276,7 +276,6 @@
   }
 
   .app-shell-rail,
-  .app-command-bar,
   .app-mobile-dock {
     --bg-color: var(--ledger-frame);
     --card-bg: var(--ledger-frame-soft);
@@ -298,11 +297,6 @@
   .app-shell-rail {
     background: var(--ledger-frame);
     border-right: 1px solid color-mix(in srgb, var(--ledger-frame-text) 12%, transparent);
-  }
-
-  .app-command-bar {
-    background: var(--ledger-frame);
-    border-bottom: 1px solid color-mix(in srgb, var(--ledger-frame-text) 12%, transparent);
   }
 
   .app-mobile-dock {
@@ -331,13 +325,13 @@
     color: var(--ledger-ink);
   }
 
-  .command-trigger {
+  .app-rail-command {
     border: 1px solid color-mix(in srgb, var(--ledger-frame-text) 15%, transparent);
     border-radius: 8px;
     background: color-mix(in srgb, var(--ledger-frame-text) 4%, transparent);
   }
 
-  .command-trigger:hover {
+  .app-rail-command:hover {
     border-color: color-mix(in srgb, var(--ledger-accent-frame) 48%, transparent);
     background: color-mix(in srgb, var(--ledger-frame-text) 7%, transparent);
   }
@@ -505,8 +499,8 @@
 .page-shell-header,
 .workbench-hero {
   position: relative;
-  min-height: 148px;
-  padding-top: 1rem;
+  min-height: 116px;
+  padding-top: .25rem;
 }
 
 .page-shell-header {
@@ -516,39 +510,6 @@
 .page-heading-copy,
 .workbench-hero-copy {
   max-width: 780px;
-}
-
-.page-kicker {
-  display: flex;
-  align-items: center;
-  gap: .55rem;
-  margin-bottom: .85rem;
-  color: color-mix(in srgb, var(--text-color) 72%, transparent);
-  font-family: var(--font-mono);
-  font-size: .62rem;
-  font-weight: 600;
-  letter-spacing: .12em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.page-kicker > span:first-child {
-  display: inline-flex;
-  width: 1.7rem;
-  height: 1.7rem;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--accent1-color) 66%, transparent);
-  color: var(--accent1-color);
-  letter-spacing: 0;
-}
-
-.page-kicker-copy {
-  display: inline !important;
-  width: auto !important;
-  height: auto !important;
-  border: 0 !important;
-  color: inherit !important;
 }
 
 .page-deck,
@@ -2000,11 +1961,6 @@
     align-items: flex-start;
   }
 
-  .page-kicker {
-    margin-bottom: .65rem;
-    color: var(--ledger-frame-muted);
-  }
-
   .page-header-actions,
   .workbench-hero-actions {
     padding-left: 0;
@@ -2306,18 +2262,6 @@
   .page-heading-copy,
   .workbench-hero-copy {
     min-width: 0;
-  }
-
-  .page-kicker {
-    gap: .45rem;
-    margin-bottom: .55rem;
-    font-size: .6875rem;
-    letter-spacing: .1em;
-  }
-
-  .page-kicker > span:first-child {
-    width: 1.5rem;
-    height: 1.5rem;
   }
 
   .route-workbench .page-display-title,
@@ -2854,9 +2798,15 @@
   background: var(--route-wash) !important;
 }
 
-/* Transactions: controls read as a filter band above one dominant ledger. */
+/* Transactions: one reconciliation desk, not another vertical dashboard stack. */
 .route-transactions .transaction-desktop {
   gap: 0;
+}
+
+.route-transactions .transaction-header {
+  min-height: 116px;
+  align-items: flex-end;
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .route-transactions .transaction-filter-block,
@@ -2888,6 +2838,123 @@
 .route-transactions .transaction-secondary-block {
   border-top: 1px solid var(--route-rule);
   background: var(--route-wash);
+}
+
+@media (min-width: 1200px) {
+  .route-transactions .transaction-desktop {
+    display: grid;
+    grid-template-areas:
+      "header header"
+      "filter filter"
+      "statement ledger"
+      "charts ledger"
+      "secondary ledger";
+    grid-template-columns: minmax(23rem, .74fr) minmax(0, 1.5fr);
+    align-content: start;
+    align-items: start;
+    gap: var(--route-gap);
+    padding-inline: clamp(1.75rem, 3vw, 3.25rem);
+    padding-bottom: clamp(2rem, 4vw, 4rem);
+  }
+
+  .route-transactions .transaction-desktop > * {
+    order: 0;
+  }
+
+  .route-transactions .transaction-header {
+    grid-area: header;
+    margin: 0;
+    padding-inline: 0;
+  }
+
+  .route-transactions .transaction-filter-block {
+    grid-area: filter;
+  }
+
+  .route-transactions .transaction-statement-block {
+    grid-area: statement;
+  }
+
+  .route-transactions .transaction-charts-block {
+    grid-area: charts;
+  }
+
+  .route-transactions .transaction-secondary-block {
+    grid-area: secondary;
+  }
+
+  .route-transactions .transaction-ledger-block {
+    position: sticky;
+    top: 1.25rem;
+    grid-area: ledger;
+    align-self: start;
+    margin: 0;
+    padding-top: .75rem;
+  }
+
+  .route-transactions .transaction-filter-block > div {
+    --bg-color: var(--ledger-frame);
+    --card-bg: var(--ledger-frame-soft);
+    --wash-bg: var(--ledger-frame-soft);
+    --border-color: color-mix(in srgb, var(--ledger-frame-text) 16%, transparent);
+    --hover-bg: color-mix(in srgb, var(--ledger-frame-text) 8%, transparent);
+    --text-color: var(--ledger-frame-muted);
+    --text-bright: var(--ledger-frame-text);
+    --accent1-color: var(--ledger-accent-frame);
+    --accent-on-color: var(--ledger-frame);
+    --success-color: var(--success-frame);
+    --danger-color: var(--danger-frame);
+    margin: 0;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--ledger-frame-text) 14%, transparent);
+    background: var(--ledger-frame-soft);
+    color: var(--ledger-frame-muted);
+  }
+
+  .route-transactions .transaction-statement-block > div,
+  .route-transactions .transaction-charts-block,
+  .route-transactions .transaction-secondary-block {
+    margin: 0;
+    border: 1px solid var(--route-rule);
+    background: var(--route-surface);
+  }
+
+  .route-transactions .transaction-statement-block > div,
+  .route-transactions .transaction-charts-block > div,
+  .route-transactions .transaction-secondary-block > div {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .route-transactions .transaction-statement-block > div > div + div,
+  .route-transactions .transaction-charts-block > div > div + div {
+    border-top: 1px solid var(--route-rule);
+    border-left: 0;
+  }
+
+  .route-transactions .transaction-statement-block h2 {
+    overflow-wrap: anywhere;
+    font-size: clamp(2.3rem, 3.5vw, 4rem);
+    line-height: .94;
+  }
+
+  .route-transactions .transaction-charts-block > div > div {
+    grid-column: auto;
+  }
+
+  .route-transactions .transaction-secondary-block {
+    padding: 1.25rem;
+  }
+
+  .route-transactions .transaction-secondary-block > div > div + div {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--route-rule);
+  }
+
+  .route-transactions .transaction-ledger-surface {
+    border: 1px solid var(--route-rule);
+    background: var(--route-surface) !important;
+  }
 }
 
 /* Investments: keep the intentional 5/3/4 hierarchy visible as one register. */

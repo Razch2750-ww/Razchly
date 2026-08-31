@@ -222,7 +222,6 @@ export default function ImageAnalysis() {
     <div className="route-workbench page-register route-analyze mx-auto flex h-full w-full max-w-5xl flex-1 flex-col overflow-y-auto bg-app-bg p-4 pb-32 text-app-text md:p-8 md:pb-8">
       <ScrollReveal className="w-full flex flex-col">
         <header className="workbench-hero mb-6 border-b border-app-border pb-6">
-          <p className="page-kicker" aria-hidden="true"><span>AI</span> Extraction desk</p>
           <h1 className="text-2xl text-app-text-bright md:text-3xl"><TextReveal text="Ekstraksi mutasi dan struk" /></h1>
           <p className="mt-2 max-w-[62ch] text-sm leading-relaxed text-app-text/65">Unggah bukti transaksi, periksa hasil pembacaan, lalu pilih data yang benar sebelum menyimpannya.</p>
         </header>

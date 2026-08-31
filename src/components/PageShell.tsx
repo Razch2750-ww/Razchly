@@ -42,10 +42,6 @@ export function PageHeader({ title, subtitle, actions, mobileActions }: PageHead
   return (
     <header className="page-shell-header mb-6 flex items-start justify-between gap-4 md:mb-8">
       <div className="page-heading-copy min-w-0 flex-1">
-        <p className="page-kicker" aria-hidden="true">
-          <span>RZ</span>
-          <span className="page-kicker-copy">Private register</span>
-        </p>
         <h1 className="page-display-title text-2xl font-normal leading-tight text-app-text-bright md:text-[2.35rem]">
           {title}
         </h1>

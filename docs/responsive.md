@@ -31,7 +31,7 @@
 ### Transactions
 
 - Mobile: compact header, period controls, statement, filters, ledger rows, entry sheet
-- Desktop: large route header, filter band, monthly statement, dominant table, deeper charts
+- Desktop: one route header, dark filter band, narrow analysis rail, dominant reconciliation ledger, then deeper supporting analysis
 
 ### Investments and AI trading
 

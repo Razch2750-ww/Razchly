@@ -32,9 +32,9 @@ Gold identifies brand, current navigation, and the most important action. Green 
 
 ### Global shell
 
-- Desktop uses an L-frame: an 82px collapsed command rail plus a 78px status bar. Expansion is optional and does not change route behavior.
+- Desktop uses an L-frame with an 82px collapsed command rail. Each route owns one page header; shell utilities never repeat the route title.
 - Mobile uses a dark bottom dock with four destinations and a centered add control aligned inside the bar.
-- Profile, date, sync state, route identity, and navigation live in the frame instead of being repeated as dashboard cards.
+- Search, profile, and navigation live in the rail; route identity appears only once inside the active workspace.
 
 ### Dashboard
 

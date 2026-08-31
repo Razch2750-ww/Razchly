@@ -1194,7 +1194,6 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
       {/* Visual Title Header */}
       <header className="workbench-hero mb-6 flex flex-col justify-between gap-5 border-b border-app-border pb-6 md:flex-row md:items-end" id="ai-trading-header">
         <div className="workbench-hero-copy">
-          <p className="page-kicker" aria-hidden="true"><span>MK</span> Market analysis</p>
           <h1 className="flex items-center gap-2 text-2xl text-app-text-bright md:text-3xl">
             <Cpu className="w-7 h-7 text-app-accent1 shrink-0" />
             <TextReveal text="Meja Analisis Pasar" />

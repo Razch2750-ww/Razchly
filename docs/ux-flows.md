@@ -6,7 +6,7 @@
 
 1. User enters an authenticated route.
 2. Rail identifies the active route.
-3. Command bar exposes search, date, sync state, and profile.
+3. The route header provides the single page identity; the rail exposes search and profile without repeating it.
 4. `Ctrl/Cmd + K` or `/` opens command search.
 5. Selecting a command navigates or opens an existing quick-entry flow.
 

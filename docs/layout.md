@@ -8,10 +8,10 @@ Razchly uses an L-shaped command frame around the active workspace.
 
 - Collapsed rail: 82px
 - Expanded rail: 224px
-- Command bar: 78px
 - Workspace fills the remaining viewport and owns its vertical scrolling
 - Route transitions occur inside the workspace, never on the shell
-- The command bar contains route identity, command search, date, sync state, and profile
+- Each route owns exactly one visible page title; the shell never repeats route identity
+- Command search lives in the rail and profile remains in the rail footer
 
 ### Tablet, 768px to 1023px
 
@@ -47,6 +47,8 @@ Used by Dashboard and Transactions.
 - Dark side ledger carries decisions, exceptions, and the primary action
 - Mobile converts the statement to a single raised paper sheet
 
+Transactions uses a desktop reconciliation desk instead of the Dashboard split: a compact analysis rail supports one dominant sticky ledger. At narrower widths the rail and ledger return to a single column.
+
 ### Workbench template
 
 Used by Investments, Loans, Attendance, Grab, Savings, Analyze, and AI Trading.
@@ -69,7 +71,7 @@ Used by Investments, Loans, Attendance, Grab, Savings, Analyze, and AI Trading.
 |---:|---|
 | 0 | Route content |
 | 10 | Sticky table headers and local menus |
-| 20 | Desktop command bar and mobile dock |
+| 20 | Desktop rail and mobile dock |
 | 30 | Popovers |
 | 40 | Sheet backdrop |
 | 50 | Dialog, command palette, and sheet |

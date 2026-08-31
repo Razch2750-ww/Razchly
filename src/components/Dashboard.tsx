@@ -523,20 +523,6 @@ export default function Dashboard() {
             <Plus className="w-4 h-4" />
             Tambah
           </button>
-          <Link
-            to="/settings"
-            state={{ expandSection: 'profile' }}
-            className="flex h-11 items-center gap-2.5 rounded-xl border border-app-border bg-app-card px-3.5 text-xs font-semibold text-app-text-bright hover:bg-app-hover"
-          >
-            <div className="w-6 h-6 rounded-full bg-app-accent1 text-[11px] font-bold flex items-center justify-center text-app-bg overflow-hidden">
-              {user?.photoURL ? (
-                <img src={user.photoURL} alt="avatar" className="w-full h-full object-cover" />
-              ) : (
-                getInitials(user?.displayName || "USER")
-              )}
-            </div>
-            <span className="text-app-text/80">{user?.displayName?.split(' ')[0] || "User"}</span>
-          </Link>
         </div>
       </header>
 
