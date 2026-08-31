@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import {
   collection,
   onSnapshot,
@@ -11,7 +12,6 @@ import { useStore } from "../store/useStore";
 import { Account, Transaction, Loan } from "../types";
 import { Link, useNavigate } from "react-router-dom";
 import { AccountIcon, getAccountIconDetails } from "./AccountIcon";
-import { CategoryIcon } from "./CategoryIcon";
 import {
   Sun,
   Moon,
@@ -21,7 +21,6 @@ import {
   TrendingDown,
   Plus,
   ChevronRight,
-  FileText,
   ArrowRight,
   Car,
   ArrowUpDown,
@@ -101,6 +100,7 @@ export default function Dashboard() {
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [isInterestModalOpen, setIsInterestModalOpen] = useState(false);
   const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
 
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -175,11 +175,11 @@ export default function Dashboard() {
       "var(--color-app-danger)",
       "var(--color-app-accent1)",
       "var(--color-app-success)",
-      "#F59E0B",
-      "#8B5CF6",
-      "#EC4899",
-      "#3B82F6",
-      "#10B981"
+      "var(--chart-1)",
+      "var(--chart-2)",
+      "var(--chart-3)",
+      "var(--chart-4)",
+      "var(--warning-color)"
     ];
     let colorIdx = 0;
     expenseTransactions.forEach(t => {
@@ -269,8 +269,12 @@ export default function Dashboard() {
     });
   }, [accounts, accountSort]);
 
-  const getAccountIcon = (id: string) => {
-    return accounts.find((a) => a.id === id)?.icon || "wallet";
+  const getTransactionAccountLabel = (transaction: Transaction) => {
+    const accountName = (id?: string) => accounts.find((account) => account.id === id)?.name;
+    if (transaction.type === "transfer") {
+      return `${accountName(transaction.fromAccountId) || "Rekening asal"} → ${accountName(transaction.toAccountId) || "Rekening tujuan"}`;
+    }
+    return accountName(transaction.accountId) || "Rekening";
   };
 
   useEffect(() => {
@@ -367,6 +371,7 @@ export default function Dashboard() {
   const savingsTargets = useStore((state) => state.monthlySavingsTargets);
   const savingsTarget = savingsTargets && savingsTargets.length > 0 ? Math.max(...savingsTargets) : 0;
   const savingsProgress = savingsTarget > 0 ? Math.min(Math.max((savingsThisMonth / savingsTarget) * 100, 0), 100) : 0;
+  const savingsRemaining = Math.max(savingsTarget - Math.max(savingsThisMonth, 0), 0);
 
   const financialHealthStatus = useMemo(() => {
     if (recentTransactions.length === 0) {
@@ -487,7 +492,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="dashboard-ledger flex h-full w-full flex-1 flex-col overflow-y-auto pb-32 text-app-text md:pb-10">
+    <div className="route-dashboard page-register dashboard-ledger flex h-full w-full flex-1 flex-col overflow-y-auto pb-32 text-app-text md:pb-10">
       {/* DESKTOP HEADER */}
       <header className="dashboard-toolbar hidden items-center justify-between gap-6 border-b px-7 py-4 md:flex">
         <div>
@@ -538,14 +543,14 @@ export default function Dashboard() {
       {/* MOBILE HEADER */}
       <header className="mobile-ledger-header flex items-center justify-between px-5 pb-5 pt-6 md:hidden">
         <div>
-          <p className="font-ledger text-[28px] leading-none text-[#d7b669]">Razchly</p>
-          <p className="mt-2 text-[11px] text-white/48">{format(new Date(), "EEEE, d MMM yyyy", { locale: localeId })}</p>
+          <p className="font-ledger text-[28px] leading-none text-app-accent1">Razchly</p>
+          <p className="mt-2 text-[11px] text-app-text">{format(new Date(), "EEEE, d MMM yyyy", { locale: localeId })}</p>
         </div>
         <div className="flex items-center gap-3">
           <Link
             to="/settings"
             state={{ expandSection: 'profile' }}
-            className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#d7b669]/50 bg-[#d7b669]/10"
+            className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-app-accent1/50 bg-app-accent1/10"
             aria-label="Buka pengaturan profil"
           >
             {user?.photoURL ? (
@@ -601,7 +606,12 @@ export default function Dashboard() {
       </ScrollReveal>
 
       {/* MOBILE LEDGER */}
-      <section className="mobile-statement mx-4 mb-4 rounded-[16px] px-5 py-6 md:hidden">
+      <motion.section
+        initial={reduceMotion ? false : { opacity: 0, clipPath: "inset(0 0 100% 0)" }}
+        animate={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
+        transition={{ duration: reduceMotion ? 0 : 0.62, ease: [0.16, 1, 0.3, 1] }}
+        className="mobile-statement mx-4 mb-4 rounded-[16px] px-5 py-6 md:hidden"
+      >
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Wallet className="h-4 w-4 text-app-accent1" strokeWidth={1.7} />
@@ -640,7 +650,7 @@ export default function Dashboard() {
             </dd>
           </div>
         </dl>
-      </section>
+      </motion.section>
 
       <section className="mobile-position mx-4 mb-7 rounded-[16px] px-5 py-4 md:hidden">
         <div className="mb-3 flex items-center justify-between">
@@ -681,7 +691,12 @@ export default function Dashboard() {
       </section>
 
       {/* DESKTOP STATEMENT — one financial surface + one operational side ledger */}
-      <section className="dashboard-statement mx-7 mb-7 hidden grid-cols-12 overflow-hidden md:grid">
+      <motion.section
+        initial={reduceMotion ? false : { opacity: 0, clipPath: "inset(0 100% 0 0)" }}
+        animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
+        transition={{ duration: reduceMotion ? 0 : 0.72, ease: [0.16, 1, 0.3, 1] }}
+        className="dashboard-statement mx-7 mb-7 hidden grid-cols-12 overflow-hidden md:grid"
+      >
         <article className="statement-sheet col-span-8 p-7 xl:p-9">
           <div className="flex items-start justify-between gap-5">
             <div>
@@ -689,41 +704,41 @@ export default function Dashboard() {
               <p className="font-ledger mt-3 break-words text-[clamp(3.2rem,5vw,5.8rem)] leading-[0.92] tracking-[-0.035em]">
                 {formatRp(totalBalance)}
               </p>
-              <p className="mt-4 text-xs text-black/55">
+              <p className="mt-4 text-xs text-app-text">
                 {accounts.length} {t('dashboard.allWallets')} · {format(new Date(), "MMMM yyyy", { locale: currentLocale })}
               </p>
             </div>
             <button
               type="button"
               onClick={toggleHideBalances}
-              className="flex h-11 w-11 items-center justify-center text-black/55 hover:bg-black/[0.04] hover:text-black"
+              className="flex h-11 w-11 items-center justify-center text-app-text hover:bg-app-hover hover:text-app-text-bright"
               aria-label={hideBalances ? (language === 'en' ? "Show balances" : "Tampilkan saldo") : (language === 'en' ? "Hide balances" : "Sembunyikan saldo")}
             >
               {hideBalances ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
 
-          <div className="mt-8 grid grid-cols-2 border-y border-black/20">
+          <div className="mt-8 grid grid-cols-2 border-y border-app-border">
             <div className="py-6 pr-7">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-xs font-semibold uppercase tracking-[0.06em]">Ringkasan rekening</h3>
-                <Link to="/settings" state={{ expandSection: "accounts" }} className="text-xs font-semibold text-[#8c6826] hover:text-black">Kelola</Link>
+                <Link to="/settings" state={{ expandSection: "accounts" }} className="text-xs font-semibold text-app-accent1 hover:text-app-text-bright">Kelola</Link>
               </div>
-              <div className="divide-y divide-black/12 border-t border-black/20">
+              <div className="divide-y divide-app-border border-t border-app-border">
                 {sortedAccounts.slice(0, 4).map((account) => (
-                  <button key={account.id} type="button" onClick={() => { setEditingAccount(account); setIsAccountModalOpen(true); }} className="grid min-h-11 w-full grid-cols-[1fr_auto] items-center gap-4 text-left text-xs hover:bg-black/[0.025]">
-                    <span className="truncate text-black/66">{account.name}</span>
-                    <span className="font-mono font-semibold text-black">{formatRp(account.balance)}</span>
+                  <button key={account.id} type="button" onClick={() => { setEditingAccount(account); setIsAccountModalOpen(true); }} className="grid min-h-11 w-full grid-cols-[1fr_auto] items-center gap-4 text-left text-xs hover:bg-app-hover">
+                    <span className="truncate text-app-text">{account.name}</span>
+                    <span className="font-mono font-semibold text-app-text-bright">{formatRp(account.balance)}</span>
                   </button>
                 ))}
-                {sortedAccounts.length === 0 && <p className="py-8 text-center text-xs text-black/60">Belum ada rekening aktif.</p>}
+                {sortedAccounts.length === 0 && <p className="py-8 text-center text-xs text-app-text">Belum ada rekening aktif.</p>}
               </div>
             </div>
 
-            <div className="border-l border-black/20 py-6 pl-7">
+            <div className="border-l border-app-border py-6 pl-7">
               <div className="mb-4 flex items-center justify-between gap-4">
                 <h3 className="text-xs font-semibold uppercase tracking-[0.06em]">Arus kas</h3>
-                <select value={selectedChartAccount} onChange={(event) => setSelectedChartAccount(event.target.value)} className="h-9 max-w-36 border-0 border-b border-black/25 bg-transparent px-1 text-xs text-black outline-none">
+                <select value={selectedChartAccount} onChange={(event) => setSelectedChartAccount(event.target.value)} className="h-9 max-w-36 border-0 border-b border-app-border bg-transparent px-1 text-xs text-app-text-bright outline-none">
                   <option value="all">Semua rekening</option>
                   {accounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
                 </select>
@@ -731,46 +746,61 @@ export default function Dashboard() {
               <div className="h-[178px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 8, right: 6, left: -28, bottom: 0 }}>
-                    <CartesianGrid vertical={false} stroke="rgba(19,19,15,.14)" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "rgba(19,19,15,.52)" }} minTickGap={30} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "rgba(19,19,15,.52)" }} tickFormatter={(value) => `${Math.round(value / 1000)}k`} />
-                    <Tooltip formatter={(value: number) => hideBalances ? "Rp ••••••" : formatRp(value)} contentStyle={{ background: "#f4efe3", border: "1px solid rgba(19,19,15,.2)", borderRadius: 8, fontSize: 11 }} />
-                    <Line type="monotone" dataKey="income" stroke="#287658" strokeWidth={2} dot={false} />
-                    <Line type="monotone" dataKey="expense" stroke="#b1433e" strokeWidth={2} dot={false} />
+                    <CartesianGrid vertical={false} stroke="var(--ledger-rule)" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "var(--ledger-muted)" }} minTickGap={30} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "var(--ledger-muted)" }} tickFormatter={(value) => `${Math.round(value / 1000)}k`} />
+                    <Tooltip formatter={(value: number) => hideBalances ? "Rp ••••••" : formatRp(value)} contentStyle={{ background: "var(--ledger-paper-raised)", border: "1px solid var(--ledger-rule)", borderRadius: 8, color: "var(--ledger-ink)", fontSize: 11 }} />
+                    <Line type="monotone" dataKey="income" stroke="var(--success-color)" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="expense" stroke="var(--danger-color)" strokeWidth={2} dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </div>
           </div>
 
-          <dl className="grid grid-cols-3 divide-x divide-black/20 border-b border-black/20">
-            <div className="py-5 pr-5"><dt className="text-[11px] text-black/60">Pemasukan</dt><dd className="font-ledger mt-1 text-xl text-[#236b50]">{formatRp(incomeThisMonth)}</dd></div>
-            <div className="px-5 py-5"><dt className="text-[11px] text-black/60">Pengeluaran</dt><dd className="font-ledger mt-1 text-xl text-[#a63b37]">{formatRp(expenseThisMonth)}</dd></div>
-            <div className="py-5 pl-5"><dt className="text-[11px] text-black/60">Surplus</dt><dd className={`font-ledger mt-1 text-xl ${savingsThisMonth >= 0 ? "text-[#8c6826]" : "text-[#a63b37]"}`}>{formatRp(savingsThisMonth, { showSign: true })}</dd></div>
+          <dl className="grid grid-cols-3 divide-x divide-app-border border-b border-app-border">
+            <div className="py-5 pr-5"><dt className="text-[11px] text-app-text">Pemasukan</dt><dd className="font-ledger mt-1 text-xl text-app-success">{formatRp(incomeThisMonth)}</dd></div>
+            <div className="px-5 py-5"><dt className="text-[11px] text-app-text">Pengeluaran</dt><dd className="font-ledger mt-1 text-xl text-app-danger">{formatRp(expenseThisMonth)}</dd></div>
+            <div className="py-5 pl-5"><dt className="text-[11px] text-app-text">Surplus</dt><dd className={`font-ledger mt-1 text-xl ${savingsThisMonth >= 0 ? "text-app-accent1" : "text-app-danger"}`}>{formatRp(savingsThisMonth, { showSign: true })}</dd></div>
           </dl>
         </article>
 
         <aside className="statement-side col-span-4 flex flex-col">
           <div className="statement-side-row">
-            <div className="flex items-center justify-between"><h3>Likuiditas</h3><Link to="/settings" state={{ expandSection: "accounts" }}>Rincian</Link></div>
-            <p className="font-ledger mt-3 text-[30px] text-white">{formatRp(totalBalance)}</p>
-            <span>{financialHealthStatus.label}</span>
+            <div className="flex items-center justify-between"><h3>Kondisi bulan ini</h3><button type="button" onClick={() => navigate('/transactions')}>Analisis</button></div>
+            <p className={`font-ledger mt-3 text-[30px] ${savingsThisMonth >= 0 ? "text-app-accent1" : "text-app-danger"}`}>{financialHealthStatus.label}</p>
+            <span>{savingsThisMonth >= 0 ? `Surplus ${formatRp(savingsThisMonth)}` : `Defisit ${formatRp(Math.abs(savingsThisMonth))}`}</span>
           </div>
           <div className="statement-side-row">
             <div className="flex items-center justify-between"><h3>Pengeluaran bulan ini</h3><button type="button" onClick={() => navigate('/transactions')}>Rincian</button></div>
-            <p className="font-ledger mt-3 text-[30px] text-white">{formatRp(expenseThisMonth)}</p>
+            <p className="font-ledger mt-3 text-[30px] text-app-text-bright">{formatRp(expenseThisMonth)}</p>
             <span>Hari ini {formatRp(expenseToday)}</span>
           </div>
           <div className="statement-side-row">
             <div className="flex items-center justify-between"><h3>Target tabungan</h3><button type="button" onClick={() => navigate('/savings')}>Rincian</button></div>
-            <p className="font-ledger mt-3 text-[26px] text-white">{formatRp(savingsThisMonth)} <small>/ {formatRp(savingsTarget)}</small></p>
-            <div className="mt-3 h-1.5 overflow-hidden bg-white/10"><div className="h-full bg-[#d7b669]" style={{ width: `${savingsProgress}%` }} /></div>
+            {savingsTarget > 0 ? (
+              <>
+                <div className="mt-3 flex items-end justify-between gap-4">
+                  <p className="font-ledger text-[30px] text-app-text-bright">{Math.round(savingsProgress)}%</p>
+                  <span className="mb-1 text-[11px] text-app-text">tercapai</span>
+                </div>
+                <dl className="mt-3 grid grid-cols-2 gap-4 border-t border-app-border pt-3">
+                  <div><dt className="text-[10px] text-app-text">Terkumpul</dt><dd className="mt-1 font-mono text-[11px] text-app-text-bright">{formatRp(Math.max(savingsThisMonth, 0))}</dd></div>
+                  <div><dt className="text-[10px] text-app-text">Masih perlu</dt><dd className="mt-1 font-mono text-[11px] text-app-accent1">{formatRp(savingsRemaining)}</dd></div>
+                </dl>
+              </>
+            ) : (
+              <>
+                <p className="font-ledger mt-3 text-[26px] text-app-text-bright">Belum ditetapkan</p>
+                <span>Tentukan target bulanan agar progres dapat dihitung.</span>
+              </>
+            )}
           </div>
-          <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="statement-add mt-auto flex min-h-14 items-center justify-center gap-2 border border-[#d7b669]/70 text-sm font-semibold text-[#e5c477] hover:bg-[#d7b669] hover:text-[#11120f]">
+          <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="statement-add mt-auto flex min-h-14 items-center justify-center gap-2 border border-app-accent1/70 text-sm font-semibold text-app-accent1 hover:bg-app-accent1 hover:text-app-on-accent">
             <Plus className="h-4 w-4" /> Tambah transaksi
           </button>
         </aside>
-      </section>
+      </motion.section>
       {/* INTEREST OVERVIEW CARD */}
       <ScrollReveal className="dashboard-interest mx-4 mb-6 md:mx-7">
         <InterestCard
@@ -1184,81 +1214,53 @@ export default function Dashboard() {
 
       {/* MOBILE BOTTOM SECTION - TRANSACTIONS */}
       <div className="mobile-recent px-4 pb-12 md:hidden">
-        <div className="flex justify-between items-center mb-6 px-1">
-            <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">Transaksi Terbaru</h2>
-            <Link to="/transactions" state={{ tab: "Semua" }} className="text-app-accent1 text-[13px] font-medium">Lihat Semua</Link>
+        <div className="mb-4 flex items-end justify-between gap-4 px-1">
+          <div>
+            <h2 className="font-ledger text-[26px] leading-none text-app-text-bright">Catatan hari ini</h2>
+            <p className="mt-2 text-xs text-app-text/52">Pergerakan uang terbaru</p>
+          </div>
+          <Link to="/transactions" state={{ tab: "Semua" }} className="flex min-h-11 items-center text-[12px] font-semibold text-app-accent1">Buka ledger</Link>
         </div>
         {(() => {
           const todayMobileTransactions = recentTransactions.filter(t => isSameDay(parseTxDate(t.date), new Date()));
           return todayMobileTransactions.length === 0 ? (
-           <div className="flex flex-col items-center justify-center py-12">
-              <div className="w-20 h-20 rounded-full bg-app-card border border-app-border flex items-center justify-center mb-5">
-                 <FileText className="w-8 h-8 text-app-accent1" />
-              </div>
-              <p className="text-app-text-bright font-semibold mb-1.5">Belum ada transaksi hari ini</p>
-              <p className="text-app-text/60 text-[13px]">Mulai catat transaksi pertama Anda hari ini</p>
-           </div>
+            <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="daybook-empty w-full py-10 text-left">
+              <span className="font-ledger block text-[22px] text-app-text-bright">Halaman hari ini masih kosong.</span>
+              <span className="mt-2 block text-xs leading-relaxed text-app-text/58">Catat transaksi pertama agar arus kas hari ini mulai terbaca.</span>
+              <span className="mt-5 inline-flex min-h-11 items-center gap-2 text-xs font-semibold text-app-accent1"><Plus className="h-4 w-4" /> Tambah transaksi</span>
+            </button>
           ) : (
-           <div className="space-y-3">
-              {todayMobileTransactions.map((t) => (
-                 <button type="button" key={t.id} onClick={() => navigate('/transactions', { state: { tab: "Semua" } })} className="relative flex w-full items-center justify-between overflow-hidden rounded-2xl border border-app-border bg-app-card p-4 text-left">
-
-                     <div className="flex items-center gap-4 relative z-10">
-                       <div className={`w-12 h-12 rounded-[1.1rem] flex items-center justify-center shrink-0 ${t.type === "income" ? "bg-app-success/10 text-app-success" : t.type === "expense" ? "bg-app-danger/10 text-app-danger" : "bg-app-accent1/10 text-app-accent1"}`}>
-                         {t.type === "income" && <TrendingUp className="w-5 h-5" />}
-                         {t.type === "expense" && <TrendingDown className="w-5 h-5" />}
-                         {t.type === "transfer" && (
-                           <AccountIcon
-                             iconId={getAccountIcon(t.fromAccountId)}
-                             className="w-6 h-6 border-0 bg-transparent shadow-none"
-                           />
-                         )}
-                       </div>
-                       <div>
-                         <div className="flex items-center gap-2 mb-0.5">
-                           <p className="text-app-text-bright font-semibold text-[15px]">
-                             {t.note || (t.type === "income" ? "Pemasukan" : t.type === "expense" ? "Pengeluaran" : "Transfer")}
-                           </p>
-                           {t.categoryId && (
-                              <span className="px-2 py-0.5 bg-app-bg border border-app-border text-app-text text-[11px] font-semibold rounded-full hidden sm:flex items-center gap-1">
-                                <CategoryIcon iconId={t.categoryIcon || 'dollar-sign'} className="w-3 h-3 text-app-text/70" />
-                                <span>{t.categoryName}</span>
-                              </span>
-                           )}
-                         </div>
-                         <p className="text-app-text/60 text-[13px]">
-                           {safeFormatDate(t.date, "dd MMM yyyy", { locale: localeId })}
-                         </p>
-                       </div>
-                     </div>
-                     <p className={`text-[17px] font-semibold whitespace-nowrap relative z-10 ${t.type === "income" ? "text-app-success" : t.type === "expense" ? "text-app-danger" : "text-app-text"}`}>
-                       {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""} Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(t.amount)}
-                       {Boolean(t.adminFee) && (
-                         <span className="block text-[11px] text-app-danger font-semibold text-right mt-0.5">
-                           Fee: -Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(t.adminFee)}
-                         </span>
-                       )}
-                     </p>
-                 </button>
+            <div className="mobile-daybook border-y border-app-border">
+              {todayMobileTransactions.slice(0, 6).map((transaction) => (
+                <button type="button" key={transaction.id} onClick={() => navigate('/transactions', { state: { tab: "Semua" } })} className="daybook-row grid min-h-[76px] w-full grid-cols-[42px_minmax(0,1fr)_auto] items-center gap-3 text-left">
+                  <time className="font-mono text-[10px] text-app-text/48">{safeFormatDate(transaction.date, "HH:mm", { locale: localeId })}</time>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold text-app-text-bright">{transaction.note || (transaction.type === "income" ? "Pemasukan" : transaction.type === "expense" ? "Pengeluaran" : "Transfer")}</span>
+                    <span className="mt-1 block truncate text-[11px] text-app-text/52">{transaction.categoryName || getTransactionAccountLabel(transaction)}</span>
+                  </span>
+                  <span className={`whitespace-nowrap font-mono text-xs font-semibold ${transaction.type === "income" ? "text-app-success" : transaction.type === "expense" ? "text-app-danger" : "text-app-text-bright"}`}>
+                    {transaction.type === "income" ? "+" : transaction.type === "expense" ? "-" : ""}{formatRp(transaction.amount)}
+                  </span>
+                </button>
               ))}
-           </div>
+            </div>
           );
         })()}
       </div>
 
       {/* DESKTOP BOTTOM SECTION - TRANSACTIONS */}
-      <ScrollReveal className="dashboard-recent mx-7 hidden shrink-0 flex-col overflow-hidden border border-app-border bg-app-card p-6 md:flex">
-        <div className="flex items-center justify-between mb-5 relative z-10">
+      <ScrollReveal className="dashboard-recent mx-7 hidden shrink-0 flex-col overflow-hidden border border-app-border bg-app-card md:flex">
+        <div className="relative z-10 flex items-end justify-between gap-5 border-b border-app-border px-6 py-5">
           <div>
-            <h2 className="text-app-text-bright text-[20px] font-semibold tracking-[-0.01em]">{t('dashboard.recentTransactions')}</h2>
-            <p className="text-app-text/60 text-xs font-medium">Aktivitas transaksi keuangan Anda hari ini</p>
+            <h2 className="font-ledger text-[28px] leading-none text-app-text-bright">{t('dashboard.recentTransactions')}</h2>
+            <p className="mt-2 text-xs text-app-text/58">Ledger aktivitas hari ini</p>
           </div>
           <Link
             to="/transactions"
             state={{ tab: "Semua" }}
-            className="text-app-accent1 text-xs font-semibold hover:underline flex items-center gap-1 bg-app-accent1/10 border border-app-accent1/20 px-3 py-1.5 rounded-xl transition-all"
+            className="flex min-h-11 items-center gap-1 text-xs font-semibold text-app-accent1 hover:text-app-text-bright"
           >
-            {language === 'en' ? 'View all transactions' : 'Lihat semua transaksi'} <ArrowRight className="w-3.5 h-3.5" />
+            {language === 'en' ? 'Open full ledger' : 'Buka ledger lengkap'} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
@@ -1266,82 +1268,43 @@ export default function Dashboard() {
           const filteredBottomTransactions = selectedChartAccount === "all" ? recentTransactions : recentTransactions.filter(t => t.accountId === selectedChartAccount);
           const todayDesktopTransactions = filteredBottomTransactions.filter(t => isSameDay(parseTxDate(t.date), new Date()));
           return todayDesktopTransactions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 rounded-2xl bg-app-bg border border-app-border border-dashed relative z-10">
-              <FileText className="w-8 h-8 text-app-text/30 mb-2" />
-              <p className="text-app-text/60 text-xs font-medium">{language === 'en' ? 'No transactions recorded today' : 'Belum ada transaksi yang dicatat hari ini'}</p>
+            <div className="relative z-10 grid min-h-32 grid-cols-[1fr_auto] items-center gap-6 px-6 py-8">
+              <div>
+                <p className="font-ledger text-[24px] text-app-text-bright">Belum ada entri hari ini.</p>
+                <p className="mt-2 text-xs text-app-text/58">Transaksi baru akan muncul sebagai baris ledger.</p>
+              </div>
+              <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="flex min-h-11 items-center gap-2 border border-app-accent1 px-4 text-xs font-semibold text-app-accent1 hover:bg-app-accent1 hover:text-app-bg"><Plus className="h-4 w-4" /> Tambah transaksi</button>
             </div>
           ) : (
-            <div className="space-y-3 relative z-10">
-              {todayDesktopTransactions.map((tx) => (
-                <div
-                  key={tx.id}
-                  onClick={() => navigate('/transactions', { state: { tab: "Semua" } })}
-                  className="flex items-center justify-between p-3.5 rounded-2xl bg-app-bg border border-app-border hover:border-app-accent1/50 transition cursor-pointer relative overflow-hidden group"
-                >
-                  <div className="flex items-center gap-3.5 relative z-10">
-                    <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0
-                        ${
-                          tx.type === "income"
-                            ? "bg-app-success/10 text-app-success"
-                            : tx.type === "expense"
-                              ? "bg-app-danger/10 text-app-danger"
-                              : "bg-app-accent1/10 text-app-accent1"
-                        }`}
-                    >
-                      {tx.type === "income" && <TrendingUp className="w-5 h-5" />}
-                      {tx.type === "expense" && <TrendingDown className="w-5 h-5" />}
-                      {tx.type === "transfer" && (
-                        <AccountIcon
-                          iconId={getAccountIcon(tx.fromAccountId)}
-                          className="w-5 h-5 border-0 bg-transparent shadow-none"
-                        />
-                      )}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-app-text-bright font-semibold text-xs">
-                          {tx.note ||
-                            (tx.type === "income"
-                              ? t('dashboard.income')
-                              : tx.type === "expense"
-                                ? t('dashboard.expense')
-                                : "Transfer")}
-                        </p>
-                        {tx.categoryId && (
-                            <span className="px-2 py-0.5 bg-app-card border border-app-border text-app-text text-[11px] font-semibold rounded-full hidden sm:flex items-center gap-1">
-                              <CategoryIcon iconId={tx.categoryIcon || 'dollar-sign'} className="w-3 h-3 text-app-text/70" />
-                              <span>{tx.categoryName}</span>
-                            </span>
-                        )}
-                      </div>
-                      <p className="text-[11px] text-app-text/60 mt-0.5">
-                        {safeFormatDate(tx.date, "dd MMM yyyy", { locale: currentLocale })}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end shrink-0">
-                    <p
-                      className={`text-xs font-mono font-bold whitespace-nowrap relative z-10
-                          ${
-                            tx.type === "income"
-                              ? "text-app-success"
-                              : tx.type === "expense"
-                                ? "text-app-danger"
-                                : "text-app-text-bright"
-                          }`}
-                    >
-                      {tx.type === "income" ? "+" : tx.type === "expense" ? "-" : ""}{" "}
-                      Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(tx.amount)}
-                    </p>
-                    {Boolean(tx.adminFee) && (
-                      <p className="text-[11px] text-app-danger font-semibold mt-0.5">
-                        Fee: -Rp {new Intl.NumberFormat("id-ID", { notation: "compact", maximumFractionDigits: 1 }).format(tx.adminFee)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
+            <div className="relative z-10 overflow-x-auto">
+              <table className="dashboard-daybook-table w-full border-collapse text-left">
+                <thead>
+                  <tr>
+                    <th>Transaksi</th>
+                    <th>Rekening</th>
+                    <th>Waktu</th>
+                    <th className="text-right">Nominal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {todayDesktopTransactions.slice(0, 8).map((transaction) => (
+                    <tr key={transaction.id}>
+                      <td>
+                        <button type="button" onClick={() => navigate('/transactions', { state: { tab: "Semua" } })} className="max-w-[32ch] truncate text-left text-xs font-semibold text-app-text-bright hover:text-app-accent1">
+                          {transaction.note || (transaction.type === "income" ? t('dashboard.income') : transaction.type === "expense" ? t('dashboard.expense') : "Transfer")}
+                        </button>
+                        <span className="mt-1 block text-[11px] text-app-text/52">{transaction.categoryName || transaction.type}</span>
+                      </td>
+                      <td className="max-w-[28ch] truncate text-xs text-app-text/68">{getTransactionAccountLabel(transaction)}</td>
+                      <td><time className="font-mono text-[11px] text-app-text/58">{safeFormatDate(transaction.date, "HH:mm", { locale: currentLocale })}</time></td>
+                      <td className={`whitespace-nowrap text-right font-mono text-xs font-semibold ${transaction.type === "income" ? "text-app-success" : transaction.type === "expense" ? "text-app-danger" : "text-app-text-bright"}`}>
+                        {transaction.type === "income" ? "+" : transaction.type === "expense" ? "-" : ""}{formatRp(transaction.amount)}
+                        {Boolean(transaction.adminFee) && <span className="mt-1 block text-[10px] text-app-danger">Fee -{formatRp(transaction.adminFee || 0)}</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           );
         })()}

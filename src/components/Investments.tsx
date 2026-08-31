@@ -294,7 +294,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
             onClick={() => setDirection("ara")}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold uppercase transition-all flex items-center gap-1.5 ${
               direction === "ara"
-                ? "bg-app-success text-white font-semibold"
+                ? "bg-app-success text-app-bg font-semibold"
                 : "text-app-text/60 hover:text-app-text-bright font-semibold"
             }`}
           >
@@ -305,7 +305,7 @@ function AraArbSimulator({ ownedStocks }: { ownedStocks: Investment[] }) {
             onClick={() => setDirection("arb")}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold uppercase transition-all flex items-center gap-1.5 ${
               direction === "arb"
-                ? "bg-app-danger text-white font-semibold"
+                ? "bg-app-danger text-app-bg font-semibold"
                 : "text-app-text/60 hover:text-app-text-bright font-semibold"
             }`}
           >
@@ -832,6 +832,8 @@ export default function Investments() {
 
   const handleDelete = async (id: string) => {
     if (!user) return;
+    const selectedInvestment = investments.find((investment) => investment.id === id);
+    if (!window.confirm(`Hapus ${selectedInvestment?.code || "investasi ini"} dari portofolio? Tindakan ini tidak dapat dibatalkan.`)) return;
     try {
       await deleteDoc(doc(db, "users", user.uid, "investments", id));
       toast.success("Investasi berhasil dihapus");
@@ -1566,8 +1568,8 @@ export default function Investments() {
   }, [activeInvestments, filterCategory, sortBy, quotes]);
 
   const COLORS = useMemo(() => [
-    "#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#EF4444",
-    "#14B8A6", "#6366f1", "#EC4899", "#f97316"
+    "var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)",
+    "var(--success-color)", "var(--danger-color)", "var(--warning-color)", "var(--accent1-color)"
   ], []);
 
   const formatYAxis = (val: number) => {
@@ -1712,13 +1714,14 @@ export default function Investments() {
 
   return (
     <PageShell
+      className="route-investments"
       title={language === "en" ? "Your Investments" : "Investasi Anda"}
       subtitle={language === "en" ? "Here is the summary of your investment performance." : "Berikut ringkasan performa investasi Anda."}
       actions={actionsInvestments}
       mobileActions={mobileActionsInvestments}
     >
       {/* Sub-tab Navigation */}
-      <div className="flex bg-app-card/60 backdrop-blur-md p-1.5 rounded-2xl border border-app-border/60 self-start mb-6 md:mb-8 gap-1.5 relative z-10 shrink-0">
+      <div className="investment-register-tabs relative z-10 mb-6 flex shrink-0 self-start border-y border-app-border md:mb-8">
         <button
           type="button"
           onClick={() => setActiveTab("dashboard")}
@@ -1766,13 +1769,13 @@ export default function Investments() {
       </div>
 
       {activeTab === "dashboard" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-in fade-in slide-in-from-bottom-2 duration-500 w-full mb-6">
+        <div className="investment-layout grid w-full grid-cols-1 items-start gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 lg:grid-cols-12 mb-6">
 
           {/* COLUMN 1: LEFT PANEL (lg:col-span-5) */}
           <div className="lg:col-span-5 flex flex-col gap-6 w-full">
 
             {/* UNIFIED HERO CHART CARD */}
-            <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col relative overflow-hidden w-full">
+            <HoverCard className="investment-hero-register relative flex w-full flex-col overflow-hidden border border-app-border bg-app-card p-6">
 
               {/* Header with Mode Toggle & Period Filter */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 relative z-10">
@@ -1958,7 +1961,7 @@ export default function Investments() {
                         type="monotone"
                         dataKey="ihsgReturn"
                         name="ihsgReturn"
-                        stroke="#8B5CF6"
+                        stroke="var(--chart-3)"
                         strokeWidth={2}
                         dot={false}
                         activeDot={{ r: 4 }}
@@ -2288,7 +2291,7 @@ export default function Investments() {
         return (
           <>
             {/* WIDGETS (STACK ON MOBILE, GRID ON DESKTOP) */}
-            <div className="flex flex-col gap-3.5 mb-6 md:grid md:grid-cols-3 md:gap-5 md:mb-8">
+            <div className="investment-secondary-widgets flex flex-col gap-3.5 mb-6 md:grid md:grid-cols-3 md:gap-5 md:mb-8">
               {/* TOTAL INVESTASI */}
               <HoverCard className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex items-center justify-between relative overflow-hidden cursor-pointer w-full min-h-[100px]">
                 <div className="flex items-center gap-5 relative z-10 w-full min-w-0">
@@ -2381,7 +2384,7 @@ export default function Investments() {
       })()}
 
       {/* MAIN SECTIONS */}
-      <div className="flex flex-col gap-6 mb-6">
+      <div className="investment-secondary-content flex flex-col gap-6 mb-6">
         {/* PERFORMA INVESTASI */}
         <div className="bg-app-card rounded-[20px] p-6 sm:p-8 border border-app-border/60 flex flex-col relative overflow-hidden">
 
@@ -2502,7 +2505,7 @@ export default function Investments() {
                   type="monotone"
                   name="Modal Awal"
                   dataKey="modal"
-                  stroke="#ffffff"
+                  stroke="var(--text-bright)"
                   strokeWidth={2}
                   dot={false}
                   activeDot={{ r: 3 }}
@@ -2865,8 +2868,8 @@ export default function Investments() {
 
                   const totalAllocValue = allocationData.reduce((sum, item) => sum + item.value, 0);
                   const COLORS = [
-                    "#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#EF4444",
-                    "#14B8A6", "#6366f1", "#EC4899", "#f97316"
+                    "var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)",
+                    "var(--success-color)", "var(--danger-color)", "var(--warning-color)", "var(--accent1-color)"
                   ];
 
                   if (totalAllocValue === 0) {
@@ -3077,7 +3080,7 @@ export default function Investments() {
 
       {/* AI INSIGHTS & STOCK RECOMMENDATIONS VIEW */}
       {activeTab === "ai_insights" && (
-        <div className="flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-300 mb-8">
+        <div className="investment-ai-view flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-300 mb-8">
           {/* TOP HEADER & RE-ANALYZE BAR */}
           <div className="bg-app-card rounded-[20px] p-6 border border-app-border/60 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
             <div className="flex items-start gap-3.5 relative z-10">
@@ -3237,7 +3240,7 @@ export default function Investments() {
               <button
                 type="button"
                 onClick={() => fetchAiInsights(investStyle)}
-                className="px-3 py-1 rounded-lg bg-app-danger text-white text-xs font-semibold cursor-pointer"
+                className="px-3 py-1 rounded-lg bg-app-danger text-app-bg text-xs font-semibold cursor-pointer"
               >
                 Coba Lagi
               </button>

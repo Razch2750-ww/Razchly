@@ -1138,7 +1138,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
     setConsoleLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 49)]);
   };
 
-  // Connect broker (Secure Encrypted Save Simulation)
+  // Connect broker for the current client session.
   const handleSaveApiConnection = (e: React.FormEvent) => {
     e.preventDefault();
     if (!bybitApiKey || !bybitSecret || !passphrase || !mt5Server) {
@@ -1146,11 +1146,10 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
       return;
     }
     const brokerName = getBrokerName();
-    // Encrypted Simulation using standard client-side XOR base64 (End-to-End Privacy)
     setIsEncrypted(true);
     setBrokerConnected(true);
-    addLog("Broker API: Kredensial dienkripsi secara end-to-end dan tersimpan aman di Firestore.");
-    addLog(`Broker API: Sukses terhubung ke ${brokerName} (Server: ${mt5Server}) dengan latensi ultra rendah (Direct Connection).`);
+    addLog("Broker API: Kredensial diterima untuk sesi klien ini dan tidak ditampilkan ulang.");
+    addLog(`Broker API: Koneksi sesi ke ${brokerName} disiapkan untuk server ${mt5Server}.`);
   };
 
   const handleDisconnect = () => {
@@ -1190,22 +1189,23 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto overflow-x-hidden bg-app-bg text-app-text" id="ai-trading-root">
+    <div className="route-workbench page-register route-ai-trading mx-auto flex h-full w-full max-w-7xl flex-1 flex-col overflow-y-auto overflow-x-hidden bg-app-bg p-4 pb-32 text-app-text md:p-8 md:pb-8" id="ai-trading-root">
 
       {/* Visual Title Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-app-border pb-5 mb-6" id="ai-trading-header">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-app-text-bright flex items-center gap-2">
+      <header className="workbench-hero mb-6 flex flex-col justify-between gap-5 border-b border-app-border pb-6 md:flex-row md:items-end" id="ai-trading-header">
+        <div className="workbench-hero-copy">
+          <p className="page-kicker" aria-hidden="true"><span>MK</span> Market analysis</p>
+          <h1 className="flex items-center gap-2 text-2xl text-app-text-bright md:text-3xl">
             <Cpu className="w-7 h-7 text-app-accent1 shrink-0" />
-            <TextReveal text="OpenAlice Neural Trading Suite" />
+            <TextReveal text="Meja Analisis Pasar" />
           </h1>
           <p className="text-sm text-app-text/70 mt-1">
-            Sistem trading kuantitatif multi-layer ultra presisi. Mengintegrasikan model kecerdasan buatan, grid-hedging otomatis, dan perlindungan ekuitas modal.
+            Telaah sinyal, risiko, backtest, dan automasi dalam satu ruang kerja. Hasil analisis bukan jaminan performa perdagangan.
           </p>
         </div>
 
         {/* Selected Asset Indicator */}
-        <div className="flex flex-wrap items-center gap-3 bg-app-card px-4 py-2 rounded-xl border border-app-border" id="selected-asset-indicator">
+        <div className="market-tape flex flex-wrap items-center gap-3 border border-app-border bg-app-card px-4 py-3" id="selected-asset-indicator">
           <div>
             <div className="text-xs text-app-text/50 font-semibold uppercase tracking-wider">ASET AKTIF</div>
             <div className="font-semibold text-app-text-bright flex items-center gap-1.5">
@@ -1265,14 +1265,15 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             onClick={() => fetchQuote(selectedSymbol)}
             disabled={loadingQuote}
             className="p-1.5 text-app-text/50 hover:text-app-text-bright rounded-lg hover:bg-app-hover transition-colors ml-1 cursor-pointer"
+            aria-label={`Perbarui harga ${selectedSymbol}`}
           >
             <RefreshCw className={`w-4 h-4 ${loadingQuote ? "animate-spin text-app-accent1" : ""}`} />
           </button>
         </div>
-      </div>
+      </header>
 
       {/* Asset Search & Selector panel */}
-      <div className="bg-app-card border border-app-border rounded-[18px] p-4" id="asset-selector-panel">
+      <div className="market-search-register border border-app-border bg-app-card p-4" id="asset-selector-panel">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-app-text/50" />
@@ -1646,7 +1647,7 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
                 )}
               </div>
               <p className="text-xs text-app-text/70">
-                Koneksikan ke broker MT5 pilihan Anda (Bybit, Exness, XM, dll) secara langsung. Kredensial Anda dienkripsi end-to-end secara privat menggunakan kata sandi Anda.
+                Gunakan testnet atau akun demo saat menguji koneksi. Periksa kembali izin API dan jangan berikan akses penarikan dana.
               </p>
 
               {/* Account Mode Selector (SIMULASI vs RIIL) */}
@@ -2039,8 +2040,8 @@ Berdasarkan parameter MQL5 EA yang Anda konfigurasi di tab kustomisasi, sistem m
             <div className="lg:col-span-2 space-y-6">
 
               {/* Live Terminal Log Console */}
-              <div className="bg-black text-emerald-400 font-mono text-xs rounded-2xl p-5 border border-app-border space-y-3">
-                <div className="flex items-center justify-between border-b border-gray-900 pb-3 text-gray-500">
+              <div className="bg-app-bg text-app-success font-mono text-xs rounded-2xl p-5 border border-app-border space-y-3">
+                <div className="flex items-center justify-between border-b border-app-border pb-3 text-app-text">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />

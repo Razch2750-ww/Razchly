@@ -219,22 +219,24 @@ export default function ImageAnalysis() {
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full h-full max-w-4xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
+    <div className="route-workbench page-register route-analyze mx-auto flex h-full w-full max-w-5xl flex-1 flex-col overflow-y-auto bg-app-bg p-4 pb-32 text-app-text md:p-8 md:pb-8">
       <ScrollReveal className="w-full flex flex-col">
-        <h1 className="text-2xl font-semibold text-app-text-bright mb-6">
-          <TextReveal text="Analisis Mutasi Rekening / Struk (AI)" />
-        </h1>
+        <header className="workbench-hero mb-6 border-b border-app-border pb-6">
+          <p className="page-kicker" aria-hidden="true"><span>AI</span> Extraction desk</p>
+          <h1 className="text-2xl text-app-text-bright md:text-3xl"><TextReveal text="Ekstraksi mutasi dan struk" /></h1>
+          <p className="mt-2 max-w-[62ch] text-sm leading-relaxed text-app-text/65">Unggah bukti transaksi, periksa hasil pembacaan, lalu pilih data yang benar sebelum menyimpannya.</p>
+        </header>
 
-        <div className="bg-app-card rounded-[18px] p-6 border border-app-border">
+        <div className="analysis-workspace border border-app-border bg-app-card p-4 md:p-6">
             <div className="flex flex-col md:flex-row gap-6">
-                <div className="flex-1 w-full flex flex-col items-center justify-center p-8 border-2 border-dashed border-app-border rounded-2xl bg-app-bg transition-colors hover:border-app-accent1/50 relative overflow-hidden min-h-[300px]">
+                <div className="analysis-dropzone relative flex min-h-[320px] w-full flex-1 flex-col items-center justify-center overflow-hidden border border-dashed border-app-border bg-app-bg p-8 transition-colors hover:border-app-accent1/60">
                     {selectedImages.length > 0 ? (
                         <div className="w-full flex flex-col items-center gap-4">
                             <div className="flex flex-wrap gap-4 justify-center items-center">
                                 {selectedImages.map((img, idx) => (
                                     <div key={idx} className="relative w-32 h-32 md:w-40 md:h-40 flex flex-col items-center justify-center bg-app-card border border-app-border rounded-xl">
                                         {img.type.startsWith('image/') ? (
-                                           <img src={img.url} alt="Preview" className="w-full h-full object-cover rounded-xl" />
+                                           <img src={img.url} alt={`Pratinjau berkas ${idx + 1}`} className="w-full h-full object-cover rounded-xl" />
                                         ) : (
                                            <div className="flex flex-col items-center justify-center w-full h-full">
                                               <FileText className="w-8 h-8 text-app-accent1 mb-2" />
@@ -249,6 +251,7 @@ export default function ImageAnalysis() {
                                                 if (newImages.length === 0) setExtractedData([]);
                                             }}
                                             className="absolute -top-2 -right-2 bg-app-danger text-app-bg p-1.5 rounded-full hover:bg-app-danger/80 transition"
+                                            aria-label={`Hapus berkas ${idx + 1}`}
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                                         </button>
@@ -267,7 +270,7 @@ export default function ImageAnalysis() {
                         <div className="text-center">
                             <ImageIcon className="w-12 h-12 text-app-text/30 mx-auto mb-4" />
                             <h3 className="text-sm font-semibold text-app-text-bright mb-1">Unggah Struk atau Screenshot Mutasi</h3>
-                            <p className="text-xs text-app-text/60 mb-4">PNG, JPG, PDF, up to 5MB. Bisa unggah beberapa file sekaligus.</p>
+                            <p className="text-xs text-app-text/60 mb-4">PNG, JPG, atau PDF hingga 5 MB. Beberapa file dapat diproses sekaligus.</p>
                             <button type="button"
                                 onClick={() => fileInputRef.current?.click()}
                                 className="bg-app-accent1 hover:bg-app-accent1/90 text-app-bg px-6 py-2.5 rounded-xl font-medium text-sm transition flex items-center gap-2 mx-auto"

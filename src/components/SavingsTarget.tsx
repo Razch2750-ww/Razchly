@@ -10,7 +10,6 @@ import { formatNumberInput, parseNumberInput } from '../utils/numberFormat';
 import { parseTxDate } from '../utils/dateUtils';
 import { Transaction } from '../types';
 import { isSameMonth, isSameDay } from 'date-fns';
-import confetti from 'canvas-confetti';
 import { HoverCard, ScrollReveal, StaggerContainer, StaggerItem, TextReveal } from "./MotionWrappers";
 
 export default function SavingsTarget() {
@@ -135,28 +134,29 @@ export default function SavingsTarget() {
   }, [dailySpendingRate, monthlyExpenseBudget]);
 
   return (
-    <div className="flex-1 flex flex-col w-full h-full max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8 overflow-y-auto bg-app-bg text-app-text">
+    <div className="route-workbench page-register route-savings mx-auto flex h-full w-full max-w-7xl flex-1 flex-col overflow-y-auto bg-app-bg p-4 pb-32 text-app-text md:p-8 md:pb-8">
       {/* HEADER */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-6 shrink-0">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-semibold text-app-text-bright mb-1 tracking-tight">
+      <header className="workbench-hero mb-6 flex shrink-0 flex-col justify-between gap-6 md:flex-row md:items-end">
+        <div className="workbench-hero-copy">
+          <p className="page-kicker" aria-hidden="true"><span>SV</span> Goal folio</p>
+          <h1 className="text-2xl text-app-text-bright md:text-3xl">
             <TextReveal text="Target Tabungan" />
           </h1>
           <p className="text-app-text/70 text-sm">Kelola dan pantau target keuangan berlapis Anda.</p>
         </div>
 
-        <div className="flex items-center gap-4 hidden md:flex">
-          <button type="button" onClick={() => setGlobalGrabModalOpen(true)} className="w-10 h-10 rounded-full bg-app-success hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity" title="Transaksi Grab">
-            <Car className="w-5 h-5" />
+        <div className="workbench-hero-actions hidden items-center gap-2 md:flex">
+          <button type="button" onClick={() => setGlobalGrabModalOpen(true)} className="inline-flex h-11 items-center gap-2 rounded-lg border border-app-border px-4 text-sm font-semibold text-app-text-bright" title="Transaksi Grab">
+            <Car className="w-4 h-4" /> Catat Grab
           </button>
-          <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="w-10 h-10 rounded-full bg-app-accent1 hover:opacity-90 flex items-center justify-center text-app-bg transition-opacity" title="Tambah Transaksi">
-            <Plus className="w-5 h-5" />
+          <button type="button" onClick={() => setGlobalAddModalOpen(true)} className="inline-flex h-11 items-center gap-2 rounded-lg bg-app-accent1 px-4 text-sm font-semibold text-app-bg" title="Tambah Transaksi">
+            <Plus className="w-4 h-4" /> Transaksi
           </button>
-          <Link to="/settings" className="px-4 h-10 rounded-full bg-app-card flex items-center justify-center text-sm font-semibold text-app-text-bright border border-app-border gap-2 hover:bg-app-hover cursor-pointer transition-colors">
-            <span className="opacity-800">{user?.displayName?.toUpperCase() || "USER"}</span>
+          <Link to="/settings" className="flex h-11 items-center justify-center gap-2 rounded-lg border border-app-border px-3 text-sm font-semibold text-app-text-bright hover:bg-app-hover">
+            <span>Profil</span>
             <div className="w-6 h-6 rounded-full bg-app-accent1 text-xs font-semibold flex items-center justify-center text-app-bg overflow-hidden flex-shrink-0">
                {user?.photoURL ? (
-                 <img src={user?.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                 <img src={user?.photoURL} alt="" className="w-full h-full object-cover" />
                ) : (
                  user?.displayName?.substring(0, 2).toUpperCase() || "US"
                )}
@@ -165,7 +165,7 @@ export default function SavingsTarget() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="savings-plan-sheet mb-8 grid grid-cols-1 gap-0 border border-app-border lg:grid-cols-3">
         <ScrollReveal className="lg:col-span-2">
           <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden h-full">
 
@@ -342,8 +342,8 @@ export default function SavingsTarget() {
                   <TrendingDown className="w-5 h-5 text-app-text/50 shrink-0" />
                 )}
                 <h4 className="text-app-text-bright font-semibold text-sm">
-                  {monthlyExpenseBudget > 0 ? (
-                    isOverBudget ? "Prediksi: Peringatan Anggaran! ⚠️" : "Prediksi: Anggaran Aman! ✨"
+                      {monthlyExpenseBudget > 0 ? (
+                    isOverBudget ? "Prediksi: anggaran berisiko" : "Prediksi: anggaran terkendali"
                   ) : (
                     "Prediksi Pengeluaran PWA"
                   )}
@@ -398,7 +398,7 @@ export default function SavingsTarget() {
           </StaggerItem>
         </StaggerContainer>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="savings-goal-register mb-8 grid grid-cols-1 gap-0 border-y border-app-border md:grid-cols-2 lg:grid-cols-3">
         {/* Tabungan Bulanan Berlayer */}
         <div className="bg-app-card rounded-2xl p-6 border border-app-border flex flex-col relative overflow-hidden">
 
@@ -430,20 +430,11 @@ export default function SavingsTarget() {
                       </div>
                     </div>
 
-                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2">
-                      <div
-                        className="h-full bg-app-accent1 transition-all duration-1000 ease-out relative"
-                        style={{ width: `${savingsProgress}%` }}
-                      >
-                        <div className="absolute inset-0 bg-white/20" />
-                      </div>
-                    </div>
-
                     <div className="flex justify-between items-center text-xs">
                       <span className="text-app-text/50">Status</span>
                       <span className="font-medium text-app-text/70">
                         {savingsThisMonth >= target ? (
-                          <span className="text-app-success font-semibold">Tercapai! 🎉</span>
+                          <span className="text-app-success font-semibold">Tercapai</span>
                         ) : (
                           `Sisa Rp ${Math.max(target - savingsThisMonth, 0).toLocaleString('id-ID')}`
                         )}
@@ -491,20 +482,11 @@ export default function SavingsTarget() {
                       </div>
                     </div>
 
-                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2">
-                      <div
-                        className="h-full bg-app-success transition-all duration-1000 ease-out relative"
-                        style={{ width: `${incomeProgress}%` }}
-                      >
-                        <div className="absolute inset-0 bg-white/20" />
-                      </div>
-                    </div>
-
                     <div className="flex justify-between items-center text-xs">
                       <span className="text-app-text/50">Status</span>
                       <span className="font-medium text-app-text/70">
                         {incomeToday >= target ? (
-                          <span className="text-app-success font-semibold">Tercapai! 🎉</span>
+                          <span className="text-app-success font-semibold">Tercapai</span>
                         ) : (
                           `Kurang Rp ${Math.max(target - incomeToday, 0).toLocaleString('id-ID')}`
                         )}
@@ -552,20 +534,11 @@ export default function SavingsTarget() {
                       </div>
                     </div>
 
-                    <div className="h-3 w-full bg-app-bg rounded-full border border-app-border overflow-hidden mb-2">
-                      <div
-                        className={`h-full transition-all duration-1000 ease-out relative ${expenseProgress >= 100 ? 'bg-app-danger' : 'bg-app-warning'}`}
-                        style={{ width: `${expenseProgress}%` }}
-                      >
-                        <div className="absolute inset-0 bg-white/20" />
-                      </div>
-                    </div>
-
                     <div className="flex justify-between items-center text-xs">
                       <span className="text-app-text/50">Status</span>
                       <span className="font-medium text-app-text/70">
                         {expenseToday > target ? (
-                          <span className="text-app-danger font-semibold">Overbudget! 🚫</span>
+                          <span className="text-app-danger font-semibold">Batas terlewati</span>
                         ) : (
                           `Sisa Rp ${Math.max(target - expenseToday, 0).toLocaleString('id-ID')}`
                         )}

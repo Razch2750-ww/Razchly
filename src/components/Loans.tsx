@@ -161,7 +161,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
       await batch.commit();
 
       sendDeviceNotification(
-        isLend ? "Penerimaan Piutang Berhasil 💸" : "Pembayaran Pinjaman Berhasil 💸",
+        isLend ? "Penerimaan piutang berhasil" : "Pembayaran pinjaman berhasil",
         isLend
           ? `Penerimaan cicilan untuk "${loan.name}" sebesar Rp ${amount.toLocaleString("id-ID")} berhasil dicatat.`
           : `Pembayaran untuk pinjaman "${loan.name}" sebesar Rp ${amount.toLocaleString("id-ID")} berhasil dicatat.`
@@ -179,10 +179,9 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
   if (isPaidOff && !isExpanded) {
     return (
       <div
-        onClick={() => setIsExpanded(true)}
-        className="bg-app-card rounded-2xl border border-app-border p-4 flex justify-between items-center opacity-70 group hover:opacity-100 transition-opacity cursor-pointer animate-in fade-in duration-200"
+        className="loan-folio loan-folio--settled flex w-full items-center justify-between border border-app-border bg-app-card p-4 text-left opacity-70 transition-opacity animate-in fade-in duration-200 hover:opacity-100"
       >
-        <div className="flex items-center gap-3">
+        <button type="button" onClick={() => setIsExpanded(true)} className="flex min-h-11 min-w-0 flex-1 items-center gap-3 text-left" aria-label={`Buka detail ${loan.name}`}>
           <div className="w-10 h-10 rounded-full bg-app-success/10 flex items-center justify-center">
             <CheckCircle className="w-5 h-5 text-app-success" />
           </div>
@@ -192,7 +191,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
             </h2>
             <p className="text-xs text-app-text/60">Rp{details.totalPrincipal.toLocaleString("id-ID")} • Lunas</p>
           </div>
-        </div>
+        </button>
         <div className="flex items-center gap-1">
           <button type="button"
             onClick={(e) => { e.stopPropagation(); onEdit(loan); }}
@@ -225,7 +224,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
   const payManualAmountLabel = isLend ? "Nominal Penerimaan Manual" : "Nominal Pembayaran Manual";
 
   return (
-    <HoverCard className={`bg-app-card rounded-2xl border ${isLend ? 'border-app-success/20 hover:border-app-success/40' : 'border-app-accent1/20 hover:border-app-accent1/40'} p-5 flex flex-col relative overflow-hidden group transition-colors w-full`}>
+    <HoverCard className={`loan-folio bg-app-card border ${isLend ? 'loan-folio--receivable border-app-success/30 hover:border-app-success/50' : 'loan-folio--payable border-app-accent1/30 hover:border-app-accent1/50'} p-5 flex flex-col relative overflow-hidden group transition-colors w-full`}>
 
       <div className="flex justify-between items-center mb-4 relative z-10">
         <div className="flex items-center gap-3">
@@ -265,7 +264,7 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
         </div>
       </div>
 
-      <div className="bg-app-bg/50 rounded-xl p-4 space-y-3 border border-app-border">
+      <div className="loan-folio-register space-y-3 border-y border-app-border py-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-xs text-app-text/70 mb-1">{totalPrincipalLabel}</p>
@@ -319,15 +318,9 @@ const LoanCard: React.FC<{ loan: Loan, deleteLoan: (id: string) => Promise<void>
         )}
       </div>
 
-      <div className="flex justify-between items-center mt-4 mb-1">
+      <div className="mt-4 flex items-center justify-between border-b border-app-border pb-4">
         <span className="text-xs text-app-text/70">Progress</span>
         <span className="text-xs font-medium text-app-text-bright">{Math.round(progress)}%</span>
-      </div>
-      <div className="w-full bg-app-bg rounded-full h-1.5 mb-5 overflow-hidden border border-app-border">
-        <div
-          className={`${isLend ? 'bg-app-success' : 'bg-app-accent1'} h-1.5 rounded-full transition-all duration-500`}
-          style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-        />
       </div>
 
       {nextPaymentDate && (
@@ -851,8 +844,8 @@ export default function Loans() {
       await batch.commit();
 
       const successTitle = type === 'lend'
-        ? (isEdit ? "Piutang Berhasil Diubah 📝" : "Piutang Baru Ditambahkan 📋")
-        : (isEdit ? "Pinjaman Berhasil Diubah 📝" : "Pinjaman Baru Ditambahkan 📋");
+        ? (isEdit ? "Piutang berhasil diubah" : "Piutang baru ditambahkan")
+        : (isEdit ? "Pinjaman berhasil diubah" : "Pinjaman baru ditambahkan");
 
       const successMsg = type === 'lend'
         ? `Piutang "${loanData.name}" sebesar Rp ${numAmount.toLocaleString("id-ID")} berhasil ${isEdit ? "diubah" : "ditambahkan"}.`
@@ -870,6 +863,8 @@ export default function Loans() {
 
   const deleteLoan = async (id: string) => {
     if (!user) return;
+    const selectedLoan = loans.find((loan) => loan.id === id);
+    if (!window.confirm(`Hapus ${selectedLoan?.name || "data pinjaman"}? Tindakan ini tidak dapat dibatalkan.`)) return;
     try {
       await deleteDoc(doc(db, "users", user.uid, "loans", id));
       toast.success("Pinjaman dihapus");
@@ -891,6 +886,7 @@ export default function Loans() {
 
   return (
     <PageShell
+      className="route-loans"
       title="Pinjaman"
       subtitle="Kelola data pinjaman beserta bunga dan auto debit."
       mobileActions={mobileActionsLoans}
@@ -905,7 +901,7 @@ export default function Loans() {
           action={<ActionBtn variant="primary" icon={<Plus className="w-4 h-4" />} onClick={openAddModal}>Tambah Pinjaman</ActionBtn>}
         />
       ) : (
-        <StaggerContainer className="columns-1 md:columns-2 lg:columns-3 gap-6 w-full">
+        <StaggerContainer className="loan-register grid w-full grid-cols-1 gap-5 xl:grid-cols-2">
           {[...loans]
             .sort((a, b) => {
               const aRemaining = calculateLoanDetails(a).totalPayment - (a.paidAmount || 0);
@@ -929,7 +925,7 @@ export default function Loans() {
               return b.createdAt - a.createdAt;
             })
             .map(loan => (
-              <StaggerItem key={loan.id} className="inline-block w-full mb-6 break-inside-avoid">
+              <StaggerItem key={loan.id} className="w-full">
                 <LoanCard loan={loan} deleteLoan={deleteLoan} onEdit={openEditModal} accounts={accounts} />
               </StaggerItem>
             ))}
